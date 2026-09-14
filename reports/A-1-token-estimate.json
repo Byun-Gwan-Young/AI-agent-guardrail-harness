@@ -1,0 +1,22 @@
+{
+  "assumed": true,
+  "input_tokens_range": [
+    18000,
+    30000
+  ],
+  "completion_tokens_range": [
+    5400.0,
+    9000.0
+  ],
+  "total_tokens_range": [
+    23400.0,
+    39000.0
+  ],
+  "completion_caps_at_expected_calls": [
+    10800,
+    18000
+  ],
+  "run_completion_cap_excluding_retries": 43200,
+  "total_token_hard_cap": null,
+  "reason": "Input growth and retries are not bounded by max_tokens; all estimates are assumptions"
+}

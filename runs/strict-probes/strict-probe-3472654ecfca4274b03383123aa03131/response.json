@@ -1,0 +1,40 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-0e286cd6-7200-4125-9555-7920c118e34f",
+    "object": "chat.completion",
+    "created": 1789414265,
+    "model": "openai/gpt-oss-120b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"narrative\": \"probe\",\n  \"open_issue_ids\": [],\n  \"info_items\": [],\n  \"completion_declared\": false\n}",
+          "reasoning": "We need to output in state_report_probe format."
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "queue_time": 0.064526332,
+      "prompt_tokens": 225,
+      "prompt_time": 0.012809501,
+      "completion_tokens": 57,
+      "completion_time": 0.120753827,
+      "total_tokens": 282,
+      "total_time": 0.133563328,
+      "completion_tokens_details": {
+        "reasoning_tokens": 11
+      }
+    },
+    "usage_breakdown": null,
+    "system_fingerprint": "fp_4140daa9c2",
+    "x_groq": {
+      "id": "req_01m2gpdmf7ejkbm8nd42sxkr1y",
+      "seed": 1878458167
+    },
+    "service_tier": "on_demand"
+  }
+}

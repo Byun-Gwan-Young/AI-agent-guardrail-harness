@@ -1,0 +1,49 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "narrative": {
+      "title": "Narrative",
+      "type": "string"
+    },
+    "open_issue_ids": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Open Issue Ids"
+    },
+    "info_items": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Info Items"
+    },
+    "completion_declared": {
+      "title": "Completion Declared",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "narrative",
+    "open_issue_ids",
+    "info_items",
+    "completion_declared"
+  ],
+  "title": "AgentOutput",
+  "type": "object"
+}

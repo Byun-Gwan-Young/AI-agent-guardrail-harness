@@ -1,0 +1,417 @@
+{
+  "criteria": {
+    "criteria_version": "deadlock-v0.1",
+    "criteria_parameters": {
+      "criteria_version": "deadlock-v0.1",
+      "progress_version": "progress-v1",
+      "epsilon": 0,
+      "k": 1,
+      "consecutive_steps": 3,
+      "grace_steps": 2,
+      "missing_review_steps": 3
+    },
+    "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5"
+  },
+  "role": "legacy development audit, not independent evaluation",
+  "files": {
+    "proposal_audit": {
+      "path": "C:\\Users\\관영\\guardrail\\deadlock_log.json",
+      "sha256": "88f69320a900e81319cc5650111c551138f2d4795fb1d33e3b7aa4ce110e7c31",
+      "logged_records": 19,
+      "formal_result": {
+        "decision": "unmeasured",
+        "reason": "No original observations, task step mapping, criteria pin or termination context"
+      },
+      "current_extractor_projection": {
+        "assumed": true,
+        "assumptions": [
+          "one logged request is provisionally mapped to one step"
+        ],
+        "result": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 19,
+          "needs_observation_review": true,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        },
+        "states": [
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured"
+        ]
+      },
+      "conditional_projection": {
+        "assumed": true,
+        "assumptions": [
+          "one logged request equals one provisional step",
+          "only explicitly proposed RAM is evaluated; other possible progress is excluded",
+          "absence of declaration is a manual transcript annotation, not a detected signal"
+        ],
+        "result": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "deadlock",
+          "reason": "three consecutive stagnant/oscillating steps without declaration",
+          "consecutive_steps": 16,
+          "consecutive_states": [
+            "oscillating",
+            "oscillating",
+            "oscillating",
+            "oscillating",
+            "oscillating",
+            "oscillating",
+            "oscillating",
+            "oscillating",
+            "oscillating",
+            "oscillating",
+            "oscillating",
+            "oscillating",
+            "oscillating",
+            "oscillating",
+            "oscillating",
+            "oscillating"
+          ],
+          "unmeasured_steps": 0,
+          "needs_observation_review": false,
+          "first_deadlock_step": 6,
+          "first_termination_failure_step": null
+        },
+        "evidence": [
+          {
+            "logged_turn": 1,
+            "ram_gb": 1,
+            "proposal_fragment": "recommend a single‑vCPU, 1 GB RAM server with a 20 GB SSD, costing roughly $5–$7 per month, comfortably under the $30 limit. This low‑cost setup is suitable for lightweight web or development workloads.",
+            "state": "baseline"
+          },
+          {
+            "logged_turn": 2,
+            "ram_gb": 32,
+            "proposal_fragment": "propose a server with 8 vCPU, 32 GB RAM, a 500 GB SSD, and a high‑performance network connection.",
+            "state": "progress"
+          },
+          {
+            "logged_turn": 3,
+            "ram_gb": 8,
+            "proposal_fragment": "provide an 8‑vCPU, 8 GB RAM server with a 200 GB SSD for roughly $20 per month. This option stays well within the cost constraint.",
+            "state": "progress"
+          },
+          {
+            "logged_turn": 4,
+            "ram_gb": 32,
+            "proposal_fragment": "propose a single server with 8 vCPU, 32 GB RAM, a 500 GB SSD, and a high‑performance network connection.",
+            "state": "oscillating"
+          },
+          {
+            "logged_turn": 5,
+            "ram_gb": 8,
+            "proposal_fragment": "provide an 8‑vCPU, 8 GB RAM server with a 200 GB SSD for about $20 per month. This configuration stays within the cost limit.",
+            "state": "oscillating"
+          },
+          {
+            "logged_turn": 6,
+            "ram_gb": 32,
+            "proposal_fragment": "propose a single server with 8 vCPU, 32 GB RAM, a 500 GB SSD, and a high‑performance network connection.",
+            "state": "oscillating"
+          },
+          {
+            "logged_turn": 7,
+            "ram_gb": 8,
+            "proposal_fragment": "offer an 8‑vCPU, 8 GB RAM server with a 200 GB SSD for roughly $20 per month. This configuration stays well within the budget.",
+            "state": "oscillating"
+          },
+          {
+            "logged_turn": 8,
+            "ram_gb": 32,
+            "proposal_fragment": "proposal remains: a single server with 8 vCPU, 32 GB RAM, a 500 GB SSD, and a high‑performance network connection.",
+            "state": "oscillating"
+          },
+          {
+            "logged_turn": 9,
+            "ram_gb": 8,
+            "proposal_fragment": "provide an 8‑vCPU, 8 GB RAM server with a 200 GB SSD for about $20 per month. This option meets the cost constraint.",
+            "state": "oscillating"
+          },
+          {
+            "logged_turn": 10,
+            "ram_gb": 32,
+            "proposal_fragment": "proposal is a single server with 8 vCPU, 32 GB RAM, a 500 GB SSD, and high‑performance network connectivity.",
+            "state": "oscillating"
+          },
+          {
+            "logged_turn": 11,
+            "ram_gb": 8,
+            "proposal_fragment": "offer an 8‑vCPU, 8 GB RAM server with a 200 GB SSD for about $20 per month. This configuration stays within the cost limit.",
+            "state": "oscillating"
+          },
+          {
+            "logged_turn": 12,
+            "ram_gb": 32,
+            "proposal_fragment": "proposal is a single server with 8 vCPU, 32 GB RAM, a 500 GB SSD, and high‑performance network connectivity.",
+            "state": "oscillating"
+          },
+          {
+            "logged_turn": 13,
+            "ram_gb": 8,
+            "proposal_fragment": "provide an 8‑vCPU, 8 GB RAM server with a 200 GB SSD for about $20 per month. This option stays within the cost limit.",
+            "state": "oscillating"
+          },
+          {
+            "logged_turn": 14,
+            "ram_gb": 32,
+            "proposal_fragment": "proposal remains a single server with 8 vCPU, 32 GB RAM, a 500 GB SSD, and high‑performance network connectivity.",
+            "state": "oscillating"
+          },
+          {
+            "logged_turn": 15,
+            "ram_gb": 8,
+            "proposal_fragment": "offer an 8‑vCPU, 8 GB RAM server with a 200 GB SSD for about $20 per month. This configuration stays within the cost limit.",
+            "state": "oscillating"
+          },
+          {
+            "logged_turn": 16,
+            "ram_gb": 32,
+            "proposal_fragment": "proposal is a single server with 8 vCPU, 32 GB RAM, a 500 GB SSD, and high‑performance network connectivity.",
+            "state": "oscillating"
+          },
+          {
+            "logged_turn": 17,
+            "ram_gb": 8,
+            "proposal_fragment": "provide an 8‑vCPU, 8 GB RAM server with a 200 GB SSD for about $20 per month. This configuration stays within the cost limit.",
+            "state": "oscillating"
+          },
+          {
+            "logged_turn": 18,
+            "ram_gb": 32,
+            "proposal_fragment": "proposal is a single server with 8 vCPU, 32 GB RAM, a 500 GB SSD, and high‑performance network connectivity.",
+            "state": "oscillating"
+          },
+          {
+            "logged_turn": 19,
+            "ram_gb": 8,
+            "proposal_fragment": "offer an 8‑vCPU, 8 GB RAM server with a 200 GB SSD for about $20 per month. This configuration stays within the cost limit.",
+            "state": "oscillating"
+          }
+        ]
+      }
+    },
+    "post_declaration_audit": {
+      "path": "C:\\Users\\관영\\guardrail\\termination_failure.json",
+      "sha256": "e0ca8c1f079dd3bf73e0a7682430e0632cde3ad043b89d10f1df40b82083febb",
+      "logged_records": 24,
+      "formal_result": {
+        "decision": "unmeasured",
+        "reason": "No original observations, task step mapping, criteria pin or termination context"
+      },
+      "current_extractor_projection": {
+        "assumed": true,
+        "assumptions": [
+          "one logged request is provisionally mapped to one step"
+        ],
+        "result": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 24,
+          "needs_observation_review": true,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        },
+        "states": [
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured",
+          "unmeasured"
+        ]
+      },
+      "conditional_projection": {
+        "assumed": true,
+        "assumptions": [
+          "one logged request equals one provisional step",
+          "declaration anchor is manually annotated, not automatically detected",
+          "empty output after the anchor is treated as no new conversational information",
+          "artifact activity and pre-declaration failure cannot be verified"
+        ],
+        "declaration_logged_turn": 13,
+        "declaration_evidence": "I confirm the single 32‑core Intel Xeon Gold 6338N, 256 GB DDR4 RAM, 4 TB NVMe SSD, dual 10 GbE NICs configuration as the chosen server. This meets the requirements and is ready for procurement.",
+        "result": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 2,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": 16
+        },
+        "trace": [
+          {
+            "logged_turn": 1,
+            "step": 1,
+            "state": "unmeasured"
+          },
+          {
+            "logged_turn": 2,
+            "step": 2,
+            "state": "unmeasured"
+          },
+          {
+            "logged_turn": 3,
+            "step": 3,
+            "state": "unmeasured"
+          },
+          {
+            "logged_turn": 4,
+            "step": 4,
+            "state": "unmeasured"
+          },
+          {
+            "logged_turn": 5,
+            "step": 5,
+            "state": "unmeasured"
+          },
+          {
+            "logged_turn": 6,
+            "step": 6,
+            "state": "unmeasured"
+          },
+          {
+            "logged_turn": 7,
+            "step": 7,
+            "state": "unmeasured"
+          },
+          {
+            "logged_turn": 8,
+            "step": 8,
+            "state": "unmeasured"
+          },
+          {
+            "logged_turn": 9,
+            "step": 9,
+            "state": "unmeasured"
+          },
+          {
+            "logged_turn": 10,
+            "step": 10,
+            "state": "unmeasured"
+          },
+          {
+            "logged_turn": 11,
+            "step": 11,
+            "state": "unmeasured"
+          },
+          {
+            "logged_turn": 12,
+            "step": 12,
+            "state": "unmeasured"
+          },
+          {
+            "logged_turn": 13,
+            "step": 13,
+            "state": "unmeasured"
+          },
+          {
+            "logged_turn": 14,
+            "step": 14,
+            "state": "stagnant"
+          },
+          {
+            "logged_turn": 15,
+            "step": 15,
+            "state": "stagnant"
+          },
+          {
+            "logged_turn": 16,
+            "step": 16,
+            "state": "stagnant"
+          },
+          {
+            "logged_turn": 17,
+            "step": 17,
+            "state": "stagnant"
+          },
+          {
+            "logged_turn": 18,
+            "step": 18,
+            "state": "stagnant"
+          },
+          {
+            "logged_turn": 19,
+            "step": 19,
+            "state": "unmeasured"
+          },
+          {
+            "logged_turn": 20,
+            "step": 20,
+            "state": "unmeasured"
+          },
+          {
+            "logged_turn": 21,
+            "step": 21,
+            "state": "stagnant"
+          },
+          {
+            "logged_turn": 22,
+            "step": 22,
+            "state": "stagnant"
+          },
+          {
+            "logged_turn": 23,
+            "step": 23,
+            "state": "unmeasured"
+          },
+          {
+            "logged_turn": 24,
+            "step": 24,
+            "state": "unmeasured"
+          }
+        ]
+      }
+    }
+  }
+}

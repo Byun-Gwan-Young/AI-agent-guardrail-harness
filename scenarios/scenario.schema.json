@@ -1,0 +1,529 @@
+{
+  "$defs": {
+    "Agent": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "role": {
+          "title": "Role",
+          "type": "string"
+        },
+        "system_message": {
+          "minLength": 1,
+          "title": "System Message",
+          "type": "string"
+        },
+        "permissions": {
+          "items": {
+            "enum": [
+              "read_files",
+              "write_files",
+              "run_tests"
+            ],
+            "type": "string"
+          },
+          "title": "Permissions",
+          "type": "array"
+        },
+        "writable_paths": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Writable Paths",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "role",
+        "system_message",
+        "permissions"
+      ],
+      "title": "Agent",
+      "type": "object"
+    },
+    "Metrics": {
+      "additionalProperties": false,
+      "properties": {
+        "conversation": {
+          "items": {
+            "enum": [
+              "proposal_value_delta",
+              "open_issues_count",
+              "new_info_ratio"
+            ],
+            "type": "string"
+          },
+          "title": "Conversation",
+          "type": "array"
+        },
+        "artifact": {
+          "items": {
+            "enum": [
+              "test_pass_count",
+              "files_changed",
+              "build_status"
+            ],
+            "type": "string"
+          },
+          "title": "Artifact",
+          "type": "array"
+        }
+      },
+      "title": "Metrics",
+      "type": "object"
+    },
+    "SuccessCriteria": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "tests",
+            "structured_constraints"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "test_suite": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TestSuite"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "structured_schema": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Structured Schema"
+        },
+        "evaluator_command": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evaluator Command"
+        },
+        "require_all_tests_pass": {
+          "const": true,
+          "default": true,
+          "title": "Require All Tests Pass",
+          "type": "boolean"
+        },
+        "require_unchanged_test_suite": {
+          "const": true,
+          "default": true,
+          "title": "Require Unchanged Test Suite",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "kind",
+        "description"
+      ],
+      "title": "SuccessCriteria",
+      "type": "object"
+    },
+    "Termination": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "const": "success_or_max_steps",
+          "title": "Mode",
+          "type": "string"
+        },
+        "max_steps": {
+          "minimum": 1,
+          "title": "Max Steps",
+          "type": "integer"
+        },
+        "max_llm_calls_per_step": {
+          "minimum": 1,
+          "title": "Max Llm Calls Per Step",
+          "type": "integer"
+        },
+        "require_completion_declaration": {
+          "title": "Require Completion Declaration",
+          "type": "boolean"
+        },
+        "on_criteria_alert": {
+          "const": "observe_only",
+          "title": "On Criteria Alert",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode",
+        "max_steps",
+        "max_llm_calls_per_step",
+        "require_completion_declaration",
+        "on_criteria_alert"
+      ],
+      "title": "Termination",
+      "type": "object"
+    },
+    "TerminationCollection": {
+      "additionalProperties": false,
+      "properties": {
+        "source_kind": {
+          "const": "scenario_rule",
+          "title": "Source Kind",
+          "type": "string"
+        },
+        "method": {
+          "const": "structured_completion_flag",
+          "title": "Method",
+          "type": "string"
+        },
+        "declarer_agent": {
+          "title": "Declarer Agent",
+          "type": "string"
+        },
+        "field": {
+          "const": "completion_declared",
+          "title": "Field",
+          "type": "string"
+        },
+        "missing_output": {
+          "const": "unknown",
+          "title": "Missing Output",
+          "type": "string"
+        },
+        "preserve_first_declaration": {
+          "const": true,
+          "title": "Preserve First Declaration",
+          "type": "boolean"
+        },
+        "evidence_fields": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Fields",
+          "type": "array"
+        }
+      },
+      "required": [
+        "source_kind",
+        "method",
+        "declarer_agent",
+        "field",
+        "missing_output",
+        "preserve_first_declaration",
+        "evidence_fields"
+      ],
+      "title": "TerminationCollection",
+      "type": "object"
+    },
+    "TestSuite": {
+      "additionalProperties": false,
+      "properties": {
+        "test_suite_id": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Test Suite Id",
+          "type": "string"
+        },
+        "test_roots": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Test Roots",
+          "type": "array"
+        },
+        "contract_files": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Contract Files",
+          "type": "array"
+        },
+        "command": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Command",
+          "type": "array"
+        },
+        "expected_test_count": {
+          "minimum": 1,
+          "title": "Expected Test Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "test_suite_id",
+        "test_roots",
+        "contract_files",
+        "command",
+        "expected_test_count"
+      ],
+      "title": "TestSuite",
+      "type": "object"
+    },
+    "TokenEstimate": {
+      "additionalProperties": false,
+      "properties": {
+        "assumed": {
+          "const": true,
+          "title": "Assumed",
+          "type": "boolean"
+        },
+        "expected_llm_calls_min": {
+          "minimum": 1,
+          "title": "Expected Llm Calls Min",
+          "type": "integer"
+        },
+        "expected_llm_calls_max": {
+          "minimum": 1,
+          "title": "Expected Llm Calls Max",
+          "type": "integer"
+        },
+        "mean_input_tokens_per_call": {
+          "minimum": 0,
+          "title": "Mean Input Tokens Per Call",
+          "type": "integer"
+        },
+        "mean_output_fraction_of_max_tokens": {
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "title": "Mean Output Fraction Of Max Tokens",
+          "type": "number"
+        },
+        "assumptions": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Assumptions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "assumed",
+        "expected_llm_calls_min",
+        "expected_llm_calls_max",
+        "mean_input_tokens_per_call",
+        "mean_output_fraction_of_max_tokens",
+        "assumptions"
+      ],
+      "title": "TokenEstimate",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "scenario-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "scenario_id": {
+      "title": "Scenario Id",
+      "type": "string"
+    },
+    "scenario_revision": {
+      "default": 1,
+      "minimum": 1,
+      "title": "Scenario Revision",
+      "type": "integer"
+    },
+    "group": {
+      "enum": [
+        "A",
+        "B",
+        "C"
+      ],
+      "title": "Group",
+      "type": "string"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "model": {
+      "title": "Model",
+      "type": "string"
+    },
+    "agents": {
+      "items": {
+        "$ref": "#/$defs/Agent"
+      },
+      "minItems": 1,
+      "title": "Agents",
+      "type": "array"
+    },
+    "task": {
+      "minLength": 1,
+      "title": "Task",
+      "type": "string"
+    },
+    "termination": {
+      "$ref": "#/$defs/Termination"
+    },
+    "seed": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Seed"
+    },
+    "seed_support": {
+      "enum": [
+        "supported",
+        "unsupported",
+        "unverified"
+      ],
+      "title": "Seed Support",
+      "type": "string"
+    },
+    "temperature": {
+      "maximum": 2,
+      "minimum": 0,
+      "title": "Temperature",
+      "type": "number"
+    },
+    "max_tokens": {
+      "minimum": 1,
+      "title": "Max Tokens",
+      "type": "integer"
+    },
+    "context_buffer_messages": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Context Buffer Messages"
+    },
+    "progress_source": {
+      "enum": [
+        "conversation",
+        "artifact",
+        "both"
+      ],
+      "title": "Progress Source",
+      "type": "string"
+    },
+    "progress_metric": {
+      "$ref": "#/$defs/Metrics"
+    },
+    "conversation_collection": {
+      "enum": [
+        "structured_with_paired_extraction",
+        "extracted"
+      ],
+      "title": "Conversation Collection",
+      "type": "string"
+    },
+    "expected_outcome": {
+      "enum": [
+        "unknown",
+        "success",
+        "deadlock",
+        "termination_failure"
+      ],
+      "title": "Expected Outcome",
+      "type": "string"
+    },
+    "success_criteria": {
+      "$ref": "#/$defs/SuccessCriteria"
+    },
+    "termination_context_collection": {
+      "$ref": "#/$defs/TerminationCollection"
+    },
+    "criteria_version": {
+      "const": "deadlock-v0.1",
+      "title": "Criteria Version",
+      "type": "string"
+    },
+    "fixture_dir": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Fixture Dir"
+    },
+    "monitored_paths": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Monitored Paths",
+      "type": "array"
+    },
+    "initial_issue_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Initial Issue Ids",
+      "type": "array"
+    },
+    "token_estimate": {
+      "$ref": "#/$defs/TokenEstimate"
+    }
+  },
+  "required": [
+    "schema_version",
+    "scenario_id",
+    "group",
+    "title",
+    "model",
+    "agents",
+    "task",
+    "termination",
+    "seed",
+    "seed_support",
+    "temperature",
+    "max_tokens",
+    "progress_source",
+    "progress_metric",
+    "conversation_collection",
+    "expected_outcome",
+    "success_criteria",
+    "termination_context_collection",
+    "criteria_version",
+    "token_estimate"
+  ],
+  "title": "Scenario",
+  "type": "object"
+}

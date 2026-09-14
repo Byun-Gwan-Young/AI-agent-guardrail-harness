@@ -1,0 +1,13 @@
+{
+  "criteria_version": "deadlock-v0.1",
+  "criteria_parameters": {
+    "criteria_version": "deadlock-v0.1",
+    "progress_version": "progress-v1",
+    "epsilon": 0,
+    "k": 1,
+    "consecutive_steps": 3,
+    "grace_steps": 2,
+    "missing_review_steps": 3
+  },
+  "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5"
+}

@@ -1,0 +1,448 @@
+"""Explicit single-run CLI. Importing this module never starts an experiment."""
+import argparse
+import asyncio
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import sys
+import uuid
+from importlib.metadata import version
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+import httpx
+from pydantic import BaseModel, ConfigDict
+from progress_schema import Conversation
+from artifact_hook import capture_artifact, make_observation, submit_observation
+from scenario_schema import load_scenario
+from scenario_checks import check_acceptance
+from suite_identity import compute_test_suite_id
+from experiments.step_execution import (NO_OUTPUT_PLACEHOLDER, edit_instructions, make_client,
+                                        perform_step, tool_instructions)
+from experiments.output_contract import AgentOutput, parse_output
+from experiments.step_execution import StrictFailureStreak
+
+
+def save(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + '.tmp')
+    temporary.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding='utf-8')
+    temporary.replace(path)
+
+
+def fingerprint(root):
+    return {p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+            for p in sorted(root.rglob('*')) if p.is_file()
+            and '__pycache__' not in p.parts and p.suffix != '.pyc'}
+
+
+def safe_path(root, relative):
+    p = Path(relative)
+    target = (root / p).resolve()
+    if p.is_absolute() or '..' in p.parts or not target.is_relative_to(root.resolve()):
+        raise ValueError('Path must stay within the copied workspace')
+    return target
+
+
+def make_model_context(buffer_messages):
+    from autogen_core.model_context import BufferedChatCompletionContext, UnboundedChatCompletionContext
+    return (UnboundedChatCompletionContext() if buffer_messages is None else
+            BufferedChatCompletionContext(buffer_size=buffer_messages))
+
+
+def prompt_trace(steps, session):
+    turns = {t['turn']: t for t in session.get('turns', [])}
+    rows = []
+    for step in steps:
+        linked = [turns.get(n, {}) for n in step['llm_turns']]
+        values = [t.get('prompt_tokens') for t in linked]
+        complete = len(values) == step['llm_calls'] and all(v is not None for v in values)
+        rows.append({'step_id': step['step_id'], 'agent': step['agent'],
+            'llm_turns': step['llm_turns'], 'prompt_tokens_per_call': values,
+            'prompt_tokens_sum': sum(values) if complete else None,
+            'known_prompt_tokens_subtotal': sum(v for v in values if v is not None),
+            'seed_audit': [t.get('seed_audit') for t in linked]})
+    return rows
+
+
+class CallBudget:
+    def __init__(self, limit):
+        self.limit, self.used, self.turns = limit, 0, []
+        self.final_next, self.strict_used = False, False
+
+    def reset(self):
+        self.used, self.turns = 0, []
+        self.final_next, self.strict_used = False, False
+
+    def consume(self):
+        if self.used >= self.limit:
+            raise RuntimeError('max_llm_calls_per_step reached')
+        self.used += 1
+
+    async def capture(self, response):
+        turn = response.headers.get('X-Guardrail-Turn')
+        if turn is not None:
+            self.turns.append(int(turn))
+
+
+async def deliver(client, session_id, payload, sleep=asyncio.sleep):
+    """Same immutable payload/step ID for initial submission and three retries."""
+    for attempt in range(4):
+        try:
+            result = await submit_observation(client, session_id, payload)
+            if result.get('persisted'):
+                return result
+        except httpx.HTTPStatusError as exc:
+            if exc.response.status_code < 500 and exc.response.status_code != 429:
+                raise
+        except httpx.TransportError:
+            pass
+        if attempt < 3:
+            await sleep(2 ** attempt)
+    raise RuntimeError('Observation not durably acknowledged after four attempts')
+
+
+def termination_context(first, parsed, step, reviewer):
+    if first is None and parsed and parsed['agent_id'] == reviewer and parsed['completion_declared']:
+        first = step
+    if first is not None:
+        return first, dict(declaration='declared', declared_step=first,
+                          source_kind='scenario_rule', evidence=f'reviewer completion_declared at step {first}')
+    return None, dict(declaration='none' if parsed else 'unknown',
+                      source_kind='scenario_rule', evidence=f'step {step}: ' +
+                      ('valid structured output; no reviewer declaration' if parsed else 'structured output missing or invalid'))
+
+
+class Workspace:
+    def __init__(self, scenario, root):
+        self.scenario, self.root, self.counter = scenario, root, 0
+
+    def acceptance(self):
+        self.counter += 1
+        report = self.root / '.runner-reports' / str(self.counter)
+        report.mkdir(parents=True)
+        suite = self.scenario.success_criteria.test_suite
+        identity = compute_test_suite_id(self.root, suite.test_roots, suite.contract_files, suite.command)
+        command = [s.replace('{python}', sys.executable).replace('{report_dir}', str(report))
+                   for s in suite.command]
+        # Do not pass provider credentials into candidate code. This is not an OS sandbox.
+        env = {k: v for k, v in os.environ.items()
+               if k.upper() in {'SYSTEMROOT', 'WINDIR', 'PATH', 'TEMP', 'TMP', 'COMSPEC'} }
+        env['PYTHONDONTWRITEBYTECODE'] = '1'
+        failure = None
+        try:
+            result = subprocess.run(command, cwd=self.root, env=env, capture_output=True,
+                                    text=True, encoding='utf-8', errors='replace', timeout=90)
+            save(report / 'process.json', {'returncode': result.returncode,
+                 'stdout': result.stdout, 'stderr': result.stderr})
+            summary = json.loads((report / 'summary.json').read_text(encoding='utf-8'))
+            gate = check_acceptance(self.scenario, self.root, summary)
+            if result.returncode not in (0, 1):
+                gate['machine_success'] = False
+        except (subprocess.TimeoutExpired, OSError, ValueError, KeyError) as exc:
+            failure = str(exc)
+            summary = {'passed': None, 'tests': None}
+            gate = {'machine_success': False, 'reason': 'acceptance_unmeasured'}
+        artifact = capture_artifact(self.root, self.scenario.monitored_paths,
+            junit_path=report / 'junit.xml' if failure is None else None, test_suite_id=identity)
+        return {'summary': summary, 'gate': gate, 'artifact': artifact, 'error': failure}
+
+    def tools(self, agent):
+        def read_file(path: str) -> str:
+            """Read a UTF-8 file relative to the candidate workspace."""
+            return safe_path(self.root, path).read_text(encoding='utf-8')
+
+        def writable(path):
+            target = safe_path(self.root, path)
+            if target not in {safe_path(self.root, p) for p in agent.writable_paths}:
+                raise ValueError('Role is not authorized to edit this file')
+            return target
+
+        def write_file(path: str, content: str) -> str:
+            """Replace an authorized candidate file with complete UTF-8 content."""
+            writable(path).write_text(content, encoding='utf-8')
+            return 'written: ' + path
+
+        def replace_in_file(path: str, old: str, new: str) -> str:
+            """Replace exactly one occurrence of old with new in an authorized candidate file."""
+            target = writable(path)
+            text = target.read_text(encoding='utf-8')
+            count = text.count(old) if old else 0
+            if count != 1:
+                raise ValueError(f'old must occur exactly once in {path}; found {count}')
+            target.write_text(text.replace(old, new, 1), encoding='utf-8')
+            return 'replaced in: ' + path
+
+        async def run_tests() -> str:
+            """Run the fixed acceptance command and return measured results."""
+            measured = await asyncio.to_thread(self.acceptance)
+            return json.dumps({k: measured[k] for k in ('summary', 'gate')}, ensure_ascii=False)
+
+        return [tool for permission, tool in [('read_files', read_file), ('write_files', write_file),
+                ('write_files', replace_in_file), ('run_tests', run_tests)] if permission in agent.permissions]
+
+
+async def run(args):
+    # Imports are deferred so --help and local helper tests do not construct clients.
+    from autogen_agentchat.agents import AssistantAgent
+
+    scenario_path = args.scenario.resolve()
+    scenario = load_scenario(scenario_path)
+    if {a.id for a in scenario.agents} != {'planner', 'developer', 'reviewer'}:
+        raise ValueError('This runner currently supports the approved three-role artifact scenario')
+    if scenario.success_criteria.test_suite is None or not scenario.fixture_dir:
+        raise ValueError('Executable artifact fixture required')
+    if args.run_index < 1 or (args.temperature is not None and not 0 <= args.temperature <= 2):
+        raise ValueError('Invalid run index or temperature')
+    key = os.environ.get('GROQ_API_KEY')
+    if not key:
+        raise ValueError('GROQ_API_KEY is required')
+    source = safe_path(ROOT, scenario.fixture_dir)
+    if any(p.is_symlink() or (hasattr(p, 'is_junction') and p.is_junction()) for p in source.rglob('*')):
+        raise ValueError('Fixture links are not supported')
+    suite = scenario.success_criteria.test_suite
+    if compute_test_suite_id(source, suite.test_roots, suite.contract_files, suite.command) != suite.test_suite_id:
+        raise ValueError('Original fixture does not match the approved suite ID')
+    original = fingerprint(source)
+    session_id = scenario.scenario_id + '-' + uuid.uuid4().hex
+    out = args.output_root.resolve() / session_id
+    if out.is_relative_to(source):
+        raise ValueError('Output must not be inside the source fixture')
+    out.mkdir(parents=True, exist_ok=False)
+    candidate = out / 'workspace'
+    shutil.copytree(source, candidate, ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
+    work = Workspace(scenario, candidate)
+    temperature = scenario.temperature if args.temperature is None else args.temperature
+    buffer_messages = (None if args.no_context_buffer else args.context_buffer_messages
+                       if args.context_buffer_messages is not None else scenario.context_buffer_messages)
+    if buffer_messages is not None and buffer_messages < 1:
+        raise ValueError('Context buffer must be positive')
+    if args.seed_probe is not None and scenario.seed_support != 'unverified':
+        raise ValueError('--seed-probe is only for unverified support')
+    versions = {p: version(p) for p in ('autogen-agentchat', 'autogen-core', 'autogen-ext', 'openai')}
+    save(out / 'conditions.json', {'scenario': scenario.model_dump(), 'temperature': temperature,
+         'versions': versions, 'fixture_hashes': original, 'actual_outcome': None,
+         'seed_support': scenario.seed_support, 'session_id': session_id, 'run_index': args.run_index})
+    conditions_path = out / 'conditions.json'
+    effective = json.loads(conditions_path.read_text(encoding='utf-8'))
+    effective.update(context_buffer_messages=buffer_messages, seed_probe=args.seed_probe,
+                     requested_seed=args.seed_probe if args.seed_probe is not None else scenario.seed,
+                     runner_protocol='tool-capable-step-v5-strict',
+                     output_contract='flat-state-v2', strict_support='single_probe_passed',
+                     strict_probe='strict-probe-3472654ecfca4274b03383123aa03131',
+                     final_reasoning_effort='low',
+                     strict_failure_policy='fail step; abort after two consecutive strict-failed steps; no automatic B fallback',
+                     unknown_tool_policy='mark_failed; correction in same step if a tool call slot remains; '
+                                         'abort on second invalid response in step',
+                     tool_failure_policy='invalid_tool_arguments: mark_failed, split-call correction, '
+                                         'one retry in same step, abort on second invalid response; '
+                                         'last call of each step carries no tools; '
+                                         'step without final text: failed/no_final_output, unmeasured observation',
+                     recent_messages_policy='parsed narrative only; placeholder when structured output missing; '
+                                            'no raw tool results')
+    save(conditions_path, effective)
+    print('session_id:', session_id, 'run_directory:', out, flush=True)
+    shutil.copy2(scenario_path, out / 'scenario.yaml')
+    headers = {'X-Guardrail-Session': session_id, 'X-Guardrail-Scenario': scenario.scenario_id,
+               'X-Guardrail-Run-Index': str(args.run_index),
+               'X-Guardrail-Framework-Version': 'autogen-agentchat/' + versions['autogen-agentchat']}
+    headers['X-Guardrail-Context-Buffer-Messages'] = str(buffer_messages) if buffer_messages is not None else 'none'
+    budget = CallBudget(scenario.termination.max_llm_calls_per_step)
+
+    base = args.proxy_url.rstrip('/').removesuffix('/v1')
+    model_http = httpx.AsyncClient(event_hooks={'response': [budget.capture]})
+    options = dict(model=scenario.model, api_key=key, base_url=base + '/v1',
+        default_headers=headers, http_client=model_http, max_retries=0,
+        temperature=temperature, max_tokens=scenario.max_tokens,
+        model_info={'vision': False, 'function_calling': True, 'json_output': True,
+                    'structured_output': True, 'family': 'unknown'})
+    if scenario.seed_support == 'supported':
+        options['seed'] = scenario.seed
+    elif args.seed_probe is not None:
+        options['seed'] = args.seed_probe
+    model = make_client(options, budget)
+    schema_text = (ROOT / 'scenarios/agent-output.schema.json').read_text(encoding='utf-8')
+    role_tools = [work.tools(a) for a in scenario.agents]
+    role_names = [[t.__name__ for t in ts] for ts in role_tools]
+    save(out / 'registered-tools.json', dict(zip([a.id for a in scenario.agents], role_names)))
+    agents = [AssistantAgent(a.id, model_client=model, tools=role_tools[i],
+        model_context=make_model_context(buffer_messages),
+        reflect_on_tool_use=False, model_client_stream=False,
+        system_message=a.system_message + '\nUse tools to inspect/edit the actual workspace. '
+        + tool_instructions(role_names[i]) + edit_instructions(role_names[i]) +
+        'Final response must be one JSON object matching this schema. Report the full shared state, '
+        'not only this role\'s issues. Never claim tests passed without running them.\n' + schema_text)
+        for i, a in enumerate(scenario.agents)]
+    steps, missing, first, latest, baseline = [], [], None, None, None
+    reason, error, session, started = 'max_steps', None, None, False
+    history, cursors = [], [0] * len(agents)
+    pending_feedback = [None] * len(agents)
+    strict_streak = StrictFailureStreak()
+    async with httpx.AsyncClient(base_url=base, headers=headers, timeout=60) as client:
+        try:
+            response = await client.post('/sessions')
+            response.raise_for_status()
+            started = True
+            pin_response = await client.get('/log')
+            pin_response.raise_for_status()
+            if pin_response.json()['meta'].get('criteria_version') != scenario.criteria_version:
+                raise ValueError('Proxy criteria version differs from scenario')
+            baseline = await asyncio.to_thread(work.acceptance)
+            latest = baseline
+            for step in range(1, scenario.termination.max_steps + 1):
+                index = (step - 1) % len(agents)
+                budget.reset()
+                text, parsed, call_error = '', None, None
+                context = json.dumps({'task': scenario.task,
+                    'monitored_paths': scenario.monitored_paths,
+                    'registered_tools': role_names[index],
+                    'tool_feedback': pending_feedback[index],
+                    'initial_issue_ids': scenario.initial_issue_ids,
+                    'acceptance': {k: latest[k] for k in ('summary', 'gate')},
+                    'recent_messages': history[cursors[index]:]}, ensure_ascii=False)
+                outcome = await perform_step(agents[index], context, budget, role_names[index])
+                stop_for_strict = strict_streak.observe(outcome['strict_failure'])
+                text, call_error = outcome['text'], outcome['error']
+                pending_feedback[index] = outcome['feedback']
+                if not outcome['failed']:
+                    try:
+                        parsed = parse_output(text)
+                        parsed['agent_id'] = agents[index].name
+                        parsed['step_id'] = step
+                    except (ValueError, TypeError) as exc:
+                        # A text response is not a usable final output until its schema validates.
+                        outcome['failed'] = True
+                        outcome['final_output'] = False
+                        outcome['failure_reasons'].append('no_final_output')
+                        outcome['feedback'] = '최종 구조화 JSON이 유효하지 않다. 다음 차례에는 지정된 스키마로 응답하라.'
+                        pending_feedback[index] = outcome['feedback']
+                        call_error = 'invalid_final_output: ' + type(exc).__name__
+                # Other roles see only parsed narratives; tool results stay with the agent that read them.
+                history.append({'agent': agents[index].name,
+                                'narrative': parsed['narrative'] if parsed else NO_OUTPUT_PLACEHOLDER})
+                cursors[index] = len(history)
+                latest = await asyncio.to_thread(work.acceptance)
+                first, termination = termination_context(first, parsed, step,
+                    scenario.termination_context_collection.declarer_agent)
+                record = {'step_id': step, 'agent': agents[index].name, 'text': text,
+                          'llm_calls': budget.used, 'llm_turns': sorted(set(budget.turns)),
+                          'acceptance': latest, 'call_error': call_error}
+                record.update(step_status='failed' if outcome['failed'] else 'completed',
+                              measurement_status='unmeasured' if outcome['failed'] else 'observed',
+                              tool_errors=outcome['tool_errors'], tool_feedback=outcome['feedback'],
+                              final_output=outcome['final_output'], failure_reasons=outcome['failure_reasons'])
+                record.update(strict_used=outcome['strict_used'], strict_failure=outcome['strict_failure'],
+                              consecutive_strict_failures=strict_streak.count)
+                steps.append(record)
+                save(out / 'steps.json', steps)
+                if not budget.turns:
+                    missing.append(step)
+                    raise RuntimeError('No proxy turn ID; cannot submit a linked observation')
+                payload = make_observation(step_id=step, llm_turns=record['llm_turns'],
+                    text=parsed['narrative'] if parsed else '' if outcome['failed'] else text,
+                    progress_source=scenario.progress_source, progress_metric=scenario.progress_metric.model_dump(),
+                    artifact=None if outcome['failed'] else latest['artifact'], structured=
+                    {k: parsed[k] for k in ('open_issue_ids', 'info_items')} if parsed else
+                    {'open_issue_ids': None, 'info_items': None, 'reasons': {'output': 'invalid or missing structured output'}},
+                    termination_context=termination)
+                save(out / 'observations' / f'{step}.pending.json', payload)
+                try:
+                    ack = await deliver(client, session_id, payload)
+                except Exception:
+                    missing.append(step)
+                    raise
+                save(out / 'observations' / f'{step}.ack.json', ack)
+                record['observation'] = ack['observation']
+                try:
+                    log_response = await client.get('/log')
+                    log_response.raise_for_status()
+                    trace = prompt_trace(steps, log_response.json())
+                    record['prompt_tokens'] = trace[-1]
+                    save(out / 'prompt-trend.json', trace)
+                    print(json.dumps({'step_id': step, 'agent': agents[index].name,
+                        'prompt_tokens_per_call': trace[-1]['prompt_tokens_per_call'],
+                        'prompt_tokens_sum': trace[-1]['prompt_tokens_sum']}, ensure_ascii=False), flush=True)
+                except (httpx.HTTPError, ValueError, KeyError) as exc:
+                    record['prompt_trace_error'] = type(exc).__name__
+                save(out / 'steps.json', steps)
+                if stop_for_strict:
+                    reason, error = 'strict_output_failures', 'two_consecutive_strict_failed_steps'
+                    break
+                if outcome['abort']:
+                    raise RuntimeError(call_error or 'step_aborted')
+                if outcome['failed']:
+                    continue
+                if latest['gate']['machine_success'] and (first is not None or
+                        not scenario.termination.require_completion_declaration):
+                    reason = 'success'
+                    break
+        except asyncio.CancelledError:
+            reason, error = 'user_interrupted', 'Cancelled by user'
+        except Exception as exc:
+            reason, error = 'runner_error', type(exc).__name__ + ': ' + str(exc)
+        finally:
+            cleanup_errors = []
+            if started:
+                for attempt in range(3):
+                    try:
+                        response = await client.post('/sessions/end', json={'termination_reason': reason})
+                        response.raise_for_status()
+                        break
+                    except httpx.HTTPError as exc:
+                        if attempt == 2:
+                            cleanup_errors.append('end: ' + str(exc))
+                try:
+                    response = await client.get('/log')
+                    response.raise_for_status()
+                    session = response.json()
+                    save(out / 'session.json', session)
+                    save(out / 'prompt-trend.json', prompt_trace(steps, session))
+                except httpx.HTTPError as exc:
+                    cleanup_errors.append('log: ' + str(exc))
+            await model.close()
+            await model_http.aclose()
+            turns = session.get('turns', []) if session else []
+            values = [t.get('tokens') for t in turns]
+            criteria = [s['observation']['criteria'] for s in steps if 'observation' in s]
+            summary = {'session_id': session_id, 'steps': len(steps), 'termination_reason': reason,
+                'total_tokens': sum(values) if session is not None and
+                    len(turns) == sum(s['llm_calls'] for s in steps) and
+                    all(v is not None for v in values) else None,
+                'known_tokens_subtotal': sum(v for v in values if v is not None),
+                'criteria_latest': criteria[-1] if criteria else {'decision': 'unmeasured'},
+                'criteria_alerts': [c for c in criteria if c.get('decision') in ('deadlock', 'termination_failure')],
+                'tests_passed_before': baseline['summary']['passed'] if baseline else None,
+                'tests_passed_after': latest['summary']['passed'] if latest else None,
+                'missing_observation_steps': missing, 'missing_observation_count': len(missing),
+                'fixture_unchanged': fingerprint(source) == original, 'error': error,
+                'cleanup_errors': cleanup_errors, 'actual_outcome': None}
+            summary['context_buffer_messages'] = buffer_messages
+            summary['failed_steps'] = [{'step_id': s['step_id'], 'reasons': s.get('failure_reasons', [])}
+                                       for s in steps if s.get('step_status') == 'failed']
+            save(out / 'summary.json', summary)
+            print(json.dumps(summary, ensure_ascii=False, indent=2))
+            print('run_directory:', out)
+    return 1 if error or cleanup_errors or not summary['fixture_unchanged'] else 0
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('scenario', type=Path)
+    parser.add_argument('--proxy-url', default=os.environ.get('GUARDRAIL_PROXY_URL', 'http://127.0.0.1:8000'))
+    parser.add_argument('--output-root', type=Path, default=ROOT / 'runs')
+    parser.add_argument('--run-index', type=int, default=1)
+    parser.add_argument('--temperature', type=float, default=None)
+    context_options = parser.add_mutually_exclusive_group()
+    context_options.add_argument('--context-buffer-messages', type=int, default=None)
+    context_options.add_argument('--no-context-buffer', action='store_true')
+    parser.add_argument('--seed-probe', type=int, default=None,
+                        help='Explicit unverified seed probe; does not change support status')
+    args = parser.parse_args()
+    return asyncio.run(run(args))
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())
