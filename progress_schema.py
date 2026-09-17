@@ -70,6 +70,8 @@ class TerminationContext(Record):
 
 
 class Observation(Record):
+    # Runner-owned metadata; never requested from the model. Optional for legacy inputs.
+    agent_id: str | None = Field(default=None, min_length=1)
     step_id: int = Field(ge=1)
     llm_turns: list[int] = Field(min_length=1)
     progress_source: Literal["conversation", "artifact", "both"]

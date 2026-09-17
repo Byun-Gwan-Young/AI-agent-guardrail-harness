@@ -341,7 +341,8 @@ async def run(args):
                 if not budget.turns:
                     missing.append(step)
                     raise RuntimeError('No proxy turn ID; cannot submit a linked observation')
-                payload = make_observation(step_id=step, llm_turns=record['llm_turns'],
+                payload = make_observation(step_id=step, agent_id=agents[index].name,
+                    llm_turns=record['llm_turns'],
                     text=parsed['narrative'] if parsed else '' if outcome['failed'] else text,
                     progress_source=scenario.progress_source, progress_metric=scenario.progress_metric.model_dump(),
                     artifact=None if outcome['failed'] else latest['artifact'], structured=

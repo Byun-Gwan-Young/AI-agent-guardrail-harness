@@ -59,12 +59,13 @@ def capture_artifact(workspace, monitored_paths, *, junit_path=None, test_suite_
 
 
 def make_observation(*, step_id, llm_turns, text, progress_source, progress_metric,
-                     artifact=None, structured=None, previous_extracted=None, termination_context=None):
+                     artifact=None, structured=None, previous_extracted=None, termination_context=None,
+                     agent_id=None):
     extracted = extract_conversation(text, previous_extracted)
     # Only text is passed to B, independently of A's reference record.
     primary = (Conversation(source_kind="structured", **structured).model_dump()
                if structured is not None else extracted)
-    return Observation(step_id=step_id, llm_turns=llm_turns, progress_source=progress_source,
+    return Observation(step_id=step_id, agent_id=agent_id, llm_turns=llm_turns, progress_source=progress_source,
                        progress_metric=progress_metric, conversation=primary, artifact=artifact,
                        extracted_conversation=extracted if structured is not None else None,
                        termination_context=termination_context).model_dump()

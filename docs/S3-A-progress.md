@@ -111,3 +111,15 @@ S1/S2 기존 26개 + S3-A 31개, 총 57개 통과.
 추가할 항목은 POST /sessions/observations이며, 기존 시작·종료 POST도 원본 표에 없다.
 산출물 진전도에는 실행기 훅이 필요하다는 설명도 함께 추가해야 한다.
 관리 API 목록과 결정 문서를 갱신했으며 발표 HTML은 수정하지 않았다.
+
+## P0-1 관측 스키마 확장 — 역할 식별
+
+관측 최상위에 `agent_id: str | null`을 추가한다. 값은 실행기가 선택한
+`agents[index].name`이며 실패 step에도 전달한다. 모델의 AgentOutput·strict JSON
+스키마·출력 검증·프롬프트에는 agent_id를 추가하지 않는다. 원문 대화나 모델의
+자기보고에서 역할 ID를 가져오지 않는다. 빈 문자열은 허용하지 않는다.
+
+기존 관측 입력/파일의 호환성을 위해 필드는 선택적이다. progress-v1은 이 필드를
+사용하지 않는다. progress-v2는 역할 식별이 없으면 unmeasured로 남기고 전역
+비교로 대체하지 않는다. 같은 step의 역할 ID를 바꾼 재전송은 기존 충돌 검사로
+거부한다. 상세 기준과 이력 의미는 decisions/004-role-scoped-progress.md에 기록한다.
