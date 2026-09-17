@@ -8,7 +8,7 @@ from conversation_extract import compare_extraction
 from progress_schema import Observation
 from progress_signal import calculate_progress
 from session_store import utc_now
-from deadlock_policy import evaluate_criteria
+from deadlock_policy import evaluate_criteria, progress_version_for
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,8 @@ def install_observations(app, store, session_key):
             if any(t > len(session.turns) or t in assigned for t in observation["llm_turns"]):
                 raise HTTPException(409, "Unknown or already assigned LLM turn")
             try:
-                result = calculate_progress(session.observations, observation)
+                result = calculate_progress(session.observations, observation,
+                                            version=progress_version_for(session.meta))
             except Exception:
                 logger.warning("Progress calculation failed; observation retained", exc_info=True)
                 result = {"state": "unmeasured", "reason": "progress calculation failed"}
