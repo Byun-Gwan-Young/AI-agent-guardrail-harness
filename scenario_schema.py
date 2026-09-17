@@ -95,7 +95,7 @@ class Scenario(Definition):
     expected_outcome: Literal["unknown", "success", "deadlock", "termination_failure"]
     success_criteria: SuccessCriteria
     termination_context_collection: TerminationCollection
-    criteria_version: Literal["deadlock-v0.1"]
+    criteria_version: Literal["deadlock-v0.1", "deadlock-v0.2"]
     fixture_dir: str | None = None
     monitored_paths: list[str] = Field(default_factory=list)
     initial_issue_ids: list[str] = Field(default_factory=list)

@@ -123,3 +123,11 @@ S1/S2 기존 26개 + S3-A 31개, 총 57개 통과.
 사용하지 않는다. progress-v2는 역할 식별이 없으면 unmeasured로 남기고 전역
 비교로 대체하지 않는다. 같은 step의 역할 ID를 바꾼 재전송은 기존 충돌 검사로
 거부한다. 상세 기준과 이력 의미는 decisions/004-role-scoped-progress.md에 기록한다.
+
+### progress-v2 계산 결과
+동일 agent_id의 원본 관측 이력으로 기존 계산식을 실행한다. 비교 대상에는
+공백 관측도 포함한다. 대화/산출물 모두 같은 범위이며 comparison_step_id와
+history_step_ids를 결과에 남겨 비교 근거를 확인할 수 있다. 다른 역할의
+관측은 비교 이력에 섞이지 않지만 교착 판정의 N, grace_steps,
+missing_review_steps는 모두 전역 step 기준이다. 기존 progress-v1 결과에는
+이 진단 필드를 추가하지 않는다. 세션에 고정된 criteria_version으로 경로를 선택한다.

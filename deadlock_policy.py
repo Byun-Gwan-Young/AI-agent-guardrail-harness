@@ -1,9 +1,12 @@
 """Version dispatch over pinned criteria; preserve legacy calculations unchanged."""
 from deadlock_policy_v01 import VERSION, SPEC
 from deadlock_policy_v01 import pin_criteria as pin_v01, evaluate_criteria as evaluate_v01
+from deadlock_policy_v02 import pin_criteria as pin_v02, evaluate_criteria as evaluate_v02
 
 
 def pin_criteria(version=VERSION):
+    if version == "deadlock-v0.2":
+        return pin_v02(version)
     return pin_v01(version)
 
 
@@ -18,4 +21,6 @@ def progress_version_for(pin):
 
 
 def evaluate_criteria(observations, pin):
+    if pin.get("criteria_version") == "deadlock-v0.2":
+        return evaluate_v02(observations, pin)
     return evaluate_v01(observations, pin)

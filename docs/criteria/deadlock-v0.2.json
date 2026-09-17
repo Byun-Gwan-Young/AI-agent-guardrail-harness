@@ -1,0 +1,17 @@
+{
+  "criteria_version": "deadlock-v0.2",
+  "criteria_parameters": {
+    "criteria_version": "deadlock-v0.2",
+    "progress_version": "progress-v2",
+    "epsilon": 0,
+    "k": 1,
+    "consecutive_steps": 3,
+    "grace_steps": 2,
+    "missing_review_steps": 3,
+    "comparison_scope": "same_agent_id",
+    "consecutive_steps_unit": "global_step",
+    "grace_steps_unit": "global_step",
+    "missing_review_steps_unit": "global_step"
+  },
+  "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba"
+}

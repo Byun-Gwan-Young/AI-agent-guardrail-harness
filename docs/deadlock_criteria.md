@@ -78,3 +78,22 @@ progress 상태·이벤트, 종결 선언 문맥이 없으면 측정 불가다. 
 문서의 교착/종료 실패 라벨을 detector 입력으로 사용하지 않는다.
 LLM 요청=step 등의 가정을 추가한 분석은 별도의 assumed=true 결과로만 보고하며
 새 기준이 실측에서 검증됐다는 근거로 사용하지 않는다. 적용 결과는 별도 문서에 기록한다.
+
+## P0-1 신규 기준 deadlock-v0.2
+
+기존 deadlock-v0.1.json과 위 v0.1 설명은 보존한다. 신규 스냅샷은
+criteria/deadlock-v0.2.json이며 progress_version은 progress-v2다.
+비교 대상만 동일 agent_id의 이력으로 제한한다. N=3의 연속 수는 **전역 step**
+기준이며 grace_steps=2, missing_review_steps=3도 **전역 step** 기준이다.
+역할별/순환별 카운터는 없다. epsilon=0, k=1, 종결 선언·누락 처리·상태
+우선순위·observe_only 동작은 바꾸지 않는다. agent_id 누락은 unmeasured다.
+
+새 세션은 설정의 criteria_version으로 고정하며 관측 계산도 고정된 버전에서
+progress_version을 선택한다. 기존 v0.1 세션은 설정 변경/재시작 후에도 v1
+계산을 유지한다. 버전·파라미터·해시 불일치는 판정을 보류한다.
+
+기존 guardrail.yaml 및 A-1 YAML의 v0.1 실행 조건은 자동으로 변경하지 않았다.
+v0.2 신규 실험에는 프록시 설정과 시나리오의 criteria_version을 모두
+`deadlock-v0.2`로 명시해야 한다. 실행기는 두 버전의 일치를 검증한다.
+스냅샷 생성: `venv/bin/python tools/write_criteria_snapshot.py` (외부 API 없음).
+SHA-256은 pin_criteria가 정렬된 파라미터 JSON 바이트에서 계산한다.
