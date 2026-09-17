@@ -1,0 +1,3377 @@
+{
+  "legacy_byte_match": true,
+  "new_pin": {
+    "criteria_version": "deadlock-v0.2",
+    "criteria_parameters": {
+      "criteria_version": "deadlock-v0.2",
+      "progress_version": "progress-v2",
+      "epsilon": 0,
+      "k": 1,
+      "consecutive_steps": 3,
+      "grace_steps": 2,
+      "missing_review_steps": 3,
+      "comparison_scope": "same_agent_id",
+      "consecutive_steps_unit": "global_step",
+      "grace_steps_unit": "global_step",
+      "missing_review_steps_unit": "global_step"
+    },
+    "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba"
+  },
+  "rows": [
+    {
+      "step_id": 1,
+      "role_mapping": {
+        "agent_id": "planner",
+        "status": "measured",
+        "method": "unique_request_system_prefix",
+        "evidence": [
+          {
+            "agent_id": "planner",
+            "turn": 1,
+            "path": "request_body.messages[0].content",
+            "prefix": "사용자 요청과 공개 ACCEPTANCE.md를 읽고 개발·리뷰 담당자와 실행 가능한 명세를 조율한다."
+          },
+          {
+            "agent_id": "planner",
+            "turn": 2,
+            "path": "request_body.messages[0].content",
+            "prefix": "사용자 요청과 공개 ACCEPTANCE.md를 읽고 개발·리뷰 담당자와 실행 가능한 명세를 조율한다."
+          }
+        ]
+      },
+      "old_comparison_step_id": null,
+      "new_comparison_step_id": null,
+      "old": {
+        "progress": {
+          "version": "progress-v1",
+          "state": "baseline",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "continue",
+          "reason": "progress, baseline or declaration step",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 0,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "new": {
+        "progress": {
+          "version": "progress-v2",
+          "state": "baseline",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false,
+          "comparison_step_id": null,
+          "history_step_ids": []
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.2",
+          "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+          "decision": "continue",
+          "reason": "progress, baseline or declaration step",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 0,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "classification": {
+        "cross_role_issue_events": [],
+        "old_progress_issue_only": false,
+        "old_progress_mixed_causes": false,
+        "same_role_issue_set_changed": {
+          "value": null,
+          "status": "unmeasured"
+        },
+        "issue_only_progress_removed": false,
+        "current_discarded_gap": false,
+        "previous_same_role_discarded_gap": false,
+        "current_info_items_null": false,
+        "previous_same_role_info_items_null": false,
+        "shared_artifact_events": [],
+        "missing_metrics": {
+          "conversation.open_issues_count": "missing observation/baseline or source_kind changed",
+          "conversation.new_info_ratio": "missing observation/baseline or source_kind changed",
+          "artifact.test_pass_count": "test results missing or suite/total changed",
+          "artifact.files_changed": "missing file snapshot/baseline or scope changed"
+        }
+      }
+    },
+    {
+      "step_id": 2,
+      "role_mapping": {
+        "agent_id": "developer",
+        "status": "measured",
+        "method": "unique_request_system_prefix",
+        "evidence": [
+          {
+            "agent_id": "developer",
+            "turn": 4,
+            "path": "request_body.messages[0].content",
+            "prefix": "합의한 명세와 공개 인수 조건을 만족하도록 src/task_query.py를 구현한다."
+          },
+          {
+            "agent_id": "developer",
+            "turn": 5,
+            "path": "request_body.messages[0].content",
+            "prefix": "합의한 명세와 공개 인수 조건을 만족하도록 src/task_query.py를 구현한다."
+          }
+        ]
+      },
+      "old_comparison_step_id": 1,
+      "new_comparison_step_id": null,
+      "old": {
+        "progress": {
+          "version": "progress-v1",
+          "state": "progress",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": {
+                "count": 11,
+                "delta": 7
+              },
+              "status": "measured"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": 0,
+              "status": "measured"
+            },
+            "artifact.files_changed": {
+              "value": [],
+              "status": "measured"
+            }
+          },
+          "events": [
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "description-search",
+              "kind": "new"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "negative-limit-offset",
+              "kind": "new"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "pagination-after-filtering",
+              "kind": "new"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "priority-sorting",
+              "kind": "new"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "stable-id-tiebreak",
+              "kind": "new"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "unknown-status-handling",
+              "kind": "new"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "whitespace-normalization",
+              "kind": "new"
+            }
+          ],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": true,
+          "artifact_moved": false
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "continue",
+          "reason": "progress, baseline or declaration step",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 0,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "new": {
+        "progress": {
+          "version": "progress-v2",
+          "state": "baseline",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false,
+          "comparison_step_id": null,
+          "history_step_ids": []
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.2",
+          "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+          "decision": "continue",
+          "reason": "progress, baseline or declaration step",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 0,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "classification": {
+        "cross_role_issue_events": [
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "description-search",
+            "kind": "new"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "negative-limit-offset",
+            "kind": "new"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "pagination-after-filtering",
+            "kind": "new"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "priority-sorting",
+            "kind": "new"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "stable-id-tiebreak",
+            "kind": "new"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "unknown-status-handling",
+            "kind": "new"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "whitespace-normalization",
+            "kind": "new"
+          }
+        ],
+        "old_progress_issue_only": true,
+        "old_progress_mixed_causes": false,
+        "same_role_issue_set_changed": {
+          "value": null,
+          "status": "unmeasured"
+        },
+        "issue_only_progress_removed": true,
+        "current_discarded_gap": false,
+        "previous_same_role_discarded_gap": false,
+        "current_info_items_null": true,
+        "previous_same_role_info_items_null": false,
+        "shared_artifact_events": [],
+        "missing_metrics": {
+          "conversation.open_issues_count": "missing observation/baseline or source_kind changed",
+          "conversation.new_info_ratio": "missing observation/baseline or source_kind changed",
+          "artifact.test_pass_count": "test results missing or suite/total changed",
+          "artifact.files_changed": "missing file snapshot/baseline or scope changed"
+        }
+      }
+    },
+    {
+      "step_id": 3,
+      "role_mapping": {
+        "agent_id": "reviewer",
+        "status": "measured",
+        "method": "unique_request_system_prefix",
+        "evidence": [
+          {
+            "agent_id": "reviewer",
+            "turn": 7,
+            "path": "request_body.messages[0].content",
+            "prefix": "공개 인수 조건, SPEC.md, 구현과 실제 테스트 결과를 확인한다."
+          },
+          {
+            "agent_id": "reviewer",
+            "turn": 8,
+            "path": "request_body.messages[0].content",
+            "prefix": "공개 인수 조건, SPEC.md, 구현과 실제 테스트 결과를 확인한다."
+          }
+        ]
+      },
+      "old_comparison_step_id": 2,
+      "new_comparison_step_id": null,
+      "old": {
+        "progress": {
+          "version": "progress-v1",
+          "state": "progress",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": {
+                "count": 11,
+                "delta": 0
+              },
+              "status": "measured"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": 0,
+              "status": "measured"
+            },
+            "artifact.files_changed": {
+              "value": [],
+              "status": "measured"
+            }
+          },
+          "events": [
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "negative-limit",
+              "kind": "new"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "negative-offset",
+              "kind": "new"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "priority-sort",
+              "kind": "new"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "unknown-status",
+              "kind": "new"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "negative-limit-offset",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "pagination-after-filtering",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "priority-sorting",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "unknown-status-handling",
+              "kind": "closed"
+            }
+          ],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": true,
+          "artifact_moved": false
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "continue",
+          "reason": "progress, baseline or declaration step",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 0,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "new": {
+        "progress": {
+          "version": "progress-v2",
+          "state": "baseline",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false,
+          "comparison_step_id": null,
+          "history_step_ids": []
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.2",
+          "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+          "decision": "continue",
+          "reason": "progress, baseline or declaration step",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 0,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "classification": {
+        "cross_role_issue_events": [
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "negative-limit",
+            "kind": "new"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "negative-offset",
+            "kind": "new"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "priority-sort",
+            "kind": "new"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "unknown-status",
+            "kind": "new"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "negative-limit-offset",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "pagination-after-filtering",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "priority-sorting",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "unknown-status-handling",
+            "kind": "closed"
+          }
+        ],
+        "old_progress_issue_only": true,
+        "old_progress_mixed_causes": false,
+        "same_role_issue_set_changed": {
+          "value": null,
+          "status": "unmeasured"
+        },
+        "issue_only_progress_removed": true,
+        "current_discarded_gap": false,
+        "previous_same_role_discarded_gap": false,
+        "current_info_items_null": true,
+        "previous_same_role_info_items_null": false,
+        "shared_artifact_events": [],
+        "missing_metrics": {
+          "conversation.open_issues_count": "missing observation/baseline or source_kind changed",
+          "conversation.new_info_ratio": "missing observation/baseline or source_kind changed",
+          "artifact.test_pass_count": "test results missing or suite/total changed",
+          "artifact.files_changed": "missing file snapshot/baseline or scope changed"
+        }
+      }
+    },
+    {
+      "step_id": 4,
+      "role_mapping": {
+        "agent_id": "planner",
+        "status": "measured",
+        "method": "unique_request_system_prefix",
+        "evidence": [
+          {
+            "agent_id": "planner",
+            "turn": 10,
+            "path": "request_body.messages[0].content",
+            "prefix": "사용자 요청과 공개 ACCEPTANCE.md를 읽고 개발·리뷰 담당자와 실행 가능한 명세를 조율한다."
+          },
+          {
+            "agent_id": "planner",
+            "turn": 11,
+            "path": "request_body.messages[0].content",
+            "prefix": "사용자 요청과 공개 ACCEPTANCE.md를 읽고 개발·리뷰 담당자와 실행 가능한 명세를 조율한다."
+          }
+        ]
+      },
+      "old_comparison_step_id": 3,
+      "new_comparison_step_id": 1,
+      "old": {
+        "progress": {
+          "version": "progress-v1",
+          "state": "progress",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": {
+                "count": 4,
+                "delta": -7
+              },
+              "status": "measured"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": 0,
+              "status": "measured"
+            },
+            "artifact.files_changed": {
+              "value": [
+                "SPEC.md"
+              ],
+              "status": "measured"
+            }
+          },
+          "events": [
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "description-search",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "negative-limit",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "negative-offset",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "priority-sort",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "stable-id-tiebreak",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "unknown-status",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "whitespace-normalization",
+              "kind": "closed"
+            },
+            {
+              "metric": "artifact.files_changed",
+              "item": "SPEC.md",
+              "kind": "new"
+            }
+          ],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": true
+          },
+          "coverage_complete": false,
+          "conversation_moved": true,
+          "artifact_moved": true
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "continue",
+          "reason": "progress, baseline or declaration step",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 0,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "new": {
+        "progress": {
+          "version": "progress-v2",
+          "state": "progress",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": {
+                "count": 4,
+                "delta": 0
+              },
+              "status": "measured"
+            },
+            "conversation.new_info_ratio": {
+              "value": 0.0,
+              "status": "measured"
+            },
+            "artifact.test_pass_count": {
+              "value": 0,
+              "status": "measured"
+            },
+            "artifact.files_changed": {
+              "value": [
+                "SPEC.md"
+              ],
+              "status": "measured"
+            }
+          },
+          "events": [
+            {
+              "metric": "artifact.files_changed",
+              "item": "SPEC.md",
+              "kind": "new"
+            }
+          ],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": true
+          },
+          "coverage_complete": true,
+          "conversation_moved": false,
+          "artifact_moved": true,
+          "comparison_step_id": 1,
+          "history_step_ids": [
+            1
+          ]
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.2",
+          "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+          "decision": "continue",
+          "reason": "progress, baseline or declaration step",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 0,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "classification": {
+        "cross_role_issue_events": [
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "description-search",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "negative-limit",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "negative-offset",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "priority-sort",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "stable-id-tiebreak",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "unknown-status",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "whitespace-normalization",
+            "kind": "closed"
+          }
+        ],
+        "old_progress_issue_only": false,
+        "old_progress_mixed_causes": true,
+        "same_role_issue_set_changed": {
+          "value": false,
+          "status": "measured"
+        },
+        "issue_only_progress_removed": false,
+        "current_discarded_gap": false,
+        "previous_same_role_discarded_gap": false,
+        "current_info_items_null": false,
+        "previous_same_role_info_items_null": false,
+        "shared_artifact_events": [],
+        "missing_metrics": {}
+      }
+    },
+    {
+      "step_id": 5,
+      "role_mapping": {
+        "agent_id": "developer",
+        "status": "measured",
+        "method": "unique_request_system_prefix",
+        "evidence": [
+          {
+            "agent_id": "developer",
+            "turn": 13,
+            "path": "request_body.messages[0].content",
+            "prefix": "합의한 명세와 공개 인수 조건을 만족하도록 src/task_query.py를 구현한다."
+          },
+          {
+            "agent_id": "developer",
+            "turn": 14,
+            "path": "request_body.messages[0].content",
+            "prefix": "합의한 명세와 공개 인수 조건을 만족하도록 src/task_query.py를 구현한다."
+          }
+        ]
+      },
+      "old_comparison_step_id": 4,
+      "new_comparison_step_id": 2,
+      "old": {
+        "progress": {
+          "version": "progress-v1",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 1,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "new": {
+        "progress": {
+          "version": "progress-v2",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false,
+          "comparison_step_id": 2,
+          "history_step_ids": [
+            2
+          ]
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.2",
+          "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 1,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "classification": {
+        "cross_role_issue_events": [],
+        "old_progress_issue_only": false,
+        "old_progress_mixed_causes": false,
+        "same_role_issue_set_changed": {
+          "value": null,
+          "status": "unmeasured"
+        },
+        "issue_only_progress_removed": false,
+        "current_discarded_gap": true,
+        "previous_same_role_discarded_gap": false,
+        "current_info_items_null": true,
+        "previous_same_role_info_items_null": true,
+        "shared_artifact_events": [],
+        "missing_metrics": {
+          "conversation.open_issues_count": "missing observation/baseline or source_kind changed",
+          "conversation.new_info_ratio": "missing observation/baseline or source_kind changed",
+          "artifact.test_pass_count": "test results missing or suite/total changed",
+          "artifact.files_changed": "missing file snapshot/baseline or scope changed"
+        }
+      }
+    },
+    {
+      "step_id": 6,
+      "role_mapping": {
+        "agent_id": "reviewer",
+        "status": "measured",
+        "method": "unique_request_system_prefix",
+        "evidence": [
+          {
+            "agent_id": "reviewer",
+            "turn": 16,
+            "path": "request_body.messages[0].content",
+            "prefix": "공개 인수 조건, SPEC.md, 구현과 실제 테스트 결과를 확인한다."
+          },
+          {
+            "agent_id": "reviewer",
+            "turn": 17,
+            "path": "request_body.messages[0].content",
+            "prefix": "공개 인수 조건, SPEC.md, 구현과 실제 테스트 결과를 확인한다."
+          }
+        ]
+      },
+      "old_comparison_step_id": 5,
+      "new_comparison_step_id": 3,
+      "old": {
+        "progress": {
+          "version": "progress-v1",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 2,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "new": {
+        "progress": {
+          "version": "progress-v2",
+          "state": "progress",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": {
+                "count": 11,
+                "delta": 0
+              },
+              "status": "measured"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": 0,
+              "status": "measured"
+            },
+            "artifact.files_changed": {
+              "value": [
+                "SPEC.md"
+              ],
+              "status": "measured"
+            }
+          },
+          "events": [
+            {
+              "metric": "artifact.files_changed",
+              "item": "SPEC.md",
+              "kind": "new"
+            }
+          ],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": true
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": true,
+          "comparison_step_id": 3,
+          "history_step_ids": [
+            3
+          ]
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.2",
+          "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+          "decision": "continue",
+          "reason": "progress, baseline or declaration step",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 0,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "classification": {
+        "cross_role_issue_events": [],
+        "old_progress_issue_only": false,
+        "old_progress_mixed_causes": false,
+        "same_role_issue_set_changed": {
+          "value": false,
+          "status": "measured"
+        },
+        "issue_only_progress_removed": false,
+        "current_discarded_gap": false,
+        "previous_same_role_discarded_gap": false,
+        "current_info_items_null": true,
+        "previous_same_role_info_items_null": true,
+        "shared_artifact_events": [
+          {
+            "event": {
+              "metric": "artifact.files_changed",
+              "item": "SPEC.md",
+              "kind": "new"
+            },
+            "previous_global_observations": [
+              4
+            ]
+          }
+        ],
+        "missing_metrics": {
+          "conversation.new_info_ratio": "missing observation/baseline or source_kind changed"
+        }
+      }
+    },
+    {
+      "step_id": 7,
+      "role_mapping": {
+        "agent_id": "planner",
+        "status": "measured",
+        "method": "unique_request_system_prefix",
+        "evidence": [
+          {
+            "agent_id": "planner",
+            "turn": 19,
+            "path": "request_body.messages[0].content",
+            "prefix": "사용자 요청과 공개 ACCEPTANCE.md를 읽고 개발·리뷰 담당자와 실행 가능한 명세를 조율한다."
+          },
+          {
+            "agent_id": "planner",
+            "turn": 20,
+            "path": "request_body.messages[0].content",
+            "prefix": "사용자 요청과 공개 ACCEPTANCE.md를 읽고 개발·리뷰 담당자와 실행 가능한 명세를 조율한다."
+          }
+        ]
+      },
+      "old_comparison_step_id": 6,
+      "new_comparison_step_id": 4,
+      "old": {
+        "progress": {
+          "version": "progress-v1",
+          "state": "progress",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": {
+                "count": 4,
+                "delta": -7
+              },
+              "status": "measured"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": 0,
+              "status": "measured"
+            },
+            "artifact.files_changed": {
+              "value": [],
+              "status": "measured"
+            }
+          },
+          "events": [
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "description-search",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "negative-limit",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "negative-offset",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "priority-sort",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "stable-id-tiebreak",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "unknown-status",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "whitespace-normalization",
+              "kind": "closed"
+            }
+          ],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": true,
+          "artifact_moved": false
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "continue",
+          "reason": "progress, baseline or declaration step",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 0,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "new": {
+        "progress": {
+          "version": "progress-v2",
+          "state": "stagnant",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": {
+                "count": 4,
+                "delta": 0
+              },
+              "status": "measured"
+            },
+            "conversation.new_info_ratio": {
+              "value": 0.0,
+              "status": "measured"
+            },
+            "artifact.test_pass_count": {
+              "value": 0,
+              "status": "measured"
+            },
+            "artifact.files_changed": {
+              "value": [],
+              "status": "measured"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": true,
+          "conversation_moved": false,
+          "artifact_moved": false,
+          "comparison_step_id": 4,
+          "history_step_ids": [
+            1,
+            4
+          ]
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.2",
+          "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+          "decision": "continue",
+          "reason": "insufficient consecutive evidence",
+          "consecutive_steps": 1,
+          "consecutive_states": [
+            "stagnant"
+          ],
+          "unmeasured_steps": 0,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "classification": {
+        "cross_role_issue_events": [
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "description-search",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "negative-limit",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "negative-offset",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "priority-sort",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "stable-id-tiebreak",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "unknown-status",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "whitespace-normalization",
+            "kind": "closed"
+          }
+        ],
+        "old_progress_issue_only": true,
+        "old_progress_mixed_causes": false,
+        "same_role_issue_set_changed": {
+          "value": false,
+          "status": "measured"
+        },
+        "issue_only_progress_removed": true,
+        "current_discarded_gap": false,
+        "previous_same_role_discarded_gap": false,
+        "current_info_items_null": false,
+        "previous_same_role_info_items_null": false,
+        "shared_artifact_events": [],
+        "missing_metrics": {}
+      }
+    },
+    {
+      "step_id": 8,
+      "role_mapping": {
+        "agent_id": "developer",
+        "status": "measured",
+        "method": "unique_request_system_prefix",
+        "evidence": [
+          {
+            "agent_id": "developer",
+            "turn": 22,
+            "path": "request_body.messages[0].content",
+            "prefix": "합의한 명세와 공개 인수 조건을 만족하도록 src/task_query.py를 구현한다."
+          },
+          {
+            "agent_id": "developer",
+            "turn": 23,
+            "path": "request_body.messages[0].content",
+            "prefix": "합의한 명세와 공개 인수 조건을 만족하도록 src/task_query.py를 구현한다."
+          }
+        ]
+      },
+      "old_comparison_step_id": 7,
+      "new_comparison_step_id": 5,
+      "old": {
+        "progress": {
+          "version": "progress-v1",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": {
+                "count": 11,
+                "delta": 7
+              },
+              "status": "measured"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": 0,
+              "status": "measured"
+            },
+            "artifact.files_changed": {
+              "value": [],
+              "status": "measured"
+            }
+          },
+          "events": [
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "description-search",
+              "kind": "reopen"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "negative-limit-offset",
+              "kind": "reopen"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "pagination-after-filtering",
+              "kind": "reopen"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "priority-sorting",
+              "kind": "reopen"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "stable-id-tiebreak",
+              "kind": "reopen"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "unknown-status-handling",
+              "kind": "reopen"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "whitespace-normalization",
+              "kind": "reopen"
+            }
+          ],
+          "flags": {
+            "oscillation": [],
+            "reopen": [
+              "description-search",
+              "negative-limit-offset",
+              "pagination-after-filtering",
+              "priority-sorting",
+              "stable-id-tiebreak",
+              "unknown-status-handling",
+              "whitespace-normalization"
+            ],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": true,
+          "artifact_moved": false
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 1,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "new": {
+        "progress": {
+          "version": "progress-v2",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false,
+          "comparison_step_id": 5,
+          "history_step_ids": [
+            2,
+            5
+          ]
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.2",
+          "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 1,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "classification": {
+        "cross_role_issue_events": [
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "description-search",
+            "kind": "reopen"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "negative-limit-offset",
+            "kind": "reopen"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "pagination-after-filtering",
+            "kind": "reopen"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "priority-sorting",
+            "kind": "reopen"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "stable-id-tiebreak",
+            "kind": "reopen"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "unknown-status-handling",
+            "kind": "reopen"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "whitespace-normalization",
+            "kind": "reopen"
+          }
+        ],
+        "old_progress_issue_only": false,
+        "old_progress_mixed_causes": false,
+        "same_role_issue_set_changed": {
+          "value": null,
+          "status": "unmeasured"
+        },
+        "issue_only_progress_removed": false,
+        "current_discarded_gap": false,
+        "previous_same_role_discarded_gap": true,
+        "current_info_items_null": true,
+        "previous_same_role_info_items_null": true,
+        "shared_artifact_events": [],
+        "missing_metrics": {
+          "conversation.open_issues_count": "missing observation/baseline or source_kind changed",
+          "conversation.new_info_ratio": "missing observation/baseline or source_kind changed",
+          "artifact.test_pass_count": "test results missing or suite/total changed",
+          "artifact.files_changed": "missing file snapshot/baseline or scope changed"
+        }
+      }
+    },
+    {
+      "step_id": 9,
+      "role_mapping": {
+        "agent_id": "reviewer",
+        "status": "measured",
+        "method": "unique_request_system_prefix",
+        "evidence": [
+          {
+            "agent_id": "reviewer",
+            "turn": 25,
+            "path": "request_body.messages[0].content",
+            "prefix": "공개 인수 조건, SPEC.md, 구현과 실제 테스트 결과를 확인한다."
+          }
+        ]
+      },
+      "old_comparison_step_id": 8,
+      "new_comparison_step_id": 6,
+      "old": {
+        "progress": {
+          "version": "progress-v1",
+          "state": "progress",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": {
+                "count": 11,
+                "delta": 0
+              },
+              "status": "measured"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": 0,
+              "status": "measured"
+            },
+            "artifact.files_changed": {
+              "value": [],
+              "status": "measured"
+            }
+          },
+          "events": [
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "negative-limit",
+              "kind": "reopen"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "negative-offset",
+              "kind": "reopen"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "priority-sort",
+              "kind": "reopen"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "unknown-status",
+              "kind": "reopen"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "negative-limit-offset",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "pagination-after-filtering",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "priority-sorting",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "unknown-status-handling",
+              "kind": "closed"
+            }
+          ],
+          "flags": {
+            "oscillation": [],
+            "reopen": [
+              "negative-limit",
+              "negative-offset",
+              "priority-sort",
+              "unknown-status"
+            ],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": true,
+          "artifact_moved": false
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "continue",
+          "reason": "progress, baseline or declaration step",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 0,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "new": {
+        "progress": {
+          "version": "progress-v2",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": {
+                "count": 11,
+                "delta": 0
+              },
+              "status": "measured"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": 0,
+              "status": "measured"
+            },
+            "artifact.files_changed": {
+              "value": [],
+              "status": "measured"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false,
+          "comparison_step_id": 6,
+          "history_step_ids": [
+            3,
+            6
+          ]
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.2",
+          "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 2,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "classification": {
+        "cross_role_issue_events": [
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "negative-limit",
+            "kind": "reopen"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "negative-offset",
+            "kind": "reopen"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "priority-sort",
+            "kind": "reopen"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "unknown-status",
+            "kind": "reopen"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "negative-limit-offset",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "pagination-after-filtering",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "priority-sorting",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "unknown-status-handling",
+            "kind": "closed"
+          }
+        ],
+        "old_progress_issue_only": true,
+        "old_progress_mixed_causes": false,
+        "same_role_issue_set_changed": {
+          "value": false,
+          "status": "measured"
+        },
+        "issue_only_progress_removed": true,
+        "current_discarded_gap": false,
+        "previous_same_role_discarded_gap": false,
+        "current_info_items_null": true,
+        "previous_same_role_info_items_null": true,
+        "shared_artifact_events": [],
+        "missing_metrics": {
+          "conversation.new_info_ratio": "missing observation/baseline or source_kind changed"
+        }
+      }
+    },
+    {
+      "step_id": 10,
+      "role_mapping": {
+        "agent_id": "planner",
+        "status": "measured",
+        "method": "unique_request_system_prefix",
+        "evidence": [
+          {
+            "agent_id": "planner",
+            "turn": 27,
+            "path": "request_body.messages[0].content",
+            "prefix": "사용자 요청과 공개 ACCEPTANCE.md를 읽고 개발·리뷰 담당자와 실행 가능한 명세를 조율한다."
+          },
+          {
+            "agent_id": "planner",
+            "turn": 28,
+            "path": "request_body.messages[0].content",
+            "prefix": "사용자 요청과 공개 ACCEPTANCE.md를 읽고 개발·리뷰 담당자와 실행 가능한 명세를 조율한다."
+          }
+        ]
+      },
+      "old_comparison_step_id": 9,
+      "new_comparison_step_id": 7,
+      "old": {
+        "progress": {
+          "version": "progress-v1",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 1,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "new": {
+        "progress": {
+          "version": "progress-v2",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false,
+          "comparison_step_id": 7,
+          "history_step_ids": [
+            1,
+            4,
+            7
+          ]
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.2",
+          "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 3,
+          "needs_observation_review": true,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "classification": {
+        "cross_role_issue_events": [],
+        "old_progress_issue_only": false,
+        "old_progress_mixed_causes": false,
+        "same_role_issue_set_changed": {
+          "value": null,
+          "status": "unmeasured"
+        },
+        "issue_only_progress_removed": false,
+        "current_discarded_gap": true,
+        "previous_same_role_discarded_gap": false,
+        "current_info_items_null": true,
+        "previous_same_role_info_items_null": false,
+        "shared_artifact_events": [],
+        "missing_metrics": {
+          "conversation.open_issues_count": "missing observation/baseline or source_kind changed",
+          "conversation.new_info_ratio": "missing observation/baseline or source_kind changed",
+          "artifact.test_pass_count": "test results missing or suite/total changed",
+          "artifact.files_changed": "missing file snapshot/baseline or scope changed"
+        }
+      }
+    },
+    {
+      "step_id": 11,
+      "role_mapping": {
+        "agent_id": "developer",
+        "status": "measured",
+        "method": "unique_request_system_prefix",
+        "evidence": [
+          {
+            "agent_id": "developer",
+            "turn": 30,
+            "path": "request_body.messages[0].content",
+            "prefix": "합의한 명세와 공개 인수 조건을 만족하도록 src/task_query.py를 구현한다."
+          },
+          {
+            "agent_id": "developer",
+            "turn": 31,
+            "path": "request_body.messages[0].content",
+            "prefix": "합의한 명세와 공개 인수 조건을 만족하도록 src/task_query.py를 구현한다."
+          }
+        ]
+      },
+      "old_comparison_step_id": 10,
+      "new_comparison_step_id": 8,
+      "old": {
+        "progress": {
+          "version": "progress-v1",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 2,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "new": {
+        "progress": {
+          "version": "progress-v2",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": {
+                "count": 11,
+                "delta": 0
+              },
+              "status": "measured"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": 0,
+              "status": "measured"
+            },
+            "artifact.files_changed": {
+              "value": [],
+              "status": "measured"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false,
+          "comparison_step_id": 8,
+          "history_step_ids": [
+            2,
+            5,
+            8
+          ]
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.2",
+          "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 4,
+          "needs_observation_review": true,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "classification": {
+        "cross_role_issue_events": [],
+        "old_progress_issue_only": false,
+        "old_progress_mixed_causes": false,
+        "same_role_issue_set_changed": {
+          "value": false,
+          "status": "measured"
+        },
+        "issue_only_progress_removed": false,
+        "current_discarded_gap": false,
+        "previous_same_role_discarded_gap": false,
+        "current_info_items_null": true,
+        "previous_same_role_info_items_null": true,
+        "shared_artifact_events": [],
+        "missing_metrics": {
+          "conversation.new_info_ratio": "missing observation/baseline or source_kind changed"
+        }
+      }
+    },
+    {
+      "step_id": 12,
+      "role_mapping": {
+        "agent_id": "reviewer",
+        "status": "measured",
+        "method": "unique_request_system_prefix",
+        "evidence": [
+          {
+            "agent_id": "reviewer",
+            "turn": 33,
+            "path": "request_body.messages[0].content",
+            "prefix": "공개 인수 조건, SPEC.md, 구현과 실제 테스트 결과를 확인한다."
+          }
+        ]
+      },
+      "old_comparison_step_id": 11,
+      "new_comparison_step_id": 9,
+      "old": {
+        "progress": {
+          "version": "progress-v1",
+          "state": "progress",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": {
+                "count": 11,
+                "delta": 0
+              },
+              "status": "measured"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": 0,
+              "status": "measured"
+            },
+            "artifact.files_changed": {
+              "value": [],
+              "status": "measured"
+            }
+          },
+          "events": [
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "negative-limit",
+              "kind": "reopen"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "negative-offset",
+              "kind": "reopen"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "priority-sort",
+              "kind": "reopen"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "unknown-status",
+              "kind": "reopen"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "negative-limit-offset",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "pagination-after-filtering",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "priority-sorting",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "unknown-status-handling",
+              "kind": "closed"
+            }
+          ],
+          "flags": {
+            "oscillation": [],
+            "reopen": [
+              "negative-limit",
+              "negative-offset",
+              "priority-sort",
+              "unknown-status"
+            ],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": true,
+          "artifact_moved": false
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "continue",
+          "reason": "progress, baseline or declaration step",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 0,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "new": {
+        "progress": {
+          "version": "progress-v2",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": {
+                "count": 11,
+                "delta": 0
+              },
+              "status": "measured"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": 0,
+              "status": "measured"
+            },
+            "artifact.files_changed": {
+              "value": [],
+              "status": "measured"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false,
+          "comparison_step_id": 9,
+          "history_step_ids": [
+            3,
+            6,
+            9
+          ]
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.2",
+          "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 5,
+          "needs_observation_review": true,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "classification": {
+        "cross_role_issue_events": [
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "negative-limit",
+            "kind": "reopen"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "negative-offset",
+            "kind": "reopen"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "priority-sort",
+            "kind": "reopen"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "unknown-status",
+            "kind": "reopen"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "negative-limit-offset",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "pagination-after-filtering",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "priority-sorting",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "unknown-status-handling",
+            "kind": "closed"
+          }
+        ],
+        "old_progress_issue_only": true,
+        "old_progress_mixed_causes": false,
+        "same_role_issue_set_changed": {
+          "value": false,
+          "status": "measured"
+        },
+        "issue_only_progress_removed": true,
+        "current_discarded_gap": false,
+        "previous_same_role_discarded_gap": false,
+        "current_info_items_null": true,
+        "previous_same_role_info_items_null": true,
+        "shared_artifact_events": [],
+        "missing_metrics": {
+          "conversation.new_info_ratio": "missing observation/baseline or source_kind changed"
+        }
+      }
+    },
+    {
+      "step_id": 13,
+      "role_mapping": {
+        "agent_id": "planner",
+        "status": "measured",
+        "method": "unique_request_system_prefix",
+        "evidence": [
+          {
+            "agent_id": "planner",
+            "turn": 35,
+            "path": "request_body.messages[0].content",
+            "prefix": "사용자 요청과 공개 ACCEPTANCE.md를 읽고 개발·리뷰 담당자와 실행 가능한 명세를 조율한다."
+          },
+          {
+            "agent_id": "planner",
+            "turn": 36,
+            "path": "request_body.messages[0].content",
+            "prefix": "사용자 요청과 공개 ACCEPTANCE.md를 읽고 개발·리뷰 담당자와 실행 가능한 명세를 조율한다."
+          }
+        ]
+      },
+      "old_comparison_step_id": 12,
+      "new_comparison_step_id": 10,
+      "old": {
+        "progress": {
+          "version": "progress-v1",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 1,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "new": {
+        "progress": {
+          "version": "progress-v2",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false,
+          "comparison_step_id": 10,
+          "history_step_ids": [
+            1,
+            4,
+            7,
+            10
+          ]
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.2",
+          "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 6,
+          "needs_observation_review": true,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "classification": {
+        "cross_role_issue_events": [],
+        "old_progress_issue_only": false,
+        "old_progress_mixed_causes": false,
+        "same_role_issue_set_changed": {
+          "value": null,
+          "status": "unmeasured"
+        },
+        "issue_only_progress_removed": false,
+        "current_discarded_gap": true,
+        "previous_same_role_discarded_gap": true,
+        "current_info_items_null": true,
+        "previous_same_role_info_items_null": true,
+        "shared_artifact_events": [],
+        "missing_metrics": {
+          "conversation.open_issues_count": "missing observation/baseline or source_kind changed",
+          "conversation.new_info_ratio": "missing observation/baseline or source_kind changed",
+          "artifact.test_pass_count": "test results missing or suite/total changed",
+          "artifact.files_changed": "missing file snapshot/baseline or scope changed"
+        }
+      }
+    },
+    {
+      "step_id": 14,
+      "role_mapping": {
+        "agent_id": "developer",
+        "status": "measured",
+        "method": "unique_request_system_prefix",
+        "evidence": [
+          {
+            "agent_id": "developer",
+            "turn": 38,
+            "path": "request_body.messages[0].content",
+            "prefix": "합의한 명세와 공개 인수 조건을 만족하도록 src/task_query.py를 구현한다."
+          },
+          {
+            "agent_id": "developer",
+            "turn": 39,
+            "path": "request_body.messages[0].content",
+            "prefix": "합의한 명세와 공개 인수 조건을 만족하도록 src/task_query.py를 구현한다."
+          }
+        ]
+      },
+      "old_comparison_step_id": 13,
+      "new_comparison_step_id": 11,
+      "old": {
+        "progress": {
+          "version": "progress-v1",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 2,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "new": {
+        "progress": {
+          "version": "progress-v2",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": {
+                "count": 11,
+                "delta": 0
+              },
+              "status": "measured"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": 0,
+              "status": "measured"
+            },
+            "artifact.files_changed": {
+              "value": [],
+              "status": "measured"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false,
+          "comparison_step_id": 11,
+          "history_step_ids": [
+            2,
+            5,
+            8,
+            11
+          ]
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.2",
+          "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 7,
+          "needs_observation_review": true,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "classification": {
+        "cross_role_issue_events": [],
+        "old_progress_issue_only": false,
+        "old_progress_mixed_causes": false,
+        "same_role_issue_set_changed": {
+          "value": false,
+          "status": "measured"
+        },
+        "issue_only_progress_removed": false,
+        "current_discarded_gap": false,
+        "previous_same_role_discarded_gap": false,
+        "current_info_items_null": true,
+        "previous_same_role_info_items_null": true,
+        "shared_artifact_events": [],
+        "missing_metrics": {
+          "conversation.new_info_ratio": "missing observation/baseline or source_kind changed"
+        }
+      }
+    },
+    {
+      "step_id": 15,
+      "role_mapping": {
+        "agent_id": "reviewer",
+        "status": "measured",
+        "method": "unique_request_system_prefix",
+        "evidence": [
+          {
+            "agent_id": "reviewer",
+            "turn": 41,
+            "path": "request_body.messages[0].content",
+            "prefix": "공개 인수 조건, SPEC.md, 구현과 실제 테스트 결과를 확인한다."
+          }
+        ]
+      },
+      "old_comparison_step_id": 14,
+      "new_comparison_step_id": 12,
+      "old": {
+        "progress": {
+          "version": "progress-v1",
+          "state": "progress",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": {
+                "count": 11,
+                "delta": 0
+              },
+              "status": "measured"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": 0,
+              "status": "measured"
+            },
+            "artifact.files_changed": {
+              "value": [],
+              "status": "measured"
+            }
+          },
+          "events": [
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "negative-limit",
+              "kind": "reopen"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "negative-offset",
+              "kind": "reopen"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "priority-sort",
+              "kind": "reopen"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "unknown-status",
+              "kind": "reopen"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "negative-limit-offset",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "pagination-after-filtering",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "priority-sorting",
+              "kind": "closed"
+            },
+            {
+              "metric": "conversation.open_issues_count",
+              "item": "unknown-status-handling",
+              "kind": "closed"
+            }
+          ],
+          "flags": {
+            "oscillation": [],
+            "reopen": [
+              "negative-limit",
+              "negative-offset",
+              "priority-sort",
+              "unknown-status"
+            ],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": true,
+          "artifact_moved": false
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "continue",
+          "reason": "progress, baseline or declaration step",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 0,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "new": {
+        "progress": {
+          "version": "progress-v2",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": {
+                "count": 11,
+                "delta": 0
+              },
+              "status": "measured"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": 0,
+              "status": "measured"
+            },
+            "artifact.files_changed": {
+              "value": [],
+              "status": "measured"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false,
+          "comparison_step_id": 12,
+          "history_step_ids": [
+            3,
+            6,
+            9,
+            12
+          ]
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.2",
+          "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 8,
+          "needs_observation_review": true,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "classification": {
+        "cross_role_issue_events": [
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "negative-limit",
+            "kind": "reopen"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "negative-offset",
+            "kind": "reopen"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "priority-sort",
+            "kind": "reopen"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "unknown-status",
+            "kind": "reopen"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "negative-limit-offset",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "pagination-after-filtering",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "priority-sorting",
+            "kind": "closed"
+          },
+          {
+            "metric": "conversation.open_issues_count",
+            "item": "unknown-status-handling",
+            "kind": "closed"
+          }
+        ],
+        "old_progress_issue_only": true,
+        "old_progress_mixed_causes": false,
+        "same_role_issue_set_changed": {
+          "value": false,
+          "status": "measured"
+        },
+        "issue_only_progress_removed": true,
+        "current_discarded_gap": false,
+        "previous_same_role_discarded_gap": false,
+        "current_info_items_null": true,
+        "previous_same_role_info_items_null": true,
+        "shared_artifact_events": [],
+        "missing_metrics": {
+          "conversation.new_info_ratio": "missing observation/baseline or source_kind changed"
+        }
+      }
+    },
+    {
+      "step_id": 16,
+      "role_mapping": {
+        "agent_id": "planner",
+        "status": "measured",
+        "method": "unique_request_system_prefix",
+        "evidence": [
+          {
+            "agent_id": "planner",
+            "turn": 43,
+            "path": "request_body.messages[0].content",
+            "prefix": "사용자 요청과 공개 ACCEPTANCE.md를 읽고 개발·리뷰 담당자와 실행 가능한 명세를 조율한다."
+          },
+          {
+            "agent_id": "planner",
+            "turn": 44,
+            "path": "request_body.messages[0].content",
+            "prefix": "사용자 요청과 공개 ACCEPTANCE.md를 읽고 개발·리뷰 담당자와 실행 가능한 명세를 조율한다."
+          }
+        ]
+      },
+      "old_comparison_step_id": 15,
+      "new_comparison_step_id": 13,
+      "old": {
+        "progress": {
+          "version": "progress-v1",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 1,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "new": {
+        "progress": {
+          "version": "progress-v2",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false,
+          "comparison_step_id": 13,
+          "history_step_ids": [
+            1,
+            4,
+            7,
+            10,
+            13
+          ]
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.2",
+          "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 9,
+          "needs_observation_review": true,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "classification": {
+        "cross_role_issue_events": [],
+        "old_progress_issue_only": false,
+        "old_progress_mixed_causes": false,
+        "same_role_issue_set_changed": {
+          "value": null,
+          "status": "unmeasured"
+        },
+        "issue_only_progress_removed": false,
+        "current_discarded_gap": true,
+        "previous_same_role_discarded_gap": true,
+        "current_info_items_null": true,
+        "previous_same_role_info_items_null": true,
+        "shared_artifact_events": [],
+        "missing_metrics": {
+          "conversation.open_issues_count": "missing observation/baseline or source_kind changed",
+          "conversation.new_info_ratio": "missing observation/baseline or source_kind changed",
+          "artifact.test_pass_count": "test results missing or suite/total changed",
+          "artifact.files_changed": "missing file snapshot/baseline or scope changed"
+        }
+      }
+    },
+    {
+      "step_id": 17,
+      "role_mapping": {
+        "agent_id": "developer",
+        "status": "measured",
+        "method": "unique_request_system_prefix",
+        "evidence": [
+          {
+            "agent_id": "developer",
+            "turn": 46,
+            "path": "request_body.messages[0].content",
+            "prefix": "합의한 명세와 공개 인수 조건을 만족하도록 src/task_query.py를 구현한다."
+          },
+          {
+            "agent_id": "developer",
+            "turn": 47,
+            "path": "request_body.messages[0].content",
+            "prefix": "합의한 명세와 공개 인수 조건을 만족하도록 src/task_query.py를 구현한다."
+          }
+        ]
+      },
+      "old_comparison_step_id": 16,
+      "new_comparison_step_id": 14,
+      "old": {
+        "progress": {
+          "version": "progress-v1",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 2,
+          "needs_observation_review": false,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "new": {
+        "progress": {
+          "version": "progress-v2",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": {
+                "count": 11,
+                "delta": 0
+              },
+              "status": "measured"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": 0,
+              "status": "measured"
+            },
+            "artifact.files_changed": {
+              "value": [],
+              "status": "measured"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false,
+          "comparison_step_id": 14,
+          "history_step_ids": [
+            2,
+            5,
+            8,
+            11,
+            14
+          ]
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.2",
+          "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 10,
+          "needs_observation_review": true,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "classification": {
+        "cross_role_issue_events": [],
+        "old_progress_issue_only": false,
+        "old_progress_mixed_causes": false,
+        "same_role_issue_set_changed": {
+          "value": false,
+          "status": "measured"
+        },
+        "issue_only_progress_removed": false,
+        "current_discarded_gap": false,
+        "previous_same_role_discarded_gap": false,
+        "current_info_items_null": true,
+        "previous_same_role_info_items_null": true,
+        "shared_artifact_events": [],
+        "missing_metrics": {
+          "conversation.new_info_ratio": "missing observation/baseline or source_kind changed"
+        }
+      }
+    },
+    {
+      "step_id": 18,
+      "role_mapping": {
+        "agent_id": "reviewer",
+        "status": "measured",
+        "method": "unique_request_system_prefix",
+        "evidence": [
+          {
+            "agent_id": "reviewer",
+            "turn": 49,
+            "path": "request_body.messages[0].content",
+            "prefix": "공개 인수 조건, SPEC.md, 구현과 실제 테스트 결과를 확인한다."
+          }
+        ]
+      },
+      "old_comparison_step_id": 17,
+      "new_comparison_step_id": 15,
+      "old": {
+        "progress": {
+          "version": "progress-v1",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.1",
+          "criteria_sha256": "bb10a3900e28aa5f5d2f4a62f57db79d71b1b82a63c0dda51dd11e398bb7dba5",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 3,
+          "needs_observation_review": true,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "new": {
+        "progress": {
+          "version": "progress-v2",
+          "state": "unmeasured",
+          "metrics": {
+            "conversation.open_issues_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "conversation.new_info_ratio": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing observation/baseline or source_kind changed"
+            },
+            "artifact.test_pass_count": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "test results missing or suite/total changed"
+            },
+            "artifact.files_changed": {
+              "value": null,
+              "status": "unmeasured",
+              "reason": "missing file snapshot/baseline or scope changed"
+            }
+          },
+          "events": [],
+          "flags": {
+            "oscillation": [],
+            "reopen": [],
+            "revert": [],
+            "test_plateau": false
+          },
+          "coverage_complete": false,
+          "conversation_moved": false,
+          "artifact_moved": false,
+          "comparison_step_id": 15,
+          "history_step_ids": [
+            3,
+            6,
+            9,
+            12,
+            15
+          ]
+        },
+        "criteria": {
+          "criteria_version": "deadlock-v0.2",
+          "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+          "decision": "unmeasured",
+          "reason": "observation or termination context missing",
+          "consecutive_steps": 0,
+          "consecutive_states": [],
+          "unmeasured_steps": 11,
+          "needs_observation_review": true,
+          "first_deadlock_step": null,
+          "first_termination_failure_step": null
+        }
+      },
+      "classification": {
+        "cross_role_issue_events": [],
+        "old_progress_issue_only": false,
+        "old_progress_mixed_causes": false,
+        "same_role_issue_set_changed": {
+          "value": null,
+          "status": "unmeasured"
+        },
+        "issue_only_progress_removed": false,
+        "current_discarded_gap": true,
+        "previous_same_role_discarded_gap": false,
+        "current_info_items_null": true,
+        "previous_same_role_info_items_null": true,
+        "shared_artifact_events": [],
+        "missing_metrics": {
+          "conversation.open_issues_count": "missing observation/baseline or source_kind changed",
+          "conversation.new_info_ratio": "missing observation/baseline or source_kind changed",
+          "artifact.test_pass_count": "test results missing or suite/total changed",
+          "artifact.files_changed": "missing file snapshot/baseline or scope changed"
+        }
+      }
+    }
+  ],
+  "summary": {
+    "steps": 18,
+    "cross_role_issue_progress_candidates": 6,
+    "removed": 6,
+    "retained": 0,
+    "unresolved_roles": 0,
+    "p0_1_success": true,
+    "shared_artifact_steps": [
+      6
+    ],
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "measured_detection_latency": {
+      "value": null,
+      "status": "unmeasured"
+    },
+    "actual_stop_step": {
+      "value": null,
+      "status": "unmeasured"
+    }
+  },
+  "input_path": "logs/A-1-82c393c248a34286b318f344f2e181e4.json",
+  "input_sha256": "da8636936f5978e74c330937216a427412db385bd86bfa71dafeeb00446901fe",
+  "role_rules_path": "scenarios/A-1-ambiguous-task-query.yaml",
+  "role_rules_sha256": "9b8f040f8703f1a2184b91d0c4d4afc98ef61d63ea299be4b504810a082e533c",
+  "role_rules": {
+    "planner": "사용자 요청과 공개 ACCEPTANCE.md를 읽고 개발·리뷰 담당자와 실행 가능한 명세를 조율한다.",
+    "developer": "합의한 명세와 공개 인수 조건을 만족하도록 src/task_query.py를 구현한다.",
+    "reviewer": "공개 인수 조건, SPEC.md, 구현과 실제 테스트 결과를 확인한다."
+  },
+  "protocol_sha256": "fab3a3bd8de9a6000e00c67011ecacb92b91747545ab5f7f6d28c26c769ca831"
+}
