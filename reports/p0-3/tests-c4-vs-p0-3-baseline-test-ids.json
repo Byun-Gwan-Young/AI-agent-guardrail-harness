@@ -1,0 +1,31 @@
+{
+  "groups": {
+    "baseline": {
+      "executed": 180,
+      "passed": 180,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "new": {
+      "executed": 39,
+      "passed": 39,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total": {
+    "executed": 219,
+    "passed": 219,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "missing_baseline_ids": [],
+  "network_attempts": [],
+  "python": "3.14.3 (main, Sep 17 2026, 12:04:26) [Clang 17.0.0 (clang-1700.6.3.2)]",
+  "executable": "/Users/byeongwan-yeong/AI-agent-guardrail-harness/venv/bin/python",
+  "failures": [],
+  "errors": []
+}
