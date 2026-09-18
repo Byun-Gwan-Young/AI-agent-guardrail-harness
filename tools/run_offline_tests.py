@@ -12,8 +12,9 @@ sys.path.insert(0, str(ROOT))
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--baseline', type=Path, default=ROOT / 'tests/fixtures/p0-2-baseline-test-ids.json')
     args = parser.parse_args()
-    baseline = set(json.loads((ROOT / 'tests/fixtures/p0-2-baseline-test-ids.json').read_text()))
+    baseline = set(json.loads(args.baseline.read_text()))
     attempts = []
     def audit(event, _args):
         if event in ('socket.connect', 'socket.getaddrinfo', 'socket.sendto'):
