@@ -69,7 +69,18 @@ class TerminationContext(Record):
         return self
 
 
+class CollectionMetadata(Record):
+    policy: Literal["legacy-failed-step-v1", "independent-sources-v1"]
+    final_output_status: Literal["valid", "invalid", "unmeasured"]
+    final_output_reason: str | None
+    source_turn: int | None = Field(default=None, ge=1)
+    measurement_status: Literal["observed", "partial", "unmeasured"]
+    metric_status: dict[str, Literal["measured", "unmeasured"]]
+    reasons: dict[str, str]
+
+
 class Observation(Record):
+    collection: CollectionMetadata | None = None
     # Runner-owned metadata; never requested from the model. Optional for legacy inputs.
     agent_id: str | None = Field(default=None, min_length=1)
     step_id: int = Field(ge=1)
@@ -84,6 +95,8 @@ class Observation(Record):
 
     @model_validator(mode="after")
     def validate_observation(self):
+        if self.collection and self.collection.source_turn is not None and self.collection.source_turn not in self.llm_turns:
+            raise ValueError("Collection source turn must belong to the observation")
         if self.termination_context and self.termination_context.declared_step is not None:
             if self.termination_context.declared_step > self.step_id:
                 raise ValueError("Declaration cannot refer to a future step")

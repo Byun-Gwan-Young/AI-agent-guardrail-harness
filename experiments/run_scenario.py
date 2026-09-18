@@ -24,6 +24,8 @@ from experiments.step_execution import (NO_OUTPUT_PLACEHOLDER, edit_instructions
                                         perform_step, tool_instructions)
 from experiments.output_contract import AgentOutput, parse_output
 from experiments.step_execution import StrictFailureStreak
+from experiments.observation_collection import (DEFAULT_POLICY, LEGACY, PROTOCOLS,
+    unavailable, validate_final_response, select_sources, collection_metadata)
 
 
 def save(path, value):
@@ -72,20 +74,52 @@ class CallBudget:
     def __init__(self, limit):
         self.limit, self.used, self.turns = limit, 0, []
         self.final_next, self.strict_used = False, False
+        self.final_report = unavailable("no verified final report")
+        self.response_evidence = None
 
     def reset(self):
         self.used, self.turns = 0, []
         self.final_next, self.strict_used = False, False
+        self.final_report = unavailable("no verified final report")
+        self.response_evidence = None
 
     def consume(self):
         if self.used >= self.limit:
             raise RuntimeError('max_llm_calls_per_step reached')
         self.used += 1
+        self.final_report = unavailable("no verified final report")
+        self.response_evidence = None
 
     async def capture(self, response):
         turn = response.headers.get('X-Guardrail-Turn')
         if turn is not None:
             self.turns.append(int(turn))
+        # Read the same response body once; no extra request. Never log credentials.
+        try:
+            await response.aread()
+            self.response_evidence = dict(request=json.loads(response.request.content),
+                response=response.json(), status_code=response.status_code,
+                turn=int(turn) if turn is not None else None)
+        except (ValueError, RuntimeError, TypeError):
+            self.response_evidence = None
+
+    def confirm_final_report(self, content):
+        if self.response_evidence is None:
+            self.final_report = unavailable('final HTTP evidence unavailable')
+            return
+        receipt = validate_final_response(**self.response_evidence, step_turns=self.turns)
+        if receipt['status'] == 'valid' and receipt['value'] != parse_output(content):
+            receipt = unavailable('SDK and HTTP output mismatch', 'invalid', receipt['source_turn'])
+        self.final_report = receipt
+
+    def observation_report(self):
+        if self.final_report['status'] == 'valid':
+            return self.final_report
+        if self.response_evidence is not None:
+            receipt = validate_final_response(**self.response_evidence, step_turns=self.turns)
+            if receipt['status'] != 'valid':
+                return receipt
+        return self.final_report
 
 
 async def deliver(client, session_id, payload, sleep=asyncio.sleep):
@@ -189,6 +223,9 @@ async def run(args):
     # Imports are deferred so --help and local helper tests do not construct clients.
     from autogen_agentchat.agents import AssistantAgent
 
+    collection_policy = getattr(args, "collection_policy", DEFAULT_POLICY)
+    if collection_policy not in PROTOCOLS:
+        raise ValueError("Unsupported collection policy")
     scenario_path = args.scenario.resolve()
     scenario = load_scenario(scenario_path)
     if {a.id for a in scenario.agents} != {'planner', 'developer', 'reviewer'}:
@@ -230,7 +267,7 @@ async def run(args):
     effective = json.loads(conditions_path.read_text(encoding='utf-8'))
     effective.update(context_buffer_messages=buffer_messages, seed_probe=args.seed_probe,
                      requested_seed=args.seed_probe if args.seed_probe is not None else scenario.seed,
-                     runner_protocol='tool-capable-step-v5-strict',
+                     runner_protocol=PROTOCOLS[collection_policy], collection_policy=collection_policy,
                      output_contract='flat-state-v2', strict_support='single_probe_passed',
                      strict_probe='strict-probe-3472654ecfca4274b03383123aa03131',
                      final_reasoning_effort='low',
@@ -240,7 +277,7 @@ async def run(args):
                      tool_failure_policy='invalid_tool_arguments: mark_failed, split-call correction, '
                                          'one retry in same step, abort on second invalid response; '
                                          'last call of each step carries no tools; '
-                                         'step without final text: failed/no_final_output, unmeasured observation',
+                                         'step without final text: failed/no_final_output; observation uses collection_policy',
                      recent_messages_policy='parsed narrative only; placeholder when structured output missing; '
                                             'no raw tool results')
     save(conditions_path, effective)
@@ -277,6 +314,7 @@ async def run(args):
         'not only this role\'s issues. Never claim tests passed without running them.\n' + schema_text)
         for i, a in enumerate(scenario.agents)]
     steps, missing, first, latest, baseline = [], [], None, None, None
+    observation_first = None
     reason, error, session, started = 'max_steps', None, None, False
     history, cursors = [], [0] * len(agents)
     pending_feedback = [None] * len(agents)
@@ -327,6 +365,18 @@ async def run(args):
                 latest = await asyncio.to_thread(work.acceptance)
                 first, termination = termination_context(first, parsed, step,
                     scenario.termination_context_collection.declarer_agent)
+                receipt = outcome['observation_report']
+                observed_parsed, observed_artifact = select_sources(collection_policy,
+                    failed=outcome['failed'], legacy_parsed=parsed, final_report=receipt,
+                    artifact=latest['artifact'])
+                if collection_policy != LEGACY:
+                    if observed_parsed is not None:
+                        observed_parsed.update(agent_id=agents[index].name, step_id=step)
+                    # Observation declaration must not alter execution success/stop control.
+                    observation_first, termination = termination_context(observation_first,
+                        observed_parsed, step, scenario.termination_context_collection.declarer_agent)
+                metadata = collection_metadata(collection_policy, receipt, observed_parsed,
+                    observed_artifact, scenario.progress_source, scenario.progress_metric.model_dump())
                 record = {'step_id': step, 'agent': agents[index].name, 'text': text,
                           'llm_calls': budget.used, 'llm_turns': sorted(set(budget.turns)),
                           'acceptance': latest, 'call_error': call_error}
@@ -336,6 +386,10 @@ async def run(args):
                               final_output=outcome['final_output'], failure_reasons=outcome['failure_reasons'])
                 record.update(strict_used=outcome['strict_used'], strict_failure=outcome['strict_failure'],
                               consecutive_strict_failures=strict_streak.count)
+                record['collection'] = metadata
+                record['observed_final_report'] = observed_parsed
+                if collection_policy != LEGACY:
+                    record['measurement_status'] = metadata['measurement_status']
                 steps.append(record)
                 save(out / 'steps.json', steps)
                 if not budget.turns:
@@ -343,12 +397,13 @@ async def run(args):
                     raise RuntimeError('No proxy turn ID; cannot submit a linked observation')
                 payload = make_observation(step_id=step, agent_id=agents[index].name,
                     llm_turns=record['llm_turns'],
-                    text=parsed['narrative'] if parsed else '' if outcome['failed'] else text,
+                    text=observed_parsed['narrative'] if observed_parsed else '',
                     progress_source=scenario.progress_source, progress_metric=scenario.progress_metric.model_dump(),
-                    artifact=None if outcome['failed'] else latest['artifact'], structured=
-                    {k: parsed[k] for k in ('open_issue_ids', 'info_items')} if parsed else
+                    artifact=observed_artifact, structured=
+                    {k: observed_parsed[k] for k in ('open_issue_ids', 'info_items')} if observed_parsed else
                     {'open_issue_ids': None, 'info_items': None, 'reasons': {'output': 'invalid or missing structured output'}},
-                    termination_context=termination)
+                    termination_context=termination,
+                    collection=metadata if collection_policy != LEGACY else None)
                 save(out / 'observations' / f'{step}.pending.json', payload)
                 try:
                     ack = await deliver(client, session_id, payload)
@@ -432,6 +487,7 @@ async def run(args):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('scenario', type=Path)
+    parser.add_argument('--collection-policy', choices=tuple(PROTOCOLS), default=DEFAULT_POLICY)
     parser.add_argument('--proxy-url', default=os.environ.get('GUARDRAIL_PROXY_URL', 'http://127.0.0.1:8000'))
     parser.add_argument('--output-root', type=Path, default=ROOT / 'runs')
     parser.add_argument('--run-index', type=int, default=1)

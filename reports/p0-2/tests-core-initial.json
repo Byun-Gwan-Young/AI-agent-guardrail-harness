@@ -1,0 +1,36 @@
+{
+  "groups": {
+    "baseline": {
+      "executed": 157,
+      "passed": 157,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "new": {
+      "executed": 19,
+      "passed": 18,
+      "failures": 0,
+      "errors": 1,
+      "skipped": 0
+    }
+  },
+  "total": {
+    "executed": 176,
+    "passed": 175,
+    "failures": 0,
+    "errors": 1,
+    "skipped": 0
+  },
+  "missing_baseline_ids": [],
+  "network_attempts": [],
+  "python": "3.14.3 (main, Sep 17 2026, 12:04:26) [Clang 17.0.0 (clang-1700.6.3.2)]",
+  "executable": "/Users/byeongwan-yeong/AI-agent-guardrail-harness/venv/bin/python",
+  "failures": [],
+  "errors": [
+    {
+      "test": "test_independent_collection.IndependentRunnerTests.test_429_has_no_report_but_keeps_actual_artifact_and_abort",
+      "traceback": "Traceback (most recent call last):\n  File \"/Users/byeongwan-yeong/.pyenv/versions/3.14.3/lib/python3.14/asyncio/runners.py\", line 127, in run\n    return self._loop.run_until_complete(task)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"/Users/byeongwan-yeong/.pyenv/versions/3.14.3/lib/python3.14/asyncio/base_events.py\", line 719, in run_until_complete\n    return future.result()\n           ~~~~~~~~~~~~~^^\n  File \"/Users/byeongwan-yeong/AI-agent-guardrail-harness/tests/test_independent_collection.py\", line 135, in test_429_has_no_report_but_keeps_actual_artifact_and_abort\n    r=await self.run_offline([httpx.Response(429,json={'error':{'message':'limit'}})])\n      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/byeongwan-yeong/AI-agent-guardrail-harness/tests/test_tool_recovery.py\", line 324, in run_offline\n    'pending': {p.name for p in (out/'observations').iterdir()}}\n                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"/Users/byeongwan-yeong/.pyenv/versions/3.14.3/lib/python3.14/pathlib/__init__.py\", line 836, in iterdir\n    with os.scandir(root_dir) as scandir_it:\n         ~~~~~~~~~~^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: '/var/folders/k0/h8xgtr8d5ll4hw5_9198vr_m0000gn/T/tmpddjklnm_/runs/A-1-5ef59a62feb74fa0a1e9081beae73aaf/observations'\n"
+    }
+  ]
+}

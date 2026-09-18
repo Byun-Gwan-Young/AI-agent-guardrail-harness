@@ -281,15 +281,19 @@ class RunnerIntegrationTests(unittest.IsolatedAsyncioTestCase):
         # Synthetic harness only; production YAML and fixture remain untouched.
         scenario.termination.max_steps = max_steps
         scenario.model = 'fake-model'
+        if hasattr(self, 'criteria_version'):
+            scenario.criteria_version = self.criteria_version
         upstream_requests = []
         def upstream_handler(request):
             upstream_requests.append(json.loads(request.content))
-            return responses.pop(0)
+            return responses(request) if callable(responses) else responses.pop(0)
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            config = root / 'config.yaml'; config.write_text('{}')
+            config = root / 'config.yaml'; config.write_text(
+                'criteria_version: ' + scenario.criteria_version if hasattr(self, 'criteria_version') else '{}')
             upstream = httpx.MockTransport(upstream_handler)
-            app = create_app(root / 'logs', transport=upstream, config_path=config)
+            extra = {'sleep': self.proxy_sleep} if hasattr(self, 'proxy_sleep') else {}
+            app = create_app(root / 'logs', transport=upstream, config_path=config, **extra)
             real_client = httpx.AsyncClient
             class OfflineClient(real_client):
                 def __init__(self, *a, **kw):
@@ -300,11 +304,14 @@ class RunnerIntegrationTests(unittest.IsolatedAsyncioTestCase):
                 artifact = capture_artifact(work.root, scenario.monitored_paths,
                     test_suite_id=scenario.success_criteria.test_suite.test_suite_id)
                 artifact.update(test_pass_count=7,test_total_count=16)
-                return {'summary':{'passed':7,'tests':16}, 'gate':{'machine_success':False},
-                        'artifact':artifact,'error':None}
+                result = {'summary':{'passed':7,'tests':16},
+                          'gate':{'machine_success':getattr(self, 'machine_success', False)},
+                          'artifact':artifact,'error':None}
+                return self.acceptance_transform(result) if hasattr(self, 'acceptance_transform') else result
             args = SimpleNamespace(scenario=scenario_path,run_index=1,temperature=0.0,
                 output_root=root/'runs',no_context_buffer=False,context_buffer_messages=12,
-                seed_probe=None,proxy_url='http://mock')
+                seed_probe=None,proxy_url='http://mock',
+                collection_policy=getattr(self, 'collection_policy', 'legacy-failed-step-v1'))
             with patch.object(runner,'ROOT',project), patch.object(runner,'load_scenario',return_value=scenario), \
                     patch.object(runner.Workspace,'acceptance',acceptance), \
                     patch('httpx.AsyncClient',OfflineClient), patch.dict('os.environ',{'GROQ_API_KEY':'fake'}), \

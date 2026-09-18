@@ -131,3 +131,14 @@ history_step_ids를 결과에 남겨 비교 근거를 확인할 수 있다. 다�
 관측은 비교 이력에 섞이지 않지만 교착 판정의 N, grace_steps,
 missing_review_steps는 모두 전역 step 기준이다. 기존 progress-v1 결과에는
 이 진단 필드를 추가하지 않는다. 세션에 고정된 criteria_version으로 경로를 선택한다.
+# P0-2 관측 수집 정책 추가
+
+`Observation.collection`은 선택 메타데이터다. `policy`, `final_output_status`
+(`valid`/`invalid`/`unmeasured`), `final_output_reason`, `source_turn`,
+`measurement_status` (`observed`/`partial`/`unmeasured`), 지표별 `metric_status`와
+`reasons`를 저장한다. source_turn이 있으면 해당 관측 llm_turns에 속해야 한다.
+수집 상태는 원시 입력의 유무이며 진전도 판정이 아니다. 미수집 값은 null로 유지한다.
+모델 출력 스키마는 그대로이며 agent_id는 실행기만 부여한다.
+기존 collection 없는 관측도 호환된다. 수집 정책은
+[결정 005](decisions/005-independent-observation-collection.md)를 따른다.
+진전도·교착 계산 버전은 변경하지 않는다.

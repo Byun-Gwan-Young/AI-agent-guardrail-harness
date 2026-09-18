@@ -109,6 +109,8 @@ def make_client(options, budget):
                     parse_output(result.content)
                 except (ValueError, TypeError) as exc:
                     raise StrictOutputError('strict_schema_mismatch', str(exc)) from exc
+            if final:
+                budget.confirm_final_report(result.content)
             return result
 
         async def create_stream(self, *a, **kw):
@@ -240,4 +242,5 @@ async def perform_step(agent, context, budget, allowed):
         reasons.append('no_final_output')
     return {'text': text, 'failed': bool(reasons), 'abort': abort, 'error': error,
             'tool_errors': errors, 'feedback': feedback, 'final_output': final_output,
-            'failure_reasons': reasons, 'strict_failure': strict_failure, 'strict_used': budget.strict_used}
+            'failure_reasons': reasons, 'strict_failure': strict_failure, 'strict_used': budget.strict_used,
+            'observation_report': budget.observation_report()}

@@ -1,0 +1,14 @@
+{
+  "progress_signal.py": "6503029fbd837bbaad46bdc60abbf01cddc0b325fad3014e11e56794639da34f",
+  "progress_signal_v1.py": "718499bc38edab1106b2f74583e5935c675a89d22776f6cca32d7a3a187a03ea",
+  "deadlock_policy.py": "e51e269056a8837ac5e39af2b55f6adbaa1b4dea0836a029588cae5e436d04fb",
+  "deadlock_policy_v01.py": "b7d7775876f31ad16bd90c0056dbb89f1edab505f6a897c015d6864313ebda85",
+  "deadlock_policy_v02.py": "2f2864cf89232faddf60622706cea8dae24d027bdcbcafd4bfc3a0faa9f6861d",
+  "docs/criteria/deadlock-v0.1.json": "e8d0b3c90b4e8346eabe61500e3d01380a586131f1724d4515a428ebb7aa62aa",
+  "docs/criteria/deadlock-v0.2.json": "3090436e3a92f47b5de5c8080211000e6262d34abe905493ea982b4acbd06214",
+  "reports/p0-1/replay.json": "b41f7a81d30404459e1710167055faff39fc68b4d033891275bd7ce23938b18a",
+  "reports/p0-1/comparison.md": "ce31c426617e834a8e1e043c2b2c97fb3150304e5dab520b3ce92d9a7a181589",
+  "experiments/output_contract.py": "b57f28ba93d437e74cbe7da41e6c533c2527f0d938ee03d0d19dcf00ac637222",
+  "scenarios/agent-output.schema.json": "f7411d5a498a8cc37f1d344821b9988281f05427fcb4acebaad59de0d2c2e8ad",
+  "logs/A-1-82c393c248a34286b318f344f2e181e4.json": "da8636936f5978e74c330937216a427412db385bd86bfa71dafeeb00446901fe"
+}
