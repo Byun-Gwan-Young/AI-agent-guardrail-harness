@@ -23,8 +23,9 @@ from suite_identity import compute_test_suite_id
 from experiments.step_execution import (NO_OUTPUT_PLACEHOLDER, edit_instructions, make_client,
                                         perform_step, tool_instructions)
 from experiments.output_contract import AgentOutput, parse_output
+from experiments.issue_contract import IssueContract, V1, V2, VERSIONS, PROTOCOL_V2, for_scenario
 from experiments.step_execution import StrictFailureStreak
-from experiments.observation_collection import (DEFAULT_POLICY, LEGACY, PROTOCOLS,
+from experiments.observation_collection import (DEFAULT_POLICY, INDEPENDENT, LEGACY, PROTOCOLS,
     unavailable, validate_final_response, select_sources, collection_metadata)
 
 
@@ -71,7 +72,8 @@ def prompt_trace(steps, session):
 
 
 class CallBudget:
-    def __init__(self, limit):
+    def __init__(self, limit, contract=None):
+        self.contract = contract if contract is not None else IssueContract(V1)
         self.limit, self.used, self.turns = limit, 0, []
         self.final_next, self.strict_used = False, False
         self.final_report = unavailable("no verified final report")
@@ -107,8 +109,8 @@ class CallBudget:
         if self.response_evidence is None:
             self.final_report = unavailable('final HTTP evidence unavailable')
             return
-        receipt = validate_final_response(**self.response_evidence, step_turns=self.turns)
-        if receipt['status'] == 'valid' and receipt['value'] != parse_output(content):
+        receipt = validate_final_response(**self.response_evidence, step_turns=self.turns, contract=self.contract)
+        if receipt['status'] == 'valid' and receipt['value'] != self.contract.parse(content):
             receipt = unavailable('SDK and HTTP output mismatch', 'invalid', receipt['source_turn'])
         self.final_report = receipt
 
@@ -116,7 +118,7 @@ class CallBudget:
         if self.final_report['status'] == 'valid':
             return self.final_report
         if self.response_evidence is not None:
-            receipt = validate_final_response(**self.response_evidence, step_turns=self.turns)
+            receipt = validate_final_response(**self.response_evidence, step_turns=self.turns, contract=self.contract)
             if receipt['status'] != 'valid':
                 return receipt
         return self.final_report
@@ -228,6 +230,10 @@ async def run(args):
         raise ValueError("Unsupported collection policy")
     scenario_path = args.scenario.resolve()
     scenario = load_scenario(scenario_path)
+    contract = for_scenario(getattr(args, 'output_contract', V2), scenario)
+    if contract.version == V2 and collection_policy != INDEPENDENT:
+        # v7 extends the v6 independent-observation protocol; no other combination is labelled.
+        raise ValueError('output-contract-v2 requires the independent collection policy')
     if {a.id for a in scenario.agents} != {'planner', 'developer', 'reviewer'}:
         raise ValueError('This runner currently supports the approved three-role artifact scenario')
     if scenario.success_criteria.test_suite is None or not scenario.fixture_dir:
@@ -267,7 +273,7 @@ async def run(args):
     effective = json.loads(conditions_path.read_text(encoding='utf-8'))
     effective.update(context_buffer_messages=buffer_messages, seed_probe=args.seed_probe,
                      requested_seed=args.seed_probe if args.seed_probe is not None else scenario.seed,
-                     runner_protocol=PROTOCOLS[collection_policy], collection_policy=collection_policy,
+                     runner_protocol=PROTOCOL_V2 if contract.version == V2 else PROTOCOLS[collection_policy], collection_policy=collection_policy,
                      output_contract='flat-state-v2', strict_support='single_probe_passed',
                      strict_probe='strict-probe-3472654ecfca4274b03383123aa03131',
                      final_reasoning_effort='low',
@@ -280,6 +286,9 @@ async def run(args):
                                          'step without final text: failed/no_final_output; observation uses collection_policy',
                      recent_messages_policy='parsed narrative only; placeholder when structured output missing; '
                                             'no raw tool results')
+    effective.update(output_contract_version=contract.version, allowed_issues_sha256=contract.sha256)
+    if contract.version == V2:
+        effective.update(output_contract=contract.version, strict_support='unverified', strict_probe=None)
     save(conditions_path, effective)
     print('session_id:', session_id, 'run_directory:', out, flush=True)
     shutil.copy2(scenario_path, out / 'scenario.yaml')
@@ -287,7 +296,7 @@ async def run(args):
                'X-Guardrail-Run-Index': str(args.run_index),
                'X-Guardrail-Framework-Version': 'autogen-agentchat/' + versions['autogen-agentchat']}
     headers['X-Guardrail-Context-Buffer-Messages'] = str(buffer_messages) if buffer_messages is not None else 'none'
-    budget = CallBudget(scenario.termination.max_llm_calls_per_step)
+    budget = CallBudget(scenario.termination.max_llm_calls_per_step, contract)
 
     base = args.proxy_url.rstrip('/').removesuffix('/v1')
     model_http = httpx.AsyncClient(event_hooks={'response': [budget.capture]})
@@ -302,6 +311,8 @@ async def run(args):
         options['seed'] = args.seed_probe
     model = make_client(options, budget)
     schema_text = (ROOT / 'scenarios/agent-output.schema.json').read_text(encoding='utf-8')
+    if contract.version == V2:
+        schema_text = json.dumps(contract.schema(), ensure_ascii=False) + '\n' + contract.instructions()
     role_tools = [work.tools(a) for a in scenario.agents]
     role_names = [[t.__name__ for t in ts] for ts in role_tools]
     save(out / 'registered-tools.json', dict(zip([a.id for a in scenario.agents], role_names)))
@@ -347,14 +358,14 @@ async def run(args):
                 pending_feedback[index] = outcome['feedback']
                 if not outcome['failed']:
                     try:
-                        parsed = parse_output(text)
+                        parsed = contract.parse(text)
                         parsed['agent_id'] = agents[index].name
                         parsed['step_id'] = step
                     except (ValueError, TypeError) as exc:
                         # A text response is not a usable final output until its schema validates.
                         outcome['failed'] = True
                         outcome['final_output'] = False
-                        outcome['failure_reasons'].append('no_final_output')
+                        outcome['failure_reasons'].append(getattr(exc, 'code', 'no_final_output'))
                         outcome['feedback'] = '최종 구조화 JSON이 유효하지 않다. 다음 차례에는 지정된 스키마로 응답하라.'
                         pending_feedback[index] = outcome['feedback']
                         call_error = 'invalid_final_output: ' + type(exc).__name__
@@ -403,7 +414,8 @@ async def run(args):
                     {k: observed_parsed[k] for k in ('open_issue_ids', 'info_items')} if observed_parsed else
                     {'open_issue_ids': None, 'info_items': None, 'reasons': {'output': 'invalid or missing structured output'}},
                     termination_context=termination,
-                    collection=metadata if collection_policy != LEGACY else None)
+                    collection=metadata if collection_policy != LEGACY else None,
+                    issue_report=contract.report(observed_parsed))
                 save(out / 'observations' / f'{step}.pending.json', payload)
                 try:
                     ack = await deliver(client, session_id, payload)
@@ -488,6 +500,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('scenario', type=Path)
     parser.add_argument('--collection-policy', choices=tuple(PROTOCOLS), default=DEFAULT_POLICY)
+    parser.add_argument('--output-contract', choices=VERSIONS, default=V2)
     parser.add_argument('--proxy-url', default=os.environ.get('GUARDRAIL_PROXY_URL', 'http://127.0.0.1:8000'))
     parser.add_argument('--output-root', type=Path, default=ROOT / 'runs')
     parser.add_argument('--run-index', type=int, default=1)

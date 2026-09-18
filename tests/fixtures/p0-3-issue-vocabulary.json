@@ -1,0 +1,7 @@
+{
+  "initial_issue_ids": ["fixture-core"],
+  "allowed_issues": [
+    {"id": "fixture-core", "definition": "Synthetic core behavior must match the fixture contract."},
+    {"id": "fixture-edge", "definition": "Synthetic boundary inputs must satisfy the fixture checks."}
+  ]
+}

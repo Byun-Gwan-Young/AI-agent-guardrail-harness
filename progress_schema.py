@@ -1,7 +1,7 @@
 """Versioned observation input; computed verdicts are never accepted as input."""
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator, model_serializer
 
 CONVERSATION_METRICS = ["proposal_value_delta", "open_issues_count", "new_info_ratio"]
 ARTIFACT_METRICS = ["test_pass_count", "files_changed", "build_status"]
@@ -79,7 +79,15 @@ class CollectionMetadata(Record):
     reasons: dict[str, str]
 
 
+class IssueReport(Record):
+    output_contract_version: Literal['output-contract-v2']
+    allowed_issues_sha256: str = Field(pattern=r'^[0-9a-f]{64}$')
+    unlisted_issues: list[str] | None
+
+
 class Observation(Record):
+    # Evidence only: never selected by progress metrics or paired extraction.
+    issue_report: IssueReport | None = None
     collection: CollectionMetadata | None = None
     # Runner-owned metadata; never requested from the model. Optional for legacy inputs.
     agent_id: str | None = Field(default=None, min_length=1)
@@ -92,6 +100,13 @@ class Observation(Record):
     # Paired B output for evaluation against A; never used in A's progress verdict.
     extracted_conversation: Conversation | None = None
     termination_context: TerminationContext | None = None
+
+    @model_serializer(mode='wrap')
+    def preserve_legacy_shape(self, handler):
+        data = handler(self)
+        if self.issue_report is None:
+            data.pop('issue_report', None)
+        return data
 
     @model_validator(mode="after")
     def validate_observation(self):

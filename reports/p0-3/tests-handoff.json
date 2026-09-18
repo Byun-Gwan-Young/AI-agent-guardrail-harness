@@ -1,0 +1,44 @@
+{
+  "groups": {
+    "baseline": {
+      "executed": 157,
+      "passed": 157,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "new": {
+      "executed": 39,
+      "passed": 36,
+      "failures": 0,
+      "errors": 3,
+      "skipped": 0
+    }
+  },
+  "total": {
+    "executed": 196,
+    "passed": 193,
+    "failures": 0,
+    "errors": 3,
+    "skipped": 0
+  },
+  "missing_baseline_ids": [],
+  "network_attempts": [],
+  "python": "3.14.3 (main, Sep 17 2026, 12:04:26) [Clang 17.0.0 (clang-1700.6.3.2)]",
+  "executable": "/Users/byeongwan-yeong/AI-agent-guardrail-harness/venv/bin/python",
+  "failures": [],
+  "errors": [
+    {
+      "test": "test_issue_vocabulary.IssueRunnerTests.test_all_roles_receive_definitions_and_only_local_enum_validation",
+      "traceback": "Traceback (most recent call last):\n  File \"/Users/byeongwan-yeong/.pyenv/versions/3.14.3/lib/python3.14/asyncio/runners.py\", line 127, in run\n    return self._loop.run_until_complete(task)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"/Users/byeongwan-yeong/.pyenv/versions/3.14.3/lib/python3.14/asyncio/base_events.py\", line 719, in run_until_complete\n    return future.result()\n           ~~~~~~~~~~~~~^^\n  File \"/Users/byeongwan-yeong/AI-agent-guardrail-harness/tests/test_issue_vocabulary.py\", line 156, in test_all_roles_receive_definitions_and_only_local_enum_validation\n    r = await self.run_offline(lambda request:v2_response(), max_steps=3)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/byeongwan-yeong/AI-agent-guardrail-harness/tests/test_tool_recovery.py\", line 285, in run_offline\n    scenario = self.scenario_transform(scenario)\n  File \"/Users/byeongwan-yeong/AI-agent-guardrail-harness/tests/test_issue_vocabulary.py\", line 153, in scenario_transform\n    return Scenario.model_validate(data)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"/Users/byeongwan-yeong/AI-agent-guardrail-harness/venv/lib/python3.14/site-packages/pydantic/main.py\", line 732, in model_validate\n    return cls.__pydantic_validator__.validate_python(\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        obj,\n        ^^^^\n    ...<5 lines>...\n        by_name=by_name,\n        ^^^^^^^^^^^^^^^^\n    )\n    ^\npydantic_core._pydantic_core.ValidationError: 1 validation error for Scenario\n  Value error, Expected calls must fit the declared maximum [type=value_error, input_value={'schema_version': 'scena...석하지 않는다.']}}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error\n"
+    },
+    {
+      "test": "test_issue_vocabulary.IssueRunnerTests.test_invalid_id_discards_whole_conversation_preserves_artifact_and_failure",
+      "traceback": "Traceback (most recent call last):\n  File \"/Users/byeongwan-yeong/.pyenv/versions/3.14.3/lib/python3.14/asyncio/runners.py\", line 127, in run\n    return self._loop.run_until_complete(task)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"/Users/byeongwan-yeong/.pyenv/versions/3.14.3/lib/python3.14/asyncio/base_events.py\", line 719, in run_until_complete\n    return future.result()\n           ~~~~~~~~~~~~~^^\n  File \"/Users/byeongwan-yeong/AI-agent-guardrail-harness/tests/test_issue_vocabulary.py\", line 176, in test_invalid_id_discards_whole_conversation_preserves_artifact_and_failure\n    r = await self.run_offline([recovery.success(),v2_response(invalid),recovery.success(),v2_response()])\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/byeongwan-yeong/AI-agent-guardrail-harness/tests/test_tool_recovery.py\", line 285, in run_offline\n    scenario = self.scenario_transform(scenario)\n  File \"/Users/byeongwan-yeong/AI-agent-guardrail-harness/tests/test_issue_vocabulary.py\", line 153, in scenario_transform\n    return Scenario.model_validate(data)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"/Users/byeongwan-yeong/AI-agent-guardrail-harness/venv/lib/python3.14/site-packages/pydantic/main.py\", line 732, in model_validate\n    return cls.__pydantic_validator__.validate_python(\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        obj,\n        ^^^^\n    ...<5 lines>...\n        by_name=by_name,\n        ^^^^^^^^^^^^^^^^\n    )\n    ^\npydantic_core._pydantic_core.ValidationError: 1 validation error for Scenario\n  Value error, Expected calls must fit the declared maximum [type=value_error, input_value={'schema_version': 'scena...석하지 않는다.']}}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error\n"
+    },
+    {
+      "test": "test_issue_vocabulary.IssueRunnerTests.test_recovered_final_keeps_unlisted_evidence_but_still_failed",
+      "traceback": "Traceback (most recent call last):\n  File \"/Users/byeongwan-yeong/.pyenv/versions/3.14.3/lib/python3.14/asyncio/runners.py\", line 127, in run\n    return self._loop.run_until_complete(task)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"/Users/byeongwan-yeong/.pyenv/versions/3.14.3/lib/python3.14/asyncio/base_events.py\", line 719, in run_until_complete\n    return future.result()\n           ~~~~~~~~~~~~~^^\n  File \"/Users/byeongwan-yeong/AI-agent-guardrail-harness/tests/test_issue_vocabulary.py\", line 187, in test_recovered_final_keeps_unlisted_evidence_but_still_failed\n    r = await self.run_offline([recovery.unknown400(),recovery.success(),v2_response(),\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                               recovery.success(),v2_response()])\n                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/byeongwan-yeong/AI-agent-guardrail-harness/tests/test_tool_recovery.py\", line 285, in run_offline\n    scenario = self.scenario_transform(scenario)\n  File \"/Users/byeongwan-yeong/AI-agent-guardrail-harness/tests/test_issue_vocabulary.py\", line 153, in scenario_transform\n    return Scenario.model_validate(data)\n           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^\n  File \"/Users/byeongwan-yeong/AI-agent-guardrail-harness/venv/lib/python3.14/site-packages/pydantic/main.py\", line 732, in model_validate\n    return cls.__pydantic_validator__.validate_python(\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        obj,\n        ^^^^\n    ...<5 lines>...\n        by_name=by_name,\n        ^^^^^^^^^^^^^^^^\n    )\n    ^\npydantic_core._pydantic_core.ValidationError: 1 validation error for Scenario\n  Value error, Expected calls must fit the declared maximum [type=value_error, input_value={'schema_version': 'scena...석하지 않는다.']}}, input_type=dict]\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error\n"
+    }
+  ]
+}

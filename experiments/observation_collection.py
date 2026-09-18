@@ -13,7 +13,7 @@ def unavailable(reason, status='unmeasured', source_turn=None):
     return {'status': status, 'source_turn': source_turn, 'value': None, 'reason': reason}
 
 
-def validate_final_response(*, request, response, status_code, turn, step_turns):
+def validate_final_response(*, request, response, status_code, turn, step_turns, contract=None):
     """Require evidence of a linked, complete, tool-free strict final report."""
     if type(turn) is not int or turn not in step_turns:
         return unavailable('final response not linked to this step')
@@ -35,9 +35,10 @@ def validate_final_response(*, request, response, status_code, turn, step_turns)
             or message.get('function_call') or not isinstance(message.get('content'), str)):
         return unavailable('incomplete final response or tool result', 'invalid', turn)
     try:
-        value = parse_output(message['content'])
-    except (ValueError, TypeError):
-        return unavailable('final output contract violation', 'invalid', turn)
+        value = (contract.parse if contract is not None else parse_output)(message['content'])
+    except (ValueError, TypeError) as exc:
+        code = getattr(exc, 'code', None)
+        return unavailable('final output contract violation' + (': ' + code if code else ''), 'invalid', turn)
     return {'status': 'valid', 'source_turn': turn, 'value': value, 'reason': None}
 
 

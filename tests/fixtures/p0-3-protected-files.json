@@ -1,0 +1,10 @@
+{
+  "scenarios/A-1-ambiguous-task-query.yaml": "9b8f040f8703f1a2184b91d0c4d4afc98ef61d63ea299be4b504810a082e533c",
+  "reports/p0-2/replay.json": "7acc3084d79ef529eb549107e3fe85d2aa60a10ad8a838191e2191975c166514",
+  "reports/p0-2/comparison.md": "877f3954cb159eae52358f5d841ca1e8fbd4695138ab9045be14be3084203cf0",
+  "scenario_assets/A-1/acceptance_runner.py": "649041640ed784b692e17aef705672e0961daf8418580e5245b7613e71b9cb16",
+  "scenario_assets/A-1/SPEC.md": "d02b69f75fefe029a3b74c1dc1d49e3ac231eaaf29f9f17701f042ecd64386c7",
+  "scenario_assets/A-1/ACCEPTANCE.md": "d5d00d051b250d23855bc9588cb601613b3c81757212beba6ea546284857a8ae",
+  "scenario_assets/A-1/tests/test_task_query.py": "f47224e37cb081d14f9d5b4cc50710d2f13ba8b7f53b7531b96e3d7e4b56d1a1",
+  "scenario_assets/A-1/src/task_query.py": "52eb4d11f3c54708ae9f5721b2734fccd12b2f8dac35c89c2ed8f7178695025d"
+}

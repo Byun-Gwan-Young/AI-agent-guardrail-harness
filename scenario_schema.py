@@ -73,6 +73,19 @@ class TokenEstimate(Definition):
     assumptions: list[str] = Field(min_length=1)
 
 
+class AllowedIssue(Definition):
+    id: str
+    definition: str
+
+    @model_validator(mode="after")
+    def nonempty_single_line(self):
+        if not self.id.strip() or self.id != self.id.strip() or any(c.isspace() for c in self.id):
+            raise ValueError("Issue ID must be nonempty and contain no whitespace; no normalization")
+        if not self.definition.strip() or len(self.definition.splitlines()) != 1:
+            raise ValueError("Issue definition must be a nonempty single line")
+        return self
+
+
 class Scenario(Definition):
     schema_version: Literal["scenario-v1"]
     scenario_id: str
@@ -99,10 +112,21 @@ class Scenario(Definition):
     fixture_dir: str | None = None
     monitored_paths: list[str] = Field(default_factory=list)
     initial_issue_ids: list[str] = Field(default_factory=list)
+    # None identifies a legacy scenario with no closed vocabulary.
+    allowed_issues: list[AllowedIssue] | None = None
     token_estimate: TokenEstimate
 
     @model_validator(mode="after")
     def consistency(self):
+        initial = self.initial_issue_ids
+        if any(not i.strip() or any(c.isspace() for c in i) for i in initial) or len(initial) != len(set(initial)):
+            raise ValueError("Initial issue IDs must be nonempty, whitespace-free and unique")
+        if self.allowed_issues is not None:
+            allowed = [i.id for i in self.allowed_issues]
+            if len(allowed) != len(set(allowed)):
+                raise ValueError("Allowed issue IDs must be unique")
+            if not set(initial) <= set(allowed):
+                raise ValueError("Initial issue IDs must be a subset of allowed issue IDs")
         ids = [agent.id for agent in self.agents]
         if len(ids) != len(set(ids)) or self.termination_context_collection.declarer_agent not in ids:
             raise ValueError("Agent IDs must be unique and declarer must exist")

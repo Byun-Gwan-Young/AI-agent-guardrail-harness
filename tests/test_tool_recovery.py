@@ -278,6 +278,9 @@ class RunnerIntegrationTests(unittest.IsolatedAsyncioTestCase):
         project = Path(__file__).resolve().parents[1]
         scenario_path = project / 'scenarios/A-1-ambiguous-task-query.yaml'
         scenario = load_scenario(scenario_path).model_copy(deep=True)
+        if hasattr(self, 'scenario_transform'):
+            # Revalidated before the harness overrides below, which bypass validation.
+            scenario = self.scenario_transform(scenario)
         # Synthetic harness only; production YAML and fixture remain untouched.
         scenario.termination.max_steps = max_steps
         scenario.model = 'fake-model'
@@ -312,6 +315,7 @@ class RunnerIntegrationTests(unittest.IsolatedAsyncioTestCase):
                 output_root=root/'runs',no_context_buffer=False,context_buffer_messages=12,
                 seed_probe=None,proxy_url='http://mock',
                 collection_policy=getattr(self, 'collection_policy', 'legacy-failed-step-v1'))
+            args.output_contract = getattr(self, 'output_contract', 'output-contract-v1')
             with patch.object(runner,'ROOT',project), patch.object(runner,'load_scenario',return_value=scenario), \
                     patch.object(runner.Workspace,'acceptance',acceptance), \
                     patch('httpx.AsyncClient',OfflineClient), patch.dict('os.environ',{'GROQ_API_KEY':'fake'}), \
