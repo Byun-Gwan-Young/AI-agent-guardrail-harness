@@ -8,7 +8,7 @@ import httpx
 
 from scenario_schema import Scenario, load_scenario
 from experiments.issue_contract import (IssueContract, IssueContractViolation, ISSUE_ID_COLLISION,
-                                        V1, V2, PROTOCOL_V2, for_scenario)
+                                        OPEN_ISSUE_ID_NOT_ALLOWED, V1, V2, PROTOCOL_V2, for_scenario)
 from experiments.output_contract import output_schema, strict_response_format, parse_output
 from experiments.observation_collection import INDEPENDENT, validate_final_response
 from experiments.run_scenario import CallBudget
@@ -100,6 +100,16 @@ class VersionedContractTests(unittest.TestCase):
             with self.subTest(value=value), self.assertRaises(ValueError):
                 self.contract.parse(json.dumps(value))
 
+    def test_vocabulary_codes_distinguish_membership_from_format(self):
+        with self.assertRaises(IssueContractViolation) as ctx:
+            self.contract.parse(json.dumps({**VALUE,'open_issue_ids':['fixture-core','outside']}))
+        self.assertEqual(ctx.exception.code, OPEN_ISSUE_ID_NOT_ALLOWED)
+        # Duplicates are a format error even when an ID is also outside the vocabulary.
+        for ids in (['fixture-core','fixture-core'], ['outside','outside']):
+            with self.subTest(ids=ids), self.assertRaises(ValueError) as ctx:
+                self.contract.parse(json.dumps({**VALUE,'open_issue_ids':ids}))
+            self.assertIsNone(getattr(ctx.exception,'code',None))
+
     def test_duplicate_unlisted_issues_rejected_exactly(self):
         with self.assertRaises(ValueError):
             self.contract.parse(json.dumps({**VALUE,'unlisted_issues':['Same text','Same text']}))
@@ -116,8 +126,8 @@ class VersionedContractTests(unittest.TestCase):
             with self.subTest(open=other):
                 try:
                     self.contract.parse(json.dumps({**VALUE,'open_issue_ids':other}))
-                except IssueContractViolation:
-                    self.fail('only the collision rule uses the collision code')
+                except IssueContractViolation as exc:
+                    self.assertNotEqual(exc.code, ISSUE_ID_COLLISION)
                 except ValueError:
                     pass
         for near in (['FIXTURE-CORE'], [' fixture-core'], ['fixture-core ']):
@@ -161,7 +171,9 @@ class VersionedContractTests(unittest.TestCase):
         self.assertEqual(valid['value'], VALUE)
         bad = validate_final_response(response=v2_response({**VALUE,'open_issue_ids':['outside']}).json(), **args)
         self.assertEqual(bad['status'], 'invalid'); self.assertIsNone(bad['value'])
-        self.assertEqual(bad['reason'], 'final output contract violation')
+        self.assertEqual(bad['reason'], 'final output contract violation: ' + OPEN_ISSUE_ID_NOT_ALLOWED)
+        fmt = validate_final_response(response=v2_response({**VALUE,'open_issue_ids':['x','x']}).json(), **args)
+        self.assertEqual(fmt['reason'], 'final output contract violation')
         clash = validate_final_response(response=v2_response({**VALUE,'unlisted_issues':['fixture-core']}).json(), **args)
         self.assertEqual(clash['status'], 'invalid'); self.assertIsNone(clash['value'])
         self.assertEqual(clash['reason'], 'final output contract violation: ' + ISSUE_ID_COLLISION)
@@ -212,7 +224,8 @@ class IssueRunnerTests(unittest.IsolatedAsyncioTestCase):
         r = await self.run_offline([recovery.success(),v2_response(invalid),recovery.success(),v2_response()])
         s = r['steps'][0]; o = s['observation']
         self.assertEqual(s['step_status'],'failed')
-        self.assertIn('strict_schema_mismatch',s['failure_reasons'])
+        self.assertIn(OPEN_ISSUE_ID_NOT_ALLOWED,s['failure_reasons'])
+        self.assertEqual(s['vocabulary_violation'],OPEN_ISSUE_ID_NOT_ALLOWED)
         self.assertIsNone(s['observed_final_report'])
         self.assertIsNone(o['conversation']['open_issue_ids'])
         self.assertIsNone(o['issue_report']['unlisted_issues'])
@@ -260,3 +273,74 @@ class IssueRunnerTests(unittest.IsolatedAsyncioTestCase):
         self.collection_policy = 'legacy-failed-step-v1'
         with self.assertRaises(ValueError):
             await self.run_offline(lambda request:v2_response())
+
+
+def raw_final(content):
+    body = recovery.success().json()
+    body['choices'][0]['message']['content'] = content
+    return httpx.Response(200, json=body)
+
+
+FORMAT = raw_final('{"narrative":"missing other fields"}')
+OUTSIDE = {**VALUE,'open_issue_ids':['outside']}
+COLLIDE = {**VALUE,'unlisted_issues':['fixture-core']}
+
+
+class VocabularyStreakTests(unittest.IsolatedAsyncioTestCase):
+    """D-17: vocabulary violations never stop the session; format/HTTP strict failures still do."""
+    run_offline = recovery.RunnerIntegrationTests.run_offline
+    scenario_transform = IssueRunnerTests.scenario_transform
+    collection_policy = INDEPENDENT
+    criteria_version = 'deadlock-v0.2'
+    output_contract = V2
+
+    def responses(self, kinds):
+        final = {'ok':lambda:v2_response(), 'outside':lambda:v2_response(OUTSIDE),
+                 'collide':lambda:v2_response(COLLIDE), 'format':lambda:FORMAT}
+        return [x for k in kinds for x in (recovery.success(), final[k]())]
+
+    async def test_repeated_vocabulary_violations_do_not_stop_session(self):
+        kinds = ['outside','collide','outside','outside','collide']
+        r = await self.run_offline(self.responses(kinds), max_steps=5)
+        self.assertEqual(len(r['steps']), 5)
+        self.assertEqual(r['summary']['termination_reason'], 'max_steps')
+        self.assertEqual([s['step_status'] for s in r['steps']], ['failed'] * 5)
+        self.assertEqual([s['vocabulary_violation'] for s in r['steps']],
+                         [OPEN_ISSUE_ID_NOT_ALLOWED, ISSUE_ID_COLLISION, OPEN_ISSUE_ID_NOT_ALLOWED,
+                          OPEN_ISSUE_ID_NOT_ALLOWED, ISSUE_ID_COLLISION])
+        self.assertEqual([s['consecutive_vocabulary_violations'] for s in r['steps']], [1,2,3,4,5])
+        self.assertEqual([s['consecutive_strict_failures'] for s in r['steps']], [0] * 5)
+        self.assertEqual(r['summary']['vocabulary_violations_total'], 5)
+        self.assertEqual(r['summary']['vocabulary_violation_steps'], [1,2,3,4,5])
+        for s in r['steps']:
+            self.assertIsNone(s['observed_final_report'])
+            self.assertIsNone(s['observation']['conversation']['open_issue_ids'])
+            self.assertIsNotNone(s['observation']['artifact'])
+
+    async def test_two_consecutive_format_failures_still_stop_under_v2(self):
+        r = await self.run_offline(self.responses(['format','format','ok']), max_steps=3)
+        self.assertEqual(len(r['steps']), 2)
+        self.assertEqual(r['summary']['termination_reason'], 'strict_output_failures')
+        self.assertEqual([s['consecutive_strict_failures'] for s in r['steps']], [1,2])
+        self.assertEqual([s['vocabulary_violation'] for s in r['steps']], [None, None])
+        self.assertEqual(r['summary']['vocabulary_violations_total'], 0)
+
+    async def test_mixed_counters_increment_and_reset_independently(self):
+        kinds = ['format','outside','collide','format','ok','outside']
+        r = await self.run_offline(self.responses(kinds), max_steps=6)
+        self.assertEqual(len(r['steps']), 6)
+        self.assertEqual(r['summary']['termination_reason'], 'max_steps')
+        self.assertEqual([s['consecutive_strict_failures'] for s in r['steps']], [1,0,0,1,0,0])
+        self.assertEqual([s['consecutive_vocabulary_violations'] for s in r['steps']], [0,1,2,0,0,1])
+        self.assertEqual([s['vocabulary_violations_total'] for s in r['steps']], [0,1,2,2,2,3])
+        self.assertEqual([s['step_status'] for s in r['steps']],
+                         ['failed','failed','failed','failed','completed','failed'])
+        self.assertEqual(r['summary']['vocabulary_violation_steps'], [2,3,6])
+
+    async def test_v1_records_have_no_vocabulary_fields(self):
+        self.output_contract = V1
+        r = await self.run_offline(self.responses(['format','format']), max_steps=2)
+        for s in r['steps']:
+            self.assertNotIn('vocabulary_violation', s)
+        self.assertNotIn('vocabulary_violations_total', r['summary'])
+        self.assertEqual(r['summary']['termination_reason'], 'strict_output_failures')

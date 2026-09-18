@@ -13,6 +13,10 @@ VERSIONS = (V1, V2)
 PROTOCOL_V2 = 'tool-capable-step-v7-issue-ids'
 # Distinct from every other contract violation (D-13 collision rule).
 ISSUE_ID_COLLISION = 'unlisted_issue_id_collision'
+OPEN_ISSUE_ID_NOT_ALLOWED = 'open_issue_id_not_allowed'
+# D-17: well-formed output with out-of-vocabulary values. Step still fails, but these are
+# excluded from the consecutive strict-failure stop and counted separately.
+VOCABULARY_VIOLATIONS = (OPEN_ISSUE_ID_NOT_ALLOWED, ISSUE_ID_COLLISION)
 
 
 class IssueContractViolation(ValueError):
@@ -67,8 +71,10 @@ class IssueContract:
         value = AgentOutputV2.model_validate(json.loads(text)).model_dump()
         ids = value['open_issue_ids']
         allowed = {i for i, _ in self.allowed}
-        if ids is not None and (len(ids) != len(set(ids)) or not set(ids) <= allowed):
-            raise ValueError('Duplicate or unlisted open issue ID')
+        if ids is not None and len(ids) != len(set(ids)):
+            raise ValueError('Duplicate open issue ID')
+        if ids is not None and not set(ids) <= allowed:
+            raise IssueContractViolation(OPEN_ISSUE_ID_NOT_ALLOWED, 'Open issue ID outside allowed_issues')
         unlisted = value['unlisted_issues'] or []
         if any(not item.strip() or len(item.splitlines()) != 1 for item in unlisted):
             raise ValueError('Unlisted issues must be nonempty short single-line descriptions')

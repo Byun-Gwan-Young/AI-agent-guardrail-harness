@@ -23,7 +23,8 @@ from suite_identity import compute_test_suite_id
 from experiments.step_execution import (NO_OUTPUT_PLACEHOLDER, edit_instructions, make_client,
                                         perform_step, tool_instructions)
 from experiments.output_contract import AgentOutput, parse_output
-from experiments.issue_contract import IssueContract, V1, V2, VERSIONS, PROTOCOL_V2, for_scenario
+from experiments.issue_contract import (IssueContract, V1, V2, VERSIONS, PROTOCOL_V2, VOCABULARY_VIOLATIONS,
+                                        for_scenario)
 from experiments.step_execution import StrictFailureStreak
 from experiments.observation_collection import (DEFAULT_POLICY, INDEPENDENT, LEGACY, PROTOCOLS,
     unavailable, validate_final_response, select_sources, collection_metadata)
@@ -288,7 +289,10 @@ async def run(args):
                                             'no raw tool results')
     effective.update(output_contract_version=contract.version, allowed_issues_sha256=contract.sha256)
     if contract.version == V2:
-        effective.update(output_contract=contract.version, strict_support='unverified', strict_probe=None)
+        effective.update(output_contract=contract.version, strict_support='unverified', strict_probe=None,
+                         strict_failure_policy='fail step; abort after two consecutive strict-failed steps; '
+                                               'vocabulary violations fail the step but are excluded from that '
+                                               'streak and counted separately; no automatic B fallback')
     save(conditions_path, effective)
     print('session_id:', session_id, 'run_directory:', out, flush=True)
     shutil.copy2(scenario_path, out / 'scenario.yaml')
@@ -330,6 +334,7 @@ async def run(args):
     history, cursors = [], [0] * len(agents)
     pending_feedback = [None] * len(agents)
     strict_streak = StrictFailureStreak()
+    vocabulary_streak, vocabulary_total = StrictFailureStreak(), 0
     async with httpx.AsyncClient(base_url=base, headers=headers, timeout=60) as client:
         try:
             response = await client.post('/sessions')
@@ -353,7 +358,11 @@ async def run(args):
                     'acceptance': {k: latest[k] for k in ('summary', 'gate')},
                     'recent_messages': history[cursors[index]:]}, ensure_ascii=False)
                 outcome = await perform_step(agents[index], context, budget, role_names[index])
-                stop_for_strict = strict_streak.observe(outcome['strict_failure'])
+                vocabulary = outcome['strict_failure'] if outcome['strict_failure'] in VOCABULARY_VIOLATIONS else None
+                # A vocabulary-violation step is not a strict failure for the stop streak (D-17).
+                stop_for_strict = strict_streak.observe(outcome['strict_failure'] if vocabulary is None else None)
+                vocabulary_streak.observe(vocabulary)
+                vocabulary_total += vocabulary is not None
                 text, call_error = outcome['text'], outcome['error']
                 pending_feedback[index] = outcome['feedback']
                 if not outcome['failed']:
@@ -397,6 +406,10 @@ async def run(args):
                               final_output=outcome['final_output'], failure_reasons=outcome['failure_reasons'])
                 record.update(strict_used=outcome['strict_used'], strict_failure=outcome['strict_failure'],
                               consecutive_strict_failures=strict_streak.count)
+                if contract.version == V2:
+                    record.update(vocabulary_violation=vocabulary,
+                                  consecutive_vocabulary_violations=vocabulary_streak.count,
+                                  vocabulary_violations_total=vocabulary_total)
                 record['collection'] = metadata
                 record['observed_final_report'] = observed_parsed
                 if collection_policy != LEGACY:
@@ -488,6 +501,9 @@ async def run(args):
                 'fixture_unchanged': fingerprint(source) == original, 'error': error,
                 'cleanup_errors': cleanup_errors, 'actual_outcome': None}
             summary['context_buffer_messages'] = buffer_messages
+            if contract.version == V2:
+                summary['vocabulary_violation_steps'] = [s['step_id'] for s in steps if s.get('vocabulary_violation')]
+                summary['vocabulary_violations_total'] = vocabulary_total
             summary['failed_steps'] = [{'step_id': s['step_id'], 'reasons': s.get('failure_reasons', [])}
                                        for s in steps if s.get('step_status') == 'failed']
             save(out / 'summary.json', summary)
