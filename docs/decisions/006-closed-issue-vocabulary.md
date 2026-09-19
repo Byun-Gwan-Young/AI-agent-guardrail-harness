@@ -42,7 +42,7 @@ strict 연속 중단). 역할마다 같은 쟁점을 다른 문자열로 적어 
 - ID 마다 근거 파일:행을 시나리오 YAML 주석으로 기록한다. 주석은 스키마 필드가 아니므로
   모델에 전달되지 않지만 시나리오 파일 해시에는 포함된다.
 - 첫 적용 : `scenarios/A-1-v2-ambiguous-task-query.yaml`. A-1 과의 차이는 `scenario_id`,
-  `allowed_issues`, 주석뿐이다. A-1 과 A-1-v2 세션은 섞지 않는다.
+  `allowed_issues`, 주석, 그리고 D-18 의 `criteria_version` 이다. A-1 과 A-1-v2 세션은 섞지 않는다.
 
 ## D-16 `unlisted_issues` 항목 제한
 
@@ -64,6 +64,25 @@ strict 연속 중단). 역할마다 같은 쟁점을 다른 문자열로 적어 
   `vocabulary_violations_total`. v2 에서만 기록하며 v1 기록 형태는 그대로다.
 - v7 로 수행한 실제 실행 로그가 아직 없으므로 프로토콜 버전을 올리지 않고 v7 안에서
   수정했다. 이 변경 이전 v7 로그는 존재하지 않는다.
+
+## D-18 A-1-v2 판정 버전
+
+- A-1-v2 는 `criteria_version: deadlock-v0.2`(pin 이 `progress-v2` 를 정한다)로 실행한다.
+  G0-8 은 P0-1~P0-3 수정이 실제 실행에서 작동하는지 확인하는 것이므로 v0.1 로는 의미가 없다.
+  시나리오 스키마에는 별도 `progress_version` 필드가 없다.
+- A-1-v2 는 실행 기록이 없으므로 시나리오 ID 를 바꾸지 않고 그 자리에서 고쳤다. 이전 해시로
+  만든 실행 전 기록(`reports/p0-3/A-1-v2-preflight.json`)은 보존하고, 새 해시 기록은
+  `reports/p0-3/A-1-v2-preflight-deadlock-v0.2.json` 에 따로 둔다.
+- 프록시 판정 버전은 설정 파일의 `criteria_version` 으로 정해지고, 설정 파일 경로는 환경변수
+  `GUARDRAIL_CONFIG` 로 고른다(`experiment_config.py:9`, 기본 `guardrail.yaml`). CLI 옵션은 없다.
+  기본 `guardrail.yaml` 은 v0.1 그대로 두고, v0.2 실행은 `guardrail-deadlock-v0.2.yaml` 을
+  명시적으로 지정한다. 두 파일은 `criteria_version` 외에 같다(테스트로 확인).
+- 실행기는 세션 시작 직후 프록시 pin 과 시나리오 `criteria_version` 이 다르면 중단한다
+  (`run_scenario.py`, `Proxy criteria version differs from scenario`). 설정을 빠뜨리면 조용히
+  v0.1 로 돌지 않고 첫 모델 호출 전에 멈춘다. 다만 프록시에 세션과 로그 파일은 생성되므로
+  그 세션 ID 는 무효로 남기고 재사용하지 않는다.
+- 기존 세션은 생성 시점의 pin 을 로그 meta 에 보존하고, replay 도구는 설정 파일을 읽지 않는다.
+  기존 A-1(v0.1) 로그·replay 결과는 영향이 없다.
 
 ## 알려진 공백
 
