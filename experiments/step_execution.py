@@ -2,6 +2,8 @@
 import json
 import re
 
+from experiments.issue_contract import PROTOCOL_V2 as PROTOCOL_V7
+
 TOOL_VOCABULARY = ('read_file', 'write_file', 'replace_in_file', 'run_tests')
 FINAL_ONLY = ('This is the final call of this step. No tools are available for this call. '
               'Return only the final JSON object matching the schema. Do not call any tool.')
@@ -9,6 +11,37 @@ NO_OUTPUT_PLACEHOLDER = '[구조화 출력 없음]'
 # Only these kinds are invalid model responses counted toward the per-step abort.
 COUNTED_KINDS = ('unknown_tool', 'invalid_tool_arguments')
 TOOL_ERROR_SUMMARY_CHARS = 300
+# v8 = v7 plus harness facts the model could not otherwise know (G0-14, defects 6 and 7).
+# Facts only: no strategy advice about what to do with the budget or the files.
+PROTOCOL_V8 = 'tool-capable-step-v8-budget-and-writable-paths'
+
+
+def harness_facts(writable_paths, call_limit):
+    """Static per-role facts appended to the v8 system message; values come from the scenario."""
+    files = ', '.join(writable_paths) if writable_paths else 'none'
+    return (f'Files this role can write: {files}. '
+            f'Each step allows at most {call_limit} model calls for this role; '
+            'the last call of a step has no tools and returns the final report. ')
+
+
+def call_budget(call_number, call_limit):
+    return {'model_call': call_number, 'max_model_calls': call_limit,
+            'remaining_after_this_call': call_limit - call_number, 'last_call_has_no_tools': True}
+
+
+def with_call_budget(message, call_number, call_limit):
+    """Attach the per-call budget fact. JSON contexts get a field so final_messages still parses them."""
+    try:
+        data = json.loads(message)
+    except (TypeError, ValueError):
+        data = None
+    if isinstance(data, dict):
+        return json.dumps({**data, 'call_budget': call_budget(call_number, call_limit)}, ensure_ascii=False)
+    fact = call_budget(call_number, call_limit)
+    return (message + (' ' if message and not message.endswith(' ') else '') +
+            f"Model call {fact['model_call']} of at most {fact['max_model_calls']} in this step; "
+            f"{fact['remaining_after_this_call']} call(s) remain after this one, "
+            'and the last call of the step has no tools.')
 
 
 def tool_execution_records(events, llm_call):
@@ -189,7 +222,7 @@ def correction(kind, names, allowed):
     return text
 
 
-async def perform_step(agent, context, budget, allowed):
+async def perform_step(agent, context, budget, allowed, budget_notes=False):
     from autogen_agentchat.messages import TextMessage, ToolCallRequestEvent
     from autogen_core import CancellationToken
     errors, text, feedback, executions = [], '', None, []
@@ -200,6 +233,9 @@ async def perform_step(agent, context, budget, allowed):
     while budget.used < budget.limit:
         final_call = budget.used + 1 == budget.limit or budget.final_next
         message = FINAL_ONLY if final_call else incoming
+        if budget_notes and not final_call:
+            # The final call is already announced by FINAL_ONLY and rebuilt by final_messages.
+            message = with_call_budget(message, budget.used + 1, budget.limit)
         kind, names, detail, tool_round = None, [], None, False
         try:
             result = await agent.on_messages([TextMessage(content=message, source='user')], CancellationToken())

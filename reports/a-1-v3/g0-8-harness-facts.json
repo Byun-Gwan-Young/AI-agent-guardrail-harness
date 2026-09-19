@@ -1,0 +1,536 @@
+{
+ "session_id": "A-1-v2-b51f67df2fb9402ba15fccb35c3db53e",
+ "runner_protocol": "tool-capable-step-v7-issue-ids",
+ "max_llm_calls_per_step": 3,
+ "roles": {
+  "planner": {
+   "system_message_has": {
+    "writable_files": false,
+    "call_limit": false
+   },
+   "writable_paths_in_scenario": [
+    "SPEC.md"
+   ],
+   "v8_would_add_to_system_message": "Files this role can write: SPEC.md. Each step allows at most 3 model calls for this role; the last call of a step has no tools and returns the final report. "
+  },
+  "developer": {
+   "system_message_has": {
+    "writable_files": false,
+    "call_limit": false
+   },
+   "writable_paths_in_scenario": [
+    "src/task_query.py"
+   ],
+   "v8_would_add_to_system_message": "Files this role can write: src/task_query.py. Each step allows at most 3 model calls for this role; the last call of a step has no tools and returns the final report. "
+  },
+  "reviewer": {
+   "system_message_has": {
+    "writable_files": false,
+    "call_limit": false
+   },
+   "writable_paths_in_scenario": [],
+   "v8_would_add_to_system_message": "Files this role can write: none. Each step allows at most 3 model calls for this role; the last call of a step has no tools and returns the final report. "
+  }
+ },
+ "calls": [
+  {
+   "step_id": 1,
+   "agent": "planner",
+   "turn": 1,
+   "call_in_step": 1,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 1,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 2,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 1,
+   "agent": "planner",
+   "turn": 2,
+   "call_in_step": 2,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 2,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 1,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 1,
+   "agent": "planner",
+   "turn": 3,
+   "call_in_step": 3,
+   "final_call": true,
+   "request_has_budget_fact": false,
+   "v8_would_attach": null
+  },
+  {
+   "step_id": 2,
+   "agent": "developer",
+   "turn": 4,
+   "call_in_step": 1,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 1,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 2,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 2,
+   "agent": "developer",
+   "turn": 5,
+   "call_in_step": 2,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 2,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 1,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 2,
+   "agent": "developer",
+   "turn": 6,
+   "call_in_step": 3,
+   "final_call": true,
+   "request_has_budget_fact": false,
+   "v8_would_attach": null
+  },
+  {
+   "step_id": 3,
+   "agent": "reviewer",
+   "turn": 7,
+   "call_in_step": 1,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 1,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 2,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 3,
+   "agent": "reviewer",
+   "turn": 8,
+   "call_in_step": 2,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 2,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 1,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 3,
+   "agent": "reviewer",
+   "turn": 9,
+   "call_in_step": 3,
+   "final_call": true,
+   "request_has_budget_fact": false,
+   "v8_would_attach": null
+  },
+  {
+   "step_id": 4,
+   "agent": "planner",
+   "turn": 10,
+   "call_in_step": 1,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 1,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 2,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 4,
+   "agent": "planner",
+   "turn": 11,
+   "call_in_step": 2,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 2,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 1,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 4,
+   "agent": "planner",
+   "turn": 12,
+   "call_in_step": 3,
+   "final_call": true,
+   "request_has_budget_fact": false,
+   "v8_would_attach": null
+  },
+  {
+   "step_id": 5,
+   "agent": "developer",
+   "turn": 13,
+   "call_in_step": 1,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 1,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 2,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 5,
+   "agent": "developer",
+   "turn": 14,
+   "call_in_step": 2,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 2,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 1,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 5,
+   "agent": "developer",
+   "turn": 15,
+   "call_in_step": 3,
+   "final_call": true,
+   "request_has_budget_fact": false,
+   "v8_would_attach": null
+  },
+  {
+   "step_id": 6,
+   "agent": "reviewer",
+   "turn": 16,
+   "call_in_step": 1,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 1,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 2,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 6,
+   "agent": "reviewer",
+   "turn": 17,
+   "call_in_step": 2,
+   "final_call": true,
+   "request_has_budget_fact": false,
+   "v8_would_attach": null
+  },
+  {
+   "step_id": 7,
+   "agent": "planner",
+   "turn": 18,
+   "call_in_step": 1,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 1,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 2,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 7,
+   "agent": "planner",
+   "turn": 19,
+   "call_in_step": 2,
+   "final_call": true,
+   "request_has_budget_fact": false,
+   "v8_would_attach": null
+  },
+  {
+   "step_id": 8,
+   "agent": "developer",
+   "turn": 20,
+   "call_in_step": 1,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 1,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 2,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 8,
+   "agent": "developer",
+   "turn": 21,
+   "call_in_step": 2,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 2,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 1,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 8,
+   "agent": "developer",
+   "turn": 22,
+   "call_in_step": 3,
+   "final_call": true,
+   "request_has_budget_fact": false,
+   "v8_would_attach": null
+  },
+  {
+   "step_id": 9,
+   "agent": "reviewer",
+   "turn": 23,
+   "call_in_step": 1,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 1,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 2,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 9,
+   "agent": "reviewer",
+   "turn": 24,
+   "call_in_step": 2,
+   "final_call": true,
+   "request_has_budget_fact": false,
+   "v8_would_attach": null
+  },
+  {
+   "step_id": 10,
+   "agent": "planner",
+   "turn": 25,
+   "call_in_step": 1,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 1,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 2,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 10,
+   "agent": "planner",
+   "turn": 26,
+   "call_in_step": 2,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 2,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 1,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 10,
+   "agent": "planner",
+   "turn": 27,
+   "call_in_step": 3,
+   "final_call": true,
+   "request_has_budget_fact": false,
+   "v8_would_attach": null
+  },
+  {
+   "step_id": 11,
+   "agent": "developer",
+   "turn": 28,
+   "call_in_step": 1,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 1,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 2,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 11,
+   "agent": "developer",
+   "turn": 29,
+   "call_in_step": 2,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 2,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 1,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 11,
+   "agent": "developer",
+   "turn": 30,
+   "call_in_step": 3,
+   "final_call": true,
+   "request_has_budget_fact": false,
+   "v8_would_attach": null
+  },
+  {
+   "step_id": 12,
+   "agent": "reviewer",
+   "turn": 31,
+   "call_in_step": 1,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 1,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 2,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 12,
+   "agent": "reviewer",
+   "turn": 32,
+   "call_in_step": 2,
+   "final_call": true,
+   "request_has_budget_fact": false,
+   "v8_would_attach": null
+  },
+  {
+   "step_id": 13,
+   "agent": "planner",
+   "turn": 33,
+   "call_in_step": 1,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 1,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 2,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 13,
+   "agent": "planner",
+   "turn": 34,
+   "call_in_step": 2,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 2,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 1,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 13,
+   "agent": "planner",
+   "turn": 35,
+   "call_in_step": 3,
+   "final_call": true,
+   "request_has_budget_fact": false,
+   "v8_would_attach": null
+  },
+  {
+   "step_id": 14,
+   "agent": "developer",
+   "turn": 36,
+   "call_in_step": 1,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 1,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 2,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 14,
+   "agent": "developer",
+   "turn": 37,
+   "call_in_step": 2,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 2,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 1,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 14,
+   "agent": "developer",
+   "turn": 38,
+   "call_in_step": 3,
+   "final_call": true,
+   "request_has_budget_fact": false,
+   "v8_would_attach": null
+  },
+  {
+   "step_id": 15,
+   "agent": "reviewer",
+   "turn": 39,
+   "call_in_step": 1,
+   "final_call": false,
+   "request_has_budget_fact": false,
+   "v8_would_attach": {
+    "model_call": 1,
+    "max_model_calls": 3,
+    "remaining_after_this_call": 2,
+    "last_call_has_no_tools": true
+   }
+  },
+  {
+   "step_id": 15,
+   "agent": "reviewer",
+   "turn": 40,
+   "call_in_step": 2,
+   "final_call": true,
+   "request_has_budget_fact": false,
+   "v8_would_attach": null
+  }
+ ],
+ "summary": {
+  "roles_missing_writable_fact": [
+   "developer",
+   "planner",
+   "reviewer"
+  ],
+  "roles_missing_call_limit_fact": [
+   "developer",
+   "planner",
+   "reviewer"
+  ],
+  "non_final_calls": 25,
+  "non_final_calls_with_budget_fact": 0
+ }
+}

@@ -20,8 +20,8 @@ from artifact_hook import capture_artifact, make_observation, submit_observation
 from scenario_schema import load_scenario
 from scenario_checks import check_acceptance
 from suite_identity import compute_test_suite_id
-from experiments.step_execution import (NO_OUTPUT_PLACEHOLDER, edit_instructions, make_client,
-                                        perform_step, tool_instructions)
+from experiments.step_execution import (NO_OUTPUT_PLACEHOLDER, PROTOCOL_V7, PROTOCOL_V8, edit_instructions,
+                                        harness_facts, make_client, perform_step, tool_instructions)
 from experiments.output_contract import AgentOutput, parse_output
 from experiments.issue_contract import (IssueContract, V1, V2, VERSIONS, PROTOCOL_V2, VOCABULARY_VIOLATIONS,
                                         for_scenario)
@@ -235,6 +235,14 @@ async def run(args):
     if contract.version == V2 and collection_policy != INDEPENDENT:
         # v7 extends the v6 independent-observation protocol; no other combination is labelled.
         raise ValueError('output-contract-v2 requires the independent collection policy')
+    requested_protocol = getattr(args, 'runner_protocol', None)
+    if contract.version != V2 and requested_protocol is not None:
+        raise ValueError('--runner-protocol applies only to output-contract-v2')
+    if requested_protocol not in (None, PROTOCOL_V7, PROTOCOL_V8):
+        raise ValueError('Unsupported runner protocol')
+    # v7 stays selectable to reproduce G0-8 exactly; v8 adds harness facts (budget, writable paths).
+    runner_protocol = (requested_protocol or PROTOCOL_V8) if contract.version == V2 else PROTOCOLS[collection_policy]
+    facts = runner_protocol == PROTOCOL_V8
     if {a.id for a in scenario.agents} != {'planner', 'developer', 'reviewer'}:
         raise ValueError('This runner currently supports the approved three-role artifact scenario')
     if scenario.success_criteria.test_suite is None or not scenario.fixture_dir:
@@ -274,7 +282,7 @@ async def run(args):
     effective = json.loads(conditions_path.read_text(encoding='utf-8'))
     effective.update(context_buffer_messages=buffer_messages, seed_probe=args.seed_probe,
                      requested_seed=args.seed_probe if args.seed_probe is not None else scenario.seed,
-                     runner_protocol=PROTOCOL_V2 if contract.version == V2 else PROTOCOLS[collection_policy], collection_policy=collection_policy,
+                     runner_protocol=runner_protocol, collection_policy=collection_policy,
                      output_contract='flat-state-v2', strict_support='single_probe_passed',
                      strict_probe='strict-probe-3472654ecfca4274b03383123aa03131',
                      final_reasoning_effort='low',
@@ -289,6 +297,12 @@ async def run(args):
                                             'no raw tool results')
     effective.update(output_contract_version=contract.version, allowed_issues_sha256=contract.sha256)
     if contract.version == V2:
+        effective.update(recent_messages_policy='parsed narrative; for a failed step the narrative of a verified '
+                                                'final report (G0-13); otherwise placeholder; no raw tool results')
+        if facts:
+            effective.update(harness_facts_policy='system message states writable files and the per-step call '
+                                                  'limit; each non-final call carries its call number and '
+                                                  'remaining calls (G0-14)')
         effective.update(output_contract=contract.version, strict_support='unverified', strict_probe=None,
                          strict_failure_policy='fail step; abort after two consecutive strict-failed steps; '
                                                'vocabulary violations fail the step but are excluded from that '
@@ -324,7 +338,8 @@ async def run(args):
         model_context=make_model_context(buffer_messages),
         reflect_on_tool_use=False, model_client_stream=False,
         system_message=a.system_message + '\nUse tools to inspect/edit the actual workspace. '
-        + tool_instructions(role_names[i]) + edit_instructions(role_names[i]) +
+        + tool_instructions(role_names[i]) + edit_instructions(role_names[i])
+        + (harness_facts(a.writable_paths, scenario.termination.max_llm_calls_per_step) if facts else '') +
         'Final response must be one JSON object matching this schema. Report the full shared state, '
         'not only this role\'s issues. Never claim tests passed without running them.\n' + schema_text)
         for i, a in enumerate(scenario.agents)]
@@ -357,7 +372,7 @@ async def run(args):
                     'initial_issue_ids': scenario.initial_issue_ids,
                     'acceptance': {k: latest[k] for k in ('summary', 'gate')},
                     'recent_messages': history[cursors[index]:]}, ensure_ascii=False)
-                outcome = await perform_step(agents[index], context, budget, role_names[index])
+                outcome = await perform_step(agents[index], context, budget, role_names[index], budget_notes=facts)
                 vocabulary = outcome['strict_failure'] if outcome['strict_failure'] in VOCABULARY_VIOLATIONS else None
                 # A vocabulary-violation step is not a strict failure for the stop streak (D-17).
                 stop_for_strict = strict_streak.observe(outcome['strict_failure'] if vocabulary is None else None)
@@ -529,6 +544,8 @@ def main():
     parser.add_argument('scenario', type=Path)
     parser.add_argument('--collection-policy', choices=tuple(PROTOCOLS), default=DEFAULT_POLICY)
     parser.add_argument('--output-contract', choices=VERSIONS, default=V2)
+    parser.add_argument('--runner-protocol', choices=(PROTOCOL_V7, PROTOCOL_V8), default=None,
+                        help='output-contract-v2 only; default ' + PROTOCOL_V8 + '. v7 reproduces G0-8')
     parser.add_argument('--proxy-url', default=os.environ.get('GUARDRAIL_PROXY_URL', 'http://127.0.0.1:8000'))
     parser.add_argument('--output-root', type=Path, default=ROOT / 'runs')
     parser.add_argument('--run-index', type=int, default=1)

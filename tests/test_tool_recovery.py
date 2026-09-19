@@ -316,6 +316,9 @@ class RunnerIntegrationTests(unittest.IsolatedAsyncioTestCase):
                 seed_probe=None,proxy_url='http://mock',
                 collection_policy=getattr(self, 'collection_policy', 'legacy-failed-step-v1'))
             args.output_contract = getattr(self, 'output_contract', 'output-contract-v1')
+            # Existing v2 tests pin v7 explicitly; v8 tests set runner_protocol themselves.
+            args.runner_protocol = getattr(self, 'runner_protocol',
+                'tool-capable-step-v7-issue-ids' if args.output_contract == 'output-contract-v2' else None)
             with patch.object(runner,'ROOT',project), patch.object(runner,'load_scenario',return_value=scenario), \
                     patch.object(runner.Workspace,'acceptance',acceptance), \
                     patch('httpx.AsyncClient',OfflineClient), patch.dict('os.environ',{'GROQ_API_KEY':'fake'}), \
