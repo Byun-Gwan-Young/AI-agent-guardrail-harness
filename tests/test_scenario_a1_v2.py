@@ -2,11 +2,17 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import tempfile
 import unittest
+
+import httpx
+import yaml
 
 from scenario_schema import load_scenario
 from experiments.issue_contract import V2, for_scenario
 from tools.scenario_preflight import preflight
+from experiment_config import load_config
+from proxy import create_app
 
 ROOT = Path(__file__).resolve().parents[1]
 V1_PATH = ROOT / 'scenarios/A-1-ambiguous-task-query.yaml'
@@ -18,10 +24,13 @@ class A1V2ScenarioTests(unittest.TestCase):
     def setUp(self):
         self.old, self.new = load_scenario(V1_PATH), load_scenario(V2_PATH)
 
-    def test_only_identity_and_vocabulary_differ_from_a1(self):
+    def test_only_identity_vocabulary_and_criteria_differ_from_a1(self):
         old, new = self.old.model_dump(), self.new.model_dump()
         self.assertEqual(new.pop('scenario_id'), 'A-1-v2')
         self.assertIsNotNone(new.pop('allowed_issues'))
+        # D-18: A-1-v2 runs under deadlock-v0.2 / progress-v2; A-1 stays on v0.1.
+        self.assertEqual((new.pop('criteria_version'), old.pop('criteria_version')),
+                         ('deadlock-v0.2', 'deadlock-v0.1'))
         old.pop('scenario_id'); self.assertIsNone(old.pop('allowed_issues'))
         self.assertEqual(new, old)
         self.assertEqual(self.new.expected_outcome, 'unknown')
@@ -65,5 +74,42 @@ class PreflightTests(unittest.TestCase):
         self.assertEqual(report['acceptance']['summary']['tests'],
                          scenario.success_criteria.test_suite.expected_test_count)
         self.assertIsNone(report['acceptance']['error'])
-        saved = json.loads((ROOT / 'reports/p0-3/A-1-v2-preflight.json').read_text(encoding='utf-8'))
+        self.assertEqual((report['criteria_version'], report['progress_version']), ('deadlock-v0.2', 'progress-v2'))
+        saved = json.loads((ROOT / 'reports/p0-3/A-1-v2-preflight-deadlock-v0.2.json').read_text(encoding='utf-8'))
         self.assertEqual(report, saved)
+        # The earlier v0.1 preflight is kept as a historical record, not overwritten.
+        old = json.loads((ROOT / 'reports/p0-3/A-1-v2-preflight.json').read_text(encoding='utf-8'))
+        self.assertNotEqual(old['scenario_sha256'], report['scenario_sha256'])
+        self.assertEqual(old['acceptance'], report['acceptance'])
+
+
+V02_CONFIG = ROOT / 'guardrail-deadlock-v0.2.yaml'
+
+
+class ProxyCriteriaConfigTests(unittest.IsolatedAsyncioTestCase):
+    async def pinned(self, config_path):
+        with tempfile.TemporaryDirectory() as directory:
+            app = create_app(Path(directory) / 'logs', config_path=config_path)
+            async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url='http://proxy',
+                                         headers={'X-Guardrail-Session': 'criteria-check'}) as client:
+                (await client.post('/sessions')).raise_for_status()
+                return (await client.get('/log')).json()['meta']
+
+    def test_v02_config_differs_from_default_only_in_criteria_version(self):
+        default, v02 = load_config(ROOT / 'guardrail.yaml'), load_config(V02_CONFIG)
+        self.assertEqual((default.pop('criteria_version'), v02.pop('criteria_version')),
+                         ('deadlock-v0.1', 'deadlock-v0.2'))
+        self.assertEqual(default, v02)
+        self.assertEqual(yaml.safe_load((ROOT / 'guardrail.yaml').read_text(encoding='utf-8'))['criteria_version'],
+                         'deadlock-v0.1')
+
+    async def test_runner_version_check_matches_only_with_explicit_config(self):
+        a1, a1v2 = load_scenario(V1_PATH), load_scenario(V2_PATH)
+        default = await self.pinned(ROOT / 'guardrail.yaml')
+        explicit = await self.pinned(V02_CONFIG)
+        # Same comparison as run_scenario: proxy meta criteria_version == scenario.criteria_version.
+        self.assertEqual(default['criteria_version'], a1.criteria_version)
+        self.assertNotEqual(default['criteria_version'], a1v2.criteria_version)
+        self.assertEqual(explicit['criteria_version'], a1v2.criteria_version)
+        self.assertEqual(explicit['criteria_parameters']['progress_version'], 'progress-v2')
+        self.assertEqual(default['criteria_parameters']['progress_version'], 'progress-v1')

@@ -3,6 +3,8 @@ scenario_id: A-1-v2
 # A-1 revision 4 plus a closed issue vocabulary (allowed_issues, decisions/006) for
 # output-contract-v2 / tool-capable-step-v7-issue-ids. Model, conditions, roles, writable_paths
 # and fixture are identical to A-1; sessions of A-1 and A-1-v2 are never pooled.
+# criteria_version deadlock-v0.2 (progress-v2) per D-18, changed in place before any A-1-v2 run.
+# The proxy must be started with guardrail-deadlock-v0.2.yaml (GUARDRAIL_CONFIG).
 scenario_revision: 4
 group: A
 title: 애매한 업무 조회 요청을 기획·구현·리뷰로 완성
@@ -63,7 +65,7 @@ seed_support: unverified
 temperature: 0.0
 max_tokens: 1200
 context_buffer_messages: 12
-criteria_version: deadlock-v0.1
+criteria_version: deadlock-v0.2
 progress_source: both
 progress_metric:
   conversation: [open_issues_count, new_info_ratio]

@@ -10,6 +10,7 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from deadlock_policy import pin_criteria
 from experiments.issue_contract import V1, V2, for_scenario
 from experiments.run_scenario import Workspace, fingerprint, safe_path
 from scenario_schema import load_scenario
@@ -32,6 +33,8 @@ def preflight(scenario_path):
     return {'scenario_id': scenario.scenario_id,
             'scenario_path': scenario_path.relative_to(ROOT).as_posix(),
             'scenario_sha256': hashlib.sha256(scenario_path.read_bytes()).hexdigest(),
+            'criteria_version': scenario.criteria_version,
+            'progress_version': pin_criteria(scenario.criteria_version)['criteria_parameters']['progress_version'],
             'output_contract_version': contract.version,
             'allowed_issues_sha256': contract.sha256,
             'allowed_issue_ids': [i.id for i in scenario.allowed_issues or []],
