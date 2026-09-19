@@ -7,6 +7,7 @@ standard library only. The API key is read from GROQ_API_KEY and never written o
 import argparse
 import copy
 from datetime import datetime, timezone
+from importlib import metadata
 import json
 import os
 from pathlib import Path
@@ -24,6 +25,13 @@ from scenario_schema import load_scenario
 ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions'
 DEFAULT_SCENARIO = ROOT / 'scenarios/A-1-v2-ambiguous-task-query.yaml'
 BASE, ENUM, NO_LENGTH = 'v2', 'v2-open-issue-enum', 'v2-without-length'
+EXCERPT_CHARS = 300
+
+
+def default_user_agent():
+    # The proxy forwards to Groq with httpx defaults and no User-Agent override, so the runner
+    # path reaches Groq as python-httpx/<version>. Match it instead of Python-urllib's default.
+    return 'python-httpx/' + metadata.version('httpx')
 
 
 def strip_lengths(node):
@@ -83,9 +91,10 @@ def assess(contract, status, body):
     return result
 
 
-def send(url, api_key, body):
+def send(url, api_key, body, user_agent):
     request = urllib.request.Request(url, data=json.dumps(body).encode('utf-8'), method='POST',
-        headers={'Authorization': 'Bearer ' + api_key, 'Content-Type': 'application/json'})
+        headers={'Authorization': 'Bearer ' + api_key, 'Content-Type': 'application/json',
+                 'User-Agent': user_agent})
     try:
         with urllib.request.urlopen(request, timeout=60) as response:
             return response.status, response.read().decode('utf-8', 'replace')
@@ -97,10 +106,11 @@ def redact(text, api_key):
     return text.replace(api_key, '[REDACTED]') if api_key else text
 
 
-def probe(scenario_path, variants, output_root, api_key=None, transport=send):
+def probe(scenario_path, variants, output_root, api_key=None, transport=send, user_agent=None):
     """api_key=None builds and saves request bodies only (dry run); no network call is made."""
     scenario = load_scenario(scenario_path)
     contract = for_scenario(V2, scenario)
+    user_agent = user_agent or default_user_agent()
     folder = output_root / ('groq-strict-probe-' + uuid.uuid4().hex)
     folder.mkdir(parents=True, exist_ok=False)
     results = []
@@ -111,7 +121,7 @@ def probe(scenario_path, variants, output_root, api_key=None, transport=send):
             results.append({'variant': variant, 'sent': False})
             continue
         try:
-            status, text = transport(ENDPOINT, api_key, body)
+            status, text = transport(ENDPOINT, api_key, body, user_agent)
         except (urllib.error.URLError, OSError) as exc:
             results.append({'variant': variant, 'sent': True, 'transport_error': type(exc).__name__})
             continue
@@ -121,8 +131,13 @@ def probe(scenario_path, variants, output_root, api_key=None, transport=send):
             parsed = json.loads(text)
         except ValueError:
             parsed = None
-        results.append({'variant': variant, 'sent': True, **assess(contract, status, parsed)})
+        result = {'variant': variant, 'sent': True, **assess(contract, status, parsed)}
+        if not isinstance(parsed, dict):
+            # Redacted before truncation so no partial key survives the cut.
+            result['non_json_body_excerpt'] = text[:EXCERPT_CHARS]
+        results.append(result)
     report = {'scenario_id': scenario.scenario_id, 'model': scenario.model, 'endpoint': ENDPOINT,
+              'user_agent': user_agent,
               'output_contract_version': contract.version, 'allowed_issues_sha256': contract.sha256,
               'created_at': datetime.now(timezone.utc).isoformat(), 'dry_run': api_key is None,
               'note': 'One request per variant does not establish reliability or token-level enforcement.',
@@ -137,6 +152,8 @@ def main():
     parser.add_argument('--with-enum', action='store_true', help='also send the open_issue_ids enum variant')
     parser.add_argument('--without-length', action='store_true', help='also send the minLength/maxLength-free variant')
     parser.add_argument('--dry-run', action='store_true', help='build and save request bodies only')
+    parser.add_argument('--user-agent', default=None,
+                        help='explicit User-Agent (default: the python-httpx UA the proxy sends to Groq)')
     parser.add_argument('--output-root', type=Path, default=ROOT / 'runs/strict-probes')
     args = parser.parse_args()
     variants = [BASE] + [ENUM] * args.with_enum + [NO_LENGTH] * args.without_length
@@ -145,7 +162,7 @@ def main():
         key = os.environ.get('GROQ_API_KEY')
         if not key:
             parser.error('Set GROQ_API_KEY in the process environment, or use --dry-run')
-    folder, report = probe(args.scenario, variants, args.output_root, key)
+    folder, report = probe(args.scenario, variants, args.output_root, key, user_agent=args.user_agent)
     print(json.dumps(report, ensure_ascii=True, indent=2))
     print('output:', folder)
     return 0 if report['dry_run'] or all(r.get('contract_valid') for r in report['results']) else 1

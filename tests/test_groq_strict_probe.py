@@ -25,7 +25,7 @@ GOOD = dict(narrative='probe', open_issue_ids=['requirements'], info_items=[], c
 def reply(value=GOOD, finish='stop', status=200):
     body = {'choices': [{'finish_reason': finish, 'message': {'role': 'assistant', 'content': json.dumps(value)}}],
             'usage': {'prompt_tokens': 10, 'completion_tokens': 5, 'total_tokens': 15}}
-    return lambda url, key, request: (status, json.dumps(body))
+    return lambda url, key, request, user_agent: (status, json.dumps(body))
 
 
 class RequestBodyTests(unittest.TestCase):
@@ -98,7 +98,7 @@ class ProbeRunTests(unittest.TestCase):
                          sorted([v + '.request.json' for v in (probe.BASE, probe.ENUM, probe.NO_LENGTH)] + ['result.json']))
 
     def test_reports_status_finish_contract_and_usage_without_leaking_key(self):
-        leaky = lambda url, key, request: (401, json.dumps({'error': {'message': 'bad key ' + key}}))
+        leaky = lambda url, key, request, user_agent: (401, json.dumps({'error': {'message': 'bad key ' + key}}))
         cases = [(reply(), True, None, 'stop'),
                  (reply({**GOOD, 'unlisted_issues': ['requirements']}), False, ISSUE_ID_COLLISION, 'stop'),
                  (reply(finish='length'), False, None, 'length')]
@@ -129,3 +129,59 @@ class ProbeRunTests(unittest.TestCase):
         with patch('sys.argv', ['probe']), patch.dict('os.environ', {}, clear=True), \
                 patch('sys.stderr'), self.assertRaises(SystemExit):
             probe.main()
+
+
+class TransportHeaderTests(unittest.TestCase):
+    def capture(self, **kw):
+        sent = {}
+        class Response:
+            status = 200
+            def __enter__(self): return self
+            def __exit__(self, *a): return False
+            def read(self): return b'{}'
+        def urlopen(request, timeout):
+            sent.update(headers=dict(request.header_items()), url=request.full_url); return Response()
+        directory = tempfile.TemporaryDirectory(); self.addCleanup(directory.cleanup)
+        with patch('urllib.request.urlopen', urlopen):
+            folder, report = probe.probe(probe.DEFAULT_SCENARIO, [probe.BASE], Path(directory.name), KEY, **kw)
+        return sent, report
+
+    def test_explicit_user_agent_matches_proxy_path_by_default(self):
+        import httpx as real
+        sent, report = self.capture()
+        self.assertEqual(sent['headers']['User-agent'], 'python-httpx/' + real.__version__)
+        self.assertNotIn('Python-urllib', json.dumps(sent['headers']))
+        self.assertEqual(report['user_agent'], sent['headers']['User-agent'])
+        sent, report = self.capture(user_agent='custom-probe/1')
+        self.assertEqual(sent['headers']['User-agent'], 'custom-probe/1')
+
+    def test_proxy_upstream_user_agent_is_httpx_default(self):
+        # Guard for the default above: the proxy sets no User-Agent of its own.
+        text = (ROOT / 'proxy.py').read_text(encoding='utf-8')
+        self.assertNotIn('user-agent', text.lower())
+
+
+class NonJsonResponseTests(unittest.TestCase):
+    def run_probe(self, text, status=403):
+        directory = tempfile.TemporaryDirectory(); self.addCleanup(directory.cleanup)
+        folder, report = probe.probe(probe.DEFAULT_SCENARIO, [probe.BASE], Path(directory.name), KEY,
+                                     lambda url, key, request, user_agent: (status, text))
+        return folder, report['results'][0]
+
+    def test_non_json_excerpt_is_first_300_chars_with_key_redacted(self):
+        html = '<html><title>403 Forbidden</title>' + ('x' * 250) + KEY + ('y' * 500)
+        folder, result = self.run_probe(html)
+        self.assertEqual((result['http_status'], result['error_message']), (403, 'non-JSON response'))
+        expected = html.replace(KEY, '[REDACTED]')[:probe.EXCERPT_CHARS]
+        self.assertEqual(result['non_json_body_excerpt'], expected)
+        self.assertEqual(len(result['non_json_body_excerpt']), 300)
+        for path in folder.iterdir():
+            text = path.read_text(encoding='utf-8')
+            self.assertNotIn(KEY, text); self.assertNotIn(KEY[:12], text.replace('[REDACTED]', ''))
+
+    def test_short_body_and_json_body(self):
+        _, result = self.run_probe('error code: 1010')
+        self.assertEqual(result['non_json_body_excerpt'], 'error code: 1010')
+        _, result = self.run_probe(json.dumps({'error': {'message': 'forbidden'}}))
+        self.assertNotIn('non_json_body_excerpt', result)
+        self.assertEqual(result['error_message'], 'forbidden')
