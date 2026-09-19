@@ -88,6 +88,11 @@ strict 연속 중단). 역할마다 같은 쟁점을 다른 문자열로 적어 
 
 - v2 로그의 offline replay 경로가 없다. `tools/replay_preserved_observations.py` 는 계약 없이
   v1 로 파싱하며 기존 v1 로그 전용이다 (Stage 2 에서 검토).
-- 제공자 strict 수용 여부 미확인. 사용자가 probe 를 1회 실행해 확인한다. 1회 결과는
-  신뢰성이나 토큰 단위 강제를 증명하지 않는다.
+- 제공자 strict 수용 (2026-09-19 사용자 probe 1회, `tools/probe_groq_strict.py`) :
+  `runs/strict-probes/groq-strict-probe-234c983dfc67409d9b8ec33671b9dc89/result.json`.
+  A-1-v2 의 v2 `response_format`(minLength/maxLength 포함), UA `python-httpx/0.28.1` 로
+  HTTP 200, `finish_reason` stop, v2 계약 통과, usage prompt 1165 / completion 132
+  (그중 reasoning_tokens 39). 요청 1회이므로 반복 신뢰성, 제공자가 토큰 단위로 스키마를
+  강제하는지, enum·길이 제약의 실제 강제 여부는 확인되지 않았다. `strict_support` 는
+  계속 `unverified` 로 둔다. 이전 403(non-JSON) 은 기본 urllib UA 로 보낸 요청이었다.
 - 다른 역할에 `[구조화 출력 없음]` 을 전달하는 동작(G0-13)은 어휘 위반에도 그대로다.
