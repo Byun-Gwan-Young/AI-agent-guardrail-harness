@@ -1,0 +1,169 @@
+{
+  "observation": {
+    "issue_report": {
+      "output_contract_version": "output-contract-v2",
+      "allowed_issues_sha256": "434e1ebc382f48bd2788a669aa66afca1129bc987ab08ea4ca3e9241a9098a10",
+      "unlisted_issues": null
+    },
+    "collection": {
+      "policy": "independent-sources-v1",
+      "final_output_status": "valid",
+      "final_output_reason": null,
+      "source_turn": 35,
+      "measurement_status": "observed",
+      "metric_status": {
+        "conversation.open_issues_count": "measured",
+        "artifact.test_pass_count": "measured",
+        "artifact.files_changed": "measured"
+      },
+      "reasons": {}
+    },
+    "agent_id": "planner",
+    "step_id": 13,
+    "llm_turns": [
+      33,
+      34,
+      35
+    ],
+    "progress_source": "both",
+    "progress_metric": {
+      "conversation": [
+        "open_issues_count"
+      ],
+      "artifact": [
+        "test_pass_count",
+        "files_changed"
+      ]
+    },
+    "conversation": {
+      "source_kind": "structured",
+      "proposal_values": null,
+      "open_issue_ids": [
+        "requirements",
+        "acceptance-review",
+        "status-filter",
+        "pagination-validation",
+        "search-normalization",
+        "sort-order",
+        "filtering-order"
+      ],
+      "info_items": null,
+      "extractor_version": null,
+      "reasons": {},
+      "evidence": []
+    },
+    "artifact": {
+      "file_hashes": {
+        "SPEC.md": "d02b69f75fefe029a3b74c1dc1d49e3ac231eaaf29f9f17701f042ecd64386c7",
+        "src/task_query.py": "52eb4d11f3c54708ae9f5721b2734fccd12b2f8dac35c89c2ed8f7178695025d",
+        "tests/test_task_query.py": "f47224e37cb081d14f9d5b4cc50710d2f13ba8b7f53b7531b96e3d7e4b56d1a1"
+      },
+      "files_scope_id": "efddfd5a18fead85f9987a1bac25f0ca2ace120eb6302c1622cd9c54e0c17128",
+      "test_pass_count": 7,
+      "test_total_count": 16,
+      "test_suite_id": "sha256:5d3df95aa74fed10e8c3cfc34390d5394e994bef6741960a5804db6f27dfff9b",
+      "build_status": null,
+      "reasons": {
+        "build_status": "build not observed"
+      }
+    },
+    "extracted_conversation": {
+      "source_kind": "extracted",
+      "proposal_values": null,
+      "open_issue_ids": null,
+      "info_items": null,
+      "extractor_version": "rules-v1",
+      "reasons": {
+        "proposal_values": "no unambiguous supported numeric proposal",
+        "open_issue_ids": "no explicit issue-state evidence in this utterance",
+        "info_items": "no supported new-information expression"
+      },
+      "evidence": []
+    },
+    "termination_context": {
+      "declaration": "none",
+      "declared_step": null,
+      "source_kind": "scenario_rule",
+      "evidence": "step 13: valid structured output; no reviewer declaration"
+    },
+    "observed_at": "2026-09-19T15:38:35.002704+00:00",
+    "progress": {
+      "version": "progress-v2",
+      "state": "stagnant",
+      "metrics": {
+        "conversation.open_issues_count": {
+          "value": {
+            "count": 7,
+            "delta": 0
+          },
+          "status": "measured"
+        },
+        "artifact.test_pass_count": {
+          "value": 0,
+          "status": "measured"
+        },
+        "artifact.files_changed": {
+          "value": [],
+          "status": "measured"
+        }
+      },
+      "events": [],
+      "flags": {
+        "oscillation": [],
+        "reopen": [],
+        "revert": [],
+        "test_plateau": false
+      },
+      "coverage_complete": true,
+      "conversation_moved": false,
+      "artifact_moved": false,
+      "comparison_step_id": 10,
+      "history_step_ids": [
+        1,
+        4,
+        7,
+        10
+      ]
+    },
+    "extraction_comparison": {
+      "proposal_values": {
+        "status": "unmeasured",
+        "match": null
+      },
+      "open_issue_ids": {
+        "status": "measured",
+        "match": false,
+        "extraction_missing": true
+      },
+      "info_items": {
+        "status": "unmeasured",
+        "match": null
+      }
+    },
+    "criteria": {
+      "criteria_version": "deadlock-v0.2",
+      "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+      "decision": "deadlock",
+      "reason": "three consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 10,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 6,
+      "first_termination_failure_step": null
+    }
+  },
+  "duplicate": false,
+  "persisted": true
+}
