@@ -17,3 +17,14 @@ step_execution.py의 final_messages도 recent_messages를 최종 요청의 사�
 반복 유발 여부의 실측: {"value": null, "status": "unmeasured"}.
 신규 실행기 모의 테스트는 관측에 narrative가 보존되면서 다음 역할에 placeholder가
 전달되는 동작을 확인한다. 이는 실제 세션에서 반복을 유발했다는 검증이 아니다.
+
+## 해결 (2026-09-20, G0-13 / D-15)
+
+`tool-capable-step-v7-issue-ids`(output-contract-v2, 독립 수집 정책) 에서 수정했다.
+실패 step 이라도 P0-2 제출 조건을 만족한 검증된 최종 보고(최종 요청 HTTP 원문 검증 + v2 계약 통과)가
+있으면 다른 역할의 `recent_messages` 에 그 narrative 를 전달한다. 검증된 보고가 없거나 어휘 위반
+(D-17, 계약 위반이라 원문 검증이 invalid) 이면 지금처럼 `[구조화 출력 없음]` 을 전달한다.
+v7 로 수행한 실제 실행이 없으므로 프로토콜 버전은 올리지 않았다. v1 계약·v5·v6 경로는 그대로다.
+steps.json 의 `shared_narrative_source`(`parsed` / `verified_final_report` / `placeholder`) 로
+어느 경로로 전달했는지 남긴다(v2 에서만). 결정 : `docs/decisions/009-verified-narrative-sharing.md`.
+반복 유발 여부의 실측은 여전히 `unmeasured` 다 (G0-8 에서 관찰).

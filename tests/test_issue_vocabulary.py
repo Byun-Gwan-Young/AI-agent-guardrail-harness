@@ -241,7 +241,9 @@ class IssueRunnerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(s['observation']['issue_report']['unlisted_issues'],VALUE['unlisted_issues'])
         self.assertIsNotNone(s['observation']['artifact'])
         incoming = json.loads(r['upstream_requests'][3]['messages'][-1]['content'])
-        self.assertEqual(incoming['recent_messages'][0]['narrative'],'[구조화 출력 없음]')
+        # G0-13: the verified final report of the failed step is shared, not a placeholder.
+        self.assertEqual(incoming['recent_messages'][0]['narrative'],VALUE['narrative'])
+        self.assertEqual(s['shared_narrative_source'],'verified_final_report')
 
     async def test_collision_fails_step_with_distinct_reason_and_keeps_artifact(self):
         clash = {**VALUE,'unlisted_issues':['fixture-edge']}
@@ -344,3 +346,58 @@ class VocabularyStreakTests(unittest.IsolatedAsyncioTestCase):
             self.assertNotIn('vocabulary_violation', s)
         self.assertNotIn('vocabulary_violations_total', r['summary'])
         self.assertEqual(r['summary']['termination_reason'], 'strict_output_failures')
+
+
+def next_context(requests, index):
+    """The work context the next role received (first request whose last message is the JSON context)."""
+    seen = 0
+    for request in requests:
+        try:
+            context = json.loads(request['messages'][-1]['content'])
+        except (TypeError, ValueError):
+            continue
+        if isinstance(context, dict) and 'recent_messages' in context:
+            if seen == index:
+                return context
+            seen += 1
+
+
+class RecoveredNarrativeSharingTests(unittest.IsolatedAsyncioTestCase):
+    """G0-13 (v7): share only verified final reports; placeholder otherwise."""
+    run_offline = recovery.RunnerIntegrationTests.run_offline
+    scenario_transform = IssueRunnerTests.scenario_transform
+    collection_policy = INDEPENDENT
+    criteria_version = 'deadlock-v0.2'
+    output_contract = V2
+
+    async def shared(self, first_step):
+        r = await self.run_offline(first_step + [recovery.success(), v2_response()])
+        return r, next_context(r['upstream_requests'], 1)['recent_messages']
+
+    async def test_completed_step_shares_parsed_output(self):
+        r, recent = await self.shared([recovery.success(), v2_response()])
+        self.assertEqual(recent, [{'agent':'planner','narrative':VALUE['narrative']}])
+        self.assertEqual(r['steps'][0]['shared_narrative_source'], 'parsed')
+
+    async def test_vocabulary_violations_keep_placeholder(self):
+        for bad in ({**VALUE,'open_issue_ids':['outside']}, {**VALUE,'unlisted_issues':['fixture-core']}):
+            with self.subTest(bad=bad):
+                r, recent = await self.shared([recovery.success(), v2_response(bad)])
+                self.assertEqual(recent, [{'agent':'planner','narrative':'[구조화 출력 없음]'}])
+                self.assertEqual(r['steps'][0]['shared_narrative_source'], 'placeholder')
+                self.assertIsNotNone(r['steps'][0]['vocabulary_violation'])
+
+    async def test_no_verified_final_keeps_placeholder(self):
+        r, recent = await self.shared([recovery.success(), raw_final('{"narrative":"partial"}')])
+        self.assertEqual(recent, [{'agent':'planner','narrative':'[구조화 출력 없음]'}])
+        self.assertEqual(r['steps'][0]['collection']['final_output_status'], 'invalid')
+
+    async def test_v1_contract_under_independent_policy_is_unchanged(self):
+        self.output_contract = V1
+        self.scenario_transform = lambda scenario: scenario
+        r = await self.run_offline([recovery.unknown400(), recovery.success(), recovery.success(),
+                                   recovery.success(agent_id='developer'), recovery.success(agent_id='developer')])
+        self.assertEqual(r['steps'][0]['collection']['final_output_status'], 'valid')
+        self.assertEqual(next_context(r['upstream_requests'], 1)['recent_messages'],
+                         [{'agent':'planner','narrative':'[구조화 출력 없음]'}])
+        self.assertNotIn('shared_narrative_source', r['steps'][0])

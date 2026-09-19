@@ -379,13 +379,18 @@ async def run(args):
                         pending_feedback[index] = outcome['feedback']
                         call_error = 'invalid_final_output: ' + type(exc).__name__
                 # Other roles see only parsed narratives; tool results stay with the agent that read them.
+                shared, shared_source = parsed, 'parsed' if parsed else 'placeholder'
+                receipt = outcome['observation_report']
+                if shared is None and contract.version == V2 and receipt['status'] == 'valid':
+                    # G0-13 (v7 only): a verified final report of a failed step is shared, not hidden.
+                    # Vocabulary violations never yield a valid receipt, so they keep the placeholder.
+                    shared, shared_source = receipt['value'], 'verified_final_report'
                 history.append({'agent': agents[index].name,
-                                'narrative': parsed['narrative'] if parsed else NO_OUTPUT_PLACEHOLDER})
+                                'narrative': shared['narrative'] if shared else NO_OUTPUT_PLACEHOLDER})
                 cursors[index] = len(history)
                 latest = await asyncio.to_thread(work.acceptance)
                 first, termination = termination_context(first, parsed, step,
                     scenario.termination_context_collection.declarer_agent)
-                receipt = outcome['observation_report']
                 observed_parsed, observed_artifact = select_sources(collection_policy,
                     failed=outcome['failed'], legacy_parsed=parsed, final_report=receipt,
                     artifact=latest['artifact'])
@@ -413,6 +418,7 @@ async def run(args):
                 record.update(strict_used=outcome['strict_used'], strict_failure=outcome['strict_failure'],
                               consecutive_strict_failures=strict_streak.count)
                 if contract.version == V2:
+                    record.update(shared_narrative_source=shared_source)
                     record.update(vocabulary_violation=vocabulary,
                                   consecutive_vocabulary_violations=vocabulary_streak.count,
                                   vocabulary_violations_total=vocabulary_total)
