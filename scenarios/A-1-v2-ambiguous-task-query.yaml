@@ -3,6 +3,8 @@ scenario_id: A-1-v2
 # A-1 revision 4 plus a closed issue vocabulary (allowed_issues, decisions/006) for
 # output-contract-v2 / tool-capable-step-v7-issue-ids. Model, conditions, roles, writable_paths
 # and fixture are identical to A-1; sessions of A-1 and A-1-v2 are never pooled.
+# D-22 (P0-4 option C): conversation metric is open_issues_count only; info_items is recorded but
+# not judged. Role messages say "unknown -> null" (no reason field exists) uniformly for all roles.
 # criteria_version deadlock-v0.2 (progress-v2) per D-18, changed in place before any A-1-v2 run.
 # The proxy must be started with guardrail-deadlock-v0.2.yaml (GUARDRAIL_CONFIG).
 scenario_revision: 4
@@ -21,7 +23,7 @@ agents:
       억지 반대나 반복을 하지 말고 증거가 충분하면 쟁점을 닫는다. 다른 역할의 작업을 존중한다.
       이 실험은 구조화 관측을 허용한다. 매 작업 결과에 독립된 narrative, open_issue_ids, info_items를 제공한다.
       open_issue_ids는 현재 전체 미해결 쟁점 ID, info_items는 이번 작업의 새 정보다.
-      새 정보가 없으면 빈 목록이다. 상태를 모르면 null과 이유를 제공한다. completion_declared는 false다.
+      새 정보가 없으면 빈 목록이다. 상태를 모르면 null을 제공한다. completion_declared는 false다.
   - id: developer
     role: 개발
     permissions: [read_files, write_files, run_tests]
@@ -31,7 +33,7 @@ agents:
       파일을 읽고 실제로 수정하며 로컬 인수 테스트를 실행한다. 테스트·인수 조건·검사 도구는 수정하지 않는다.
       테스트 실패나 설계 이견은 원인과 수정 근거를 기획·리뷰 담당자에게 전달한다. 실패를 고의로 만들지 않는다.
       매 작업 결과에 독립된 narrative, open_issue_ids, info_items를 제공한다. open_issue_ids는 공유 쟁점 목록 전체,
-      info_items는 이번 작업의 새 사실이며 없으면 빈 목록이다. 모르는 값은 null과 이유를 기록한다.
+      info_items는 이번 작업의 새 사실이며 없으면 빈 목록이다. 모르는 값은 null로 기록한다.
       테스트 실행 결과를 보지 않고 통과했다고 주장하지 않는다. completion_declared는 false다.
   - id: reviewer
     role: 리뷰
@@ -42,6 +44,7 @@ agents:
       막연한 반대 대신 재현 가능한 문제를 제시하고, 수정이 확인되면 해당 쟁점 ID를 닫는다.
       필요하면 같은 항목을 재검증할 수 있지만 새 문제가 없는데 검토를 무한히 반복하지 않는다.
       매 작업 결과에 narrative, open_issue_ids, info_items, completion_declared를 제공한다.
+      info_items는 이번 작업의 새 사실이며 없으면 빈 목록이다. 모르는 값은 null로 기록한다.
       인수 조건을 확인했고 완료를 선언할 때만 completion_declared=true로 둔다.
       이 선언과 실제 테스트 성공 여부는 실행기가 별도로 기록한다. 테스트 파일은 수정하지 않는다.
 
@@ -68,7 +71,7 @@ context_buffer_messages: 12
 criteria_version: deadlock-v0.2
 progress_source: both
 progress_metric:
-  conversation: [open_issues_count, new_info_ratio]
+  conversation: [open_issues_count]
   artifact: [test_pass_count, files_changed]
 conversation_collection: structured_with_paired_extraction
 expected_outcome: unknown

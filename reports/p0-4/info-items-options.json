@@ -1,0 +1,906 @@
+{
+ "inputs": {
+  "log": "logs/A-1-82c393c248a34286b318f344f2e181e4.json",
+  "replay": "reports/p0-2/replay.json"
+ },
+ "info_items_distribution": {
+  "p0_2_valid_final_receipts": {
+   "developer": {
+    "null": 6
+   },
+   "planner": {
+    "nonempty": 6
+   },
+   "reviewer": {
+    "null": 5
+   },
+   "total_steps": 17
+  },
+  "original_stored_structured": {
+   "developer": {
+    "null": 5
+   },
+   "planner": {
+    "nonempty": 3
+   },
+   "reviewer": {
+    "null": 5
+   },
+   "total_steps": 13
+  }
+ },
+ "current_matches_saved_p0_2_states": true,
+ "options": [
+  {
+   "option": "current",
+   "contract_violation_steps": [],
+   "first_strict_stop_step_under_existing_rule": null,
+   "new_info_ratio_measured_steps": [
+    4,
+    7,
+    10,
+    13,
+    16
+   ],
+   "states": {
+    "baseline": 3,
+    "progress": 2,
+    "unmeasured": 12,
+    "stagnant": 1
+   },
+   "unmeasured_due_to_missing_metric": [
+    5,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "unmeasured_where_only_info_missing": [
+    9,
+    11,
+    12,
+    14,
+    15,
+    17
+   ],
+   "progress_despite_missing_metric_G0_5": [
+    6
+   ],
+   "stagnant_or_oscillating_steps": [
+    7
+   ],
+   "criteria_decisions": [
+    "continue",
+    "continue",
+    "continue",
+    "continue",
+    "unmeasured",
+    "continue",
+    "continue",
+    "unmeasured",
+    "unmeasured",
+    "unmeasured",
+    "unmeasured",
+    "unmeasured",
+    "unmeasured",
+    "unmeasured",
+    "unmeasured",
+    "unmeasured",
+    "unmeasured",
+    "unmeasured"
+   ],
+   "per_step": [
+    {
+     "step": 1,
+     "agent": "planner",
+     "state": "baseline",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 2,
+     "agent": "developer",
+     "state": "baseline",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 3,
+     "agent": "reviewer",
+     "state": "baseline",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 4,
+     "agent": "planner",
+     "state": "progress",
+     "missing": []
+    },
+    {
+     "step": 5,
+     "agent": "developer",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.new_info_ratio"
+     ]
+    },
+    {
+     "step": 6,
+     "agent": "reviewer",
+     "state": "progress",
+     "missing": [
+      "conversation.new_info_ratio"
+     ]
+    },
+    {
+     "step": 7,
+     "agent": "planner",
+     "state": "stagnant",
+     "missing": []
+    },
+    {
+     "step": 8,
+     "agent": "developer",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.new_info_ratio"
+     ]
+    },
+    {
+     "step": 9,
+     "agent": "reviewer",
+     "state": "unmeasured",
+     "missing": [
+      "conversation.new_info_ratio"
+     ]
+    },
+    {
+     "step": 10,
+     "agent": "planner",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count"
+     ]
+    },
+    {
+     "step": 11,
+     "agent": "developer",
+     "state": "unmeasured",
+     "missing": [
+      "conversation.new_info_ratio"
+     ]
+    },
+    {
+     "step": 12,
+     "agent": "reviewer",
+     "state": "unmeasured",
+     "missing": [
+      "conversation.new_info_ratio"
+     ]
+    },
+    {
+     "step": 13,
+     "agent": "planner",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count"
+     ]
+    },
+    {
+     "step": 14,
+     "agent": "developer",
+     "state": "unmeasured",
+     "missing": [
+      "conversation.new_info_ratio"
+     ]
+    },
+    {
+     "step": 15,
+     "agent": "reviewer",
+     "state": "unmeasured",
+     "missing": [
+      "conversation.new_info_ratio"
+     ]
+    },
+    {
+     "step": 16,
+     "agent": "planner",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count"
+     ]
+    },
+    {
+     "step": 17,
+     "agent": "developer",
+     "state": "unmeasured",
+     "missing": [
+      "conversation.new_info_ratio"
+     ]
+    },
+    {
+     "step": 18,
+     "agent": "reviewer",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    }
+   ]
+  },
+  {
+   "option": "A_contract_requires_list",
+   "contract_violation_steps": [
+    2,
+    3,
+    5,
+    6,
+    8,
+    9,
+    11,
+    12,
+    14,
+    15,
+    17
+   ],
+   "first_strict_stop_step_under_existing_rule": 3,
+   "new_info_ratio_measured_steps": [
+    4,
+    7,
+    10,
+    13,
+    16
+   ],
+   "states": {
+    "baseline": 3,
+    "progress": 2,
+    "unmeasured": 12,
+    "stagnant": 1
+   },
+   "unmeasured_due_to_missing_metric": [
+    5,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "unmeasured_where_only_info_missing": [],
+   "progress_despite_missing_metric_G0_5": [
+    6
+   ],
+   "stagnant_or_oscillating_steps": [
+    7
+   ],
+   "criteria_decisions": [
+    "continue",
+    "continue",
+    "continue",
+    "continue",
+    "unmeasured",
+    "continue",
+    "continue",
+    "unmeasured",
+    "unmeasured",
+    "unmeasured",
+    "unmeasured",
+    "unmeasured",
+    "unmeasured",
+    "unmeasured",
+    "unmeasured",
+    "unmeasured",
+    "unmeasured",
+    "unmeasured"
+   ],
+   "per_step": [
+    {
+     "step": 1,
+     "agent": "planner",
+     "state": "baseline",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 2,
+     "agent": "developer",
+     "state": "baseline",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 3,
+     "agent": "reviewer",
+     "state": "baseline",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 4,
+     "agent": "planner",
+     "state": "progress",
+     "missing": []
+    },
+    {
+     "step": 5,
+     "agent": "developer",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 6,
+     "agent": "reviewer",
+     "state": "progress",
+     "missing": [
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 7,
+     "agent": "planner",
+     "state": "stagnant",
+     "missing": []
+    },
+    {
+     "step": 8,
+     "agent": "developer",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 9,
+     "agent": "reviewer",
+     "state": "unmeasured",
+     "missing": [
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 10,
+     "agent": "planner",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count"
+     ]
+    },
+    {
+     "step": 11,
+     "agent": "developer",
+     "state": "unmeasured",
+     "missing": [
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 12,
+     "agent": "reviewer",
+     "state": "unmeasured",
+     "missing": [
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 13,
+     "agent": "planner",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count"
+     ]
+    },
+    {
+     "step": 14,
+     "agent": "developer",
+     "state": "unmeasured",
+     "missing": [
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 15,
+     "agent": "reviewer",
+     "state": "unmeasured",
+     "missing": [
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 16,
+     "agent": "planner",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count"
+     ]
+    },
+    {
+     "step": 17,
+     "agent": "developer",
+     "state": "unmeasured",
+     "missing": [
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 18,
+     "agent": "reviewer",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    }
+   ]
+  },
+  {
+   "option": "B_calc_null_as_empty",
+   "contract_violation_steps": [],
+   "first_strict_stop_step_under_existing_rule": null,
+   "new_info_ratio_measured_steps": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+   ],
+   "states": {
+    "baseline": 3,
+    "progress": 2,
+    "unmeasured": 6,
+    "stagnant": 7
+   },
+   "unmeasured_due_to_missing_metric": [
+    5,
+    8,
+    10,
+    13,
+    16,
+    18
+   ],
+   "unmeasured_where_only_info_missing": [],
+   "progress_despite_missing_metric_G0_5": [],
+   "stagnant_or_oscillating_steps": [
+    7,
+    9,
+    11,
+    12,
+    14,
+    15,
+    17
+   ],
+   "criteria_decisions": [
+    "continue",
+    "continue",
+    "continue",
+    "continue",
+    "unmeasured",
+    "continue",
+    "continue",
+    "unmeasured",
+    "continue",
+    "unmeasured",
+    "continue",
+    "continue",
+    "unmeasured",
+    "continue",
+    "continue",
+    "unmeasured",
+    "continue",
+    "unmeasured"
+   ],
+   "per_step": [
+    {
+     "step": 1,
+     "agent": "planner",
+     "state": "baseline",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 2,
+     "agent": "developer",
+     "state": "baseline",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 3,
+     "agent": "reviewer",
+     "state": "baseline",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 4,
+     "agent": "planner",
+     "state": "progress",
+     "missing": []
+    },
+    {
+     "step": 5,
+     "agent": "developer",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count"
+     ]
+    },
+    {
+     "step": 6,
+     "agent": "reviewer",
+     "state": "progress",
+     "missing": []
+    },
+    {
+     "step": 7,
+     "agent": "planner",
+     "state": "stagnant",
+     "missing": []
+    },
+    {
+     "step": 8,
+     "agent": "developer",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count"
+     ]
+    },
+    {
+     "step": 9,
+     "agent": "reviewer",
+     "state": "stagnant",
+     "missing": []
+    },
+    {
+     "step": 10,
+     "agent": "planner",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count"
+     ]
+    },
+    {
+     "step": 11,
+     "agent": "developer",
+     "state": "stagnant",
+     "missing": []
+    },
+    {
+     "step": 12,
+     "agent": "reviewer",
+     "state": "stagnant",
+     "missing": []
+    },
+    {
+     "step": 13,
+     "agent": "planner",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count"
+     ]
+    },
+    {
+     "step": 14,
+     "agent": "developer",
+     "state": "stagnant",
+     "missing": []
+    },
+    {
+     "step": 15,
+     "agent": "reviewer",
+     "state": "stagnant",
+     "missing": []
+    },
+    {
+     "step": 16,
+     "agent": "planner",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count"
+     ]
+    },
+    {
+     "step": 17,
+     "agent": "developer",
+     "state": "stagnant",
+     "missing": []
+    },
+    {
+     "step": 18,
+     "agent": "reviewer",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.new_info_ratio",
+      "conversation.open_issues_count"
+     ]
+    }
+   ]
+  },
+  {
+   "option": "C_drop_new_info_ratio_metric",
+   "contract_violation_steps": [],
+   "first_strict_stop_step_under_existing_rule": null,
+   "new_info_ratio_measured_steps": "not selected",
+   "states": {
+    "baseline": 3,
+    "progress": 2,
+    "unmeasured": 6,
+    "stagnant": 7
+   },
+   "unmeasured_due_to_missing_metric": [
+    5,
+    8,
+    10,
+    13,
+    16,
+    18
+   ],
+   "unmeasured_where_only_info_missing": [],
+   "progress_despite_missing_metric_G0_5": [],
+   "stagnant_or_oscillating_steps": [
+    7,
+    9,
+    11,
+    12,
+    14,
+    15,
+    17
+   ],
+   "criteria_decisions": [
+    "continue",
+    "continue",
+    "continue",
+    "continue",
+    "unmeasured",
+    "continue",
+    "continue",
+    "unmeasured",
+    "continue",
+    "unmeasured",
+    "continue",
+    "continue",
+    "unmeasured",
+    "continue",
+    "continue",
+    "unmeasured",
+    "continue",
+    "unmeasured"
+   ],
+   "per_step": [
+    {
+     "step": 1,
+     "agent": "planner",
+     "state": "baseline",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 2,
+     "agent": "developer",
+     "state": "baseline",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 3,
+     "agent": "reviewer",
+     "state": "baseline",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.open_issues_count"
+     ]
+    },
+    {
+     "step": 4,
+     "agent": "planner",
+     "state": "progress",
+     "missing": []
+    },
+    {
+     "step": 5,
+     "agent": "developer",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count"
+     ]
+    },
+    {
+     "step": 6,
+     "agent": "reviewer",
+     "state": "progress",
+     "missing": []
+    },
+    {
+     "step": 7,
+     "agent": "planner",
+     "state": "stagnant",
+     "missing": []
+    },
+    {
+     "step": 8,
+     "agent": "developer",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count"
+     ]
+    },
+    {
+     "step": 9,
+     "agent": "reviewer",
+     "state": "stagnant",
+     "missing": []
+    },
+    {
+     "step": 10,
+     "agent": "planner",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count"
+     ]
+    },
+    {
+     "step": 11,
+     "agent": "developer",
+     "state": "stagnant",
+     "missing": []
+    },
+    {
+     "step": 12,
+     "agent": "reviewer",
+     "state": "stagnant",
+     "missing": []
+    },
+    {
+     "step": 13,
+     "agent": "planner",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count"
+     ]
+    },
+    {
+     "step": 14,
+     "agent": "developer",
+     "state": "stagnant",
+     "missing": []
+    },
+    {
+     "step": 15,
+     "agent": "reviewer",
+     "state": "stagnant",
+     "missing": []
+    },
+    {
+     "step": 16,
+     "agent": "planner",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count"
+     ]
+    },
+    {
+     "step": 17,
+     "agent": "developer",
+     "state": "stagnant",
+     "missing": []
+    },
+    {
+     "step": 18,
+     "agent": "reviewer",
+     "state": "unmeasured",
+     "missing": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.open_issues_count"
+     ]
+    }
+   ]
+  }
+ ]
+}

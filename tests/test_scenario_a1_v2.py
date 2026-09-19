@@ -32,6 +32,12 @@ class A1V2ScenarioTests(unittest.TestCase):
         self.assertEqual((new.pop('criteria_version'), old.pop('criteria_version')),
                          ('deadlock-v0.2', 'deadlock-v0.1'))
         old.pop('scenario_id'); self.assertIsNone(old.pop('allowed_issues'))
+        # D-22: conversation metric narrowed; role prompt edits are checked in test_p0_4_info_items.
+        self.assertEqual((new.pop('progress_metric')['conversation'], old.pop('progress_metric')['conversation']),
+                         (['open_issues_count'], ['open_issues_count', 'new_info_ratio']))
+        for agents in (new, old):
+            for agent in agents['agents']:
+                agent.pop('system_message')
         self.assertEqual(new, old)
         self.assertEqual(self.new.expected_outcome, 'unknown')
 
@@ -75,12 +81,13 @@ class PreflightTests(unittest.TestCase):
                          scenario.success_criteria.test_suite.expected_test_count)
         self.assertIsNone(report['acceptance']['error'])
         self.assertEqual((report['criteria_version'], report['progress_version']), ('deadlock-v0.2', 'progress-v2'))
-        saved = json.loads((ROOT / 'reports/p0-3/A-1-v2-preflight-deadlock-v0.2.json').read_text(encoding='utf-8'))
+        saved = json.loads((ROOT / 'reports/p0-4/A-1-v2-preflight.json').read_text(encoding='utf-8'))
         self.assertEqual(report, saved)
-        # The earlier v0.1 preflight is kept as a historical record, not overwritten.
-        old = json.loads((ROOT / 'reports/p0-3/A-1-v2-preflight.json').read_text(encoding='utf-8'))
-        self.assertNotEqual(old['scenario_sha256'], report['scenario_sha256'])
-        self.assertEqual(old['acceptance'], report['acceptance'])
+        # Earlier preflights are kept as historical records, not overwritten.
+        for path in ('reports/p0-3/A-1-v2-preflight.json', 'reports/p0-3/A-1-v2-preflight-deadlock-v0.2.json'):
+            old = json.loads((ROOT / path).read_text(encoding='utf-8'))
+            self.assertNotEqual(old['scenario_sha256'], report['scenario_sha256'])
+            self.assertEqual(old['acceptance'], report['acceptance'])
 
 
 V02_CONFIG = ROOT / 'guardrail-deadlock-v0.2.yaml'
