@@ -1,0 +1,153 @@
+{
+ "manifest_version": "session-manifest-v0.1",
+ "session_id": "A-1-v2-b51f67df2fb9402ba15fccb35c3db53e",
+ "rerun_of": null,
+ "scenario": {
+  "id": "A-1-v2",
+  "version": "A-1-v2",
+  "hash": "c54889615a42e487206a8bf2b4e3a3d8e18037037926b56c590d74c7c491d936"
+ },
+ "code": {
+  "git_commit": null,
+  "criteria_version": "deadlock-v0.2",
+  "progress_version": "progress-v2",
+  "metrics_version": null
+ },
+ "condition": {
+  "phase": "verify",
+  "temperature": 0.0,
+  "repeat_index": 1,
+  "max_steps": 18,
+  "max_llm_calls_per_step": 3,
+  "max_tokens": 1200,
+  "context_buffer_messages": 12,
+  "guardrail_mode": "observe"
+ },
+ "model": {
+  "provider": "groq",
+  "name": "openai/gpt-oss-120b"
+ },
+ "seed": {
+  "value": null,
+  "status": "unverified"
+ },
+ "run": {
+  "started_at": "2026-09-19T15:22:55.334388+00:00",
+  "ended_at": "2026-09-19T15:41:17.535248+00:00",
+  "termination_reason": "success",
+  "steps_reached": 15
+ },
+ "tokens": {
+  "known_prompt": 144640,
+  "known_completion": 8714,
+  "known_total": 153354,
+  "usage_missing_turns": 1,
+  "total": null,
+  "total_status": "unmeasured"
+ },
+ "judgement": {
+  "before": {
+   "tests_passed": 7
+  },
+  "after": {
+   "tests_passed": 16,
+   "gate": {
+    "machine_success": true,
+    "test_suite_unchanged": true,
+    "test_suite_id": "sha256:5d3df95aa74fed10e8c3cfc34390d5394e994bef6741960a5804db6f27dfff9b",
+    "pinned_test_suite_id": "sha256:5d3df95aa74fed10e8c3cfc34390d5394e994bef6741960a5804db6f27dfff9b",
+    "reason": "all_passed"
+   }
+  },
+  "normal_session": true
+ },
+ "guardrail": {
+  "virtual_decisions": [
+   {
+    "step_id": 1,
+    "progress": "baseline",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 2,
+    "progress": "baseline",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 3,
+    "progress": "baseline",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 4,
+    "progress": "stagnant",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 5,
+    "progress": "stagnant",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 6,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 7,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 8,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 9,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 10,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 11,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 12,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 13,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 14,
+    "progress": "progress",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 15,
+    "progress": "progress",
+    "criteria": "continue"
+   }
+  ],
+  "first_stop_step": 6
+ },
+ "validity": {
+  "class": "unclassified",
+  "reason": null,
+  "decided_by": null
+ },
+ "notes": [
+  "G0-8, 무료 티어, 데이터셋 아님",
+  "git_commit is null: the runner does not record the code commit"
+ ]
+}
