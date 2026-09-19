@@ -8,6 +8,21 @@ FINAL_ONLY = ('This is the final call of this step. No tools are available for t
 NO_OUTPUT_PLACEHOLDER = '[구조화 출력 없음]'
 # Only these kinds are invalid model responses counted toward the per-step abort.
 COUNTED_KINDS = ('unknown_tool', 'invalid_tool_arguments')
+TOOL_ERROR_SUMMARY_CHARS = 300
+
+
+def tool_execution_records(events, llm_call):
+    """Executed tool results with the framework's is_error flag. Evidence only, not control flow."""
+    from autogen_agentchat.messages import ToolCallExecutionEvent
+    records = []
+    for event in events or []:
+        if isinstance(event, ToolCallExecutionEvent):
+            for result in event.content:
+                records.append({'llm_call_in_step': llm_call, 'tool': result.name, 'call_id': result.call_id,
+                                'is_error': bool(result.is_error),
+                                'error_summary': str(result.content)[:TOOL_ERROR_SUMMARY_CHARS]
+                                                 if result.is_error else None})
+    return records
 
 
 class StrictOutputError(RuntimeError):
@@ -177,7 +192,7 @@ def correction(kind, names, allowed):
 async def perform_step(agent, context, budget, allowed):
     from autogen_agentchat.messages import TextMessage, ToolCallRequestEvent
     from autogen_core import CancellationToken
-    errors, text, feedback = [], '', None
+    errors, text, feedback, executions = [], '', None, []
     abort, error, final_output = False, None, False
     strict_failure = None
     incoming = context
@@ -191,6 +206,7 @@ async def perform_step(agent, context, budget, allowed):
             text = result.chat_message.content
             if not isinstance(text, str):
                 text = json.dumps(text, ensure_ascii=False)
+            executions.extend(tool_execution_records(result.inner_messages, budget.used))
             for event in result.inner_messages or []:
                 if isinstance(event, ToolCallRequestEvent):
                     tool_round = True
@@ -250,6 +266,6 @@ async def perform_step(agent, context, budget, allowed):
         # Budget ended on a tool result or a tool attempt: no final answer was produced.
         reasons.append('no_final_output')
     return {'text': text, 'failed': bool(reasons), 'abort': abort, 'error': error,
-            'tool_errors': errors, 'feedback': feedback, 'final_output': final_output,
+            'tool_errors': errors, 'tool_executions': executions, 'feedback': feedback, 'final_output': final_output,
             'failure_reasons': reasons, 'strict_failure': strict_failure, 'strict_used': budget.strict_used,
             'observation_report': budget.observation_report()}

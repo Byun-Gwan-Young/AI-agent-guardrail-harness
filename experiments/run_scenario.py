@@ -400,10 +400,16 @@ async def run(args):
                 record = {'step_id': step, 'agent': agents[index].name, 'text': text,
                           'llm_calls': budget.used, 'llm_turns': sorted(set(budget.turns)),
                           'acceptance': latest, 'call_error': call_error}
-                record.update(step_status='failed' if outcome['failed'] else 'completed',
+                # G0-6: executed tool errors fail the recorded step only. outcome['failed'] still drives
+                # parsing, placeholders, source selection and the success check, so control flow is unchanged.
+                tool_execution_error = any(e['is_error'] for e in outcome['tool_executions'])
+                record.update(step_status='failed' if outcome['failed'] or tool_execution_error else 'completed',
                               measurement_status='unmeasured' if outcome['failed'] else 'observed',
                               tool_errors=outcome['tool_errors'], tool_feedback=outcome['feedback'],
-                              final_output=outcome['final_output'], failure_reasons=outcome['failure_reasons'])
+                              tool_executions=outcome['tool_executions'],
+                              final_output=outcome['final_output'],
+                              failure_reasons=outcome['failure_reasons']
+                                              + ['tool_execution_error'] * tool_execution_error)
                 record.update(strict_used=outcome['strict_used'], strict_failure=outcome['strict_failure'],
                               consecutive_strict_failures=strict_streak.count)
                 if contract.version == V2:
