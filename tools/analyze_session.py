@@ -7,6 +7,7 @@ derived stay null with a reason. Writes one analysis JSON and one session manife
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import statistics
@@ -192,17 +193,26 @@ def shared_artifact_progress(rows):
     return counted
 
 
-def secret_scan(paths):
+def secret_scan(paths, env_names=()):
+    """Pattern hits plus the literal value of each named environment variable set right now (D-11)."""
+    checked = {}
+    patterns = dict(SECRET_PATTERNS)
+    for name in sorted({n for n in env_names if n}):
+        value = os.environ.get(name)
+        checked[name] = 'set' if value else 'not set in this environment'
+        if value and len(value) >= 8:
+            patterns['env:' + name] = re.compile(re.escape(value))
     hits = {}
     for path in paths:
         for file in ([path] if path.is_file() else sorted(p for p in path.rglob('*') if p.is_file())):
             text = file.read_text(encoding='utf-8', errors='replace')
-            for name, pattern in SECRET_PATTERNS.items():
+            for name, pattern in patterns.items():
                 count = len(pattern.findall(text))
                 if count:
                     hits.setdefault(file.relative_to(ROOT).as_posix(), {})[name] = count
     return {'files_scanned': sum(1 if p.is_file() else sum(1 for q in p.rglob('*') if q.is_file()) for p in paths),
-            'patterns': sorted(SECRET_PATTERNS), 'hits': hits, 'clean': not hits}
+            'patterns': sorted(patterns), 'environment_variables_checked': checked,
+            'hits': hits, 'clean': not hits}
 
 
 def analyse(session_id):
@@ -285,8 +295,11 @@ def analyse(session_id):
                                                       'collection_policy', 'output_contract_version', 'allowed_issues_sha256',
                                                       'recent_messages_policy', 'seed_support', 'requested_seed', 'versions')},
         'meta': {k: log['meta'].get(k) for k in ('model', 'max_tokens', 'criteria_version', 'criteria_sha256',
-                                                  'temperature', 'seed_status', 'context_buffer_messages', 'framework_version')},
-        'secret_scan': secret_scan([log_path, run])}
+                                                  'temperature', 'seed_status', 'context_buffer_messages',
+                                                  'framework_version', 'upstream')},
+        'secret_scan': secret_scan([log_path, run],
+                                   {(log['meta'].get('upstream') or {}).get('api_key_env'),
+                                    'GROQ_API_KEY', 'KMU_API_KEY'})}
 
 
 def manifest(a, phase, notes):
@@ -304,8 +317,10 @@ def manifest(a, phase, notes):
                           'max_tokens': a['meta']['max_tokens'],
                           'context_buffer_messages': a['conditions']['context_buffer_messages'],
                           'guardrail_mode': 'observe' if scenario.termination.on_criteria_alert == 'observe_only' else None},
-            'model': {'provider': 'groq' if 'api.groq.com' in (ROOT / 'proxy.py').read_text(encoding='utf-8') else None,
-                      'name': a['meta']['model']},
+            # Provider comes from what the proxy recorded for this session; never assumed.
+            'model': {'provider': (a['meta']['upstream'] or {}).get('base_url_host'),
+                      'name': a['meta']['model'],
+                      'upstream': a['meta']['upstream']},
             'seed': {'value': a['conditions']['requested_seed'], 'status': a['conditions']['seed_support']},
             'run': {'started_at': a['termination']['started_at'], 'ended_at': a['termination']['ended_at'],
                     'termination_reason': a['termination']['reason'], 'steps_reached': a['termination']['steps_reached']},
@@ -318,7 +333,9 @@ def manifest(a, phase, notes):
                                                  'criteria': r['criteria_decision']} for r in a['steps']],
                           'first_stop_step': a['first_stop_step']},
             'validity': {'class': 'unclassified', 'reason': None, 'decided_by': None},
-            'notes': notes + ['git_commit is null: the runner does not record the code commit']}
+            'notes': notes + ['git_commit is null: the runner does not record the code commit']
+                     + ([] if a['meta']['upstream'] else
+                        ['model.provider is null: this session predates upstream recording in the proxy log'])}
 
 
 def main():

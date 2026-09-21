@@ -1626,7 +1626,8 @@
   "temperature": 0.0,
   "seed_status": "unverified",
   "context_buffer_messages": 12,
-  "framework_version": "autogen-agentchat/0.5.7"
+  "framework_version": "autogen-agentchat/0.5.7",
+  "upstream": null
  },
  "secret_scan": {
   "files_scanned": 97,
@@ -1636,6 +1637,10 @@
    "groq_key",
    "openai_style_key"
   ],
+  "environment_variables_checked": {
+   "GROQ_API_KEY": "not set in this environment",
+   "KMU_API_KEY": "not set in this environment"
+  },
   "hits": {},
   "clean": true
  }

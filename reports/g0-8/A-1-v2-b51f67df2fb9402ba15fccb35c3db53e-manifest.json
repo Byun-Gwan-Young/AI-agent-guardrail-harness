@@ -24,8 +24,9 @@
   "guardrail_mode": "observe"
  },
  "model": {
-  "provider": "groq",
-  "name": "openai/gpt-oss-120b"
+  "provider": null,
+  "name": "openai/gpt-oss-120b",
+  "upstream": null
  },
  "seed": {
   "value": null,
@@ -148,6 +149,7 @@
  },
  "notes": [
   "G0-8, 무료 티어, 데이터셋 아님",
-  "git_commit is null: the runner does not record the code commit"
+  "git_commit is null: the runner does not record the code commit",
+  "model.provider is null: this session predates upstream recording in the proxy log"
  ]
 }

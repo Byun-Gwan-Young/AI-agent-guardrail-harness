@@ -7,7 +7,6 @@ standard library only. The API key is read from GROQ_API_KEY and never written o
 import argparse
 import copy
 from datetime import datetime, timezone
-from importlib import metadata
 import json
 import os
 from pathlib import Path
@@ -25,13 +24,7 @@ from scenario_schema import load_scenario
 ENDPOINT = 'https://api.groq.com/openai/v1/chat/completions'
 DEFAULT_SCENARIO = ROOT / 'scenarios/A-1-v2-ambiguous-task-query.yaml'
 BASE, ENUM, NO_LENGTH = 'v2', 'v2-open-issue-enum', 'v2-without-length'
-EXCERPT_CHARS = 300
-
-
-def default_user_agent():
-    # The proxy forwards to Groq with httpx defaults and no User-Agent override, so the runner
-    # path reaches Groq as python-httpx/<version>. Match it instead of Python-urllib's default.
-    return 'python-httpx/' + metadata.version('httpx')
+from tools.probe_gateway_support import EXCERPT_CHARS, default_user_agent, redact  # noqa: F401
 
 
 def strip_lengths(node):
@@ -100,10 +93,6 @@ def send(url, api_key, body, user_agent):
             return response.status, response.read().decode('utf-8', 'replace')
     except urllib.error.HTTPError as exc:
         return exc.code, exc.read().decode('utf-8', 'replace')
-
-
-def redact(text, api_key):
-    return text.replace(api_key, '[REDACTED]') if api_key else text
 
 
 def probe(scenario_path, variants, output_root, api_key=None, transport=send, user_agent=None):
