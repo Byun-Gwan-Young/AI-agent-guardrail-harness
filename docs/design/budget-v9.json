@@ -1,0 +1,105 @@
+{
+ "ESTIMATE": true,
+ "basis": "A-1-v4 (protocol v9) credit ESTIMATE (C-13 part 3). Read-only; every output is an estimate.",
+ "inputs": {
+  "A-1-v3_calls": 23,
+  "A-1-v3_steps": 9,
+  "A-1-v3_calls_per_step": 2.556,
+  "A-1-v3_credit_per_call_mean": 0.71436,
+  "A-1-v3_credit_per_call_max": 1.6614,
+  "A-1-v3_credits_by_price_total": 16.43025,
+  "probe_credits": {
+   "v8-final-strict": 0.24885,
+   "reasoning-no-tools-low": 0.1722,
+   "reasoning-no-tools-high": 0.9456,
+   "reasoning-tools-low": 0.2058,
+   "reasoning-tools-high": 0.9204
+  },
+  "probe_high_minus_low_per_call": [
+   0.7146,
+   0.7734
+  ]
+ },
+ "v9_credit_per_call": [
+  1.42896,
+  2.4348
+ ],
+ "A-1-v4_session": {
+  "like_A-1-v3_9_steps": {
+   "steps": 9,
+   "calls": [
+    23,
+    23
+   ],
+   "credits": [
+    32.9,
+    56.0
+   ]
+  },
+  "18_steps": {
+   "steps": 18,
+   "calls": [
+    46,
+    54
+   ],
+   "credits": [
+    65.7,
+    131.5
+   ]
+  },
+  "30_steps_max": {
+   "steps": 30,
+   "calls": [
+    77,
+    90
+   ],
+   "credits": [
+    110.0,
+    219.1
+   ]
+  }
+ },
+ "pilot": {
+  "sessions": 7,
+  "note": "B-6 and C-9 have no measurement; the A-1-v4 per-session range is used for them",
+  "credits": [
+   230,
+   1534
+  ]
+ },
+ "main_collection": {
+  "normal_60_failure_30": {
+   "sessions": 90,
+   "credits": [
+    5274,
+    19719
+   ]
+  },
+  "normal_93_failure_30": {
+   "sessions": 123,
+   "credits": [
+    6360,
+    26949
+   ]
+  },
+  "normal_124_failure_30": {
+   "sessions": 154,
+   "credits": [
+    7380,
+    33741
+   ]
+  }
+ },
+ "main_collection_cap": {
+  "sessions": 220,
+  "credits_upper": 48202
+ },
+ "verify_all_scenarios": {
+  "sessions": 22,
+  "credits": [
+   724,
+   4820
+  ]
+ },
+ "excluded": "D-32 cross-check model: price and conditions unknown until its probe"
+}
