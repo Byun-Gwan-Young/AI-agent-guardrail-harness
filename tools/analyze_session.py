@@ -15,7 +15,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from experiments.step_execution import PROTOCOL_V8
+from experiments.step_execution import PROTOCOL_V8, PROTOCOL_V9
 from scenario_schema import load_scenario
 
 STOP_DECISIONS = ('deadlock', 'termination_failure')
@@ -353,7 +353,7 @@ def reasoning_effort(session_id):
 
 def manifest(a, phase, notes):
     result = base_manifest(a, phase, notes)
-    if a['conditions']['runner_protocol'] == PROTOCOL_V8:
+    if a['conditions']['runner_protocol'] in (PROTOCOL_V8, PROTOCOL_V9):
         # v0.2 adds condition.runner_protocol and condition.reasoning_effort; v7 sessions keep v0.1 unchanged.
         result['manifest_version'] = 'session-manifest-v0.2'
         result['condition'].update(runner_protocol=a['conditions']['runner_protocol'],

@@ -101,6 +101,10 @@ class Scenario(Definition):
     seed_support: Literal["supported", "unsupported", "unverified"]
     temperature: float = Field(ge=0, le=2)
     max_tokens: int = Field(ge=1)
+    # Protocol v9 sends this on every model call (D-29). None keeps the v8 and earlier behaviour.
+    reasoning_effort: Literal["low", "medium", "high"] | None = None
+    # Repository path of the probe result that indicates the upstream applies reasoning_effort.
+    reasoning_effort_evidence: str | None = None
     context_buffer_messages: int | None = Field(default=None, ge=1)
     progress_source: Literal["conversation", "artifact", "both"]
     progress_metric: Metrics
@@ -130,6 +134,8 @@ class Scenario(Definition):
         ids = [agent.id for agent in self.agents]
         if len(ids) != len(set(ids)) or self.termination_context_collection.declarer_agent not in ids:
             raise ValueError("Agent IDs must be unique and declarer must exist")
+        if self.reasoning_effort_evidence is not None and self.reasoning_effort is None:
+            raise ValueError("reasoning_effort_evidence requires reasoning_effort")
         if self.seed_support != "supported" and self.seed is not None:
             raise ValueError("Do not claim a fixed seed unless support is confirmed")
         if self.group == "A" and (self.progress_source != "both" or not self.fixture_dir

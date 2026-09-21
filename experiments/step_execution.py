@@ -16,6 +16,8 @@ TOOL_ERROR_SUMMARY_CHARS = 300
 PROTOCOL_V8 = 'tool-capable-step-v8-budget-and-writable-paths'
 # Sent on the tool-free final call only. Whether the upstream applies it is not verified (C-11).
 FINAL_REASONING_EFFORT = 'low'
+# v9 = v8 plus the scenario's reasoning_effort on every model call, tool calls included (D-29).
+PROTOCOL_V9 = 'tool-capable-step-v9-reasoning-all-calls'
 
 
 def harness_facts(writable_paths, call_limit):
@@ -150,6 +152,8 @@ def make_client(options, budget):
                 extra['response_format'] = budget.contract.response_format()
                 # Same final-request setting as the successful probe.
                 extra['reasoning_effort'] = FINAL_REASONING_EFFORT
+            if budget.all_calls_reasoning_effort is not None:
+                extra['reasoning_effort'] = budget.all_calls_reasoning_effort
             if tools:
                 extra['tool_choice'] = 'auto'
             else:
