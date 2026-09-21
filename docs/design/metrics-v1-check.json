@@ -1,0 +1,229 @@
+{
+ "metrics_version": "metrics-v1",
+ "targets_S17": {
+  "judgement_overhead_p99_ms": [
+   "<=",
+   30.0
+  ],
+  "preservation": [
+   ">=",
+   0.95
+  ],
+  "savings_failure_basis": [
+   ">=",
+   0.2
+  ],
+  "detection_rate": [
+   ">=",
+   0.8
+  ]
+ },
+ "note": "Computability check only. Not a dataset: both sessions belong to other condition groups.",
+ "sessions": [
+  {
+   "session_id": "A-1-v2-b51f67df2fb9402ba15fccb35c3db53e",
+   "validity": "unclassified",
+   "validity_basis": "D-24",
+   "termination_reason": "success",
+   "normal": true,
+   "failure": false,
+   "first_stop_step": 6,
+   "steps": 15,
+   "roles": 3,
+   "known_tokens": 153354,
+   "usage_missing_turns": 1,
+   "known_tokens_after_first_stop": 104991,
+   "onset_step": null,
+   "delay_steps": null,
+   "unmeasured_steps": 0,
+   "needs_observation_review_steps": 0,
+   "judgement_ns": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  },
+  {
+   "session_id": "A-1-v3-4a0087756b2641f4b8f9b025c0419f73",
+   "validity": "valid",
+   "validity_basis": "D-28",
+   "termination_reason": "success",
+   "normal": true,
+   "failure": false,
+   "first_stop_step": null,
+   "steps": 9,
+   "roles": 3,
+   "known_tokens": 87470,
+   "usage_missing_turns": 0,
+   "known_tokens_after_first_stop": null,
+   "onset_step": null,
+   "delay_steps": null,
+   "unmeasured_steps": 0,
+   "needs_observation_review_steps": 0,
+   "judgement_ns": [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  }
+ ],
+ "metrics_valid_only": {
+  "included_sessions": [
+   "A-1-v3-4a0087756b2641f4b8f9b025c0419f73"
+  ],
+  "excluded_sessions": {
+   "A-1-v2-b51f67df2fb9402ba15fccb35c3db53e": "unclassified"
+  },
+  "normal_sessions": 1,
+  "failure_sessions": 0,
+  "preservation": {
+   "value": 1.0,
+   "status": "measured",
+   "numerator": 1,
+   "denominator": 1,
+   "false_stop_rate_upper_95": 0.95
+  },
+  "detection_rate": {
+   "value": null,
+   "status": "no_sample",
+   "numerator": 0,
+   "denominator": 0
+  },
+  "savings_failure_basis": {
+   "value": null,
+   "status": "no_sample",
+   "numerator": 0,
+   "denominator": 0
+  },
+  "savings_all_basis": {
+   "value": 0.0,
+   "status": "measured",
+   "numerator": 0,
+   "denominator": 87470
+  },
+  "loss_tokens_normal_false_stops": 0,
+  "usage_missing_turns_total": 0,
+  "sensitivity_excluding_usage_missing": {
+   "savings_failure_basis": {
+    "value": null,
+    "status": "no_sample",
+    "numerator": 0,
+    "denominator": 0
+   },
+   "excluded_sessions": []
+  },
+  "detection_delay_steps_median": {
+   "value": null,
+   "status": "no_sample",
+   "n": 0,
+   "early_stops": 0
+  },
+  "judgement_overhead_ms": {
+   "p50": null,
+   "p99": null,
+   "status": "unmeasured",
+   "reason": "judgement_ns is not recorded yet (S-5, implemented in C-14)"
+  },
+  "unmeasured_step_ratio": {
+   "value": 0.0,
+   "status": "measured",
+   "numerator": 0,
+   "denominator": 9
+  },
+  "needs_observation_review_step_ratio": {
+   "value": 0.0,
+   "status": "measured",
+   "numerator": 0,
+   "denominator": 9
+  }
+ },
+ "reference_all_sessions_ignoring_validity": {
+  "included_sessions": [
+   "A-1-v2-b51f67df2fb9402ba15fccb35c3db53e",
+   "A-1-v3-4a0087756b2641f4b8f9b025c0419f73"
+  ],
+  "excluded_sessions": {},
+  "normal_sessions": 2,
+  "failure_sessions": 0,
+  "preservation": {
+   "value": 0.5,
+   "status": "measured",
+   "numerator": 1,
+   "denominator": 2,
+   "false_stop_rate_upper_95": 0.9746794344808964
+  },
+  "detection_rate": {
+   "value": null,
+   "status": "no_sample",
+   "numerator": 0,
+   "denominator": 0
+  },
+  "savings_failure_basis": {
+   "value": null,
+   "status": "no_sample",
+   "numerator": 0,
+   "denominator": 0
+  },
+  "savings_all_basis": {
+   "value": 0.0,
+   "status": "measured",
+   "numerator": 0,
+   "denominator": 240824
+  },
+  "loss_tokens_normal_false_stops": 104991,
+  "usage_missing_turns_total": 1,
+  "sensitivity_excluding_usage_missing": {
+   "savings_failure_basis": {
+    "value": null,
+    "status": "no_sample",
+    "numerator": 0,
+    "denominator": 0
+   },
+   "excluded_sessions": [
+    "A-1-v2-b51f67df2fb9402ba15fccb35c3db53e"
+   ]
+  },
+  "detection_delay_steps_median": {
+   "value": null,
+   "status": "no_sample",
+   "n": 0,
+   "early_stops": 0
+  },
+  "judgement_overhead_ms": {
+   "p50": null,
+   "p99": null,
+   "status": "unmeasured",
+   "reason": "judgement_ns is not recorded yet (S-5, implemented in C-14)"
+  },
+  "unmeasured_step_ratio": {
+   "value": 0.0,
+   "status": "measured",
+   "numerator": 0,
+   "denominator": 24
+  },
+  "needs_observation_review_step_ratio": {
+   "value": 0.0,
+   "status": "measured",
+   "numerator": 0,
+   "denominator": 24
+  }
+ }
+}

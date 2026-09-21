@@ -1,0 +1,710 @@
+{
+ "sessions": {
+  "G0-8": "A-1-v2-b51f67df2fb9402ba15fccb35c3db53e",
+  "A-1-v3": "A-1-v3-4a0087756b2641f4b8f9b025c0419f73"
+ },
+ "replay": {
+  "G0-8": {
+   "roles": 3,
+   "stored_equals_recomputed_v0.2": true,
+   "stored_equals_param_rule_N3": true,
+   "global_artifact_states": [
+    "baseline",
+    "baseline",
+    "baseline",
+    "stagnant",
+    "stagnant",
+    "stagnant",
+    "stagnant",
+    "stagnant",
+    "stagnant",
+    "stagnant",
+    "stagnant",
+    "stagnant",
+    "stagnant",
+    "progress",
+    "progress"
+   ],
+   "global_artifact_event_steps": [
+    14
+   ],
+   "stored_states": [
+    "baseline",
+    "baseline",
+    "baseline",
+    "stagnant",
+    "stagnant",
+    "stagnant",
+    "stagnant",
+    "stagnant",
+    "stagnant",
+    "stagnant",
+    "stagnant",
+    "stagnant",
+    "stagnant",
+    "progress",
+    "progress"
+   ],
+   "rules": {
+    "R0 deadlock-v0.2 (3 global steps = 1 role round when roles=3)": {
+     "decisions": [
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "continue",
+      "continue"
+     ],
+     "first_stop_step": 6
+    },
+    "R1 1 role round (N = roles x 1)": {
+     "decisions": [
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "continue",
+      "continue"
+     ],
+     "first_stop_step": 6
+    },
+    "R2 2 role rounds (N = roles x 2)": {
+     "decisions": [
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "continue",
+      "continue"
+     ],
+     "first_stop_step": 9
+    },
+    "G  global artifact comparison, N=3": {
+     "decisions": [
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "continue",
+      "continue"
+     ],
+     "first_stop_step": 6
+    },
+    "G2 global artifact comparison, 2 role rounds": {
+     "decisions": [
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "deadlock",
+      "continue",
+      "continue"
+     ],
+     "first_stop_step": 9
+    }
+   }
+  },
+  "A-1-v3": {
+   "roles": 3,
+   "stored_equals_recomputed_v0.2": true,
+   "stored_equals_param_rule_N3": true,
+   "global_artifact_states": [
+    "baseline",
+    "baseline",
+    "baseline",
+    "stagnant",
+    "progress",
+    "progress",
+    "progress",
+    "progress",
+    "stagnant"
+   ],
+   "global_artifact_event_steps": [
+    5
+   ],
+   "stored_states": [
+    "baseline",
+    "baseline",
+    "baseline",
+    "stagnant",
+    "progress",
+    "progress",
+    "progress",
+    "progress",
+    "stagnant"
+   ],
+   "rules": {
+    "R0 deadlock-v0.2 (3 global steps = 1 role round when roles=3)": {
+     "decisions": [
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue"
+     ],
+     "first_stop_step": null
+    },
+    "R1 1 role round (N = roles x 1)": {
+     "decisions": [
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue"
+     ],
+     "first_stop_step": null
+    },
+    "R2 2 role rounds (N = roles x 2)": {
+     "decisions": [
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue"
+     ],
+     "first_stop_step": null
+    },
+    "G  global artifact comparison, N=3": {
+     "decisions": [
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue"
+     ],
+     "first_stop_step": null
+    },
+    "G2 global artifact comparison, 2 role rounds": {
+     "decisions": [
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue",
+      "continue"
+     ],
+     "first_stop_step": null
+    }
+   }
+  }
+ },
+ "metrics": {
+  "G0-8": {
+   "termination_reason": "success",
+   "steps": 15,
+   "llm_calls": 40,
+   "tests_after": 16,
+   "tests_total": 16,
+   "all_tests_pass_at_end": true,
+   "reviewer_declared": true,
+   "normal": {
+    "N1 all tests pass + declaration (= runner success)": true,
+    "N2 all tests pass at end, declaration not required": true,
+    "N3 pass fraction >= 0.9 at end": true
+   },
+   "first_stop_step": 6,
+   "known_total": 153354,
+   "total_status": "unmeasured",
+   "usage_missing_turns": 1,
+   "known_tokens_after_first_stop": 104991,
+   "unmeasured_decisions": 0,
+   "needs_observation_review_any": false,
+   "last_artifact_or_test_change_step": 14,
+   "onset_a": null,
+   "detection_delay": null,
+   "llm_calls_per_step": 2.667,
+   "artifact_progress_steps": [
+    14,
+    15
+   ]
+  },
+  "A-1-v3": {
+   "termination_reason": "success",
+   "steps": 9,
+   "llm_calls": 23,
+   "tests_after": 16,
+   "tests_total": 16,
+   "all_tests_pass_at_end": true,
+   "reviewer_declared": true,
+   "normal": {
+    "N1 all tests pass + declaration (= runner success)": true,
+    "N2 all tests pass at end, declaration not required": true,
+    "N3 pass fraction >= 0.9 at end": true
+   },
+   "first_stop_step": null,
+   "known_total": 87470,
+   "total_status": "measured",
+   "usage_missing_turns": 0,
+   "known_tokens_after_first_stop": null,
+   "unmeasured_decisions": 0,
+   "needs_observation_review_any": false,
+   "last_artifact_or_test_change_step": 5,
+   "onset_a": null,
+   "detection_delay": null,
+   "llm_calls_per_step": 2.556,
+   "artifact_progress_steps": [
+    5,
+    6,
+    7
+   ]
+  }
+ },
+ "lint": [
+  {
+   "scenario": "A-1-v2",
+   "protocol": "v7",
+   "roles": {
+    "planner": {
+     "L1 call budget stated": false,
+     "L2 writable files stated": false,
+     "L3 instruction names fields missing from contract": [],
+     "L3b instruction asks for a reason with null (no reason field)": false
+    },
+    "developer": {
+     "L1 call budget stated": false,
+     "L2 writable files stated": false,
+     "L3 instruction names fields missing from contract": [],
+     "L3b instruction asks for a reason with null (no reason field)": false
+    },
+    "reviewer": {
+     "L1 call budget stated": false,
+     "L2 writable files stated": false,
+     "L3 instruction names fields missing from contract": [],
+     "L3b instruction asks for a reason with null (no reason field)": false
+    }
+   },
+   "L4 initial_issue_ids subset of allowed": true,
+   "L4b every allowed id has a definition": true,
+   "L5 identifiers explicit": {
+    "model": true,
+    "criteria_version": true,
+    "max_tokens": true,
+    "temperature": true,
+    "expected_outcome_unknown": true
+   }
+  },
+  {
+   "scenario": "A-1-v2",
+   "protocol": "v8",
+   "roles": {
+    "planner": {
+     "L1 call budget stated": true,
+     "L2 writable files stated": true,
+     "L3 instruction names fields missing from contract": [],
+     "L3b instruction asks for a reason with null (no reason field)": false
+    },
+    "developer": {
+     "L1 call budget stated": true,
+     "L2 writable files stated": true,
+     "L3 instruction names fields missing from contract": [],
+     "L3b instruction asks for a reason with null (no reason field)": false
+    },
+    "reviewer": {
+     "L1 call budget stated": true,
+     "L2 writable files stated": true,
+     "L3 instruction names fields missing from contract": [],
+     "L3b instruction asks for a reason with null (no reason field)": false
+    }
+   },
+   "L4 initial_issue_ids subset of allowed": true,
+   "L4b every allowed id has a definition": true,
+   "L5 identifiers explicit": {
+    "model": true,
+    "criteria_version": true,
+    "max_tokens": true,
+    "temperature": true,
+    "expected_outcome_unknown": true
+   }
+  },
+  {
+   "scenario": "A-1-v3",
+   "protocol": "v7",
+   "roles": {
+    "planner": {
+     "L1 call budget stated": false,
+     "L2 writable files stated": false,
+     "L3 instruction names fields missing from contract": [],
+     "L3b instruction asks for a reason with null (no reason field)": false
+    },
+    "developer": {
+     "L1 call budget stated": false,
+     "L2 writable files stated": false,
+     "L3 instruction names fields missing from contract": [],
+     "L3b instruction asks for a reason with null (no reason field)": false
+    },
+    "reviewer": {
+     "L1 call budget stated": false,
+     "L2 writable files stated": false,
+     "L3 instruction names fields missing from contract": [],
+     "L3b instruction asks for a reason with null (no reason field)": false
+    }
+   },
+   "L4 initial_issue_ids subset of allowed": true,
+   "L4b every allowed id has a definition": true,
+   "L5 identifiers explicit": {
+    "model": true,
+    "criteria_version": true,
+    "max_tokens": true,
+    "temperature": true,
+    "expected_outcome_unknown": true
+   }
+  },
+  {
+   "scenario": "A-1-v3",
+   "protocol": "v8",
+   "roles": {
+    "planner": {
+     "L1 call budget stated": true,
+     "L2 writable files stated": true,
+     "L3 instruction names fields missing from contract": [],
+     "L3b instruction asks for a reason with null (no reason field)": false
+    },
+    "developer": {
+     "L1 call budget stated": true,
+     "L2 writable files stated": true,
+     "L3 instruction names fields missing from contract": [],
+     "L3b instruction asks for a reason with null (no reason field)": false
+    },
+    "reviewer": {
+     "L1 call budget stated": true,
+     "L2 writable files stated": true,
+     "L3 instruction names fields missing from contract": [],
+     "L3b instruction asks for a reason with null (no reason field)": false
+    }
+   },
+   "L4 initial_issue_ids subset of allowed": true,
+   "L4b every allowed id has a definition": true,
+   "L5 identifiers explicit": {
+    "model": true,
+    "criteria_version": true,
+    "max_tokens": true,
+    "temperature": true,
+    "expected_outcome_unknown": true
+   }
+  }
+ ],
+ "credits": {
+  "A-1-v3_recorded": 16.43025,
+  "A-1-v3_by_price_per_step_sum": 16.43025,
+  "A-1-v3_per_step": [
+   {
+    "step_id": 1,
+    "agent": "planner",
+    "calls": 3,
+    "prompt": 6572,
+    "completion": 656,
+    "credits_by_price": 1.3794
+   },
+   {
+    "step_id": 2,
+    "agent": "developer",
+    "calls": 3,
+    "prompt": 6717,
+    "completion": 322,
+    "credits_by_price": 1.20075
+   },
+   {
+    "step_id": 3,
+    "agent": "reviewer",
+    "calls": 3,
+    "prompt": 7334,
+    "completion": 794,
+    "credits_by_price": 1.5765
+   },
+   {
+    "step_id": 4,
+    "agent": "planner",
+    "calls": 3,
+    "prompt": 11221,
+    "completion": 2199,
+    "credits_by_price": 3.00255
+   },
+   {
+    "step_id": 5,
+    "agent": "developer",
+    "calls": 3,
+    "prompt": 12123,
+    "completion": 1550,
+    "credits_by_price": 2.74845
+   },
+   {
+    "step_id": 6,
+    "agent": "reviewer",
+    "calls": 2,
+    "prompt": 8249,
+    "completion": 549,
+    "credits_by_price": 1.56675
+   },
+   {
+    "step_id": 7,
+    "agent": "planner",
+    "calls": 2,
+    "prompt": 9488,
+    "completion": 448,
+    "credits_by_price": 1.692
+   },
+   {
+    "step_id": 8,
+    "agent": "developer",
+    "calls": 2,
+    "prompt": 9920,
+    "completion": 293,
+    "credits_by_price": 1.6638
+   },
+   {
+    "step_id": 9,
+    "agent": "reviewer",
+    "calls": 2,
+    "prompt": 8491,
+    "completion": 544,
+    "credits_by_price": 1.60005
+   }
+  ],
+  "A-1-v3_mean_per_step": 1.82558,
+  "A-1-v3_max_per_step": 3.00255,
+  "G0-8_per_step_by_price": [
+   {
+    "step_id": 1,
+    "agent": "planner",
+    "calls": 3,
+    "prompt": 6433,
+    "completion": 472,
+    "credits_by_price": 1.24815
+   },
+   {
+    "step_id": 2,
+    "agent": "developer",
+    "calls": 3,
+    "prompt": 6680,
+    "completion": 386,
+    "credits_by_price": 1.2336
+   },
+   {
+    "step_id": 3,
+    "agent": "reviewer",
+    "calls": 3,
+    "prompt": 6906,
+    "completion": 329,
+    "credits_by_price": 1.2333
+   },
+   {
+    "step_id": 4,
+    "agent": "planner",
+    "calls": 3,
+    "prompt": 11069,
+    "completion": 509,
+    "credits_by_price": 1.96575
+   },
+   {
+    "step_id": 5,
+    "agent": "developer",
+    "calls": 3,
+    "prompt": 6992,
+    "completion": 264,
+    "credits_by_price": 1.2072
+   },
+   {
+    "step_id": 6,
+    "agent": "reviewer",
+    "calls": 2,
+    "prompt": 7757,
+    "completion": 566,
+    "credits_by_price": 1.50315
+   },
+   {
+    "step_id": 7,
+    "agent": "planner",
+    "calls": 2,
+    "prompt": 8768,
+    "completion": 452,
+    "credits_by_price": 1.5864
+   },
+   {
+    "step_id": 8,
+    "agent": "developer",
+    "calls": 3,
+    "prompt": 12495,
+    "completion": 295,
+    "credits_by_price": 2.05125
+   },
+   {
+    "step_id": 9,
+    "agent": "reviewer",
+    "calls": 2,
+    "prompt": 8189,
+    "completion": 640,
+    "credits_by_price": 1.61235
+   },
+   {
+    "step_id": 10,
+    "agent": "planner",
+    "calls": 3,
+    "prompt": 12910,
+    "completion": 329,
+    "credits_by_price": 2.1339
+   },
+   {
+    "step_id": 11,
+    "agent": "developer",
+    "calls": 3,
+    "prompt": 11883,
+    "completion": 768,
+    "credits_by_price": 2.24325
+   },
+   {
+    "step_id": 12,
+    "agent": "reviewer",
+    "calls": 2,
+    "prompt": 9183,
+    "completion": 551,
+    "credits_by_price": 1.70805
+   },
+   {
+    "step_id": 13,
+    "agent": "planner",
+    "calls": 3,
+    "prompt": 13125,
+    "completion": 1521,
+    "credits_by_price": 2.88135
+   },
+   {
+    "step_id": 14,
+    "agent": "developer",
+    "calls": 3,
+    "prompt": 12974,
+    "completion": 1254,
+    "credits_by_price": 2.6985
+   },
+   {
+    "step_id": 15,
+    "agent": "reviewer",
+    "calls": 2,
+    "prompt": 9276,
+    "completion": 378,
+    "credits_by_price": 1.6182
+   }
+  ],
+  "probe_2a31f5fe_credits_per_request": {
+   "v8-final-strict": 0.24885,
+   "reasoning-no-tools-low": 0.1722,
+   "reasoning-no-tools-high": 0.9456,
+   "reasoning-tools-low": 0.2058,
+   "reasoning-tools-high": 0.9204
+  },
+  "G0-8_mean_per_step_by_price": 1.79496,
+  "G0-8_max_per_step_by_price": 2.88135,
+  "ESTIMATE": {
+   "basis": "A-1-v3 per-step credits (mean..max) x steps; v9 adds probe high-low credit per call. Short arithmetic probe; real reasoning growth unknown. Not a measurement.",
+   "probe_high_minus_low_credit_per_call": [
+    0.7146,
+    0.7734
+   ],
+   "v8_session_18_steps": [
+    32.86,
+    54.05
+   ],
+   "v8_session_30_steps": [
+    54.77,
+    90.08
+   ],
+   "v9_per_step": [
+    3.652,
+    5.323
+   ],
+   "v9_session_18_steps": [
+    65.74,
+    95.81
+   ],
+   "v9_session_30_steps": [
+    109.56,
+    159.68
+   ],
+   "d30_minimum_90_sessions_v9_30_steps": [
+    2958.0,
+    14371.0
+   ]
+  }
+ },
+ "pooled_reference_only": {
+  "preservation_both_sessions": 0.5,
+  "preservation_valid_only_(D-24 excludes G0-8)": 1.0,
+  "failure_sessions": 0,
+  "savings_numerator_known": 0,
+  "savings_denominator_known_a_exclude_missing": 87470,
+  "savings_denominator_known_b_lower_bound": 240824,
+  "loss_tokens_in_normal_sessions_after_stop": {
+   "G0-8": 104991,
+   "A-1-v3": 0
+  }
+ },
+ "sample_size": {
+  "normal_sessions_needed_with_0_false_stops": 59,
+  "normal_sessions_needed_with_1_false_stops": 93,
+  "normal_sessions_needed_with_2_false_stops": 124,
+  "normal_sessions_needed_with_3_false_stops": 153,
+  "rule_of_three_zero_false_stops": 60
+ }
+}
