@@ -126,7 +126,10 @@ class GatewayProbeTests(unittest.TestCase):
         def recorder(url, api_key, body, user_agent, method='POST'):
             (calls if calls is not None else []).append({'url': url, 'method': method, 'body': body})
             if method == 'GET':
-                return 200, json.dumps({'used': 10.0 if not calls or len(calls) < 3 else 10.5, 'limit': 5000})
+                used = 10.0 if not calls or len(calls) < 3 else 10.5
+                # Shape of the real /credits/ body: usage is nested, not top-level (C-11).
+                return 200, json.dumps({'monthly_allocated': {'used': used, 'limit': 5000},
+                                        'total': {'used': used + 100}})
             return 200, json.dumps(transport or {})
         with patch('urllib.request.urlopen', side_effect=AssertionError('network used')):
             return probe.probe(A1V3, KMU, variants, Path(self.directory.name), 'developer', key, recorder)
@@ -180,6 +183,7 @@ class GatewayProbeTests(unittest.TestCase):
         self.assertTrue(calls[0]['url'].endswith('/credits/'))
         self.assertEqual(result['credits']['status'], 'measured')
         self.assertEqual(result['credits']['value'], 0.5)
+        self.assertEqual(result['credits']['field'], 'monthly_allocated.used')
         self.assertEqual((result['http_status'], result['finish_reason']), (200, 'stop'))
         self.assertTrue(result['reasoning_content_present'])
         self.assertFalse(result['contract_valid'])
@@ -187,6 +191,39 @@ class GatewayProbeTests(unittest.TestCase):
             self.assertNotIn(KEY, path.read_text(encoding='utf-8'), path.name)
 
     def test_missing_used_field_is_unmeasured(self):
-        self.assertEqual(probe.credit_delta({'body': {}}, {'body': {'used': 1}})['status'], 'unmeasured')
-        self.assertEqual(probe.credit_delta({'body': {'used': 1}}, {'body': {'used': 3}}),
-                         {'value': 2, 'status': 'measured', 'used_before': 1, 'used_after': 3})
+        monthly = lambda v: {'body': {'monthly_allocated': {'used': v}, 'total': {'used': v + 50}}}
+        self.assertEqual(probe.credit_delta({'body': {}}, monthly(1))['status'], 'unmeasured')
+        # A top-level used field is not the gateway's shape and is not read.
+        self.assertEqual(probe.credit_delta({'body': {'used': 1}}, {'body': {'used': 3}})['status'], 'unmeasured')
+        self.assertEqual(probe.credit_delta(monthly(4241.70359), monthly(4258.13384)),
+                         {'value': 16.43025, 'status': 'measured', 'field': 'monthly_allocated.used',
+                          'used_before': 4241.70359, 'used_after': 4258.13384})
+
+    def test_total_used_is_the_fallback_and_fields_must_match(self):
+        total = lambda v: {'body': {'total': {'used': v}}}
+        self.assertEqual(probe.credit_delta(total(1), total(3))['field'], 'total.used')
+        mixed = probe.credit_delta({'body': {'monthly_allocated': {'used': 1}}}, total(3))
+        self.assertEqual((mixed['status'], mixed['value']), ('unmeasured', None))
+
+    def test_reasoning_set_differs_only_in_effort_and_tools(self):
+        folder, report = self.run_probe(list(probe.REASONING_SET), key=None)
+        bodies = {v: json.loads((folder / (v + '.request.json')).read_text(encoding='utf-8'))
+                  for v in probe.REASONING_SET}
+        strip = lambda b: {k: v for k, v in b.items() if k not in ('reasoning_effort', 'tools', 'tool_choice')}
+        self.assertEqual(len({json.dumps(strip(b), sort_keys=True) for b in bodies.values()}), 1)
+        self.assertEqual([bodies[v]['reasoning_effort'] for v in probe.REASONING_SET], ['low', 'high', 'low', 'high'])
+        self.assertNotIn('tools', bodies[probe.REASON_NO_TOOLS_LOW])
+        self.assertNotIn('tools', bodies[probe.REASON_NO_TOOLS_HIGH])
+        self.assertEqual(bodies[probe.REASON_TOOLS_LOW]['tools'], bodies[probe.REASON_TOOLS_HIGH]['tools'])
+        self.assertEqual(bodies[probe.REASON_TOOLS_LOW]['tool_choice'], 'auto')
+        self.assertIsNone(report['reasoning_comparison'])
+
+    def test_reasoning_comparison_reports_gaps_only(self):
+        usage = lambda n: {'completion_tokens_details': {'reasoning_tokens': n}}
+        results = [{'variant': v, 'usage': usage(n), 'tool_calls': []}
+                   for v, n in zip(probe.REASONING_SET, (100, 900, 20, 25))]
+        comparison = probe.reasoning_comparison(results + [{'variant': probe.FINAL, 'usage': usage(1)}])
+        self.assertEqual((comparison['high_minus_low_without_tools'], comparison['high_minus_low_with_tools']),
+                         (800, 5))
+        self.assertNotIn(probe.FINAL, comparison['reasoning_tokens'])
+        self.assertIsNone(probe.reasoning_comparison(results[:1])['high_minus_low_without_tools'])

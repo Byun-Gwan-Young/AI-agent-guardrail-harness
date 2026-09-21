@@ -3,7 +3,10 @@
 Builds requests from the same code the runner uses: the v8 role system message, the runner's tool
 definitions and the output-contract-v2 strict response format. Variant 1 is sent by default;
 variants 2 and 3 are opt-in and differ only in reasoning_effort, so their reasoning_tokens can be
-compared to see whether the gateway forwards that field. HTTP uses the standard library only.
+compared to see whether the gateway forwards that field. The opt-in reasoning set (C-11) sends one
+multi-step arithmetic question four times: without tools at low/high, and with the runner's tools at
+low/high. A large low/high gap without tools and a small one with tools is consistent with the gateway
+dropping reasoning_effort when tools are present; the probe reports numbers only and decides nothing. HTTP uses the standard library only.
 The API key is read from the environment variable named in the proxy config and never written.
 """
 import argparse
@@ -32,6 +35,13 @@ DEFAULT_SCENARIO = ROOT / 'scenarios/A-1-v3-ambiguous-task-query.yaml'
 DEFAULT_CONFIG = ROOT / 'guardrail-deadlock-v0.2-kmu.yaml'
 FINAL, TOOLS_LOW, TOOLS_HIGH = 'v8-final-strict', 'v8-tools-reasoning-low', 'v8-tools-reasoning-high'
 CREDITS_PATH = '/credits/'
+# The /credits/ body nests usage; the first field present is used and named in the result (C-11).
+CREDIT_USED_FIELDS = (('monthly_allocated', 'used'), ('total', 'used'))
+REASON_NO_TOOLS_LOW, REASON_NO_TOOLS_HIGH = 'reasoning-no-tools-low', 'reasoning-no-tools-high'
+REASON_TOOLS_LOW, REASON_TOOLS_HIGH = 'reasoning-tools-low', 'reasoning-tools-high'
+REASONING_SET = (REASON_NO_TOOLS_LOW, REASON_NO_TOOLS_HIGH, REASON_TOOLS_LOW, REASON_TOOLS_HIGH)
+REASONING_QUESTION = ('How many integers n with 1 <= n <= 1000 are divisible by 3 or 5 but not by 7? '
+                      'Work it out, then reply with the integer only. Do not call any tool.')
 
 
 def role_tools(scenario, agent, workspace):
@@ -61,6 +71,13 @@ def request_bodies(scenario, agent, workspace, variants):
                                             {'role': 'user', 'content': json.dumps({'observed_records': records},
                                                                                    ensure_ascii=False)}],
                                'response_format': contract.response_format()}
+        elif variant in REASONING_SET:
+            # Same question and settings; only reasoning_effort and the presence of tools differ.
+            body = {**common, 'reasoning_effort': 'high' if variant.endswith('-high') else 'low',
+                    'messages': [{'role': 'user', 'content': REASONING_QUESTION}]}
+            if variant in (REASON_TOOLS_LOW, REASON_TOOLS_HIGH):
+                body.update(tools=copy.deepcopy(tools), tool_choice='auto')
+            bodies[variant] = body
         else:
             bodies[variant] = {**common, 'reasoning_effort': 'high' if variant == TOOLS_HIGH else 'low',
                                'messages': [{'role': 'system', 'content': system},
@@ -90,15 +107,42 @@ def credits(base_url, api_key, user_agent, transport):
 
 
 def used_credits(snapshot):
+    """(value, 'parent.used') from the first CREDIT_USED_FIELDS entry present, else (None, None)."""
     body = (snapshot or {}).get('body')
-    return body.get('used') if isinstance(body, dict) else None
+    for parent, field in CREDIT_USED_FIELDS:
+        section = body.get(parent) if isinstance(body, dict) else None
+        if isinstance(section, dict) and isinstance(section.get(field), (int, float)):
+            return section[field], parent + '.' + field
+    return None, None
 
 
 def credit_delta(before, after):
-    start, end = used_credits(before), used_credits(after)
+    (start, start_field), (end, end_field) = used_credits(before), used_credits(after)
     if start is None or end is None:
-        return {'value': None, 'status': 'unmeasured', 'reason': 'used field not present in /credits/ response'}
-    return {'value': end - start, 'status': 'measured', 'used_before': start, 'used_after': end}
+        return {'value': None, 'status': 'unmeasured', 'field': start_field or end_field,
+                'reason': 'none of ' + ', '.join(p + '.' + f for p, f in CREDIT_USED_FIELDS)
+                          + ' present in both /credits/ responses'}
+    if start_field != end_field:
+        return {'value': None, 'status': 'unmeasured', 'field': None,
+                'reason': 'before and after used different fields: ' + start_field + ', ' + end_field}
+    return {'value': round(end - start, 10), 'status': 'measured', 'field': start_field,
+            'used_before': start, 'used_after': end}
+
+
+def reasoning_comparison(results):
+    """reasoning_tokens of the reasoning set side by side; high minus low with and without tools."""
+    results = [r for r in results if r['variant'] in REASONING_SET and r.get('sent', True)]
+    tokens = {r['variant']: ((r.get('usage') or {}).get('completion_tokens_details') or {}).get('reasoning_tokens')
+              for r in results}
+    if not tokens:
+        return None
+    def gap(high, low):
+        return None if tokens.get(high) is None or tokens.get(low) is None else tokens[high] - tokens[low]
+    return {'reasoning_tokens': tokens,
+            'high_minus_low_without_tools': gap(REASON_NO_TOOLS_HIGH, REASON_NO_TOOLS_LOW),
+            'high_minus_low_with_tools': gap(REASON_TOOLS_HIGH, REASON_TOOLS_LOW),
+            'tool_calls_made': {r['variant']: r.get('tool_calls') for r in results},
+            'note': 'One request each. Numbers only; whether the gateway drops reasoning_effort is decided by the PM.'}
 
 
 def assess(contract, variant, status, body):
@@ -183,7 +227,7 @@ def probe(scenario_path, config_path, variants, output_root, role, api_key=None,
               'created_at': datetime.now(timezone.utc).isoformat(), 'dry_run': api_key is None,
               'note': 'One request per variant does not establish reliability. Compare the '
                       'reasoning_tokens of the two tool variants to see whether reasoning_effort was applied.',
-              'results': results}
+              'results': results, 'reasoning_comparison': reasoning_comparison(results)}
     (folder / 'result.json').write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
     return folder, report
 
@@ -195,11 +239,14 @@ def main():
     parser.add_argument('--role', default='developer')
     parser.add_argument('--with-tools-low', action='store_true', help='also send the tool variant (reasoning low)')
     parser.add_argument('--with-tools-high', action='store_true', help='also send the tool variant (reasoning high)')
+    parser.add_argument('--with-reasoning-set', action='store_true',
+                        help='also send the four reasoning_effort discriminator requests (C-11)')
     parser.add_argument('--dry-run', action='store_true', help='build and save request bodies only')
     parser.add_argument('--user-agent', default=None)
     parser.add_argument('--output-root', type=Path, default=ROOT / 'runs/gateway-probes')
     args = parser.parse_args()
-    variants = [FINAL] + [TOOLS_LOW] * args.with_tools_low + [TOOLS_HIGH] * args.with_tools_high
+    variants = ([FINAL] + [TOOLS_LOW] * args.with_tools_low + [TOOLS_HIGH] * args.with_tools_high
+                + list(REASONING_SET) * args.with_reasoning_set)
     key = None
     if not args.dry_run:
         name = upstream(load_config(args.config))['api_key_env']
