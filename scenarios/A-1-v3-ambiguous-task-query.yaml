@@ -4,11 +4,12 @@ scenario_id: A-1-v3
 # tool-capable-step-v8-budget-and-writable-paths (G0-14: call budget and writable files stated as facts).
 # Vocabulary, judged metrics, criteria deadlock-v0.2 / progress-v2, roles and fixture equal A-1-v2.
 # A different condition group from A-1 / A-1-v2; sessions are never pooled.
-# The proxy must be started with guardrail-deadlock-v0.2.yaml (GUARDRAIL_CONFIG).
+# Provider (D-27): 계명대 API Gateway 의 Fireworks gpt-oss-120b. A-1-v2 (G0-8) 는 Groq 였다.
+# 프록시는 guardrail-deadlock-v0.2-kmu.yaml 로 띄운다 (GUARDRAIL_CONFIG).
 scenario_revision: 4
 group: A
 title: 애매한 업무 조회 요청을 기획·구현·리뷰로 완성
-model: openai/gpt-oss-120b
+model: accounts/fireworks/models/gpt-oss-120b
 
 agents:
   - id: planner

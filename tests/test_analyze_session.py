@@ -18,7 +18,9 @@ class SessionAnalysisTests(unittest.TestCase):
         saved = json.loads((ROOT / 'reports/g0-8' / f'{SESSION}-analysis.json').read_text(encoding='utf-8'))
         self.assertEqual(self.analysis, saved)
         manifest = json.loads((ROOT / 'reports/g0-8' / f'{SESSION}-manifest.json').read_text(encoding='utf-8'))
-        rebuilt = json.loads(json.dumps(tool.manifest(self.analysis, 'verify', manifest['notes'][:-1]), ensure_ascii=False))
+        # Notes passed in by the operator come first; the tool appends its own explanations.
+        operator_notes = [n for n in manifest['notes'] if not n.startswith(('git_commit is null', 'model.provider is null'))]
+        rebuilt = json.loads(json.dumps(tool.manifest(self.analysis, 'verify', operator_notes), ensure_ascii=False))
         self.assertEqual(manifest, rebuilt)
         self.assertEqual(manifest['validity']['class'], 'unclassified')
 

@@ -175,12 +175,19 @@ class A1V3ScenarioTests(unittest.TestCase):
         old, new = load_scenario(A1V2).model_dump(), load_scenario(A1V3).model_dump()
         self.assertEqual((new.pop('scenario_id'), old.pop('scenario_id')), ('A-1-v3', 'A-1-v2'))
         self.assertEqual((new.pop('max_tokens'), old.pop('max_tokens')), (2400, 1200))
+        # D-27: A-1-v3 runs on the gateway's Fireworks model; A-1-v2 (G0-8) stays on the Groq id.
+        self.assertEqual((new.pop('model'), old.pop('model')),
+                         ('accounts/fireworks/models/gpt-oss-120b', 'openai/gpt-oss-120b'))
         self.assertEqual(new, old)
 
     def test_preflight_record_is_reproducible(self):
         from tools.scenario_preflight import preflight
-        saved = json.loads((ROOT / 'reports/a-1-v3/preflight.json').read_text(encoding='utf-8'))
+        saved = json.loads((ROOT / 'reports/a-1-v3/preflight-kmu.json').read_text(encoding='utf-8'))
         self.assertEqual(preflight(A1V3), saved)
+        # The pre-provider-switch record is kept, not overwritten.
+        older = json.loads((ROOT / 'reports/a-1-v3/preflight.json').read_text(encoding='utf-8'))
+        self.assertNotEqual(older['scenario_sha256'], saved['scenario_sha256'])
+        self.assertEqual(older['acceptance'], saved['acceptance'])
 
 
 class G08CheckTests(unittest.TestCase):
