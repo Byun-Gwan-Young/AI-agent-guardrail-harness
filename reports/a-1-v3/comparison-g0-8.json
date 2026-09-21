@@ -1,0 +1,321 @@
+{
+ "comparison_version": "session-comparison-v0.1",
+ "caveats": [
+  "one session each; no causal attribution",
+  "provider, runner protocol and max_tokens may differ at once (see each column)",
+  "seed unverified: temperature 0.0 does not establish reproducibility"
+ ],
+ "baseline": {
+  "session_id": "A-1-v2-b51f67df2fb9402ba15fccb35c3db53e",
+  "scenario_id": "A-1-v2",
+  "provider": null,
+  "model": "openai/gpt-oss-120b",
+  "runner_protocol": "tool-capable-step-v7-issue-ids",
+  "max_tokens": 1200,
+  "temperature": 0.0,
+  "seed": "unverified",
+  "termination_reason": "success",
+  "steps_reached": 15,
+  "tests_before": 7,
+  "tests_after": 16,
+  "tokens": {
+   "known_prompt": 144640,
+   "known_completion": 8714,
+   "known_total": 153354,
+   "usage_missing_turns": 1,
+   "total": null,
+   "total_status": "unmeasured"
+  },
+  "cached_prompt_tokens": 4096,
+  "cached_prompt_tokens_status": "reported",
+  "llm_calls": 40,
+  "first_stop_step": 6,
+  "stagnant_runs": [
+   [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13
+   ]
+  ],
+  "first_test_change_step": 14,
+  "rereads_in_context": [
+   {
+    "step_id": 4,
+    "agent": "planner",
+    "turn": 11,
+    "path": "SPEC.md",
+    "identical": true
+   },
+   {
+    "step_id": 11,
+    "agent": "developer",
+    "turn": 29,
+    "path": "src/task_query.py",
+    "identical": true
+   }
+  ],
+  "tool_calls_per_step": {
+   "1": 2,
+   "2": 2,
+   "3": 2,
+   "4": 2,
+   "5": 1,
+   "6": 0,
+   "7": 0,
+   "8": 2,
+   "9": 0,
+   "10": 2,
+   "11": 2,
+   "12": 0,
+   "13": 2,
+   "14": 2,
+   "15": 0
+  },
+  "steps_without_tool_calls": [
+   6,
+   7,
+   9,
+   12,
+   15
+  ],
+  "edit_attempts_outside_writable_paths": [
+   {
+    "step_id": 13,
+    "agent": "planner",
+    "tool": "write_file",
+    "path": "src/task_query.py",
+    "argument_chars": 2906
+   }
+  ],
+  "budget_exhausted_without_edit_steps": [
+   1,
+   2,
+   4,
+   8,
+   10,
+   11
+  ],
+  "http_errors": [
+   {
+    "turn": 14,
+    "status": 400,
+    "code": "tool_use_failed",
+    "message": "Failed to parse tool call arguments as JSON",
+    "failed_generation_chars": 1638,
+    "failed_generation_tail": "us: str = \\\"open\\\",\\n    offset: int = 0,\\n    limit: int = 20,\\n) -> List[Dict[str, Any]]:\\n    \\\"\\\"\\\"Return a list of tasks matching the given criteria.\\n\\n\"}",
+    "json_parse": {
+     "parses": false,
+     "error": "Expecting ',' delimiter",
+     "position": 1638,
+     "length": 1638
+    }
+   }
+  ],
+  "tool_use_failed": 1,
+  "finish_reason_counts": {
+   "stop": 20,
+   "tool_calls": 19
+  },
+  "completion_over_1200": [],
+  "edit_calls_200": [
+   {
+    "turn": 34,
+    "tool": "write_file",
+    "path": "src/task_query.py",
+    "argument_chars": 2906,
+    "completion": 1111,
+    "reasoning": 353
+   },
+   {
+    "turn": 36,
+    "tool": "replace_in_file",
+    "path": "src/task_query.py",
+    "argument_chars": 2260,
+    "completion": 1049,
+    "reasoning": 454
+   }
+  ],
+  "reasoning_effort_requested": [
+   null,
+   "low"
+  ],
+  "harness_facts_in_system_message": {
+   "planner": {
+    "writable_files": false,
+    "call_limit": false
+   },
+   "developer": {
+    "writable_files": false,
+    "call_limit": false
+   },
+   "reviewer": {
+    "writable_files": false,
+    "call_limit": false
+   }
+  },
+  "per_call_budget_fact_in_non_final_calls": [
+   0,
+   25
+  ],
+  "g0_12_extra_progress_counts": 1,
+  "credits": null
+ },
+ "candidate": {
+  "session_id": "A-1-v3-4a0087756b2641f4b8f9b025c0419f73",
+  "scenario_id": "A-1-v3",
+  "provider": "factchat.mindlogic-kr-api.com",
+  "model": "accounts/fireworks/models/gpt-oss-120b",
+  "runner_protocol": "tool-capable-step-v8-budget-and-writable-paths",
+  "max_tokens": 2400,
+  "temperature": 0.0,
+  "seed": "unverified",
+  "termination_reason": "success",
+  "steps_reached": 9,
+  "tests_before": 7,
+  "tests_after": 16,
+  "tokens": {
+   "known_prompt": 80115,
+   "known_completion": 7355,
+   "known_total": 87470,
+   "usage_missing_turns": 0,
+   "total": 87470,
+   "total_status": "measured"
+  },
+  "cached_prompt_tokens": 22596,
+  "cached_prompt_tokens_status": "reported",
+  "llm_calls": 23,
+  "first_stop_step": null,
+  "stagnant_runs": [
+   [
+    4
+   ],
+   [
+    9
+   ]
+  ],
+  "first_test_change_step": 5,
+  "rereads_in_context": [
+   {
+    "step_id": 1,
+    "agent": "planner",
+    "turn": 2,
+    "path": "SPEC.md",
+    "identical": true
+   }
+  ],
+  "tool_calls_per_step": {
+   "1": 2,
+   "2": 2,
+   "3": 2,
+   "4": 2,
+   "5": 2,
+   "6": 0,
+   "7": 0,
+   "8": 0,
+   "9": 0
+  },
+  "steps_without_tool_calls": [
+   6,
+   7,
+   8,
+   9
+  ],
+  "edit_attempts_outside_writable_paths": [
+   {
+    "step_id": 4,
+    "agent": "planner",
+    "tool": "write_file",
+    "path": "src/task_query.py",
+    "argument_chars": 3406
+   }
+  ],
+  "budget_exhausted_without_edit_steps": [
+   1,
+   2
+  ],
+  "http_errors": [],
+  "tool_use_failed": 0,
+  "finish_reason_counts": {
+   "stop": 13,
+   "tool_calls": 10
+  },
+  "completion_over_1200": [
+   {
+    "turn": 11,
+    "completion": 1814
+   },
+   {
+    "turn": 14,
+    "completion": 1237
+   }
+  ],
+  "edit_calls_200": [
+   {
+    "turn": 11,
+    "tool": "write_file",
+    "path": "src/task_query.py",
+    "argument_chars": 3406,
+    "completion": 1814,
+    "reasoning": 907
+   },
+   {
+    "turn": 14,
+    "tool": "replace_in_file",
+    "path": "src/task_query.py",
+    "argument_chars": 2560,
+    "completion": 1237,
+    "reasoning": 578
+   }
+  ],
+  "reasoning_effort_requested": [
+   null,
+   "low"
+  ],
+  "harness_facts_in_system_message": {
+   "planner": {
+    "writable_files": true,
+    "call_limit": true
+   },
+   "developer": {
+    "writable_files": true,
+    "call_limit": true
+   },
+   "reviewer": {
+    "writable_files": true,
+    "call_limit": true
+   }
+  },
+  "per_call_budget_fact_in_non_final_calls": [
+   11,
+   14
+  ],
+  "g0_12_extra_progress_counts": 2,
+  "credits": {
+   "recorded_before": 4241.70359,
+   "recorded_after": 4258.13384,
+   "used": 16.43025,
+   "price_assumption_per_1M_usd": {
+    "prompt": 0.15,
+    "completion": 0.6
+   },
+   "credits_by_price_x1000_all_prompt_full_price": 16.43025,
+   "difference": 0.0,
+   "credits_per_1k_tokens": 0.1878386876,
+   "basis": "user-recorded /credits/ monthly_allocated.used; no other use in between is a user confirmation item"
+  }
+ },
+ "changed_conditions": [
+  "provider",
+  "model",
+  "runner_protocol",
+  "max_tokens",
+  "scenario_id"
+ ]
+}

@@ -1,0 +1,1138 @@
+{
+ "session_id": "A-1-v3-4a0087756b2641f4b8f9b025c0419f73",
+ "isolation": {
+  "log_session_id_matches": true,
+  "runner_session_id_matches": true,
+  "runner_copy_equals_proxy_log": true,
+  "meta_scenario_id": "A-1-v3",
+  "conditions_mixed": false,
+  "turns": 23,
+  "turn_ids_consecutive": true,
+  "turns_linked_to_steps": 23,
+  "every_turn_linked_once": true,
+  "observation_step_ids": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9
+  ]
+ },
+ "scenario": {
+  "id": "A-1-v3",
+  "sha256": "de343e007bb196c57c62d8ca5df5b68294264d3f6f403706437f5a8fcf38bd5d",
+  "progress_metric": {
+   "conversation": [
+    "open_issues_count"
+   ],
+   "artifact": [
+    "test_pass_count",
+    "files_changed"
+   ]
+  },
+  "progress_source": "both",
+  "monitored_paths": [
+   "SPEC.md",
+   "src/task_query.py",
+   "tests/test_task_query.py"
+  ],
+  "writable_paths": {
+   "planner": [
+    "SPEC.md"
+   ],
+   "developer": [
+    "src/task_query.py"
+   ],
+   "reviewer": []
+  }
+ },
+ "tokens": {
+  "known_prompt": 80115,
+  "known_completion": 7355,
+  "known_total": 87470,
+  "usage_missing_turns": 0,
+  "usage_missing_turn_ids": [],
+  "total": 87470,
+  "total_status": "measured"
+ },
+ "termination": {
+  "reason": "success",
+  "steps_reached": 9,
+  "started_at": "2026-09-21T02:18:05.226270+00:00",
+  "ended_at": "2026-09-21T02:19:32.659522+00:00"
+ },
+ "judgement": {
+  "tests_before": 7,
+  "tests_after": 16,
+  "machine_success_at_end": true,
+  "gate_at_end": {
+   "machine_success": true,
+   "test_suite_unchanged": true,
+   "test_suite_id": "sha256:5d3df95aa74fed10e8c3cfc34390d5394e994bef6741960a5804db6f27dfff9b",
+   "pinned_test_suite_id": "sha256:5d3df95aa74fed10e8c3cfc34390d5394e994bef6741960a5804db6f27dfff9b",
+   "reason": "all_passed"
+  }
+ },
+ "steps": [
+  {
+   "step_id": 1,
+   "agent": "planner",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "progress_state": "baseline",
+   "comparison_step_id": null,
+   "metrics": {
+    "conversation.open_issues_count": null,
+    "artifact.test_pass_count": null,
+    "artifact.files_changed": null
+   },
+   "unmeasured_metrics": [
+    "artifact.files_changed",
+    "artifact.test_pass_count",
+    "conversation.open_issues_count"
+   ],
+   "events": [],
+   "criteria_decision": "continue",
+   "consecutive_steps": 0,
+   "open_issue_ids": [
+    "acceptance-review",
+    "filtering-order",
+    "pagination-validation",
+    "requirements",
+    "search-normalization",
+    "sort-order",
+    "status-filter"
+   ],
+   "open_issue_change_vs_same_role": null,
+   "tests_after_step": 7,
+   "tests_change_in_step": null,
+   "files_changed_in_step": [],
+   "tool_calls": [
+    {
+     "tool": "read_file",
+     "path": "SPEC.md",
+     "argument_chars": 18
+    },
+    {
+     "tool": "read_file",
+     "path": "SPEC.md",
+     "argument_chars": 18
+    }
+   ],
+   "edit_attempts": [],
+   "edit_attempts_outside_writable_paths": [],
+   "tool_execution_errors": [],
+   "tool_errors": [],
+   "http_errors": [],
+   "shared_narrative_source": "parsed",
+   "vocabulary_violation": null,
+   "unlisted_issues": [],
+   "info_items": null,
+   "completion_declared": false,
+   "final_output_status": "valid",
+   "observation_has_conversation": true,
+   "observation_has_artifact": true,
+   "llm_turns": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "step_id": 2,
+   "agent": "developer",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "progress_state": "baseline",
+   "comparison_step_id": null,
+   "metrics": {
+    "conversation.open_issues_count": null,
+    "artifact.test_pass_count": null,
+    "artifact.files_changed": null
+   },
+   "unmeasured_metrics": [
+    "artifact.files_changed",
+    "artifact.test_pass_count",
+    "conversation.open_issues_count"
+   ],
+   "events": [],
+   "criteria_decision": "continue",
+   "consecutive_steps": 0,
+   "open_issue_ids": [
+    "acceptance-review",
+    "filtering-order",
+    "pagination-validation",
+    "requirements",
+    "search-normalization",
+    "sort-order",
+    "status-filter"
+   ],
+   "open_issue_change_vs_same_role": null,
+   "tests_after_step": 7,
+   "tests_change_in_step": 0,
+   "files_changed_in_step": [],
+   "tool_calls": [
+    {
+     "tool": "read_file",
+     "path": "src/task_query.py",
+     "argument_chars": 28
+    },
+    {
+     "tool": "read_file",
+     "path": "SPEC.md",
+     "argument_chars": 18
+    }
+   ],
+   "edit_attempts": [],
+   "edit_attempts_outside_writable_paths": [],
+   "tool_execution_errors": [],
+   "tool_errors": [],
+   "http_errors": [],
+   "shared_narrative_source": "parsed",
+   "vocabulary_violation": null,
+   "unlisted_issues": null,
+   "info_items": null,
+   "completion_declared": false,
+   "final_output_status": "valid",
+   "observation_has_conversation": true,
+   "observation_has_artifact": true,
+   "llm_turns": [
+    4,
+    5,
+    6
+   ]
+  },
+  {
+   "step_id": 3,
+   "agent": "reviewer",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "progress_state": "baseline",
+   "comparison_step_id": null,
+   "metrics": {
+    "conversation.open_issues_count": null,
+    "artifact.test_pass_count": null,
+    "artifact.files_changed": null
+   },
+   "unmeasured_metrics": [
+    "artifact.files_changed",
+    "artifact.test_pass_count",
+    "conversation.open_issues_count"
+   ],
+   "events": [],
+   "criteria_decision": "continue",
+   "consecutive_steps": 0,
+   "open_issue_ids": [
+    "acceptance-review",
+    "filtering-order",
+    "pagination-validation",
+    "requirements",
+    "search-normalization",
+    "sort-order",
+    "status-filter"
+   ],
+   "open_issue_change_vs_same_role": null,
+   "tests_after_step": 7,
+   "tests_change_in_step": 0,
+   "files_changed_in_step": [],
+   "tool_calls": [
+    {
+     "tool": "run_tests",
+     "path": null,
+     "argument_chars": 2
+    },
+    {
+     "tool": "read_file",
+     "path": "SPEC.md",
+     "argument_chars": 18
+    }
+   ],
+   "edit_attempts": [],
+   "edit_attempts_outside_writable_paths": [],
+   "tool_execution_errors": [],
+   "tool_errors": [],
+   "http_errors": [],
+   "shared_narrative_source": "parsed",
+   "vocabulary_violation": null,
+   "unlisted_issues": null,
+   "info_items": null,
+   "completion_declared": false,
+   "final_output_status": "valid",
+   "observation_has_conversation": true,
+   "observation_has_artifact": true,
+   "llm_turns": [
+    7,
+    8,
+    9
+   ]
+  },
+  {
+   "step_id": 4,
+   "agent": "planner",
+   "step_status": "failed",
+   "failure_reasons": [
+    "tool_execution_error"
+   ],
+   "progress_state": "stagnant",
+   "comparison_step_id": 1,
+   "metrics": {
+    "conversation.open_issues_count": {
+     "count": 7,
+     "delta": 0
+    },
+    "artifact.test_pass_count": 0,
+    "artifact.files_changed": []
+   },
+   "unmeasured_metrics": [],
+   "events": [],
+   "criteria_decision": "continue",
+   "consecutive_steps": 1,
+   "open_issue_ids": [
+    "acceptance-review",
+    "filtering-order",
+    "pagination-validation",
+    "requirements",
+    "search-normalization",
+    "sort-order",
+    "status-filter"
+   ],
+   "open_issue_change_vs_same_role": {
+    "added": [],
+    "removed": []
+   },
+   "tests_after_step": 7,
+   "tests_change_in_step": 0,
+   "files_changed_in_step": [],
+   "tool_calls": [
+    {
+     "tool": "read_file",
+     "path": "src/task_query.py",
+     "argument_chars": 28
+    },
+    {
+     "tool": "write_file",
+     "path": "src/task_query.py",
+     "argument_chars": 3406
+    }
+   ],
+   "edit_attempts": [
+    {
+     "tool": "write_file",
+     "path": "src/task_query.py",
+     "argument_chars": 3406
+    }
+   ],
+   "edit_attempts_outside_writable_paths": [
+    {
+     "tool": "write_file",
+     "path": "src/task_query.py",
+     "argument_chars": 3406
+    }
+   ],
+   "tool_execution_errors": [
+    {
+     "llm_call_in_step": 2,
+     "tool": "write_file",
+     "call_id": "call_YupZprhqCvZ48Pg7spS413a4",
+     "is_error": true,
+     "error_summary": "Role is not authorized to edit this file"
+    }
+   ],
+   "tool_errors": [],
+   "http_errors": [],
+   "shared_narrative_source": "parsed",
+   "vocabulary_violation": null,
+   "unlisted_issues": [],
+   "info_items": null,
+   "completion_declared": false,
+   "final_output_status": "valid",
+   "observation_has_conversation": true,
+   "observation_has_artifact": true,
+   "llm_turns": [
+    10,
+    11,
+    12
+   ]
+  },
+  {
+   "step_id": 5,
+   "agent": "developer",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "progress_state": "progress",
+   "comparison_step_id": 2,
+   "metrics": {
+    "conversation.open_issues_count": {
+     "count": 2,
+     "delta": -5
+    },
+    "artifact.test_pass_count": 9,
+    "artifact.files_changed": [
+     "src/task_query.py"
+    ]
+   },
+   "unmeasured_metrics": [],
+   "events": [
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "filtering-order",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "pagination-validation",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "search-normalization",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "sort-order",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "status-filter",
+     "kind": "closed"
+    },
+    {
+     "metric": "artifact.test_pass_count",
+     "item": "tests",
+     "kind": "improved"
+    },
+    {
+     "metric": "artifact.files_changed",
+     "item": "src/task_query.py",
+     "kind": "new"
+    }
+   ],
+   "criteria_decision": "continue",
+   "consecutive_steps": 0,
+   "open_issue_ids": [
+    "acceptance-review",
+    "requirements"
+   ],
+   "open_issue_change_vs_same_role": {
+    "added": [],
+    "removed": [
+     "filtering-order",
+     "pagination-validation",
+     "search-normalization",
+     "sort-order",
+     "status-filter"
+    ]
+   },
+   "tests_after_step": 16,
+   "tests_change_in_step": 9,
+   "files_changed_in_step": [
+    "src/task_query.py"
+   ],
+   "tool_calls": [
+    {
+     "tool": "read_file",
+     "path": "tests/test_task_query.py",
+     "argument_chars": 35
+    },
+    {
+     "tool": "replace_in_file",
+     "path": "src/task_query.py",
+     "argument_chars": 2560
+    }
+   ],
+   "edit_attempts": [
+    {
+     "tool": "replace_in_file",
+     "path": "src/task_query.py",
+     "argument_chars": 2560
+    }
+   ],
+   "edit_attempts_outside_writable_paths": [],
+   "tool_execution_errors": [],
+   "tool_errors": [],
+   "http_errors": [],
+   "shared_narrative_source": "parsed",
+   "vocabulary_violation": null,
+   "unlisted_issues": null,
+   "info_items": null,
+   "completion_declared": false,
+   "final_output_status": "valid",
+   "observation_has_conversation": true,
+   "observation_has_artifact": true,
+   "llm_turns": [
+    13,
+    14,
+    15
+   ]
+  },
+  {
+   "step_id": 6,
+   "agent": "reviewer",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "progress_state": "progress",
+   "comparison_step_id": 3,
+   "metrics": {
+    "conversation.open_issues_count": {
+     "count": 1,
+     "delta": -6
+    },
+    "artifact.test_pass_count": 9,
+    "artifact.files_changed": [
+     "src/task_query.py"
+    ]
+   },
+   "unmeasured_metrics": [],
+   "events": [
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "acceptance-review",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "filtering-order",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "pagination-validation",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "search-normalization",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "sort-order",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "status-filter",
+     "kind": "closed"
+    },
+    {
+     "metric": "artifact.test_pass_count",
+     "item": "tests",
+     "kind": "improved"
+    },
+    {
+     "metric": "artifact.files_changed",
+     "item": "src/task_query.py",
+     "kind": "new"
+    }
+   ],
+   "criteria_decision": "continue",
+   "consecutive_steps": 0,
+   "open_issue_ids": [
+    "requirements"
+   ],
+   "open_issue_change_vs_same_role": {
+    "added": [],
+    "removed": [
+     "acceptance-review",
+     "filtering-order",
+     "pagination-validation",
+     "search-normalization",
+     "sort-order",
+     "status-filter"
+    ]
+   },
+   "tests_after_step": 16,
+   "tests_change_in_step": 0,
+   "files_changed_in_step": [],
+   "tool_calls": [],
+   "edit_attempts": [],
+   "edit_attempts_outside_writable_paths": [],
+   "tool_execution_errors": [],
+   "tool_errors": [],
+   "http_errors": [],
+   "shared_narrative_source": "parsed",
+   "vocabulary_violation": null,
+   "unlisted_issues": [],
+   "info_items": [
+    "SPEC.md still lacks concrete requirement details for the task query feature."
+   ],
+   "completion_declared": false,
+   "final_output_status": "valid",
+   "observation_has_conversation": true,
+   "observation_has_artifact": true,
+   "llm_turns": [
+    16,
+    17
+   ]
+  },
+  {
+   "step_id": 7,
+   "agent": "planner",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "progress_state": "progress",
+   "comparison_step_id": 4,
+   "metrics": {
+    "conversation.open_issues_count": {
+     "count": 1,
+     "delta": -6
+    },
+    "artifact.test_pass_count": 9,
+    "artifact.files_changed": [
+     "src/task_query.py"
+    ]
+   },
+   "unmeasured_metrics": [],
+   "events": [
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "acceptance-review",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "filtering-order",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "pagination-validation",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "search-normalization",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "sort-order",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "status-filter",
+     "kind": "closed"
+    },
+    {
+     "metric": "artifact.test_pass_count",
+     "item": "tests",
+     "kind": "improved"
+    },
+    {
+     "metric": "artifact.files_changed",
+     "item": "src/task_query.py",
+     "kind": "new"
+    }
+   ],
+   "criteria_decision": "continue",
+   "consecutive_steps": 0,
+   "open_issue_ids": [
+    "requirements"
+   ],
+   "open_issue_change_vs_same_role": {
+    "added": [],
+    "removed": [
+     "acceptance-review",
+     "filtering-order",
+     "pagination-validation",
+     "search-normalization",
+     "sort-order",
+     "status-filter"
+    ]
+   },
+   "tests_after_step": 16,
+   "tests_change_in_step": 0,
+   "files_changed_in_step": [],
+   "tool_calls": [],
+   "edit_attempts": [],
+   "edit_attempts_outside_writable_paths": [],
+   "tool_execution_errors": [],
+   "tool_errors": [],
+   "http_errors": [],
+   "shared_narrative_source": "parsed",
+   "vocabulary_violation": null,
+   "unlisted_issues": [],
+   "info_items": [
+    "Implementation of select_tasks meets all acceptance criteria."
+   ],
+   "completion_declared": false,
+   "final_output_status": "valid",
+   "observation_has_conversation": true,
+   "observation_has_artifact": true,
+   "llm_turns": [
+    18,
+    19
+   ]
+  },
+  {
+   "step_id": 8,
+   "agent": "developer",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "progress_state": "progress",
+   "comparison_step_id": 5,
+   "metrics": {
+    "conversation.open_issues_count": {
+     "count": 1,
+     "delta": -1
+    },
+    "artifact.test_pass_count": 0,
+    "artifact.files_changed": []
+   },
+   "unmeasured_metrics": [],
+   "events": [
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "acceptance-review",
+     "kind": "closed"
+    }
+   ],
+   "criteria_decision": "continue",
+   "consecutive_steps": 0,
+   "open_issue_ids": [
+    "requirements"
+   ],
+   "open_issue_change_vs_same_role": {
+    "added": [],
+    "removed": [
+     "acceptance-review"
+    ]
+   },
+   "tests_after_step": 16,
+   "tests_change_in_step": 0,
+   "files_changed_in_step": [],
+   "tool_calls": [],
+   "edit_attempts": [],
+   "edit_attempts_outside_writable_paths": [],
+   "tool_execution_errors": [],
+   "tool_errors": [],
+   "http_errors": [],
+   "shared_narrative_source": "parsed",
+   "vocabulary_violation": null,
+   "unlisted_issues": null,
+   "info_items": null,
+   "completion_declared": false,
+   "final_output_status": "valid",
+   "observation_has_conversation": true,
+   "observation_has_artifact": true,
+   "llm_turns": [
+    20,
+    21
+   ]
+  },
+  {
+   "step_id": 9,
+   "agent": "reviewer",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "progress_state": "stagnant",
+   "comparison_step_id": 6,
+   "metrics": {
+    "conversation.open_issues_count": {
+     "count": 1,
+     "delta": 0
+    },
+    "artifact.test_pass_count": 0,
+    "artifact.files_changed": []
+   },
+   "unmeasured_metrics": [],
+   "events": [],
+   "criteria_decision": "continue",
+   "consecutive_steps": 0,
+   "open_issue_ids": [
+    "requirements"
+   ],
+   "open_issue_change_vs_same_role": {
+    "added": [],
+    "removed": []
+   },
+   "tests_after_step": 16,
+   "tests_change_in_step": 0,
+   "files_changed_in_step": [],
+   "tool_calls": [],
+   "edit_attempts": [],
+   "edit_attempts_outside_writable_paths": [],
+   "tool_execution_errors": [],
+   "tool_errors": [],
+   "http_errors": [],
+   "shared_narrative_source": "parsed",
+   "vocabulary_violation": null,
+   "unlisted_issues": [],
+   "info_items": [
+    "SPEC.md still lacks concrete requirement details for the task query feature."
+   ],
+   "completion_declared": true,
+   "final_output_status": "valid",
+   "observation_has_conversation": true,
+   "observation_has_artifact": true,
+   "llm_turns": [
+    22,
+    23
+   ]
+  }
+ ],
+ "first_stop_step": null,
+ "stagnant_classification": [
+  {
+   "step_id": 4,
+   "agent": "planner",
+   "state": "stagnant",
+   "classification": "no_measurable_change",
+   "basis": "no file hash, test count or own open-issue change since comparison step",
+   "activity_outside_metrics": {
+    "read_calls": 1,
+    "run_tests_calls": 0,
+    "edit_attempts": [
+     {
+      "tool": "write_file",
+      "path": "src/task_query.py",
+      "argument_chars": 3406
+     }
+    ],
+    "http_errors": [],
+    "tool_execution_errors": [
+     "Role is not authorized to edit this file"
+    ],
+    "no_tool_calls": false
+   }
+  },
+  {
+   "step_id": 9,
+   "agent": "reviewer",
+   "state": "stagnant",
+   "classification": "no_measurable_change",
+   "basis": "no file hash, test count or own open-issue change since comparison step",
+   "activity_outside_metrics": {
+    "read_calls": 0,
+    "run_tests_calls": 0,
+    "edit_attempts": [],
+    "http_errors": [],
+    "tool_execution_errors": [],
+    "no_tool_calls": true
+   }
+  }
+ ],
+ "counterfactual_stop": {
+  "first_stop_step": null
+ },
+ "p0_checks": {
+  "comparison_same_role": true,
+  "open_issue_events_by_step": {
+   "5": [
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "filtering-order",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "pagination-validation",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "search-normalization",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "sort-order",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "status-filter",
+     "kind": "closed"
+    }
+   ],
+   "6": [
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "acceptance-review",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "filtering-order",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "pagination-validation",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "search-normalization",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "sort-order",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "status-filter",
+     "kind": "closed"
+    }
+   ],
+   "7": [
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "acceptance-review",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "filtering-order",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "pagination-validation",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "search-normalization",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "sort-order",
+     "kind": "closed"
+    },
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "status-filter",
+     "kind": "closed"
+    }
+   ],
+   "8": [
+    {
+     "metric": "conversation.open_issues_count",
+     "item": "acceptance-review",
+     "kind": "closed"
+    }
+   ]
+  },
+  "failed_steps_sources": [
+   {
+    "step_id": 4,
+    "failure_reasons": [
+     "tool_execution_error"
+    ],
+    "final_output_status": "valid",
+    "observation_has_conversation": true,
+    "observation_has_artifact": true
+   }
+  ],
+  "vocabulary_violations_total": 0,
+  "vocabulary_violation_steps": [],
+  "unlisted_issues_by_step": {
+   "1": [],
+   "2": null,
+   "3": null,
+   "4": [],
+   "5": null,
+   "6": [],
+   "7": [],
+   "8": null,
+   "9": []
+  },
+  "judged_metrics": [
+   "artifact.files_changed",
+   "artifact.test_pass_count",
+   "conversation.open_issues_count"
+  ],
+  "info_items_recorded": {
+   "1": null,
+   "2": null,
+   "3": null,
+   "4": null,
+   "5": null,
+   "6": [
+    "SPEC.md still lacks concrete requirement details for the task query feature."
+   ],
+   "7": [
+    "Implementation of select_tasks meets all acceptance criteria."
+   ],
+   "8": null,
+   "9": [
+    "SPEC.md still lacks concrete requirement details for the task query feature."
+   ]
+  },
+  "tool_execution_errors": [
+   {
+    "step_id": 4,
+    "agent": "planner",
+    "errors": [
+     {
+      "llm_call_in_step": 2,
+      "tool": "write_file",
+      "call_id": "call_YupZprhqCvZ48Pg7spS413a4",
+      "is_error": true,
+      "error_summary": "Role is not authorized to edit this file"
+     }
+    ],
+    "edit_attempts_outside_writable_paths": [
+     {
+      "tool": "write_file",
+      "path": "src/task_query.py",
+      "argument_chars": 3406
+     }
+    ]
+   }
+  ],
+  "shared_narrative_source": {
+   "parsed": 9
+  },
+  "unmeasured_due_to_missing_metric": []
+ },
+ "g0_7": {
+  "http_errors": [],
+  "finish_reason_counts": {
+   "stop": 13,
+   "tool_calls": 10
+  },
+  "completion_tokens": {
+   "n": 23,
+   "min": 43,
+   "median": 198,
+   "max": 1814
+  },
+  "reasoning_tokens": {
+   "n": 23,
+   "min": 0,
+   "median": 111,
+   "max": 907
+  },
+  "max_tokens_requested": [
+   2400
+  ],
+  "edit_calls_200": [
+   {
+    "turn": 11,
+    "tool": "write_file",
+    "path": "src/task_query.py",
+    "argument_chars": 3406,
+    "completion": 1814,
+    "reasoning": 907
+   },
+   {
+    "turn": 14,
+    "tool": "replace_in_file",
+    "path": "src/task_query.py",
+    "argument_chars": 2560,
+    "completion": 1237,
+    "reasoning": 578
+   }
+  ]
+ },
+ "g0_12_shared_artifact_progress": [
+  {
+   "origin_step": 5,
+   "files": [
+    "src/task_query.py"
+   ],
+   "counted_as_progress_by": [
+    [
+     5,
+     "developer"
+    ],
+    [
+     6,
+     "reviewer"
+    ],
+    [
+     7,
+     "planner"
+    ]
+   ],
+   "extra_counts": 2
+  }
+ ],
+ "d_10": {
+  "known_total": 87470,
+  "http_429_turns": []
+ },
+ "prompt_checks": {
+  "planner": {
+   "writable_paths_listed": false,
+   "mentions_own_writable_files": [
+    "SPEC.md"
+   ],
+   "states_call_budget": false
+  },
+  "developer": {
+   "writable_paths_listed": false,
+   "mentions_own_writable_files": [
+    "src/task_query.py"
+   ],
+   "states_call_budget": false
+  },
+  "reviewer": {
+   "writable_paths_listed": false,
+   "mentions_own_writable_files": [],
+   "states_call_budget": false
+  }
+ },
+ "conditions": {
+  "temperature": 0.0,
+  "run_index": 1,
+  "context_buffer_messages": 12,
+  "runner_protocol": "tool-capable-step-v8-budget-and-writable-paths",
+  "collection_policy": "independent-sources-v1",
+  "output_contract_version": "output-contract-v2",
+  "allowed_issues_sha256": "434e1ebc382f48bd2788a669aa66afca1129bc987ab08ea4ca3e9241a9098a10",
+  "recent_messages_policy": "parsed narrative; for a failed step the narrative of a verified final report (G0-13); otherwise placeholder; no raw tool results",
+  "seed_support": "unverified",
+  "requested_seed": null,
+  "versions": {
+   "autogen-agentchat": "0.5.7",
+   "autogen-core": "0.5.7",
+   "autogen-ext": "0.5.7",
+   "openai": "3.7.0"
+  }
+ },
+ "meta": {
+  "model": "accounts/fireworks/models/gpt-oss-120b",
+  "max_tokens": 2400,
+  "criteria_version": "deadlock-v0.2",
+  "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+  "temperature": 0.0,
+  "seed_status": "unverified",
+  "context_buffer_messages": 12,
+  "framework_version": "autogen-agentchat/0.5.7",
+  "upstream": {
+   "base_url_host": "factchat.mindlogic-kr-api.com",
+   "base_url": "https://factchat.mindlogic-kr-api.com/v1/gateway",
+   "chat_path": "/chat/completions/",
+   "api_key_env": "KMU_API_KEY",
+   "config_file": "guardrail-deadlock-v0.2-kmu.yaml"
+  }
+ },
+ "secret_scan": {
+  "files_scanned": 64,
+  "patterns": [
+   "authorization_field",
+   "bearer_value",
+   "groq_key",
+   "openai_style_key"
+  ],
+  "environment_variables_checked": {
+   "GROQ_API_KEY": "not set in this environment",
+   "KMU_API_KEY": "not set in this environment"
+  },
+  "hits": {},
+  "clean": true
+ }
+}

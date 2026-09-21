@@ -1,0 +1,137 @@
+{
+ "manifest_version": "session-manifest-v0.2",
+ "session_id": "A-1-v3-4a0087756b2641f4b8f9b025c0419f73",
+ "rerun_of": null,
+ "scenario": {
+  "id": "A-1-v3",
+  "version": "A-1-v3",
+  "hash": "de343e007bb196c57c62d8ca5df5b68294264d3f6f403706437f5a8fcf38bd5d"
+ },
+ "code": {
+  "git_commit": null,
+  "criteria_version": "deadlock-v0.2",
+  "progress_version": "progress-v2",
+  "metrics_version": null
+ },
+ "condition": {
+  "phase": "verify",
+  "temperature": 0.0,
+  "repeat_index": 1,
+  "max_steps": 18,
+  "max_llm_calls_per_step": 3,
+  "max_tokens": 2400,
+  "context_buffer_messages": 12,
+  "guardrail_mode": "observe",
+  "runner_protocol": "tool-capable-step-v8-budget-and-writable-paths",
+  "reasoning_effort": {
+   "requested": "low",
+   "applied": "unverified",
+   "source": "request bodies in the proxy log (conditions.json predates this field)"
+  }
+ },
+ "model": {
+  "provider": "factchat.mindlogic-kr-api.com",
+  "name": "accounts/fireworks/models/gpt-oss-120b",
+  "upstream": {
+   "base_url_host": "factchat.mindlogic-kr-api.com",
+   "base_url": "https://factchat.mindlogic-kr-api.com/v1/gateway",
+   "chat_path": "/chat/completions/",
+   "api_key_env": "KMU_API_KEY",
+   "config_file": "guardrail-deadlock-v0.2-kmu.yaml"
+  }
+ },
+ "seed": {
+  "value": null,
+  "status": "unverified"
+ },
+ "run": {
+  "started_at": "2026-09-21T02:18:05.226270+00:00",
+  "ended_at": "2026-09-21T02:19:32.659522+00:00",
+  "termination_reason": "success",
+  "steps_reached": 9
+ },
+ "tokens": {
+  "known_prompt": 80115,
+  "known_completion": 7355,
+  "known_total": 87470,
+  "usage_missing_turns": 0,
+  "total": 87470,
+  "total_status": "measured"
+ },
+ "judgement": {
+  "before": {
+   "tests_passed": 7
+  },
+  "after": {
+   "tests_passed": 16,
+   "gate": {
+    "machine_success": true,
+    "test_suite_unchanged": true,
+    "test_suite_id": "sha256:5d3df95aa74fed10e8c3cfc34390d5394e994bef6741960a5804db6f27dfff9b",
+    "pinned_test_suite_id": "sha256:5d3df95aa74fed10e8c3cfc34390d5394e994bef6741960a5804db6f27dfff9b",
+    "reason": "all_passed"
+   }
+  },
+  "normal_session": true
+ },
+ "guardrail": {
+  "virtual_decisions": [
+   {
+    "step_id": 1,
+    "progress": "baseline",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 2,
+    "progress": "baseline",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 3,
+    "progress": "baseline",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 4,
+    "progress": "stagnant",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 5,
+    "progress": "progress",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 6,
+    "progress": "progress",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 7,
+    "progress": "progress",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 8,
+    "progress": "progress",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 9,
+    "progress": "stagnant",
+    "criteria": "continue"
+   }
+  ],
+  "first_stop_step": null
+ },
+ "validity": {
+  "class": "unclassified",
+  "reason": null,
+  "decided_by": null
+ },
+ "notes": [
+  "A-1-v3 재검증, 계명대 API Gateway 크레딧(Groq 무료 티어 아님), 데이터셋 아님",
+  "session credits user-recorded monthly_allocated.used 4241.70359 -> 4258.13384; no other use in between is a user confirmation item",
+  "git_commit is null: the runner does not record the code commit"
+ ]
+}
