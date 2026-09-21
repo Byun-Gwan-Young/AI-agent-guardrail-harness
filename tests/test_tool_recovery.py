@@ -319,6 +319,7 @@ class RunnerIntegrationTests(unittest.IsolatedAsyncioTestCase):
             # Existing v2 tests pin v7 explicitly; v8 tests set runner_protocol themselves.
             args.runner_protocol = getattr(self, 'runner_protocol',
                 'tool-capable-step-v7-issue-ids' if args.output_contract == 'output-contract-v2' else None)
+            args.api_key_env = getattr(self, 'api_key_env', 'GROQ_API_KEY')
             with patch.object(runner,'ROOT',project), patch.object(runner,'load_scenario',return_value=scenario), \
                     patch.object(runner.Workspace,'acceptance',acceptance), \
                     patch('httpx.AsyncClient',OfflineClient), patch.dict('os.environ',{'GROQ_API_KEY':'fake'}), \

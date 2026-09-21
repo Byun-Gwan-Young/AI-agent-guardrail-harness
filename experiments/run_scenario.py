@@ -153,6 +153,29 @@ def termination_context(first, parsed, step, reviewer):
                       ('valid structured output; no reviewer declaration' if parsed else 'structured output missing or invalid'))
 
 
+def ensure_key_env(upstream, key_env):
+    """The runner must read the key the proxy's own upstream configuration names (D-27)."""
+    configured = (upstream or {}).get('api_key_env')
+    if configured not in (None, key_env):
+        raise ValueError('Proxy expects the key from ' + configured + ', not ' + key_env)
+
+
+def role_system_message(agent, tool_names, scenario, schema_text, facts):
+    """Role system prompt. Shared with the offline provider probe so the two cannot drift."""
+    return (agent.system_message + '\nUse tools to inspect/edit the actual workspace. '
+            + tool_instructions(tool_names) + edit_instructions(tool_names)
+            + (harness_facts(agent.writable_paths, scenario.termination.max_llm_calls_per_step) if facts else '') +
+            'Final response must be one JSON object matching this schema. Report the full shared state, '
+            'not only this role\'s issues. Never claim tests passed without running them.\n' + schema_text)
+
+
+def schema_instructions(contract, root=ROOT):
+    """The schema block appended to every role prompt, per output contract version."""
+    if contract.version == V2:
+        return json.dumps(contract.schema(), ensure_ascii=False) + '\n' + contract.instructions()
+    return (root / 'scenarios/agent-output.schema.json').read_text(encoding='utf-8')
+
+
 class Workspace:
     def __init__(self, scenario, root):
         self.scenario, self.root, self.counter = scenario, root, 0
@@ -240,8 +263,10 @@ async def run(args):
         raise ValueError('--runner-protocol applies only to output-contract-v2')
     if requested_protocol not in (None, PROTOCOL_V7, PROTOCOL_V8):
         raise ValueError('Unsupported runner protocol')
-    # v7 stays selectable to reproduce G0-8 exactly; v8 adds harness facts (budget, writable paths).
-    runner_protocol = (requested_protocol or PROTOCOL_V8) if contract.version == V2 else PROTOCOLS[collection_policy]
+    # D-25: no default. Several people run sessions, so the protocol is always stated explicitly.
+    if contract.version == V2 and requested_protocol is None:
+        raise ValueError('--runner-protocol is required for output-contract-v2')
+    runner_protocol = requested_protocol if contract.version == V2 else PROTOCOLS[collection_policy]
     facts = runner_protocol == PROTOCOL_V8
     if {a.id for a in scenario.agents} != {'planner', 'developer', 'reviewer'}:
         raise ValueError('This runner currently supports the approved three-role artifact scenario')
@@ -249,9 +274,11 @@ async def run(args):
         raise ValueError('Executable artifact fixture required')
     if args.run_index < 1 or (args.temperature is not None and not 0 <= args.temperature <= 2):
         raise ValueError('Invalid run index or temperature')
-    key = os.environ.get('GROQ_API_KEY')
+    # The provider is chosen by the proxy config; the runner only forwards the key it is told to read.
+    key_env = getattr(args, 'api_key_env', None) or 'GROQ_API_KEY'
+    key = os.environ.get(key_env)
     if not key:
-        raise ValueError('GROQ_API_KEY is required')
+        raise ValueError(key_env + ' is required')
     source = safe_path(ROOT, scenario.fixture_dir)
     if any(p.is_symlink() or (hasattr(p, 'is_junction') and p.is_junction()) for p in source.rglob('*')):
         raise ValueError('Fixture links are not supported')
@@ -328,20 +355,14 @@ async def run(args):
     elif args.seed_probe is not None:
         options['seed'] = args.seed_probe
     model = make_client(options, budget)
-    schema_text = (ROOT / 'scenarios/agent-output.schema.json').read_text(encoding='utf-8')
-    if contract.version == V2:
-        schema_text = json.dumps(contract.schema(), ensure_ascii=False) + '\n' + contract.instructions()
+    schema_text = schema_instructions(contract)
     role_tools = [work.tools(a) for a in scenario.agents]
     role_names = [[t.__name__ for t in ts] for ts in role_tools]
     save(out / 'registered-tools.json', dict(zip([a.id for a in scenario.agents], role_names)))
     agents = [AssistantAgent(a.id, model_client=model, tools=role_tools[i],
         model_context=make_model_context(buffer_messages),
         reflect_on_tool_use=False, model_client_stream=False,
-        system_message=a.system_message + '\nUse tools to inspect/edit the actual workspace. '
-        + tool_instructions(role_names[i]) + edit_instructions(role_names[i])
-        + (harness_facts(a.writable_paths, scenario.termination.max_llm_calls_per_step) if facts else '') +
-        'Final response must be one JSON object matching this schema. Report the full shared state, '
-        'not only this role\'s issues. Never claim tests passed without running them.\n' + schema_text)
+        system_message=role_system_message(a, role_names[i], scenario, schema_text, facts))
         for i, a in enumerate(scenario.agents)]
     steps, missing, first, latest, baseline = [], [], None, None, None
     observation_first = None
@@ -357,8 +378,12 @@ async def run(args):
             started = True
             pin_response = await client.get('/log')
             pin_response.raise_for_status()
-            if pin_response.json()['meta'].get('criteria_version') != scenario.criteria_version:
+            meta = pin_response.json()['meta']
+            if meta.get('criteria_version') != scenario.criteria_version:
                 raise ValueError('Proxy criteria version differs from scenario')
+            ensure_key_env(meta.get('upstream'), key_env)
+            effective.update(api_key_env=key_env, upstream=meta.get('upstream'))
+            save(conditions_path, effective)
             baseline = await asyncio.to_thread(work.acceptance)
             latest = baseline
             for step in range(1, scenario.termination.max_steps + 1):
@@ -545,7 +570,9 @@ def main():
     parser.add_argument('--collection-policy', choices=tuple(PROTOCOLS), default=DEFAULT_POLICY)
     parser.add_argument('--output-contract', choices=VERSIONS, default=V2)
     parser.add_argument('--runner-protocol', choices=(PROTOCOL_V7, PROTOCOL_V8), default=None,
-                        help='output-contract-v2 only; default ' + PROTOCOL_V8 + '. v7 reproduces G0-8')
+                        help='required for output-contract-v2 (D-25). v7 reproduces G0-8')
+    parser.add_argument('--api-key-env', default='GROQ_API_KEY',
+                        help='environment variable holding the provider key; must match the proxy config')
     parser.add_argument('--proxy-url', default=os.environ.get('GUARDRAIL_PROXY_URL', 'http://127.0.0.1:8000'))
     parser.add_argument('--output-root', type=Path, default=ROOT / 'runs')
     parser.add_argument('--run-index', type=int, default=1)
@@ -556,6 +583,8 @@ def main():
     parser.add_argument('--seed-probe', type=int, default=None,
                         help='Explicit unverified seed probe; does not change support status')
     args = parser.parse_args()
+    if args.output_contract == V2 and args.runner_protocol is None:
+        parser.error('--runner-protocol is required for --output-contract ' + V2)
     return asyncio.run(run(args))
 
 
