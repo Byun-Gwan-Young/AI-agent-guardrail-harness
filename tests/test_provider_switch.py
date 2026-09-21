@@ -102,6 +102,10 @@ class RunnerTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(run['conditions']['api_key_env'], 'GROQ_API_KEY')
         self.assertEqual(run['conditions']['upstream']['api_key_env'], 'GROQ_API_KEY')
         self.assertEqual(run['conditions']['upstream']['base_url_host'], 'api.groq.com')
+        self.assertEqual(run['conditions']['reasoning_effort'],
+                         {'requested': 'low', 'applied': 'unverified',
+                          'sent_on': 'final tool-free call of each step only'})
+        self.assertEqual(run['conditions']['final_reasoning_effort'], 'low')
         self.assertNotIn(KEY, json.dumps(run['conditions'], ensure_ascii=False))
 
     def test_key_variable_must_match_the_proxy_configuration(self):

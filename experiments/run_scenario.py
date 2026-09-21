@@ -20,8 +20,9 @@ from artifact_hook import capture_artifact, make_observation, submit_observation
 from scenario_schema import load_scenario
 from scenario_checks import check_acceptance
 from suite_identity import compute_test_suite_id
-from experiments.step_execution import (NO_OUTPUT_PLACEHOLDER, PROTOCOL_V7, PROTOCOL_V8, edit_instructions,
-                                        harness_facts, make_client, perform_step, tool_instructions)
+from experiments.step_execution import (FINAL_REASONING_EFFORT, NO_OUTPUT_PLACEHOLDER, PROTOCOL_V7, PROTOCOL_V8,
+                                        edit_instructions, harness_facts, make_client, perform_step,
+                                        tool_instructions)
 from experiments.output_contract import AgentOutput, parse_output
 from experiments.issue_contract import (IssueContract, V1, V2, VERSIONS, PROTOCOL_V2, VOCABULARY_VIOLATIONS,
                                         for_scenario)
@@ -312,7 +313,7 @@ async def run(args):
                      runner_protocol=runner_protocol, collection_policy=collection_policy,
                      output_contract='flat-state-v2', strict_support='single_probe_passed',
                      strict_probe='strict-probe-3472654ecfca4274b03383123aa03131',
-                     final_reasoning_effort='low',
+                     final_reasoning_effort=FINAL_REASONING_EFFORT,
                      strict_failure_policy='fail step; abort after two consecutive strict-failed steps; no automatic B fallback',
                      unknown_tool_policy='mark_failed; correction in same step if a tool call slot remains; '
                                          'abort on second invalid response in step',
@@ -330,6 +331,9 @@ async def run(args):
             effective.update(harness_facts_policy='system message states writable files and the per-step call '
                                                   'limit; each non-final call carries its call number and '
                                                   'remaining calls (G0-14)')
+            # What was asked for and what is known to have taken effect are kept apart (C-11).
+            effective.update(reasoning_effort={'requested': FINAL_REASONING_EFFORT, 'applied': 'unverified',
+                                               'sent_on': 'final tool-free call of each step only'})
         effective.update(output_contract=contract.version, strict_support='unverified', strict_probe=None,
                          strict_failure_policy='fail step; abort after two consecutive strict-failed steps; '
                                                'vocabulary violations fail the step but are excluded from that '

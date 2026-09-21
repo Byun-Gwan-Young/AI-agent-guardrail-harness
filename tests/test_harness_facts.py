@@ -111,6 +111,9 @@ class V8SnapshotTests(Runner):
         self.assertEqual(v8['conditions']['runner_protocol'], PROTOCOL_V8)
         self.assertIn('harness_facts_policy', v8['conditions'])
         self.assertNotIn('harness_facts_policy', v7['conditions'])
+        # C-11: requested/applied reasoning_effort is recorded from v8 on; v7 conditions are unchanged.
+        self.assertEqual(v8['conditions']['reasoning_effort']['applied'], 'unverified')
+        self.assertNotIn('reasoning_effort', v7['conditions'])
         for run in (v7, v8):
             self.assertIn('verified final report', run['conditions']['recent_messages_policy'])
         # Observations and judgements are unaffected by the prompt facts.

@@ -14,6 +14,8 @@ TOOL_ERROR_SUMMARY_CHARS = 300
 # v8 = v7 plus harness facts the model could not otherwise know (G0-14, defects 6 and 7).
 # Facts only: no strategy advice about what to do with the budget or the files.
 PROTOCOL_V8 = 'tool-capable-step-v8-budget-and-writable-paths'
+# Sent on the tool-free final call only. Whether the upstream applies it is not verified (C-11).
+FINAL_REASONING_EFFORT = 'low'
 
 
 def harness_facts(writable_paths, call_limit):
@@ -146,7 +148,8 @@ def make_client(options, budget):
             extra.pop('response_format', None)
             if final:
                 extra['response_format'] = budget.contract.response_format()
-                extra['reasoning_effort'] = 'low'  # Same final-request setting as the successful probe.
+                # Same final-request setting as the successful probe.
+                extra['reasoning_effort'] = FINAL_REASONING_EFFORT
             if tools:
                 extra['tool_choice'] = 'auto'
             else:

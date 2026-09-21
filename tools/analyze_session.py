@@ -15,6 +15,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from experiments.step_execution import PROTOCOL_V8
 from scenario_schema import load_scenario
 
 STOP_DECISIONS = ('deadlock', 'termination_failure')
@@ -302,7 +303,7 @@ def analyse(session_id):
                                     'GROQ_API_KEY', 'KMU_API_KEY'})}
 
 
-def manifest(a, phase, notes):
+def base_manifest(a, phase, notes):
     scenario = load_scenario(ROOT / 'runs' / a['session_id'] / 'scenario.yaml')
     return {'manifest_version': 'session-manifest-v0.1', 'session_id': a['session_id'], 'rerun_of': None,
             'scenario': {'id': a['scenario']['id'], 'version': a['scenario']['id'], 'hash': a['scenario']['sha256']},
@@ -336,6 +337,28 @@ def manifest(a, phase, notes):
             'notes': notes + ['git_commit is null: the runner does not record the code commit']
                      + ([] if a['meta']['upstream'] else
                         ['model.provider is null: this session predates upstream recording in the proxy log'])}
+
+
+def reasoning_effort(session_id):
+    """Requested vs applied reasoning_effort (C-11). conditions.json first; older v8 sessions fall back to the
+    values actually present in the request bodies. Applied is never inferred from the response."""
+    recorded = load(ROOT / 'runs' / session_id / 'conditions.json').get('reasoning_effort')
+    if recorded:
+        return {**recorded, 'source': 'conditions.json'}
+    sent = sorted({t['request_body']['reasoning_effort'] for t in load(ROOT / 'logs' / f'{session_id}.json')['turns']
+                   if t['request_body'].get('reasoning_effort') is not None})
+    return {'requested': sent[0] if len(sent) == 1 else sent or None, 'applied': 'unverified',
+            'source': 'request bodies in the proxy log (conditions.json predates this field)'}
+
+
+def manifest(a, phase, notes):
+    result = base_manifest(a, phase, notes)
+    if a['conditions']['runner_protocol'] == PROTOCOL_V8:
+        # v0.2 adds condition.runner_protocol and condition.reasoning_effort; v7 sessions keep v0.1 unchanged.
+        result['manifest_version'] = 'session-manifest-v0.2'
+        result['condition'].update(runner_protocol=a['conditions']['runner_protocol'],
+                                   reasoning_effort=reasoning_effort(a['session_id']))
+    return result
 
 
 def main():
