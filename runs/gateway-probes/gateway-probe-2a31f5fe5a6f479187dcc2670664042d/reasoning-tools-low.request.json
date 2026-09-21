@@ -1,0 +1,114 @@
+{
+  "model": "accounts/fireworks/models/gpt-oss-120b",
+  "temperature": 0.0,
+  "max_tokens": 2400,
+  "stream": false,
+  "reasoning_effort": "low",
+  "messages": [
+    {
+      "role": "user",
+      "content": "How many integers n with 1 <= n <= 1000 are divisible by 3 or 5 but not by 7? Work it out, then reply with the integer only. Do not call any tool."
+    }
+  ],
+  "tools": [
+    {
+      "type": "function",
+      "function": {
+        "name": "read_file",
+        "description": "Read a UTF-8 file relative to the candidate workspace.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "description": "path",
+              "title": "Path",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path"
+          ],
+          "additionalProperties": false
+        },
+        "strict": false
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "write_file",
+        "description": "Replace an authorized candidate file with complete UTF-8 content.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "description": "path",
+              "title": "Path",
+              "type": "string"
+            },
+            "content": {
+              "description": "content",
+              "title": "Content",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "content"
+          ],
+          "additionalProperties": false
+        },
+        "strict": false
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "replace_in_file",
+        "description": "Replace exactly one occurrence of old with new in an authorized candidate file.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "description": "path",
+              "title": "Path",
+              "type": "string"
+            },
+            "old": {
+              "description": "old",
+              "title": "Old",
+              "type": "string"
+            },
+            "new": {
+              "description": "new",
+              "title": "New",
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "old",
+            "new"
+          ],
+          "additionalProperties": false
+        },
+        "strict": false
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "run_tests",
+        "description": "Run the fixed acceptance command and return measured results.",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "additionalProperties": false
+        },
+        "strict": false
+      }
+    }
+  ],
+  "tool_choice": "auto"
+}

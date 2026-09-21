@@ -1,0 +1,215 @@
+{
+  "scenario_id": "A-1-v3",
+  "model": "accounts/fireworks/models/gpt-oss-120b",
+  "role": "developer",
+  "config_file": "guardrail-deadlock-v0.2-kmu.yaml",
+  "endpoint": "https://factchat.mindlogic-kr-api.com/v1/gateway/chat/completions/",
+  "api_key_env": "KMU_API_KEY",
+  "user_agent": "python-httpx/0.28.1",
+  "runner_protocol": "tool-capable-step-v8-budget-and-writable-paths",
+  "output_contract_version": "output-contract-v2",
+  "allowed_issues_sha256": "434e1ebc382f48bd2788a669aa66afca1129bc987ab08ea4ca3e9241a9098a10",
+  "max_tokens": 2400,
+  "created_at": "2026-09-21T02:40:58.165605+00:00",
+  "dry_run": false,
+  "note": "One request per variant does not establish reliability. Compare the reasoning_tokens of the two tool variants to see whether reasoning_effort was applied.",
+  "results": [
+    {
+      "variant": "v8-final-strict",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 126,
+        "prompt_tokens": 1155,
+        "total_tokens": 1281,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 41,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 41
+        }
+      },
+      "tool_calls": [],
+      "contract_valid": true,
+      "contract_violation": null,
+      "reasoning_content_present": true,
+      "credits": {
+        "value": 0.24885,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 4258.133840000001,
+        "used_after": 4258.382690000001
+      }
+    },
+    {
+      "variant": "reasoning-no-tools-low",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 258,
+        "prompt_tokens": 116,
+        "total_tokens": 374,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 247,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 247
+        }
+      },
+      "tool_calls": [],
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": true,
+      "credits": {
+        "value": 0.1722,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 4258.382690000001,
+        "used_after": 4258.554890000001
+      }
+    },
+    {
+      "variant": "reasoning-no-tools-high",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 1547,
+        "prompt_tokens": 116,
+        "total_tokens": 1663,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 1536,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 40
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1536
+        }
+      },
+      "tool_calls": [],
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": true,
+      "credits": {
+        "value": 0.9456,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 4258.554890000001,
+        "used_after": 4259.50049
+      }
+    },
+    {
+      "variant": "reasoning-tools-low",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 270,
+        "prompt_tokens": 292,
+        "total_tokens": 562,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 259,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 48
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 259
+        }
+      },
+      "tool_calls": [],
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": true,
+      "credits": {
+        "value": 0.2058,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 4259.50049,
+        "used_after": 4259.706290000001
+      }
+    },
+    {
+      "variant": "reasoning-tools-high",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 1461,
+        "prompt_tokens": 292,
+        "total_tokens": 1753,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 1450,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 48
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 1450
+        }
+      },
+      "tool_calls": [],
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": true,
+      "credits": {
+        "value": 0.9204,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 4259.706290000001,
+        "used_after": 4260.626690000001
+      }
+    }
+  ],
+  "reasoning_comparison": {
+    "reasoning_tokens": {
+      "reasoning-no-tools-low": 247,
+      "reasoning-no-tools-high": 1536,
+      "reasoning-tools-low": 259,
+      "reasoning-tools-high": 1450
+    },
+    "high_minus_low_without_tools": 1289,
+    "high_minus_low_with_tools": 1191,
+    "tool_calls_made": {
+      "reasoning-no-tools-low": [],
+      "reasoning-no-tools-high": [],
+      "reasoning-tools-low": [],
+      "reasoning-tools-high": []
+    },
+    "note": "One request each. Numbers only; whether the gateway drops reasoning_effort is decided by the PM."
+  }
+}
