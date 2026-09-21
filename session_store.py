@@ -22,7 +22,8 @@ def utc_now():
 def empty_meta():
     return dict.fromkeys(("model", "temperature", "seed", "max_tokens", "scenario_id",
                           "run_index", "framework_version", "started_at", "ended_at",
-                          "termination_reason", "criteria_version", "criteria_parameters", "criteria_sha256"))
+                          "termination_reason", "criteria_version", "criteria_parameters", "criteria_sha256",
+                          "upstream"))
 
 
 @dataclass
@@ -100,9 +101,10 @@ class JsonSessionRepository:
 
 
 class SessionStore:
-    def __init__(self, repository: SessionRepository, criteria_version=CRITERIA_VERSION):
+    def __init__(self, repository: SessionRepository, criteria_version=CRITERIA_VERSION, upstream=None):
         self.repository = repository
         self.criteria_pin = pin_criteria(criteria_version)
+        self.upstream = upstream
         self.sessions = {}
 
     def start(self, session_id):
@@ -110,6 +112,7 @@ class SessionStore:
             raise HTTPException(409, "Session key already used; use a new key")
         session = Session(session_id)
         session.meta["started_at"] = utc_now()
+        session.meta["upstream"] = self.upstream
         session.meta.update(pin_criteria(self.criteria_pin["criteria_version"]))
         try:
             self.repository.create(session.record())

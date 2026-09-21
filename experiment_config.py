@@ -1,17 +1,44 @@
 """Explicit experiment conditions, never inferred from provider defaults."""
 import os
 from pathlib import Path
+import re
 
 import yaml
 
+# The upstream provider is part of the experiment condition, so it is configured, never guessed.
+DEFAULT_UPSTREAM = {"base_url": "https://api.groq.com/openai/v1",
+                    "chat_path": "/chat/completions",
+                    "api_key_env": "GROQ_API_KEY"}
+
+
+def config_file(path=None):
+    return Path(path or os.environ.get("GUARDRAIL_CONFIG", Path(__file__).with_name("guardrail.yaml")))
+
+
+def upstream(config):
+    """Validated upstream settings. Only the key's variable name is configured, never its value."""
+    data = config.get("upstream") or {}
+    if not isinstance(data, dict) or set(data) - set(DEFAULT_UPSTREAM):
+        raise ValueError("upstream accepts only " + ", ".join(sorted(DEFAULT_UPSTREAM)))
+    settings = {**DEFAULT_UPSTREAM, **data}
+    if not str(settings["base_url"]).startswith("https://") or any(
+            c in str(settings["base_url"]) for c in "?#") or str(settings["base_url"]).endswith("/"):
+        raise ValueError("upstream.base_url must be an https origin with a path and no trailing slash")
+    if not str(settings["chat_path"]).startswith("/"):
+        raise ValueError("upstream.chat_path must start with /")
+    if not re.fullmatch(r"[A-Z][A-Z0-9_]*", str(settings["api_key_env"])):
+        raise ValueError("upstream.api_key_env must be an environment variable name")
+    return settings
+
 
 def load_config(path=None):
-    path = Path(path or os.environ.get("GUARDRAIL_CONFIG", Path(__file__).with_name("guardrail.yaml")))
+    path = config_file(path)
     data = yaml.safe_load(path.read_text(encoding="utf-8")) if path.exists() else {}
     data = data or {}
     truncate = data.get("log", {}).get("truncate")
     if truncate is not None and (type(truncate) is not int or truncate < 0):
         raise ValueError("log.truncate must be null or a non-negative integer")
+    upstream(data)
     for model in data.get("models", {}).values():
         if model.get("seed_supported") is not None and type(model["seed_supported"]) is not bool:
             raise ValueError("models.*.seed_supported must be true, false or null")

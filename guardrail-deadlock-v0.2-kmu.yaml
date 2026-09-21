@@ -1,0 +1,24 @@
+# deadlock-v0.2 / progress-v2 + 계명대 API Gateway (Fireworks gpt-oss-120b) 실행 전용 설정 (D-27).
+# 기본 guardrail.yaml(Groq, deadlock-v0.1)과 guardrail-deadlock-v0.2.yaml(Groq)은 바꾸지 않는다.
+# 프록시 시작 시 명시적으로 지정한다:
+#   GUARDRAIL_CONFIG=guardrail-deadlock-v0.2-kmu.yaml
+# criteria_version 과 upstream 외의 값은 guardrail.yaml 과 같아야 한다 (테스트로 확인).
+log:
+  truncate: null  # null = 절단 없음; 정수 = 최대 문자 수 (0도 명시적 설정)
+
+# 지원 여부를 확인한 모델만 true/false로 기입한다. 미등록 모델은 미확인.
+# false 모델의 seed는 업스트림에 보내지 않고 null + unsupported로 기록한다.
+models: {}
+
+# 정책 엔진 미구현. 설정하지 않은 버전을 임의로 만들지 않는다.
+policy_version: null
+
+# 신규 실험 전에 고정. 기존 세션은 생성 시점의 버전·파라미터를 유지한다.
+criteria_version: deadlock-v0.2
+
+# 업스트림 식별자만 둔다. 키 값은 설정에 쓰지 않고 실행 창의 환경변수에서만 읽는다.
+# 채팅 경로는 게이트웨이 문서의 끝 슬래시 형태다 (리다이렉트로 POST 가 깨지지 않게).
+upstream:
+  base_url: https://factchat.mindlogic-kr-api.com/v1/gateway
+  chat_path: /chat/completions/
+  api_key_env: KMU_API_KEY

@@ -9,17 +9,18 @@ import time
 import uuid
 from session_store import JsonSessionRepository, SessionStore, utc_now
 from health import install_health
-from experiment_config import load_config, conditions, tool_call_count, truncate_text
+from experiment_config import config_file, load_config, conditions, tool_call_count, truncate_text, upstream
 from conversation_extract import extract_conversation
 from observation_api import install_observations
 from deadlock_policy import VERSION as CRITERIA_VERSION
+
+from urllib.parse import urlsplit
 
 import httpx
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse, Response
 
 logger = logging.getLogger(__name__)
-UPSTREAM = "https://api.groq.com/openai/v1"
 
 
 def session_key(request, body):
@@ -49,11 +50,18 @@ def session_key(request, body):
 def create_app(log_dir=None, transport=None, sleep=asyncio.sleep, repository=None,
                config_path=None, clock=time.monotonic, jitter=random.uniform):
     config = load_config(config_path)
+    settings = upstream(config)
+    endpoint = settings["base_url"] + settings["chat_path"]
+    # Identifiers only: the key itself is never read here, only forwarded from the caller.
+    identity = {"base_url_host": urlsplit(settings["base_url"]).netloc,
+                "base_url": settings["base_url"], "chat_path": settings["chat_path"],
+                "api_key_env": settings["api_key_env"], "config_file": config_file(config_path).name}
     app = FastAPI()
     store = SessionStore(repository if repository is not None else JsonSessionRepository(
         log_dir or os.environ.get("GUARDRAIL_LOG_DIR", "logs")
-    ), criteria_version=config.get("criteria_version", CRITERIA_VERSION))
+    ), criteria_version=config.get("criteria_version", CRITERIA_VERSION), upstream=identity)
     app.state.store = store
+    app.state.upstream = identity
     install_health(app, store, clock, config.get("policy_version"))
     install_observations(app, store, session_key)
 
@@ -108,7 +116,7 @@ def create_app(log_dir=None, transport=None, sleep=asyncio.sleep, repository=Non
                         call_started = clock()
                         try:
                             r = await client.post(
-                                f"{UPSTREAM}/chat/completions", json=upstream_body,
+                                endpoint, json=upstream_body,
                                 headers={"Authorization": request.headers.get("authorization", "")},
                             )
                         finally:
