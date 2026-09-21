@@ -1,0 +1,130 @@
+{
+  "scenario_id": "A-1-v3",
+  "model": "accounts/fireworks/models/gpt-oss-120b",
+  "role": "developer",
+  "config_file": "guardrail-deadlock-v0.2-kmu.yaml",
+  "endpoint": "https://factchat.mindlogic-kr-api.com/v1/gateway/chat/completions/",
+  "api_key_env": "KMU_API_KEY",
+  "user_agent": "python-httpx/0.28.1",
+  "runner_protocol": "tool-capable-step-v8-budget-and-writable-paths",
+  "output_contract_version": "output-contract-v2",
+  "allowed_issues_sha256": "434e1ebc382f48bd2788a669aa66afca1129bc987ab08ea4ca3e9241a9098a10",
+  "max_tokens": 2400,
+  "created_at": "2026-09-21T02:16:06.435707+00:00",
+  "dry_run": false,
+  "note": "One request per variant does not establish reliability. Compare the reasoning_tokens of the two tool variants to see whether reasoning_effort was applied.",
+  "results": [
+    {
+      "variant": "v8-final-strict",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 126,
+        "prompt_tokens": 1155,
+        "total_tokens": 1281,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 41,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 41
+        }
+      },
+      "tool_calls": [],
+      "contract_valid": true,
+      "contract_violation": null,
+      "reasoning_content_present": true,
+      "credits": {
+        "value": null,
+        "status": "unmeasured",
+        "reason": "used field not present in /credits/ response"
+      }
+    },
+    {
+      "variant": "v8-tools-reasoning-low",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "tool_calls",
+      "usage": {
+        "completion_tokens": 40,
+        "prompt_tokens": 1533,
+        "total_tokens": 1573,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 13,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 13
+        }
+      },
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "argument_chars": 28
+        }
+      ],
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": true,
+      "credits": {
+        "value": null,
+        "status": "unmeasured",
+        "reason": "used field not present in /credits/ response"
+      }
+    },
+    {
+      "variant": "v8-tools-reasoning-high",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "tool_calls",
+      "usage": {
+        "completion_tokens": 42,
+        "prompt_tokens": 1533,
+        "total_tokens": 1575,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 17,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 40
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 17
+        }
+      },
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "argument_chars": 18
+        }
+      ],
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": true,
+      "credits": {
+        "value": null,
+        "status": "unmeasured",
+        "reason": "used field not present in /credits/ response"
+      }
+    }
+  ]
+}

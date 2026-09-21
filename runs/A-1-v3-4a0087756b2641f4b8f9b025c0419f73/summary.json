@@ -1,0 +1,39 @@
+{
+  "session_id": "A-1-v3-4a0087756b2641f4b8f9b025c0419f73",
+  "steps": 9,
+  "termination_reason": "success",
+  "total_tokens": 87470,
+  "known_tokens_subtotal": 87470,
+  "criteria_latest": {
+    "criteria_version": "deadlock-v0.2",
+    "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+    "decision": "continue",
+    "reason": "progress, baseline or declaration step",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null
+  },
+  "criteria_alerts": [],
+  "tests_passed_before": 7,
+  "tests_passed_after": 16,
+  "missing_observation_steps": [],
+  "missing_observation_count": 0,
+  "fixture_unchanged": true,
+  "error": null,
+  "cleanup_errors": [],
+  "actual_outcome": null,
+  "context_buffer_messages": 12,
+  "vocabulary_violation_steps": [],
+  "vocabulary_violations_total": 0,
+  "failed_steps": [
+    {
+      "step_id": 4,
+      "reasons": [
+        "tool_execution_error"
+      ]
+    }
+  ]
+}

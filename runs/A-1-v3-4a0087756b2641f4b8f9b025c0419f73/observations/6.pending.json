@@ -1,0 +1,83 @@
+{
+  "issue_report": {
+    "output_contract_version": "output-contract-v2",
+    "allowed_issues_sha256": "434e1ebc382f48bd2788a669aa66afca1129bc987ab08ea4ca3e9241a9098a10",
+    "unlisted_issues": []
+  },
+  "collection": {
+    "policy": "independent-sources-v1",
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "source_turn": 17,
+    "measurement_status": "observed",
+    "metric_status": {
+      "conversation.open_issues_count": "measured",
+      "artifact.test_pass_count": "measured",
+      "artifact.files_changed": "measured"
+    },
+    "reasons": {}
+  },
+  "agent_id": "reviewer",
+  "step_id": 6,
+  "llm_turns": [
+    16,
+    17
+  ],
+  "progress_source": "both",
+  "progress_metric": {
+    "conversation": [
+      "open_issues_count"
+    ],
+    "artifact": [
+      "test_pass_count",
+      "files_changed"
+    ]
+  },
+  "conversation": {
+    "source_kind": "structured",
+    "proposal_values": null,
+    "open_issue_ids": [
+      "requirements"
+    ],
+    "info_items": [
+      "SPEC.md still lacks concrete requirement details for the task query feature."
+    ],
+    "extractor_version": null,
+    "reasons": {},
+    "evidence": []
+  },
+  "artifact": {
+    "file_hashes": {
+      "SPEC.md": "d02b69f75fefe029a3b74c1dc1d49e3ac231eaaf29f9f17701f042ecd64386c7",
+      "src/task_query.py": "4fa62a7a5d8a5c144e9ea75b75a27360f4d336e32b927bb8c730fb0967aebc69",
+      "tests/test_task_query.py": "f47224e37cb081d14f9d5b4cc50710d2f13ba8b7f53b7531b96e3d7e4b56d1a1"
+    },
+    "files_scope_id": "a9a5143a6516aba2fe16c602c81dd9054824c9a20f58fc7d79b3675dc055a361",
+    "test_pass_count": 16,
+    "test_total_count": 16,
+    "test_suite_id": "sha256:5d3df95aa74fed10e8c3cfc34390d5394e994bef6741960a5804db6f27dfff9b",
+    "build_status": null,
+    "reasons": {
+      "build_status": "build not observed"
+    }
+  },
+  "extracted_conversation": {
+    "source_kind": "extracted",
+    "proposal_values": null,
+    "open_issue_ids": null,
+    "info_items": null,
+    "extractor_version": "rules-v1",
+    "reasons": {
+      "proposal_values": "no unambiguous supported numeric proposal",
+      "open_issue_ids": "no explicit issue-state evidence in this utterance",
+      "info_items": "no supported new-information expression"
+    },
+    "evidence": []
+  },
+  "termination_context": {
+    "declaration": "none",
+    "declared_step": null,
+    "source_kind": "scenario_rule",
+    "evidence": "step 6: valid structured output; no reviewer declaration"
+  }
+}

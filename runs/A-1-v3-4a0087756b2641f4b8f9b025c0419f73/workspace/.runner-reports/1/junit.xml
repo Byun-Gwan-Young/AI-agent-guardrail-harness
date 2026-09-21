@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite tests="16" failures="9" errors="0" skipped="0"><testcase name="test_task_query.TaskQueryAcceptance.test_all_statuses" /><testcase name="test_task_query.TaskQueryAcceptance.test_default_hides_completed" /><testcase name="test_task_query.TaskQueryAcceptance.test_does_not_mutate_inputs" /><testcase name="test_task_query.TaskQueryAcceptance.test_done_filter" /><testcase name="test_task_query.TaskQueryAcceptance.test_empty_collection" /><testcase name="test_task_query.TaskQueryAcceptance.test_negative_limit_rejected"><failure>Traceback (most recent call last):
+  File "/Users/byeongwan-yeong/AI-agent-guardrail-harness/runs/A-1-v3-4a0087756b2641f4b8f9b025c0419f73/workspace/tests/test_task_query.py", line 70, in test_negative_limit_rejected
+    with self.assertRaises(ValueError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+</failure></testcase><testcase name="test_task_query.TaskQueryAcceptance.test_negative_offset_rejected"><failure>Traceback (most recent call last):
+  File "/Users/byeongwan-yeong/AI-agent-guardrail-harness/runs/A-1-v3-4a0087756b2641f4b8f9b025c0419f73/workspace/tests/test_task_query.py", line 66, in test_negative_offset_rejected
+    with self.assertRaises(ValueError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+</failure></testcase><testcase name="test_task_query.TaskQueryAcceptance.test_nfkc_casefold_search"><failure>Traceback (most recent call last):
+  File "/Users/byeongwan-yeong/AI-agent-guardrail-harness/runs/A-1-v3-4a0087756b2641f4b8f9b025c0419f73/workspace/tests/test_task_query.py", line 43, in test_nfkc_casefold_search
+    self.assertEqual(select_tasks([a], query="ＣＡＦÉ"), [a])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [] != [{'id': 'a', 'title': 'Café', 'description[35 chars]: 1}]
+
+Second list contains 1 additional elements.
+First extra element 0:
+{'id': 'a', 'title': 'Café', 'description': '', 'status': 'open', 'priority': 1}
+
+- []
++ [{'description': '',
++   'id': 'a',
++   'priority': 1,
++   'status': 'open',
++   'title': 'Café'}]
+</failure></testcase><testcase name="test_task_query.TaskQueryAcceptance.test_pagination_after_filtering"><failure>Traceback (most recent call last):
+  File "/Users/byeongwan-yeong/AI-agent-guardrail-harness/runs/A-1-v3-4a0087756b2641f4b8f9b025c0419f73/workspace/tests/test_task_query.py", line 59, in test_pagination_after_filtering
+    self.assertEqual(select_tasks([done, a, b], offset=1, limit=1), [b])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'id': 'a', 'title': 'Task', 'description': '', '[27 chars]: 1}] != [{'id': 'b', 'title': 'Task', 'description': '', '[27 chars]: 1}]
+
+First differing element 0:
+{'id': 'a', 'title': 'Task', 'description': '', 'status': 'open', 'priority': 1}
+{'id': 'b', 'title': 'Task', 'description': '', 'status': 'open', 'priority': 1}
+
+  [{'description': '',
+-   'id': 'a',
+?          ^
+
++   'id': 'b',
+?          ^
+
+    'priority': 1,
+    'status': 'open',
+    'title': 'Task'}]
+</failure></testcase><testcase name="test_task_query.TaskQueryAcceptance.test_priority_sort"><failure>Traceback (most recent call last):
+  File "/Users/byeongwan-yeong/AI-agent-guardrail-harness/runs/A-1-v3-4a0087756b2641f4b8f9b025c0419f73/workspace/tests/test_task_query.py", line 51, in test_priority_sort
+    self.assertEqual(select_tasks([low, high]), [high, low])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'id': 'a', 'title': 'Task', 'description': '', '[109 chars]: 3}] != [{'id': 'b', 'title': 'Task', 'description': '', '[109 chars]: 1}]
+
+First differing element 0:
+{'id': 'a', 'title': 'Task', 'description': '', 'status': 'open', 'priority': 1}
+{'id': 'b', 'title': 'Task', 'description': '', 'status': 'open', 'priority': 3}
+
+  [{'description': '',
++   'id': 'b',
++   'priority': 3,
++   'status': 'open',
++   'title': 'Task'},
++  {'description': '',
+    'id': 'a',
+    'priority': 1,
+    'status': 'open',
+-   'title': 'Task'},
+-  {'description': '',
+-   'id': 'b',
+-   'priority': 3,
+-   'status': 'open',
+    'title': 'Task'}]
+</failure></testcase><testcase name="test_task_query.TaskQueryAcceptance.test_searches_description"><failure>Traceback (most recent call last):
+  File "/Users/byeongwan-yeong/AI-agent-guardrail-harness/runs/A-1-v3-4a0087756b2641f4b8f9b025c0419f73/workspace/tests/test_task_query.py", line 39, in test_searches_description
+    self.assertEqual(select_tasks([a], query="security"), [a])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [] != [{'id': 'a', 'title': 'Task', 'description[50 chars]: 1}]
+
+Second list contains 1 additional elements.
+First extra element 0:
+{'id': 'a', 'title': 'Task', 'description': 'Security review', 'status': 'open', 'priority': 1}
+
+- []
++ [{'description': 'Security review',
++   'id': 'a',
++   'priority': 1,
++   'status': 'open',
++   'title': 'Task'}]
+</failure></testcase><testcase name="test_task_query.TaskQueryAcceptance.test_stable_id_tiebreak"><failure>Traceback (most recent call last):
+  File "/Users/byeongwan-yeong/AI-agent-guardrail-harness/runs/A-1-v3-4a0087756b2641f4b8f9b025c0419f73/workspace/tests/test_task_query.py", line 55, in test_stable_id_tiebreak
+    self.assertEqual(select_tasks([b, a]), [a, b])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [{'id': 'b', 'title': 'Task', 'description': '', '[109 chars]: 1}] != [{'id': 'a', 'title': 'Task', 'description': '', '[109 chars]: 1}]
+
+First differing element 0:
+{'id': 'b', 'title': 'Task', 'description': '', 'status': 'open', 'priority': 1}
+{'id': 'a', 'title': 'Task', 'description': '', 'status': 'open', 'priority': 1}
+
+  [{'description': '',
+-   'id': 'b',
+?          ^
+
++   'id': 'a',
+?          ^
+
+    'priority': 1,
+    'status': 'open',
+    'title': 'Task'},
+   {'description': '',
+-   'id': 'a',
+?          ^
+
++   'id': 'b',
+?          ^
+
+    'priority': 1,
+    'status': 'open',
+    'title': 'Task'}]
+</failure></testcase><testcase name="test_task_query.TaskQueryAcceptance.test_title_search" /><testcase name="test_task_query.TaskQueryAcceptance.test_unknown_status_rejected"><failure>Traceback (most recent call last):
+  File "/Users/byeongwan-yeong/AI-agent-guardrail-harness/runs/A-1-v3-4a0087756b2641f4b8f9b025c0419f73/workspace/tests/test_task_query.py", line 62, in test_unknown_status_rejected
+    with self.assertRaises(ValueError):
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+AssertionError: ValueError not raised
+</failure></testcase><testcase name="test_task_query.TaskQueryAcceptance.test_whitespace_normalization"><failure>Traceback (most recent call last):
+  File "/Users/byeongwan-yeong/AI-agent-guardrail-harness/runs/A-1-v3-4a0087756b2641f4b8f9b025c0419f73/workspace/tests/test_task_query.py", line 47, in test_whitespace_normalization
+    self.assertEqual(select_tasks([a], query="  release notes  "), [a])
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: [] != [{'id': 'a', 'title': 'Release   notes', '[46 chars]: 1}]
+
+Second list contains 1 additional elements.
+First extra element 0:
+{'id': 'a', 'title': 'Release   notes', 'description': '', 'status': 'open', 'priority': 1}
+
+- []
++ [{'description': '',
++   'id': 'a',
++   'priority': 1,
++   'status': 'open',
++   'title': 'Release   notes'}]
+</failure></testcase><testcase name="test_task_query.TaskQueryAcceptance.test_zero_limit" /></testsuite>
