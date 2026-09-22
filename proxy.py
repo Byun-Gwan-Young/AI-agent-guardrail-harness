@@ -48,7 +48,8 @@ def session_key(request, body):
 
 
 def create_app(log_dir=None, transport=None, sleep=asyncio.sleep, repository=None,
-               config_path=None, clock=time.monotonic, jitter=random.uniform):
+               config_path=None, clock=time.monotonic, jitter=random.uniform,
+               judgement_clock_ns=time.perf_counter_ns):
     config = load_config(config_path)
     settings = upstream(config)
     endpoint = settings["base_url"] + settings["chat_path"]
@@ -63,7 +64,7 @@ def create_app(log_dir=None, transport=None, sleep=asyncio.sleep, repository=Non
     app.state.store = store
     app.state.upstream = identity
     install_health(app, store, clock, config.get("policy_version"))
-    install_observations(app, store, session_key)
+    install_observations(app, store, session_key, judgement_clock_ns)
 
     @app.post("/sessions")
     async def start_session(request: Request):

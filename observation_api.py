@@ -1,5 +1,6 @@
 """Attach runner observations without executing filesystem or test commands in the proxy."""
 import logging
+import time
 
 from fastapi import HTTPException, Request
 from pydantic import ValidationError
@@ -13,7 +14,7 @@ from deadlock_policy import evaluate_criteria, progress_version_for
 logger = logging.getLogger(__name__)
 
 
-def install_observations(app, store, session_key):
+def install_observations(app, store, session_key, clock_ns=time.perf_counter_ns):
     @app.post("/sessions/observations")
     async def observe(request: Request):
         if not request.headers.get("X-Guardrail-Session"):
@@ -41,6 +42,7 @@ def install_observations(app, store, session_key):
             assigned = {turn for o in session.observations for turn in o["llm_turns"]}
             if any(t > len(session.turns) or t in assigned for t in observation["llm_turns"]):
                 raise HTTPException(409, "Unknown or already assigned LLM turn")
+            judgement_started = clock_ns()
             try:
                 result = calculate_progress(session.observations, observation,
                                             version=progress_version_for(session.meta))
@@ -48,15 +50,16 @@ def install_observations(app, store, session_key):
                 logger.warning("Progress calculation failed; observation retained", exc_info=True)
                 result = {"state": "unmeasured", "reason": "progress calculation failed"}
             record = {**observation, "observed_at": utc_now(), "progress": result}
-            if observation["extracted_conversation"] is not None:
-                record["extraction_comparison"] = compare_extraction(
-                    observation["conversation"], observation["extracted_conversation"])
             try:
                 record["criteria"] = evaluate_criteria(session.observations + [record], session.meta)
             except Exception:
                 logger.warning("Criteria evaluation failed; observation retained", exc_info=True)
                 record["criteria"] = {"criteria_version": session.meta.get("criteria_version"),
                                       "decision": "unmeasured", "reason": "criteria evaluation failed"}
+            record["judgement_ns"] = clock_ns() - judgement_started
+            if observation["extracted_conversation"] is not None:
+                record["extraction_comparison"] = compare_extraction(
+                    observation["conversation"], observation["extracted_conversation"])
             session.observations.append(record)
             persisted = store.save(session)
             return {"observation": record, "duplicate": False, "persisted": persisted}

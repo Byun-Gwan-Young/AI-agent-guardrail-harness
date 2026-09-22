@@ -22,11 +22,12 @@ class ObservationTests(unittest.IsolatedAsyncioTestCase):
             await client.aclose()
         self.tmp.cleanup()
 
-    def client(self):
+    def client(self, judgement_clock_ns=None):
         def response(request):
             self.calls += 1
             return httpx.Response(200, json={"choices": [{"message": {"content": "timeout: 500 ms"}}]})
-        app = create_app(self.tmp.name, httpx.MockTransport(response))
+        options = {} if judgement_clock_ns is None else {'judgement_clock_ns': judgement_clock_ns}
+        app = create_app(self.tmp.name, httpx.MockTransport(response), **options)
         client = httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test")
         self.clients.append(client)
         return app, client
@@ -100,3 +101,12 @@ class ObservationTests(unittest.IsolatedAsyncioTestCase):
         result = await submit_observation(client, "a", payload)
         self.assertFalse(result["observation"]["extraction_comparison"]["proposal_values"]["match"])
         self.assertEqual(result["observation"]["conversation"]["proposal_values"]["timeout_ms"], 500)
+
+    async def test_judgement_uses_process_monotonic_nanoseconds_only(self):
+        ticks = iter((1000, 1450))
+        app, client = self.client(lambda: next(ticks))
+        await self.turn(client)
+        result = await submit_observation(client, "a", snapshot(1))
+        self.assertEqual(result["observation"]["judgement_ns"], 450)
+        stored = json.loads((Path(self.tmp.name) / "a.json").read_text(encoding="utf-8"))
+        self.assertEqual(stored["observations"][0]["judgement_ns"], 450)
