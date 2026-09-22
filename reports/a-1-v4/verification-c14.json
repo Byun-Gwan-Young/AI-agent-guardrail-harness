@@ -1,0 +1,35 @@
+{
+  "files_scanned": 176,
+  "patterns": [
+    "authorization_field",
+    "bearer_value",
+    "groq_key",
+    "openai_style_key"
+  ],
+  "environment_variables_checked": {
+    "GROQ_API_KEY": "not set in this environment",
+    "KMU_API_KEY": "not set in this environment"
+  },
+  "hits": {},
+  "clean": true,
+  "bytes_scanned": 14056341,
+  "source_hashes_unchanged": true,
+  "test_groups": {
+    "baseline": {
+      "executed": 202,
+      "passed": 202,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "new": {
+      "executed": 82,
+      "passed": 82,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "c14_added_tests": 7,
+  "network_attempts": []
+}

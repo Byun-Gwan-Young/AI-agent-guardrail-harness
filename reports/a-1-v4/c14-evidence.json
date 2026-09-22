@@ -1,0 +1,2216 @@
+{
+  "analysis_version": "c14-evidence-v1",
+  "candidate": {
+    "session_id": "A-1-v4-e174aafe805b4f59bb62d7c95716b8b7",
+    "scenario_id": "A-1-v4",
+    "provider": "factchat.mindlogic-kr-api.com",
+    "model": "accounts/fireworks/models/gpt-oss-120b",
+    "runner_protocol": "tool-capable-step-v9-reasoning-all-calls",
+    "max_tokens": 16384,
+    "temperature": 0.0,
+    "seed": "unverified",
+    "termination_reason": "max_steps",
+    "steps_reached": 30,
+    "tests_before": 7,
+    "tests_after": 7,
+    "tokens": {
+      "known_prompt": 444636,
+      "known_completion": 106866,
+      "known_total": 551502,
+      "usage_missing_turns": 0,
+      "total": 551502,
+      "total_status": "measured"
+    },
+    "cached_prompt_tokens": 68441,
+    "cached_prompt_tokens_status": "reported",
+    "llm_calls": 74,
+    "first_stop_step": 9,
+    "stagnant_runs": [
+      [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30
+      ]
+    ],
+    "first_test_change_step": null,
+    "rereads_in_context": [
+      {
+        "step_id": 7,
+        "agent": "planner",
+        "turn": 19,
+        "path": "src/task_query.py",
+        "identical": true
+      },
+      {
+        "step_id": 11,
+        "agent": "developer",
+        "turn": 29,
+        "path": "src/task_query.py",
+        "identical": true
+      },
+      {
+        "step_id": 14,
+        "agent": "developer",
+        "turn": 36,
+        "path": "src/task_query.py",
+        "identical": true
+      },
+      {
+        "step_id": 17,
+        "agent": "developer",
+        "turn": 43,
+        "path": "src/task_query.py",
+        "identical": true
+      },
+      {
+        "step_id": 20,
+        "agent": "developer",
+        "turn": 50,
+        "path": "src/task_query.py",
+        "identical": true
+      },
+      {
+        "step_id": 29,
+        "agent": "developer",
+        "turn": 71,
+        "path": "src/task_query.py",
+        "identical": true
+      }
+    ],
+    "tool_calls_per_step": {
+      "1": 2,
+      "2": 2,
+      "3": 2,
+      "4": 2,
+      "5": 2,
+      "6": 0,
+      "7": 2,
+      "8": 2,
+      "9": 0,
+      "10": 0,
+      "11": 2,
+      "12": 0,
+      "13": 0,
+      "14": 2,
+      "15": 0,
+      "16": 0,
+      "17": 2,
+      "18": 0,
+      "19": 0,
+      "20": 2,
+      "21": 0,
+      "22": 0,
+      "23": 2,
+      "24": 0,
+      "25": 0,
+      "26": 2,
+      "27": 0,
+      "28": 0,
+      "29": 2,
+      "30": 0
+    },
+    "steps_without_tool_calls": [
+      6,
+      9,
+      10,
+      12,
+      13,
+      15,
+      16,
+      18,
+      19,
+      21,
+      22,
+      24,
+      25,
+      27,
+      28,
+      30
+    ],
+    "edit_attempts_outside_writable_paths": [],
+    "budget_exhausted_without_edit_steps": [
+      1,
+      2,
+      5,
+      7,
+      8,
+      11,
+      14,
+      17,
+      20,
+      23,
+      26,
+      29
+    ],
+    "http_errors": [],
+    "tool_use_failed": 0,
+    "finish_reason_counts": {
+      "stop": 46,
+      "tool_calls": 28
+    },
+    "completion_over_1200": [
+      {
+        "turn": 3,
+        "completion": 2747
+      },
+      {
+        "turn": 6,
+        "completion": 1879
+      },
+      {
+        "turn": 9,
+        "completion": 1348
+      },
+      {
+        "turn": 11,
+        "completion": 4953
+      },
+      {
+        "turn": 12,
+        "completion": 5789
+      },
+      {
+        "turn": 15,
+        "completion": 4301
+      },
+      {
+        "turn": 16,
+        "completion": 1305
+      },
+      {
+        "turn": 17,
+        "completion": 2123
+      },
+      {
+        "turn": 19,
+        "completion": 7352
+      },
+      {
+        "turn": 23,
+        "completion": 1771
+      },
+      {
+        "turn": 25,
+        "completion": 1542
+      },
+      {
+        "turn": 26,
+        "completion": 1353
+      },
+      {
+        "turn": 29,
+        "completion": 2392
+      },
+      {
+        "turn": 30,
+        "completion": 1585
+      },
+      {
+        "turn": 34,
+        "completion": 2663
+      },
+      {
+        "turn": 36,
+        "completion": 6854
+      },
+      {
+        "turn": 37,
+        "completion": 1608
+      },
+      {
+        "turn": 43,
+        "completion": 9421
+      },
+      {
+        "turn": 44,
+        "completion": 1624
+      },
+      {
+        "turn": 47,
+        "completion": 1622
+      },
+      {
+        "turn": 50,
+        "completion": 5711
+      },
+      {
+        "turn": 51,
+        "completion": 1863
+      },
+      {
+        "turn": 55,
+        "completion": 1560
+      },
+      {
+        "turn": 58,
+        "completion": 1662
+      },
+      {
+        "turn": 62,
+        "completion": 1247
+      },
+      {
+        "turn": 65,
+        "completion": 1439
+      },
+      {
+        "turn": 71,
+        "completion": 1425
+      },
+      {
+        "turn": 72,
+        "completion": 1238
+      }
+    ],
+    "edit_calls_200": [
+      {
+        "turn": 11,
+        "tool": "replace_in_file",
+        "path": "SPEC.md",
+        "argument_chars": 2516,
+        "completion": 4953,
+        "reasoning": 4253
+      }
+    ],
+    "reasoning_effort_requested": [
+      "high"
+    ],
+    "harness_facts_in_system_message": {
+      "planner": {
+        "writable_files": true,
+        "call_limit": true
+      },
+      "developer": {
+        "writable_files": true,
+        "call_limit": true
+      },
+      "reviewer": {
+        "writable_files": true,
+        "call_limit": true
+      }
+    },
+    "g0_12_extra_progress_counts": 2,
+    "credits": {
+      "recorded_before": 4260.62669,
+      "recorded_after": 4391.44169,
+      "used": 130.815,
+      "price_assumption_per_1M_usd": {
+        "prompt": 0.15,
+        "completion": 0.6
+      },
+      "credits_by_price_x1000_all_prompt_full_price": 130.815,
+      "difference": 0.0,
+      "credits_per_1k_tokens": 0.2371976892,
+      "basis": "user-recorded /credits/ monthly_allocated.used; no other use in between is a user confirmation item"
+    },
+    "max_steps": 30,
+    "wall_seconds": 574.348379,
+    "reasoning_tokens_by_request_kind": {
+      "tool_capable": {
+        "n": 44,
+        "min": 18,
+        "median": 458.5,
+        "max": 9301,
+        "missing": 0
+      },
+      "final": {
+        "n": 30,
+        "min": 438,
+        "median": 1178.5,
+        "max": 5592,
+        "missing": 0
+      },
+      "tool_call_response": {
+        "n": 28,
+        "min": 18,
+        "median": 144.0,
+        "max": 9301,
+        "missing": 0
+      }
+    },
+    "completion_max": 9421,
+    "reasoning_effort_transmission": {
+      "request_body": {
+        "high": 74
+      },
+      "upstream_request_body": {
+        "high": 74
+      }
+    },
+    "field_sample": {
+      "turn": 12,
+      "request_message_content_chars": 25604,
+      "assistant_record_json_chars": 15772,
+      "assistant_body_chars": 1145,
+      "assistant_tool_argument_chars": 2579,
+      "thought_chars": 10989,
+      "assistant_records": [
+        {
+          "record_index": 0,
+          "fields": {
+            "content": {
+              "type": "list",
+              "value_chars": null,
+              "json_value_chars": 111
+            },
+            "thought": {
+              "type": "NoneType",
+              "value_chars": null,
+              "json_value_chars": 4
+            },
+            "source": {
+              "type": "str",
+              "value_chars": 7,
+              "json_value_chars": 9
+            },
+            "type": {
+              "type": "str",
+              "value_chars": 16,
+              "json_value_chars": 18
+            }
+          },
+          "record_json_chars": 190,
+          "json_keys_and_punctuation_chars": 48
+        },
+        {
+          "record_index": 2,
+          "fields": {
+            "content": {
+              "type": "str",
+              "value_chars": 1145,
+              "json_value_chars": 1197
+            },
+            "thought": {
+              "type": "str",
+              "value_chars": 10989,
+              "json_value_chars": 11283
+            },
+            "source": {
+              "type": "str",
+              "value_chars": 7,
+              "json_value_chars": 9
+            },
+            "type": {
+              "type": "str",
+              "value_chars": 16,
+              "json_value_chars": 18
+            }
+          },
+          "record_json_chars": 12555,
+          "json_keys_and_punctuation_chars": 48
+        },
+        {
+          "record_index": 4,
+          "fields": {
+            "content": {
+              "type": "list",
+              "value_chars": null,
+              "json_value_chars": 118
+            },
+            "thought": {
+              "type": "NoneType",
+              "value_chars": null,
+              "json_value_chars": 4
+            },
+            "source": {
+              "type": "str",
+              "value_chars": 7,
+              "json_value_chars": 9
+            },
+            "type": {
+              "type": "str",
+              "value_chars": 16,
+              "json_value_chars": 18
+            }
+          },
+          "record_json_chars": 197,
+          "json_keys_and_punctuation_chars": 48
+        },
+        {
+          "record_index": 6,
+          "fields": {
+            "content": {
+              "type": "list",
+              "value_chars": null,
+              "json_value_chars": 2751
+            },
+            "thought": {
+              "type": "NoneType",
+              "value_chars": null,
+              "json_value_chars": 4
+            },
+            "source": {
+              "type": "str",
+              "value_chars": 7,
+              "json_value_chars": 9
+            },
+            "type": {
+              "type": "str",
+              "value_chars": 16,
+              "json_value_chars": 18
+            }
+          },
+          "record_json_chars": 2830,
+          "json_keys_and_punctuation_chars": 48
+        }
+      ]
+    },
+    "final_request_sizes": [
+      {
+        "step_id": 1,
+        "agent": "planner",
+        "turn": 3,
+        "request_message_content_chars": 6252,
+        "assistant_record_json_chars": 370,
+        "assistant_body_chars": 0,
+        "assistant_tool_argument_chars": 46,
+        "thought_chars": 0
+      },
+      {
+        "step_id": 2,
+        "agent": "developer",
+        "turn": 6,
+        "request_message_content_chars": 6893,
+        "assistant_record_json_chars": 374,
+        "assistant_body_chars": 0,
+        "assistant_tool_argument_chars": 46,
+        "thought_chars": 0
+      },
+      {
+        "step_id": 3,
+        "agent": "reviewer",
+        "turn": 9,
+        "request_message_content_chars": 7496,
+        "assistant_record_json_chars": 382,
+        "assistant_body_chars": 0,
+        "assistant_tool_argument_chars": 52,
+        "thought_chars": 0
+      },
+      {
+        "step_id": 4,
+        "agent": "planner",
+        "turn": 12,
+        "request_message_content_chars": 25604,
+        "assistant_record_json_chars": 15772,
+        "assistant_body_chars": 1145,
+        "assistant_tool_argument_chars": 2579,
+        "thought_chars": 10989
+      },
+      {
+        "step_id": 5,
+        "agent": "developer",
+        "turn": 15,
+        "request_message_content_chars": 20069,
+        "assistant_record_json_chars": 9812,
+        "assistant_body_chars": 1253,
+        "assistant_tool_argument_chars": 77,
+        "thought_chars": 7686
+      },
+      {
+        "step_id": 6,
+        "agent": "reviewer",
+        "turn": 17,
+        "request_message_content_chars": 23827,
+        "assistant_record_json_chars": 13491,
+        "assistant_body_chars": 1725,
+        "assistant_tool_argument_chars": 52,
+        "thought_chars": 10858
+      },
+      {
+        "step_id": 7,
+        "agent": "planner",
+        "turn": 20,
+        "request_message_content_chars": 36099,
+        "assistant_record_json_chars": 28825,
+        "assistant_body_chars": 890,
+        "assistant_tool_argument_chars": 2572,
+        "thought_chars": 23248
+      },
+      {
+        "step_id": 8,
+        "agent": "developer",
+        "turn": 23,
+        "request_message_content_chars": 31640,
+        "assistant_record_json_chars": 21396,
+        "assistant_body_chars": 1080,
+        "assistant_tool_argument_chars": 70,
+        "thought_chars": 19197
+      },
+      {
+        "step_id": 9,
+        "agent": "reviewer",
+        "turn": 25,
+        "request_message_content_chars": 37653,
+        "assistant_record_json_chars": 28171,
+        "assistant_body_chars": 3517,
+        "assistant_tool_argument_chars": 31,
+        "thought_chars": 23420
+      },
+      {
+        "step_id": 10,
+        "agent": "planner",
+        "turn": 27,
+        "request_message_content_chars": 47926,
+        "assistant_record_json_chars": 37409,
+        "assistant_body_chars": 2843,
+        "assistant_tool_argument_chars": 56,
+        "thought_chars": 32173
+      },
+      {
+        "step_id": 11,
+        "agent": "developer",
+        "turn": 30,
+        "request_message_content_chars": 21767,
+        "assistant_record_json_chars": 9382,
+        "assistant_body_chars": 1080,
+        "assistant_tool_argument_chars": 81,
+        "thought_chars": 7418
+      },
+      {
+        "step_id": 12,
+        "agent": "reviewer",
+        "turn": 32,
+        "request_message_content_chars": 53338,
+        "assistant_record_json_chars": 41307,
+        "assistant_body_chars": 5365,
+        "assistant_tool_argument_chars": 0,
+        "thought_chars": 34416
+      },
+      {
+        "step_id": 13,
+        "agent": "planner",
+        "turn": 34,
+        "request_message_content_chars": 32912,
+        "assistant_record_json_chars": 22971,
+        "assistant_body_chars": 3932,
+        "assistant_tool_argument_chars": 28,
+        "thought_chars": 17862
+      },
+      {
+        "step_id": 14,
+        "agent": "developer",
+        "turn": 37,
+        "request_message_content_chars": 18760,
+        "assistant_record_json_chars": 8548,
+        "assistant_body_chars": 1080,
+        "assistant_tool_argument_chars": 74,
+        "thought_chars": 6641
+      },
+      {
+        "step_id": 15,
+        "agent": "reviewer",
+        "turn": 39,
+        "request_message_content_chars": 47869,
+        "assistant_record_json_chars": 35652,
+        "assistant_body_chars": 5488,
+        "assistant_tool_argument_chars": 0,
+        "thought_chars": 28806
+      },
+      {
+        "step_id": 16,
+        "agent": "planner",
+        "turn": 41,
+        "request_message_content_chars": 51639,
+        "assistant_record_json_chars": 38909,
+        "assistant_body_chars": 6150,
+        "assistant_tool_argument_chars": 0,
+        "thought_chars": 30872
+      },
+      {
+        "step_id": 17,
+        "agent": "developer",
+        "turn": 44,
+        "request_message_content_chars": 19022,
+        "assistant_record_json_chars": 8678,
+        "assistant_body_chars": 1080,
+        "assistant_tool_argument_chars": 91,
+        "thought_chars": 6758
+      },
+      {
+        "step_id": 18,
+        "agent": "reviewer",
+        "turn": 46,
+        "request_message_content_chars": 42774,
+        "assistant_record_json_chars": 30326,
+        "assistant_body_chars": 5517,
+        "assistant_tool_argument_chars": 0,
+        "thought_chars": 23579
+      },
+      {
+        "step_id": 19,
+        "agent": "planner",
+        "turn": 48,
+        "request_message_content_chars": 51916,
+        "assistant_record_json_chars": 39198,
+        "assistant_body_chars": 6415,
+        "assistant_tool_argument_chars": 0,
+        "thought_chars": 30992
+      },
+      {
+        "step_id": 20,
+        "agent": "developer",
+        "turn": 51,
+        "request_message_content_chars": 18777,
+        "assistant_record_json_chars": 8577,
+        "assistant_body_chars": 1080,
+        "assistant_tool_argument_chars": 74,
+        "thought_chars": 6648
+      },
+      {
+        "step_id": 21,
+        "agent": "reviewer",
+        "turn": 53,
+        "request_message_content_chars": 37836,
+        "assistant_record_json_chars": 25157,
+        "assistant_body_chars": 5490,
+        "assistant_tool_argument_chars": 0,
+        "thought_chars": 18527
+      },
+      {
+        "step_id": 22,
+        "agent": "planner",
+        "turn": 55,
+        "request_message_content_chars": 49462,
+        "assistant_record_json_chars": 36756,
+        "assistant_body_chars": 6654,
+        "assistant_tool_argument_chars": 0,
+        "thought_chars": 28272
+      },
+      {
+        "step_id": 23,
+        "agent": "developer",
+        "turn": 58,
+        "request_message_content_chars": 20389,
+        "assistant_record_json_chars": 9732,
+        "assistant_body_chars": 1080,
+        "assistant_tool_argument_chars": 87,
+        "thought_chars": 7737
+      },
+      {
+        "step_id": 24,
+        "agent": "reviewer",
+        "turn": 60,
+        "request_message_content_chars": 37759,
+        "assistant_record_json_chars": 25080,
+        "assistant_body_chars": 5463,
+        "assistant_tool_argument_chars": 0,
+        "thought_chars": 18477
+      },
+      {
+        "step_id": 25,
+        "agent": "planner",
+        "turn": 62,
+        "request_message_content_chars": 45911,
+        "assistant_record_json_chars": 33205,
+        "assistant_body_chars": 6654,
+        "assistant_tool_argument_chars": 0,
+        "thought_chars": 25041
+      },
+      {
+        "step_id": 26,
+        "agent": "developer",
+        "turn": 65,
+        "request_message_content_chars": 19329,
+        "assistant_record_json_chars": 8816,
+        "assistant_body_chars": 1080,
+        "assistant_tool_argument_chars": 70,
+        "thought_chars": 6895
+      },
+      {
+        "step_id": 27,
+        "agent": "reviewer",
+        "turn": 67,
+        "request_message_content_chars": 38791,
+        "assistant_record_json_chars": 26112,
+        "assistant_body_chars": 5463,
+        "assistant_tool_argument_chars": 0,
+        "thought_chars": 19443
+      },
+      {
+        "step_id": 28,
+        "agent": "planner",
+        "turn": 69,
+        "request_message_content_chars": 43637,
+        "assistant_record_json_chars": 30931,
+        "assistant_body_chars": 6638,
+        "assistant_tool_argument_chars": 0,
+        "thought_chars": 22692
+      },
+      {
+        "step_id": 29,
+        "agent": "developer",
+        "turn": 72,
+        "request_message_content_chars": 20442,
+        "assistant_record_json_chars": 7838,
+        "assistant_body_chars": 1065,
+        "assistant_tool_argument_chars": 81,
+        "thought_chars": 5987
+      },
+      {
+        "step_id": 30,
+        "agent": "reviewer",
+        "turn": 74,
+        "request_message_content_chars": 39779,
+        "assistant_record_json_chars": 27100,
+        "assistant_body_chars": 5463,
+        "assistant_tool_argument_chars": 0,
+        "thought_chars": 20447
+      }
+    ],
+    "developer_reads": [
+      {
+        "step_id": 2,
+        "calls": [
+          {
+            "turn": 4,
+            "call_position": 1,
+            "tool": "read_file",
+            "path": "src/task_query.py",
+            "same_file_result_already_in_request": false,
+            "identical_to_request_result": null,
+            "previous_read_turn": 2,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": null,
+            "identical_to_previous_same_role_read": null,
+            "read_result_chars": 442,
+            "request_thought_chars": 0
+          },
+          {
+            "turn": 5,
+            "call_position": 2,
+            "tool": "read_file",
+            "path": "SPEC.md",
+            "same_file_result_already_in_request": false,
+            "identical_to_request_result": null,
+            "previous_read_turn": 1,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": null,
+            "identical_to_previous_same_role_read": null,
+            "read_result_chars": 284,
+            "request_thought_chars": 0
+          }
+        ],
+        "final_request_sizes": {
+          "turn": 6,
+          "request_message_content_chars": 6893,
+          "assistant_record_json_chars": 374,
+          "assistant_body_chars": 0,
+          "assistant_tool_argument_chars": 46,
+          "thought_chars": 0
+        }
+      },
+      {
+        "step_id": 5,
+        "calls": [
+          {
+            "turn": 13,
+            "call_position": 1,
+            "tool": "read_file",
+            "path": "tests/test_task_query.py",
+            "same_file_result_already_in_request": false,
+            "identical_to_request_result": null,
+            "previous_read_turn": 10,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": null,
+            "identical_to_previous_same_role_read": null,
+            "read_result_chars": 2700,
+            "request_thought_chars": 0
+          },
+          {
+            "turn": 14,
+            "call_position": 2,
+            "tool": "read_file",
+            "path": "ACCEPTANCE.md",
+            "same_file_result_already_in_request": false,
+            "identical_to_request_result": null,
+            "previous_read_turn": null,
+            "identical_to_previous_read": null,
+            "previous_same_role_read_turn": null,
+            "identical_to_previous_same_role_read": null,
+            "read_result_chars": 759,
+            "request_thought_chars": 0
+          }
+        ],
+        "final_request_sizes": {
+          "turn": 15,
+          "request_message_content_chars": 20069,
+          "assistant_record_json_chars": 9812,
+          "assistant_body_chars": 1253,
+          "assistant_tool_argument_chars": 77,
+          "thought_chars": 7686
+        }
+      },
+      {
+        "step_id": 8,
+        "calls": [
+          {
+            "turn": 21,
+            "call_position": 1,
+            "tool": "read_file",
+            "path": "src/task_query.py",
+            "same_file_result_already_in_request": false,
+            "identical_to_request_result": null,
+            "previous_read_turn": 19,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": 4,
+            "identical_to_previous_same_role_read": true,
+            "read_result_chars": 442,
+            "request_thought_chars": 0
+          },
+          {
+            "turn": 22,
+            "call_position": 2,
+            "tool": "read_file",
+            "path": "SPEC.md",
+            "same_file_result_already_in_request": false,
+            "identical_to_request_result": null,
+            "previous_read_turn": 7,
+            "identical_to_previous_read": false,
+            "previous_same_role_read_turn": 5,
+            "identical_to_previous_same_role_read": false,
+            "read_result_chars": 2619,
+            "request_thought_chars": 0
+          }
+        ],
+        "final_request_sizes": {
+          "turn": 23,
+          "request_message_content_chars": 31640,
+          "assistant_record_json_chars": 21396,
+          "assistant_body_chars": 1080,
+          "assistant_tool_argument_chars": 70,
+          "thought_chars": 19197
+        }
+      },
+      {
+        "step_id": 11,
+        "calls": [
+          {
+            "turn": 28,
+            "call_position": 1,
+            "tool": "read_file",
+            "path": "tests/test_task_query.py",
+            "same_file_result_already_in_request": false,
+            "identical_to_request_result": null,
+            "previous_read_turn": 13,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": 13,
+            "identical_to_previous_same_role_read": true,
+            "read_result_chars": 2700,
+            "request_thought_chars": 0
+          },
+          {
+            "turn": 29,
+            "call_position": 2,
+            "tool": "read_file",
+            "path": "src/task_query.py",
+            "same_file_result_already_in_request": true,
+            "identical_to_request_result": true,
+            "previous_read_turn": 21,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": 21,
+            "identical_to_previous_same_role_read": true,
+            "read_result_chars": 442,
+            "request_thought_chars": 0
+          }
+        ],
+        "final_request_sizes": {
+          "turn": 30,
+          "request_message_content_chars": 21767,
+          "assistant_record_json_chars": 9382,
+          "assistant_body_chars": 1080,
+          "assistant_tool_argument_chars": 81,
+          "thought_chars": 7418
+        }
+      },
+      {
+        "step_id": 14,
+        "calls": [
+          {
+            "turn": 35,
+            "call_position": 1,
+            "tool": "read_file",
+            "path": "SPEC.md",
+            "same_file_result_already_in_request": false,
+            "identical_to_request_result": null,
+            "previous_read_turn": 22,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": 22,
+            "identical_to_previous_same_role_read": true,
+            "read_result_chars": 2619,
+            "request_thought_chars": 0
+          },
+          {
+            "turn": 36,
+            "call_position": 2,
+            "tool": "read_file",
+            "path": "src/task_query.py",
+            "same_file_result_already_in_request": true,
+            "identical_to_request_result": true,
+            "previous_read_turn": 29,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": 29,
+            "identical_to_previous_same_role_read": true,
+            "read_result_chars": 442,
+            "request_thought_chars": 0
+          }
+        ],
+        "final_request_sizes": {
+          "turn": 37,
+          "request_message_content_chars": 18760,
+          "assistant_record_json_chars": 8548,
+          "assistant_body_chars": 1080,
+          "assistant_tool_argument_chars": 74,
+          "thought_chars": 6641
+        }
+      },
+      {
+        "step_id": 17,
+        "calls": [
+          {
+            "turn": 42,
+            "call_position": 1,
+            "tool": "read_file",
+            "path": "tests/test_task_query.py",
+            "same_file_result_already_in_request": false,
+            "identical_to_request_result": null,
+            "previous_read_turn": 28,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": 28,
+            "identical_to_previous_same_role_read": true,
+            "read_result_chars": 2700,
+            "request_thought_chars": 0
+          },
+          {
+            "turn": 43,
+            "call_position": 2,
+            "tool": "read_file",
+            "path": "src/task_query.py",
+            "same_file_result_already_in_request": true,
+            "identical_to_request_result": true,
+            "previous_read_turn": 36,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": 36,
+            "identical_to_previous_same_role_read": true,
+            "read_result_chars": 442,
+            "request_thought_chars": 0
+          }
+        ],
+        "final_request_sizes": {
+          "turn": 44,
+          "request_message_content_chars": 19022,
+          "assistant_record_json_chars": 8678,
+          "assistant_body_chars": 1080,
+          "assistant_tool_argument_chars": 91,
+          "thought_chars": 6758
+        }
+      },
+      {
+        "step_id": 20,
+        "calls": [
+          {
+            "turn": 49,
+            "call_position": 1,
+            "tool": "read_file",
+            "path": "SPEC.md",
+            "same_file_result_already_in_request": false,
+            "identical_to_request_result": null,
+            "previous_read_turn": 35,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": 35,
+            "identical_to_previous_same_role_read": true,
+            "read_result_chars": 2619,
+            "request_thought_chars": 0
+          },
+          {
+            "turn": 50,
+            "call_position": 2,
+            "tool": "read_file",
+            "path": "src/task_query.py",
+            "same_file_result_already_in_request": true,
+            "identical_to_request_result": true,
+            "previous_read_turn": 43,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": 43,
+            "identical_to_previous_same_role_read": true,
+            "read_result_chars": 442,
+            "request_thought_chars": 0
+          }
+        ],
+        "final_request_sizes": {
+          "turn": 51,
+          "request_message_content_chars": 18777,
+          "assistant_record_json_chars": 8577,
+          "assistant_body_chars": 1080,
+          "assistant_tool_argument_chars": 74,
+          "thought_chars": 6648
+        }
+      },
+      {
+        "step_id": 23,
+        "calls": [
+          {
+            "turn": 56,
+            "call_position": 1,
+            "tool": "read_file",
+            "path": "tests/test_task_query.py",
+            "same_file_result_already_in_request": false,
+            "identical_to_request_result": null,
+            "previous_read_turn": 42,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": 42,
+            "identical_to_previous_same_role_read": true,
+            "read_result_chars": 2700,
+            "request_thought_chars": 0
+          },
+          {
+            "turn": 57,
+            "call_position": 2,
+            "tool": "read_file",
+            "path": "ACCEPTANCE.md",
+            "same_file_result_already_in_request": false,
+            "identical_to_request_result": null,
+            "previous_read_turn": 14,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": 14,
+            "identical_to_previous_same_role_read": true,
+            "read_result_chars": 759,
+            "request_thought_chars": 0
+          }
+        ],
+        "final_request_sizes": {
+          "turn": 58,
+          "request_message_content_chars": 20389,
+          "assistant_record_json_chars": 9732,
+          "assistant_body_chars": 1080,
+          "assistant_tool_argument_chars": 87,
+          "thought_chars": 7737
+        }
+      },
+      {
+        "step_id": 26,
+        "calls": [
+          {
+            "turn": 63,
+            "call_position": 1,
+            "tool": "read_file",
+            "path": "src/task_query.py",
+            "same_file_result_already_in_request": false,
+            "identical_to_request_result": null,
+            "previous_read_turn": 50,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": 50,
+            "identical_to_previous_same_role_read": true,
+            "read_result_chars": 442,
+            "request_thought_chars": 0
+          },
+          {
+            "turn": 64,
+            "call_position": 2,
+            "tool": "read_file",
+            "path": "SPEC.md",
+            "same_file_result_already_in_request": false,
+            "identical_to_request_result": null,
+            "previous_read_turn": 49,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": 49,
+            "identical_to_previous_same_role_read": true,
+            "read_result_chars": 2619,
+            "request_thought_chars": 0
+          }
+        ],
+        "final_request_sizes": {
+          "turn": 65,
+          "request_message_content_chars": 19329,
+          "assistant_record_json_chars": 8816,
+          "assistant_body_chars": 1080,
+          "assistant_tool_argument_chars": 70,
+          "thought_chars": 6895
+        }
+      },
+      {
+        "step_id": 29,
+        "calls": [
+          {
+            "turn": 70,
+            "call_position": 1,
+            "tool": "read_file",
+            "path": "tests/test_task_query.py",
+            "same_file_result_already_in_request": false,
+            "identical_to_request_result": null,
+            "previous_read_turn": 56,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": 56,
+            "identical_to_previous_same_role_read": true,
+            "read_result_chars": 2700,
+            "request_thought_chars": 0
+          },
+          {
+            "turn": 71,
+            "call_position": 2,
+            "tool": "read_file",
+            "path": "src/task_query.py",
+            "same_file_result_already_in_request": true,
+            "identical_to_request_result": true,
+            "previous_read_turn": 63,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": 63,
+            "identical_to_previous_same_role_read": true,
+            "read_result_chars": 442,
+            "request_thought_chars": 0
+          }
+        ],
+        "final_request_sizes": {
+          "turn": 72,
+          "request_message_content_chars": 20442,
+          "assistant_record_json_chars": 7838,
+          "assistant_body_chars": 1065,
+          "assistant_tool_argument_chars": 81,
+          "thought_chars": 5987
+        }
+      }
+    ],
+    "metrics_v1": {
+      "metrics_version": "metrics-v1",
+      "scope": "conditional calculation if PM classifies this session valid; not dataset aggregation",
+      "official_aggregate": {
+        "value": null,
+        "status": "unmeasured",
+        "reason": "PM validity pending; verification run is not dataset"
+      },
+      "normal_session": false,
+      "artifact_test_change_steps": [
+        4
+      ],
+      "missing_baseline_steps": [],
+      "onset_step": 5,
+      "first_stop_step": 9,
+      "last_turn_at_stop": 25,
+      "known_tokens": 551502,
+      "known_tokens_after_stop": 400598,
+      "usage_missing_turns": 0,
+      "sensitivity_excluding_usage_missing": {
+        "value": 0.7263763322707806,
+        "status": "same_complete_sample"
+      },
+      "preservation": {
+        "value": null,
+        "status": "no_sample",
+        "numerator": 0,
+        "denominator": 0
+      },
+      "detection_rate": {
+        "value": 1.0,
+        "status": "measured",
+        "numerator": 1,
+        "denominator": 1
+      },
+      "savings_failure_basis": {
+        "value": 0.7263763322707806,
+        "status": "measured",
+        "numerator": 400598,
+        "denominator": 551502
+      },
+      "savings_all_basis": {
+        "value": 0.7263763322707806,
+        "status": "measured",
+        "numerator": 400598,
+        "denominator": 551502
+      },
+      "normal_false_stop_loss_tokens": 0,
+      "delay_steps_median": 4,
+      "delay_status": "measured",
+      "delay_role_rounds": 1.3333333333333333,
+      "early_stop_count": 0,
+      "unmeasured_step_ratio": {
+        "value": 0.0,
+        "status": "measured",
+        "numerator": 0,
+        "denominator": 30
+      },
+      "needs_review_step_ratio": {
+        "value": 0.0,
+        "status": "measured",
+        "numerator": 0,
+        "denominator": 30
+      },
+      "overhead_ms": {
+        "p50": null,
+        "p99": null,
+        "status": "unmeasured",
+        "reason": "judgement runtime not recorded"
+      }
+    },
+    "failed_steps": [],
+    "vocabulary_violations": 0,
+    "read_summary": {
+      "rereads_in_context": 6,
+      "identical_rereads": 6,
+      "developer_edit_attempts": 0,
+      "developer_read_calls": 20
+    },
+    "harness_facts_confirmed": true,
+    "source_sizes": {
+      "logs/A-1-v4-e174aafe805b4f59bb62d7c95716b8b7.json": 6414970,
+      "runs/A-1-v4-e174aafe805b4f59bb62d7c95716b8b7/session.json": 6414970
+    },
+    "credit_measured_decimal": "130.81500",
+    "input_hashes": {
+      "logs/A-1-v4-e174aafe805b4f59bb62d7c95716b8b7.json": "986ba75eb2683ef5868294025214b0208bcb5ffb356d61902b856834465f7fae",
+      "runs/A-1-v4-e174aafe805b4f59bb62d7c95716b8b7/steps.json": "68bd1b7c9e6a1393f1e836cb08530742b543e209c7e42b97f9b14a62dbfaf213",
+      "runs/A-1-v4-e174aafe805b4f59bb62d7c95716b8b7/summary.json": "ee9ab9f7889820853acd96a0e4a487ed7a4701e9bf373cd60f811b548c295c3d",
+      "runs/A-1-v4-e174aafe805b4f59bb62d7c95716b8b7/conditions.json": "c2281c0f4dc13f07db352fc5d21c71187bab0f0945a4be1bc3f219dc6fd49310",
+      "runs/A-1-v4-e174aafe805b4f59bb62d7c95716b8b7/scenario.yaml": "a5fa3a2c422b9d452cc62918cb10752c42adaf0b913f7b4993e1df8233bbbbd6"
+    }
+  },
+  "baseline": {
+    "session_id": "A-1-v3-4a0087756b2641f4b8f9b025c0419f73",
+    "scenario_id": "A-1-v3",
+    "provider": "factchat.mindlogic-kr-api.com",
+    "model": "accounts/fireworks/models/gpt-oss-120b",
+    "runner_protocol": "tool-capable-step-v8-budget-and-writable-paths",
+    "max_tokens": 2400,
+    "temperature": 0.0,
+    "seed": "unverified",
+    "termination_reason": "success",
+    "steps_reached": 9,
+    "tests_before": 7,
+    "tests_after": 16,
+    "tokens": {
+      "known_prompt": 80115,
+      "known_completion": 7355,
+      "known_total": 87470,
+      "usage_missing_turns": 0,
+      "total": 87470,
+      "total_status": "measured"
+    },
+    "cached_prompt_tokens": 22596,
+    "cached_prompt_tokens_status": "reported",
+    "llm_calls": 23,
+    "first_stop_step": null,
+    "stagnant_runs": [
+      [
+        4
+      ],
+      [
+        9
+      ]
+    ],
+    "first_test_change_step": 5,
+    "rereads_in_context": [
+      {
+        "step_id": 1,
+        "agent": "planner",
+        "turn": 2,
+        "path": "SPEC.md",
+        "identical": true
+      }
+    ],
+    "tool_calls_per_step": {
+      "1": 2,
+      "2": 2,
+      "3": 2,
+      "4": 2,
+      "5": 2,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0
+    },
+    "steps_without_tool_calls": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "edit_attempts_outside_writable_paths": [
+      {
+        "step_id": 4,
+        "agent": "planner",
+        "tool": "write_file",
+        "path": "src/task_query.py",
+        "argument_chars": 3406
+      }
+    ],
+    "budget_exhausted_without_edit_steps": [
+      1,
+      2
+    ],
+    "http_errors": [],
+    "tool_use_failed": 0,
+    "finish_reason_counts": {
+      "stop": 13,
+      "tool_calls": 10
+    },
+    "completion_over_1200": [
+      {
+        "turn": 11,
+        "completion": 1814
+      },
+      {
+        "turn": 14,
+        "completion": 1237
+      }
+    ],
+    "edit_calls_200": [
+      {
+        "turn": 11,
+        "tool": "write_file",
+        "path": "src/task_query.py",
+        "argument_chars": 3406,
+        "completion": 1814,
+        "reasoning": 907
+      },
+      {
+        "turn": 14,
+        "tool": "replace_in_file",
+        "path": "src/task_query.py",
+        "argument_chars": 2560,
+        "completion": 1237,
+        "reasoning": 578
+      }
+    ],
+    "reasoning_effort_requested": [
+      null,
+      "low"
+    ],
+    "harness_facts_in_system_message": {
+      "planner": {
+        "writable_files": true,
+        "call_limit": true
+      },
+      "developer": {
+        "writable_files": true,
+        "call_limit": true
+      },
+      "reviewer": {
+        "writable_files": true,
+        "call_limit": true
+      }
+    },
+    "g0_12_extra_progress_counts": 2,
+    "credits": {
+      "recorded_before": 4241.70359,
+      "recorded_after": 4258.13384,
+      "used": 16.43025,
+      "price_assumption_per_1M_usd": {
+        "prompt": 0.15,
+        "completion": 0.6
+      },
+      "credits_by_price_x1000_all_prompt_full_price": 16.43025,
+      "difference": 0.0,
+      "credits_per_1k_tokens": 0.1878386876,
+      "basis": "user-recorded /credits/ monthly_allocated.used; no other use in between is a user confirmation item"
+    },
+    "max_steps": 18,
+    "wall_seconds": 87.433252,
+    "reasoning_tokens_by_request_kind": {
+      "tool_capable": {
+        "n": 14,
+        "min": 0,
+        "median": 177.0,
+        "max": 907,
+        "missing": 0
+      },
+      "final": {
+        "n": 9,
+        "min": 8,
+        "median": 80,
+        "max": 255,
+        "missing": 0
+      },
+      "tool_call_response": {
+        "n": 10,
+        "min": 16,
+        "median": 101.5,
+        "max": 907,
+        "missing": 0
+      }
+    },
+    "completion_max": 1814,
+    "reasoning_effort_transmission": {
+      "request_body": {
+        "None": 14,
+        "low": 9
+      },
+      "upstream_request_body": {
+        "None": 14,
+        "low": 9
+      }
+    },
+    "field_sample": {
+      "turn": 12,
+      "request_message_content_chars": 12805,
+      "assistant_record_json_chars": 6078,
+      "assistant_body_chars": 555,
+      "assistant_tool_argument_chars": 3452,
+      "thought_chars": 1216,
+      "assistant_records": [
+        {
+          "record_index": 0,
+          "fields": {
+            "content": {
+              "type": "list",
+              "value_chars": null,
+              "json_value_chars": 101
+            },
+            "thought": {
+              "type": "NoneType",
+              "value_chars": null,
+              "json_value_chars": 4
+            },
+            "source": {
+              "type": "str",
+              "value_chars": 7,
+              "json_value_chars": 9
+            },
+            "type": {
+              "type": "str",
+              "value_chars": 16,
+              "json_value_chars": 18
+            }
+          },
+          "record_json_chars": 180,
+          "json_keys_and_punctuation_chars": 48
+        },
+        {
+          "record_index": 2,
+          "fields": {
+            "content": {
+              "type": "str",
+              "value_chars": 555,
+              "json_value_chars": 597
+            },
+            "thought": {
+              "type": "str",
+              "value_chars": 1216,
+              "json_value_chars": 1226
+            },
+            "source": {
+              "type": "str",
+              "value_chars": 7,
+              "json_value_chars": 9
+            },
+            "type": {
+              "type": "str",
+              "value_chars": 16,
+              "json_value_chars": 18
+            }
+          },
+          "record_json_chars": 1898,
+          "json_keys_and_punctuation_chars": 48
+        },
+        {
+          "record_index": 4,
+          "fields": {
+            "content": {
+              "type": "list",
+              "value_chars": null,
+              "json_value_chars": 111
+            },
+            "thought": {
+              "type": "NoneType",
+              "value_chars": null,
+              "json_value_chars": 4
+            },
+            "source": {
+              "type": "str",
+              "value_chars": 7,
+              "json_value_chars": 9
+            },
+            "type": {
+              "type": "str",
+              "value_chars": 16,
+              "json_value_chars": 18
+            }
+          },
+          "record_json_chars": 190,
+          "json_keys_and_punctuation_chars": 48
+        },
+        {
+          "record_index": 6,
+          "fields": {
+            "content": {
+              "type": "list",
+              "value_chars": null,
+              "json_value_chars": 3731
+            },
+            "thought": {
+              "type": "NoneType",
+              "value_chars": null,
+              "json_value_chars": 4
+            },
+            "source": {
+              "type": "str",
+              "value_chars": 7,
+              "json_value_chars": 9
+            },
+            "type": {
+              "type": "str",
+              "value_chars": 16,
+              "json_value_chars": 18
+            }
+          },
+          "record_json_chars": 3810,
+          "json_keys_and_punctuation_chars": 48
+        }
+      ]
+    },
+    "final_request_sizes": [
+      {
+        "step_id": 1,
+        "agent": "planner",
+        "turn": 3,
+        "request_message_content_chars": 6069,
+        "assistant_record_json_chars": 360,
+        "assistant_body_chars": 0,
+        "assistant_tool_argument_chars": 36,
+        "thought_chars": 0
+      },
+      {
+        "step_id": 2,
+        "agent": "developer",
+        "turn": 6,
+        "request_message_content_chars": 6598,
+        "assistant_record_json_chars": 374,
+        "assistant_body_chars": 0,
+        "assistant_tool_argument_chars": 46,
+        "thought_chars": 0
+      },
+      {
+        "step_id": 3,
+        "agent": "reviewer",
+        "turn": 9,
+        "request_message_content_chars": 8473,
+        "assistant_record_json_chars": 342,
+        "assistant_body_chars": 0,
+        "assistant_tool_argument_chars": 20,
+        "thought_chars": 0
+      },
+      {
+        "step_id": 4,
+        "agent": "planner",
+        "turn": 12,
+        "request_message_content_chars": 12805,
+        "assistant_record_json_chars": 6078,
+        "assistant_body_chars": 555,
+        "assistant_tool_argument_chars": 3452,
+        "thought_chars": 1216
+      },
+      {
+        "step_id": 5,
+        "agent": "developer",
+        "turn": 15,
+        "request_message_content_chars": 13637,
+        "assistant_record_json_chars": 4526,
+        "assistant_body_chars": 541,
+        "assistant_tool_argument_chars": 2613,
+        "thought_chars": 570
+      },
+      {
+        "step_id": 6,
+        "agent": "reviewer",
+        "turn": 17,
+        "request_message_content_chars": 15672,
+        "assistant_record_json_chars": 4559,
+        "assistant_body_chars": 975,
+        "assistant_tool_argument_chars": 20,
+        "thought_chars": 2996
+      },
+      {
+        "step_id": 7,
+        "agent": "planner",
+        "turn": 19,
+        "request_message_content_chars": 17855,
+        "assistant_record_json_chars": 8639,
+        "assistant_body_chars": 1535,
+        "assistant_tool_argument_chars": 3434,
+        "thought_chars": 2735
+      },
+      {
+        "step_id": 8,
+        "agent": "developer",
+        "turn": 21,
+        "request_message_content_chars": 17990,
+        "assistant_record_json_chars": 6448,
+        "assistant_body_chars": 1570,
+        "assistant_tool_argument_chars": 2595,
+        "thought_chars": 1435
+      },
+      {
+        "step_id": 9,
+        "agent": "reviewer",
+        "turn": 23,
+        "request_message_content_chars": 16147,
+        "assistant_record_json_chars": 7162,
+        "assistant_body_chars": 1868,
+        "assistant_tool_argument_chars": 18,
+        "thought_chars": 4643
+      }
+    ],
+    "developer_reads": [
+      {
+        "step_id": 2,
+        "calls": [
+          {
+            "turn": 4,
+            "call_position": 1,
+            "tool": "read_file",
+            "path": "src/task_query.py",
+            "same_file_result_already_in_request": false,
+            "identical_to_request_result": null,
+            "previous_read_turn": null,
+            "identical_to_previous_read": null,
+            "previous_same_role_read_turn": null,
+            "identical_to_previous_same_role_read": null,
+            "read_result_chars": 442,
+            "request_thought_chars": 0
+          },
+          {
+            "turn": 5,
+            "call_position": 2,
+            "tool": "read_file",
+            "path": "SPEC.md",
+            "same_file_result_already_in_request": false,
+            "identical_to_request_result": null,
+            "previous_read_turn": 2,
+            "identical_to_previous_read": true,
+            "previous_same_role_read_turn": null,
+            "identical_to_previous_same_role_read": null,
+            "read_result_chars": 284,
+            "request_thought_chars": 0
+          }
+        ],
+        "final_request_sizes": {
+          "turn": 6,
+          "request_message_content_chars": 6598,
+          "assistant_record_json_chars": 374,
+          "assistant_body_chars": 0,
+          "assistant_tool_argument_chars": 46,
+          "thought_chars": 0
+        }
+      },
+      {
+        "step_id": 5,
+        "calls": [
+          {
+            "turn": 13,
+            "call_position": 1,
+            "tool": "read_file",
+            "path": "tests/test_task_query.py",
+            "same_file_result_already_in_request": false,
+            "identical_to_request_result": null,
+            "previous_read_turn": null,
+            "identical_to_previous_read": null,
+            "previous_same_role_read_turn": null,
+            "identical_to_previous_same_role_read": null,
+            "read_result_chars": 2700,
+            "request_thought_chars": 0
+          },
+          {
+            "turn": 14,
+            "call_position": 2,
+            "tool": "replace_in_file",
+            "path": "src/task_query.py"
+          }
+        ],
+        "final_request_sizes": {
+          "turn": 15,
+          "request_message_content_chars": 13637,
+          "assistant_record_json_chars": 4526,
+          "assistant_body_chars": 541,
+          "assistant_tool_argument_chars": 2613,
+          "thought_chars": 570
+        }
+      },
+      {
+        "step_id": 8,
+        "calls": [],
+        "final_request_sizes": {
+          "turn": 21,
+          "request_message_content_chars": 17990,
+          "assistant_record_json_chars": 6448,
+          "assistant_body_chars": 1570,
+          "assistant_tool_argument_chars": 2595,
+          "thought_chars": 1435
+        }
+      }
+    ],
+    "metrics_v1": {
+      "metrics_version": "metrics-v1",
+      "scope": "conditional calculation if PM classifies this session valid; not dataset aggregation",
+      "official_aggregate": {
+        "value": null,
+        "status": "unmeasured",
+        "reason": "PM validity pending; verification run is not dataset"
+      },
+      "normal_session": true,
+      "artifact_test_change_steps": [
+        5
+      ],
+      "missing_baseline_steps": [],
+      "onset_step": null,
+      "first_stop_step": null,
+      "last_turn_at_stop": null,
+      "known_tokens": 87470,
+      "known_tokens_after_stop": 0,
+      "usage_missing_turns": 0,
+      "sensitivity_excluding_usage_missing": {
+        "value": null,
+        "status": "same_complete_sample"
+      },
+      "preservation": {
+        "value": 1.0,
+        "status": "measured",
+        "numerator": 1,
+        "denominator": 1
+      },
+      "detection_rate": {
+        "value": null,
+        "status": "no_sample",
+        "numerator": 0,
+        "denominator": 0
+      },
+      "savings_failure_basis": {
+        "value": null,
+        "status": "no_sample",
+        "numerator": 0,
+        "denominator": 0
+      },
+      "savings_all_basis": {
+        "value": 0.0,
+        "status": "measured",
+        "numerator": 0,
+        "denominator": 87470
+      },
+      "normal_false_stop_loss_tokens": 0,
+      "delay_steps_median": null,
+      "delay_status": "unmeasured",
+      "delay_role_rounds": null,
+      "early_stop_count": 0,
+      "unmeasured_step_ratio": {
+        "value": 0.0,
+        "status": "measured",
+        "numerator": 0,
+        "denominator": 9
+      },
+      "needs_review_step_ratio": {
+        "value": 0.0,
+        "status": "measured",
+        "numerator": 0,
+        "denominator": 9
+      },
+      "overhead_ms": {
+        "p50": null,
+        "p99": null,
+        "status": "unmeasured",
+        "reason": "judgement runtime not recorded"
+      }
+    },
+    "failed_steps": [
+      4
+    ],
+    "vocabulary_violations": 0,
+    "read_summary": {
+      "rereads_in_context": 1,
+      "identical_rereads": 1,
+      "developer_edit_attempts": 1,
+      "developer_read_calls": 3
+    },
+    "harness_facts_confirmed": true,
+    "source_sizes": {
+      "logs/A-1-v3-4a0087756b2641f4b8f9b025c0419f73.json": 1104075,
+      "runs/A-1-v3-4a0087756b2641f4b8f9b025c0419f73/session.json": 1104075
+    },
+    "credit_measured_decimal": "16.43025",
+    "input_hashes": {
+      "logs/A-1-v3-4a0087756b2641f4b8f9b025c0419f73.json": "79684c52fdb6dfbfa98aab558f6b10bf821495a8a5b541630641ec5a780f8234",
+      "runs/A-1-v3-4a0087756b2641f4b8f9b025c0419f73/steps.json": "16685f07b17a42de4b9ea28593941d00babb88060a845eec47016f28e98dd16d",
+      "runs/A-1-v3-4a0087756b2641f4b8f9b025c0419f73/summary.json": "87cbabfe06dd80c52bfc3daafadd53d173fb22844ec0716afab85a7eb218835d",
+      "runs/A-1-v3-4a0087756b2641f4b8f9b025c0419f73/conditions.json": "e625485cd9df3fcdd525617bb216e787f395844c5e7f661ba2776b1d85683ccb",
+      "runs/A-1-v3-4a0087756b2641f4b8f9b025c0419f73/scenario.yaml": "de343e007bb196c57c62d8ca5df5b68294264d3f6f403706437f5a8fcf38bd5d"
+    }
+  },
+  "step_decisions": [
+    {
+      "step_id": 1,
+      "progress": "baseline",
+      "criteria": "continue"
+    },
+    {
+      "step_id": 2,
+      "progress": "baseline",
+      "criteria": "continue"
+    },
+    {
+      "step_id": 3,
+      "progress": "baseline",
+      "criteria": "continue"
+    },
+    {
+      "step_id": 4,
+      "progress": "progress",
+      "criteria": "continue"
+    },
+    {
+      "step_id": 5,
+      "progress": "progress",
+      "criteria": "continue"
+    },
+    {
+      "step_id": 6,
+      "progress": "progress",
+      "criteria": "continue"
+    },
+    {
+      "step_id": 7,
+      "progress": "stagnant",
+      "criteria": "continue"
+    },
+    {
+      "step_id": 8,
+      "progress": "stagnant",
+      "criteria": "continue"
+    },
+    {
+      "step_id": 9,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 10,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 11,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 12,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 13,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 14,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 15,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 16,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 17,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 18,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 19,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 20,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 21,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 22,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 23,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 24,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 25,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 26,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 27,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 28,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 29,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    },
+    {
+      "step_id": 30,
+      "progress": "stagnant",
+      "criteria": "deadlock"
+    }
+  ],
+  "p0_checks": {
+    "comparison_same_role": true,
+    "open_issue_events_by_step": {
+      "4": [
+        {
+          "metric": "conversation.open_issues_count",
+          "item": "requirements",
+          "kind": "closed"
+        }
+      ],
+      "5": [
+        {
+          "metric": "conversation.open_issues_count",
+          "item": "requirements",
+          "kind": "closed"
+        }
+      ],
+      "6": [
+        {
+          "metric": "conversation.open_issues_count",
+          "item": "requirements",
+          "kind": "closed"
+        }
+      ]
+    },
+    "failed_steps_sources": [],
+    "vocabulary_violations_total": 0,
+    "vocabulary_violation_steps": [],
+    "unlisted_issues_by_step": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": [],
+      "6": [],
+      "7": [],
+      "8": [],
+      "9": [],
+      "10": [],
+      "11": [],
+      "12": [],
+      "13": [],
+      "14": [],
+      "15": [],
+      "16": [],
+      "17": [],
+      "18": [],
+      "19": [],
+      "20": [],
+      "21": [],
+      "22": [],
+      "23": [],
+      "24": [],
+      "25": [],
+      "26": [],
+      "27": [],
+      "28": [],
+      "29": [],
+      "30": []
+    },
+    "judged_metrics": [
+      "artifact.files_changed",
+      "artifact.test_pass_count",
+      "conversation.open_issues_count"
+    ],
+    "info_items_recorded": {
+      "1": [
+        "Test summary: 16 tests run, 7 passed, 9 failed.",
+        "Open issues include status filter, search normalization, sorting, pagination validation, filtering order, requirements, and acceptance review.",
+        "SPEC.md still contains undecided sections; acceptance review not completed due to failing tests."
+      ],
+      "2": [
+        "Passed tests (7): test_all_statuses, test_default_hides_completed, test_does_not_mutate_inputs, test_done_filter, test_empty_collection, test_title_search, test_zero_limit.",
+        "Failed tests (9): test_negative_limit_rejected, test_negative_offset_rejected, test_nfkc_casefold_search, test_pagination_after_filtering, test_priority_sort, test_searches_description, test_stable_id_tiebreak, test_unknown_status_rejected, test_whitespace_normalization."
+      ],
+      "3": [
+        "7 passed, 9 failed"
+      ],
+      "4": [
+        "Test summary: 16 tests run, 7 passed, 9 failed.",
+        "SPEC.md now fully defines all acceptance criteria; no undecided sections remain.",
+        "Open issues: acceptance-review, status-filter, search-normalization, sort-order, pagination-validation, filtering-order."
+      ],
+      "5": [
+        "Passed tests (7): test_all_statuses, test_default_hides_completed, test_does_not_mutate_inputs, test_done_filter, test_empty_collection, test_title_search, test_zero_limit.",
+        "Failed tests (9): test_negative_limit_rejected, test_negative_offset_rejected, test_nfkc_casefold_search, test_pagination_after_filtering, test_priority_sort, test_searches_description, test_stable_id_tiebreak, test_unknown_status_rejected, test_whitespace_normalization."
+      ],
+      "6": [
+        "SPEC.md updated to fully define requirements",
+        "7 passed, 9 failed"
+      ],
+      "7": [
+        "Test summary: 16 tests run, 7 passed, 9 failed.",
+        "SPEC.md now fully defines all acceptance criteria; no undecided sections remain.",
+        "Open issues: acceptance-review, status-filter, search-normalization, sort-order, pagination-validation, filtering-order."
+      ],
+      "8": [
+        "Passed tests (7): test_all_statuses, test_default_hides_completed, test_does_not_mutate_inputs, test_done_filter, test_empty_collection, test_title_search, test_zero_limit.",
+        "Failed tests (9): test_negative_limit_rejected, test_negative_offset_rejected, test_nfkc_casefold_search, test_pagination_after_filtering, test_priority_sort, test_searches_description, test_stable_id_tiebreak, test_unknown_status_rejected, test_whitespace_normalization."
+      ],
+      "9": [
+        "SPEC.md updated to fully define requirements",
+        "7 passed, 9 failed"
+      ],
+      "10": [
+        "Test summary: 16 tests run, 7 passed, 9 failed.",
+        "SPEC.md now fully defines all acceptance criteria; no undecided sections remain.",
+        "Open issues: acceptance-review, status-filter, search-normalization, sort-order, filtering-order, pagination-validation."
+      ],
+      "11": [
+        "Passed tests (7): test_all_statuses, test_default_hides_completed, test_does_not_mutate_inputs, test_done_filter, test_empty_collection, test_title_search, test_zero_limit.",
+        "Failed tests (9): test_negative_limit_rejected, test_negative_offset_rejected, test_nfkc_casefold_search, test_pagination_after_filtering, test_priority_sort, test_searches_description, test_stable_id_tiebreak, test_unknown_status_rejected, test_whitespace_normalization."
+      ],
+      "12": [
+        "SPEC.md updated to fully define requirements",
+        "7 passed, 9 failed"
+      ],
+      "13": [
+        "Test summary: 16 tests run, 7 passed, 9 failed.",
+        "SPEC.md now fully defines all acceptance criteria; the 'requirements' issue is resolved.",
+        "Open issues: acceptance-review, status-filter, search-normalization, sort-order, filtering-order, pagination-validation."
+      ],
+      "14": [
+        "Passed tests (7): test_all_statuses, test_default_hides_completed, test_does_not_mutate_inputs, test_done_filter, test_empty_collection, test_title_search, test_zero_limit.",
+        "Failed tests (9): test_negative_limit_rejected, test_negative_offset_rejected, test_nfkc_casefold_search, test_pagination_after_filtering, test_priority_sort, test_searches_description, test_stable_id_tiebreak, test_unknown_status_rejected, test_whitespace_normalization."
+      ],
+      "15": [
+        "SPEC.md updated to fully define requirements",
+        "7 passed, 9 failed"
+      ],
+      "16": [
+        "Test summary: 16 tests run, 7 passed, 9 failed.",
+        "SPEC.md now fully defines all acceptance criteria; the 'requirements' issue is resolved.",
+        "Open issues: acceptance-review, status-filter, search-normalization, sort-order, filtering-order, pagination-validation."
+      ],
+      "17": [
+        "Passed tests (7): test_all_statuses, test_default_hides_completed, test_does_not_mutate_inputs, test_done_filter, test_empty_collection, test_title_search, test_zero_limit.",
+        "Failed tests (9): test_negative_limit_rejected, test_negative_offset_rejected, test_nfkc_casefold_search, test_pagination_after_filtering, test_priority_sort, test_searches_description, test_stable_id_tiebreak, test_unknown_status_rejected, test_whitespace_normalization."
+      ],
+      "18": [
+        "SPEC.md updated to fully define requirements",
+        "7 passed, 9 failed"
+      ],
+      "19": [
+        "Test summary: 16 tests run, 7 passed, 9 failed.",
+        "SPEC.md now fully defines all acceptance criteria; the 'requirements' issue is resolved.",
+        "Open issues: acceptance-review, status-filter, search-normalization, sort-order, filtering-order, pagination-validation."
+      ],
+      "20": [
+        "Passed tests (7): test_all_statuses, test_default_hides_completed, test_does_not_mutate_inputs, test_done_filter, test_empty_collection, test_title_search, test_zero_limit.",
+        "Failed tests (9): test_negative_limit_rejected, test_negative_offset_rejected, test_nfkc_casefold_search, test_pagination_after_filtering, test_priority_sort, test_searches_description, test_stable_id_tiebreak, test_unknown_status_rejected, test_whitespace_normalization."
+      ],
+      "21": [
+        "SPEC.md updated to fully define requirements",
+        "7 passed, 9 failed"
+      ],
+      "22": [
+        "Test summary: 16 tests run, 7 passed, 9 failed.",
+        "SPEC.md now fully defines all acceptance criteria; the 'requirements' issue is resolved.",
+        "Open issues: acceptance-review, status-filter, search-normalization, sort-order, filtering-order, pagination-validation."
+      ],
+      "23": [
+        "Passed tests (7): test_all_statuses, test_default_hides_completed, test_does_not_mutate_inputs, test_done_filter, test_empty_collection, test_title_search, test_zero_limit.",
+        "Failed tests (9): test_negative_limit_rejected, test_negative_offset_rejected, test_nfkc_casefold_search, test_pagination_after_filtering, test_priority_sort, test_searches_description, test_stable_id_tiebreak, test_unknown_status_rejected, test_whitespace_normalization."
+      ],
+      "24": [
+        "SPEC.md updated to fully define requirements",
+        "7 passed, 9 failed"
+      ],
+      "25": [
+        "Test summary: 16 tests run, 7 passed, 9 failed.",
+        "SPEC.md now fully defines all acceptance criteria; the 'requirements' issue is resolved.",
+        "Open issues: acceptance-review, status-filter, search-normalization, sort-order, filtering-order, pagination-validation."
+      ],
+      "26": [
+        "Passed tests (7): test_all_statuses, test_default_hides_completed, test_does_not_mutate_inputs, test_done_filter, test_empty_collection, test_title_search, test_zero_limit.",
+        "Failed tests (9): test_negative_limit_rejected, test_negative_offset_rejected, test_nfkc_casefold_search, test_pagination_after_filtering, test_priority_sort, test_searches_description, test_stable_id_tiebreak, test_unknown_status_rejected, test_whitespace_normalization."
+      ],
+      "27": [
+        "SPEC.md updated to fully define requirements",
+        "7 passed, 9 failed"
+      ],
+      "28": [
+        "Test summary: 16 tests run, 7 passed, 9 failed.",
+        "SPEC.md now fully defines all acceptance criteria; the 'requirements' issue is resolved.",
+        "Open issues: acceptance-review, status-filter, search-normalization, sort-order, filtering-order, pagination-validation."
+      ],
+      "29": [
+        "Passed tests (7): test_all_statuses, test_default_hides_completed, test_does_not_mutate_inputs, test_done_filter, test_empty_collection, test_title_search, test_zero_limit.",
+        "Failed tests (9): test_negative_limit_rejected, test_negative_offset_rejected, test_nfkc_casefold_search, test_pagination_after_filtering, test_priority_sort, test_searches_description, test_stable_id_tiebreak, test_unknown_status_rejected, test_whitespace_normalization."
+      ],
+      "30": [
+        "SPEC.md updated to fully define requirements",
+        "7 passed, 9 failed"
+      ]
+    },
+    "tool_execution_errors": [],
+    "shared_narrative_source": {
+      "parsed": 30
+    },
+    "unmeasured_due_to_missing_metric": []
+  },
+  "changed_conditions": [
+    "runner v9: reasoning high on all calls",
+    "max_tokens",
+    "max_steps"
+  ],
+  "interpretation": "one session each; no causal attribution; thought content neither emitted nor interpreted",
+  "validity_proposal": "unclassified",
+  "classification": "harness issue in final-report input; cause of developer repetition undetermined"
+}

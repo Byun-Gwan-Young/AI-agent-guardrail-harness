@@ -1,0 +1,243 @@
+{
+  "manifest_version": "session-manifest-v0.2-c14",
+  "session_id": "A-1-v4-e174aafe805b4f59bb62d7c95716b8b7",
+  "rerun_of": null,
+  "scenario": {
+    "id": "A-1-v4",
+    "hash": "a5fa3a2c422b9d452cc62918cb10752c42adaf0b913f7b4993e1df8233bbbbd6"
+  },
+  "code": {
+    "git_commit": null,
+    "criteria_version": "deadlock-v0.2",
+    "progress_version": "progress-v2",
+    "metrics_version": "metrics-v1"
+  },
+  "condition": {
+    "phase": "verify",
+    "temperature": 0.0,
+    "repeat_index": 1,
+    "max_steps": 30,
+    "max_llm_calls_per_step": 3,
+    "max_tokens": 16384,
+    "context_buffer_messages": 12,
+    "guardrail_mode": "observe",
+    "runner_protocol": "tool-capable-step-v9-reasoning-all-calls",
+    "reasoning_effort": {
+      "requested": "high",
+      "sent_on": "all_calls",
+      "applied": "probe_indicated",
+      "evidence": "runs/gateway-probes/gateway-probe-2a31f5fe5a6f479187dcc2670664042d/result.json",
+      "source": "conditions.json"
+    }
+  },
+  "model": {
+    "provider": "factchat.mindlogic-kr-api.com",
+    "name": "accounts/fireworks/models/gpt-oss-120b",
+    "upstream": {
+      "base_url_host": "factchat.mindlogic-kr-api.com",
+      "base_url": "https://factchat.mindlogic-kr-api.com/v1/gateway",
+      "chat_path": "/chat/completions/",
+      "api_key_env": "KMU_API_KEY",
+      "config_file": "guardrail-deadlock-v0.2-kmu.yaml"
+    }
+  },
+  "seed": {
+    "value": null,
+    "status": "unverified"
+  },
+  "run": {
+    "started_at": "2026-09-22T00:13:45.621870+00:00",
+    "ended_at": "2026-09-22T00:23:19.970249+00:00",
+    "termination_reason": "max_steps",
+    "steps_reached": 30
+  },
+  "tokens": {
+    "known_prompt": 444636,
+    "known_completion": 106866,
+    "known_total": 551502,
+    "usage_missing_turns": 0,
+    "total": 551502,
+    "total_status": "measured"
+  },
+  "judgement": {
+    "before": {
+      "tests_passed": 7
+    },
+    "after": {
+      "tests_passed": 7,
+      "gate": {
+        "machine_success": false,
+        "test_suite_unchanged": true,
+        "test_suite_id": "sha256:5d3df95aa74fed10e8c3cfc34390d5394e994bef6741960a5804db6f27dfff9b",
+        "pinned_test_suite_id": "sha256:5d3df95aa74fed10e8c3cfc34390d5394e994bef6741960a5804db6f27dfff9b",
+        "reason": "tests_not_passed"
+      }
+    },
+    "normal_session": false
+  },
+  "guardrail": {
+    "virtual_decisions": [
+      {
+        "step_id": 1,
+        "progress": "baseline",
+        "criteria": "continue"
+      },
+      {
+        "step_id": 2,
+        "progress": "baseline",
+        "criteria": "continue"
+      },
+      {
+        "step_id": 3,
+        "progress": "baseline",
+        "criteria": "continue"
+      },
+      {
+        "step_id": 4,
+        "progress": "progress",
+        "criteria": "continue"
+      },
+      {
+        "step_id": 5,
+        "progress": "progress",
+        "criteria": "continue"
+      },
+      {
+        "step_id": 6,
+        "progress": "progress",
+        "criteria": "continue"
+      },
+      {
+        "step_id": 7,
+        "progress": "stagnant",
+        "criteria": "continue"
+      },
+      {
+        "step_id": 8,
+        "progress": "stagnant",
+        "criteria": "continue"
+      },
+      {
+        "step_id": 9,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 10,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 11,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 12,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 13,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 14,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 15,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 16,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 17,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 18,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 19,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 20,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 21,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 22,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 23,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 24,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 25,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 26,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 27,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 28,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 29,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      },
+      {
+        "step_id": 30,
+        "progress": "stagnant",
+        "criteria": "deadlock"
+      }
+    ],
+    "first_stop_step": 9
+  },
+  "validity": {
+    "class": "unclassified",
+    "reason": "PM review pending: reasoning serialized into final reporting input; behavioral causality unmeasured",
+    "decided_by": null
+  },
+  "notes": [
+    "A-1-v4 재검증, 게이트웨이 크레딧, 데이터셋 아님",
+    "Validity pending PM review of AssistantMessage.thought serialization; no causal attribution",
+    "git_commit is null: the runner does not record the code commit"
+  ]
+}

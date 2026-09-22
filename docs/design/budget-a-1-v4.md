@@ -1,6 +1,6 @@
-# A-1-v4 (프로토콜 v9) 크레딧 재계산 — **추정**
+# A-1-v4 (프로토콜 v9) 크레딧 — C-13 추정과 C-14 실측
 
-- C-13 파트 3. **이 문서의 모든 크레딧 값은 추정이다.** 확정은 A-1-v4 재검증 1회 실측으로 한다
+- C-13 파트 3. **아래 C-13 표의 크레딧은 당시 추정이다.** C-14 실측 보정은 문서 끝에서 구분한다
 - 계산 : [budget_v9.py](budget_v9.py) → [budget-v9.json](budget-v9.json). 아래 숫자는 그 출력이다
 
 ## 입력 (측정값)
@@ -44,3 +44,43 @@ C-12 설계안의 추정(30 step 109.6 ~ 159.7)과 상한이 다른 이유 : C-1
 
 - 제외 : D-32 교차검증 모델 (가격·조건은 그 모델 probe 후에 안다)
 - 월 5,000 크레딧 기준으로 본 수집은 하한에서도 1 개월을 넘는다. 충전 규모는 A-1-v4 재검증 실측 후 이 스크립트 입력을 실측값으로 바꿔 다시 계산한다
+
+<!-- C14 measured update -->
+## C-14 실측 보정
+
+계산: tools/analyze_c14.py --update-budget. 사용자 기록 monthly_allocated.used 차이이며 동시 다른 사용 여부는 사용자 확인 사항이다.
+
+```json
+{
+  "session_id": "A-1-v4-e174aafe805b4f59bb62d7c95716b8b7",
+  "steps": 30,
+  "calls": 74,
+  "credits": "130.81500",
+  "credits_per_call": "1.767770270270270270270270270",
+  "wall_seconds": 574.348379,
+  "known_tokens": 551502,
+  "previous_estimate": {
+    "steps": 30,
+    "calls": [
+      77,
+      90
+    ],
+    "credits": [
+      110.0,
+      219.1
+    ]
+  },
+  "new_population_range": {
+    "value": null,
+    "status": "unmeasured",
+    "reason": "one verification session is not a population range"
+  },
+  "pilot_and_main_revised_range": {
+    "value": null,
+    "status": "unmeasured",
+    "reason": "other scenarios and repeated v4 sessions unmeasured"
+  }
+}
+```
+
+추론 내용이 다음 호출에 들어가지 않는다는 C-13 가정은 최종 보고 요청에서 성립하지 않았다. 따라서 과거 범위는 검증된 상·하한으로 사용하지 않는다. 위 실측은 이 세션의 점 관측이며 새 비용 범위를 추정해서 채우지 않는다. 기존 파일럿·본 수집 표는 과거 추정으로 보존하고 갱신 범위는 null/unmeasured로 둔다.
