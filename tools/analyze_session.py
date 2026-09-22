@@ -7,6 +7,7 @@ derived stay null with a reason. Writes one analysis JSON and one session manife
 import argparse
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import re
@@ -15,7 +16,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from experiments.step_execution import PROTOCOL_V8, PROTOCOL_V9
+from experiments.step_execution import PROTOCOL_V8, PROTOCOL_V9, PROTOCOL_V10
 from scenario_schema import load_scenario
 
 STOP_DECISIONS = ('deadlock', 'termination_failure')
@@ -351,9 +352,82 @@ def reasoning_effort(session_id):
             'source': 'request bodies in the proxy log (conditions.json predates this field)'}
 
 
+# USD per 1M tokens, per model. 1 credit = $0.001 on the gateway (C-11: exact match with the recorded usage).
+PRICE_PER_M = {'accounts/fireworks/models/gpt-oss-120b': {'prompt': 0.15, 'completion': 0.60}}
+METRICS_VERSION = 'metrics-v1'
+
+
+def judgement_time(observations):
+    """S-5 summary of per-step judgement_ns; p99 is the nearest-rank value, as in metrics-v1."""
+    values = sorted(o['judgement_ns'] for o in observations if isinstance(o.get('judgement_ns'), int))
+    if not values:
+        return {'status': 'unmeasured', 'n': 0, 'p50_ms': None, 'p99_ms': None, 'max_ms': None,
+                'reason': 'no judgement_ns in the observations'}
+    return {'status': 'measured', 'n': len(values), 'steps_without_value': len(observations) - len(values),
+            'p50_ms': statistics.median(values) / 1e6,
+            'p99_ms': values[max(0, math.ceil(0.99 * len(values)) - 1)] / 1e6, 'max_ms': values[-1] / 1e6}
+
+
+def session_credits(model, token_counts):
+    price = PRICE_PER_M.get(model)
+    if price is None:
+        return {'status': 'unmeasured', 'value': None, 'reason': 'no price recorded for this model'}
+    if token_counts['total_status'] != 'measured':
+        return {'status': 'unmeasured', 'value': None, 'reason': 'usage missing on some turns',
+                'known_value': round((token_counts['known_prompt'] * price['prompt'] + token_counts['known_completion']
+                                      * price['completion']) / 1e6 * 1000, 5)}
+    return {'status': 'measured', 'value': round((token_counts['known_prompt'] * price['prompt']
+                                                  + token_counts['known_completion'] * price['completion'])
+                                                 / 1e6 * 1000, 5),
+            'basis': 'tokens x price per 1M x 1000 (S-12); not a /credits/ reading', 'price_per_1m_usd': price}
+
+
+def validity_evidence(a):
+    """Log facts behind a validity proposal (S-9). The class itself stays with the PM."""
+    rows = a['steps']
+    return {'isolation_ok': all(a['isolation'][k] for k in ('log_session_id_matches', 'runner_session_id_matches',
+                                                            'every_turn_linked_once'))
+                            and not a['isolation']['conditions_mixed'],
+            'termination_reason': a['termination']['reason'],
+            'http_error_codes': [e['code'] or e['status'] for e in a['g0_7']['http_errors']],
+            'http_429_turns': a['d_10']['http_429_turns'],
+            'finish_reason_length': a['g0_7']['finish_reason_counts'].get('length', 0),
+            'tool_execution_errors': sum(len(r['tool_execution_errors']) for r in rows),
+            'edit_attempts_outside_writable_paths': sum(len(r['edit_attempts_outside_writable_paths']) for r in rows),
+            'unmeasured_steps': sum(r['criteria_decision'] == 'unmeasured' for r in rows)}
+
+
+def v03_fields(result, a, conditions, observations):
+    """session-manifest-v0.3 (S-8, S-1, S-23) for sessions whose runner recorded the Git state."""
+    result['manifest_version'] = 'session-manifest-v0.3'
+    result['scenario'].pop('version', None)
+    result['code'].update(git_commit=conditions.get('git_commit'), git_dirty=conditions.get('git_dirty'),
+                          git_state_status=conditions.get('git_state_status'), metrics_version=METRICS_VERSION)
+    result['condition'].update(runner_protocol=conditions.get('runner_protocol'),
+                               reasoning_effort={**(conditions.get('reasoning_effort') or {}),
+                                                 'source': 'conditions.json'} if conditions.get('reasoning_effort')
+                               else None,
+                               dataset_run=conditions.get('dataset_run'))
+    result['run']['parallel_group'] = conditions.get('parallel_group')
+    result['judgement']['normal_session'] = a['termination']['reason'] == 'success'
+    result['judgement']['normal_session_rule'] = 'S-1: all acceptance tests pass and completion declared'
+    result['judgement_time'] = judgement_time(observations)
+    result['credits'] = session_credits(a['meta']['model'], a['tokens'])
+    result['replay'] = {'status': 'unmeasured', 'reason': 'multi-rule offline replay (S-6) is scheduled for C-16'}
+    result['validity']['evidence'] = validity_evidence(a)
+    result['notes'] = [n for n in result['notes'] if not n.startswith('git_commit is null')
+                       or not conditions.get('git_commit')]
+    return result
+
+
 def manifest(a, phase, notes):
     result = base_manifest(a, phase, notes)
-    if a['conditions']['runner_protocol'] in (PROTOCOL_V8, PROTOCOL_V9):
+    conditions = load(ROOT / 'runs' / a['session_id'] / 'conditions.json')
+    if 'git_state_status' in conditions:
+        # v0.3 only for sessions recorded by the Git-aware runner; earlier manifests are never rewritten.
+        observations = load(ROOT / 'logs' / f"{a['session_id']}.json")['observations']
+        return v03_fields(result, a, conditions, observations)
+    if a['conditions']['runner_protocol'] in (PROTOCOL_V8, PROTOCOL_V9, PROTOCOL_V10):
         # v0.2 adds condition.runner_protocol and condition.reasoning_effort; v7 sessions keep v0.1 unchanged.
         result['manifest_version'] = 'session-manifest-v0.2'
         result['condition'].update(runner_protocol=a['conditions']['runner_protocol'],
