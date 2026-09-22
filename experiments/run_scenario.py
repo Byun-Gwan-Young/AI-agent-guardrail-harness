@@ -59,8 +59,10 @@ def git_state(root=ROOT):
 
 
 def enforce_dataset_clean(dataset_run, state):
-    if dataset_run and state['git_dirty'] is True:
-        raise ValueError('--dataset-run requires a clean Git working tree')
+    # S-7: a dataset session must prove its code, so an unknown checkout is refused like a dirty one.
+    if dataset_run and state['git_dirty'] is not False:
+        raise ValueError('--dataset-run requires a clean Git working tree'
+                         + (' (Git state unmeasured)' if state['git_dirty'] is None else ''))
 
 
 def safe_path(root, relative):
@@ -316,6 +318,10 @@ async def run(args):
     if compute_test_suite_id(source, suite.test_roots, suite.contract_files, suite.command) != suite.test_suite_id:
         raise ValueError('Original fixture does not match the approved suite ID')
     original = fingerprint(source)
+    # Checked before the run directory exists, so a refused dataset run leaves nothing behind.
+    repository_state = git_state()
+    dataset_run = bool(getattr(args, 'dataset_run', False))
+    enforce_dataset_clean(dataset_run, repository_state)
     session_id = scenario.scenario_id + '-' + uuid.uuid4().hex
     out = args.output_root.resolve() / session_id
     if out.is_relative_to(source):
@@ -331,9 +337,6 @@ async def run(args):
         raise ValueError('Context buffer must be positive')
     if args.seed_probe is not None and scenario.seed_support != 'unverified':
         raise ValueError('--seed-probe is only for unverified support')
-    repository_state = git_state()
-    dataset_run = bool(getattr(args, 'dataset_run', False))
-    enforce_dataset_clean(dataset_run, repository_state)
     versions = {p: version(p) for p in ('autogen-agentchat', 'autogen-core', 'autogen-ext', 'openai')}
     save(out / 'conditions.json', {'scenario': scenario.model_dump(), 'temperature': temperature,
          'versions': versions, 'fixture_hashes': original, 'actual_outcome': None,

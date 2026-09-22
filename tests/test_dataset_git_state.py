@@ -25,3 +25,10 @@ class GitStateTests(unittest.TestCase):
         enforce_dataset_clean(False, dirty)
         with self.assertRaisesRegex(ValueError, 'clean Git working tree'):
             enforce_dataset_clean(True, dirty)
+        enforce_dataset_clean(True, {'git_dirty': False})
+
+    def test_unmeasured_git_state_blocks_only_dataset_runs(self):
+        unknown = {'git_dirty': None}
+        enforce_dataset_clean(False, unknown)
+        with self.assertRaisesRegex(ValueError, 'Git state unmeasured'):
+            enforce_dataset_clean(True, unknown)
