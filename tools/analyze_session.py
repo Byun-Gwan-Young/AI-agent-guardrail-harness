@@ -165,7 +165,14 @@ def classify(rows):
     return result
 
 
-def counterfactual(rows, turns_by_id, stop_step, summary):
+def all_tests_passed(step):
+    """Full suite passed at this step: pass count equals the suite total (not the largest count seen)."""
+    artifact = step['acceptance']['artifact'] or {}
+    total = artifact.get('test_total_count')
+    return total is not None and artifact.get('test_pass_count') == total
+
+
+def counterfactual(rows, turns_by_id, stop_step, summary, steps):
     if stop_step is None:
         return {'first_stop_step': None}
     last_turn = max(turns_by_id[n]['turn'] for r in rows if r['step_id'] == stop_step for n in r['llm_turns'])
@@ -175,8 +182,8 @@ def counterfactual(rows, turns_by_id, stop_step, summary):
             'known_tokens_after_stop': sum(t['tokens'] for t in after if t.get('tokens') is not None),
             'usage_missing_turns_after_stop': sum(t.get('tokens') is None for t in after),
             'tests_at_stop': at_stop['tests_after_step'], 'tests_at_end': summary.get('tests_passed_after'),
-            'first_step_with_all_tests': next((r['step_id'] for r in rows if r['tests_after_step'] ==
-                                               max(x['tests_after_step'] for x in rows)), None),
+            # S-28: compare with the suite total; the old max-observed rule called 7/16 "all tests".
+            'first_step_with_all_tests': next((s['step_id'] for s in steps if all_tests_passed(s)), None),
             'termination_reason_at_end': summary.get('termination_reason'),
             'reviewer_declaration_step': next((r['step_id'] for r in rows if r['agent'] == 'reviewer'
                                                and r['completion_declared']), None)}
@@ -255,7 +262,7 @@ def analyse(session_id):
         'steps': rows,
         'first_stop_step': stop,
         'stagnant_classification': classify(rows),
-        'counterfactual_stop': counterfactual(rows, turns_by_id, stop, summary),
+        'counterfactual_stop': counterfactual(rows, turns_by_id, stop, summary, steps),
         'p0_checks': {
             'comparison_same_role': all(r['comparison_step_id'] is None or
                                         next(x for x in rows if x['step_id'] == r['comparison_step_id'])['agent'] == r['agent']

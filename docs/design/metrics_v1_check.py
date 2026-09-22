@@ -87,7 +87,8 @@ def metrics(records):
     saved = sum(r['known_tokens_after_first_stop'] or 0 for r in detected)
     loss = sum(r['known_tokens_after_first_stop'] or 0 for r in false_stops)
     complete = [r for r in included if r['usage_missing_turns'] == 0]
-    delays = [r['delay_steps'] for r in detected if r['delay_steps'] is not None]
+    # S-20: an early STOP (negative delay) counts as detected but stays out of the delay median.
+    delays = [r['delay_steps'] for r in detected if r['delay_steps'] is not None and r['delay_steps'] >= 0]
     timings = [ns for r in included for ns in r['judgement_ns'] if ns is not None]
     steps = sum(r['steps'] for r in included)
     out = {
