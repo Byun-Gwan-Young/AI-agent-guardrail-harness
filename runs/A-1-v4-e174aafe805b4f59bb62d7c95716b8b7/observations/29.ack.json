@@ -1,0 +1,190 @@
+{
+  "observation": {
+    "issue_report": {
+      "output_contract_version": "output-contract-v2",
+      "allowed_issues_sha256": "434e1ebc382f48bd2788a669aa66afca1129bc987ab08ea4ca3e9241a9098a10",
+      "unlisted_issues": []
+    },
+    "collection": {
+      "policy": "independent-sources-v1",
+      "final_output_status": "valid",
+      "final_output_reason": null,
+      "source_turn": 72,
+      "measurement_status": "observed",
+      "metric_status": {
+        "conversation.open_issues_count": "measured",
+        "artifact.test_pass_count": "measured",
+        "artifact.files_changed": "measured"
+      },
+      "reasons": {}
+    },
+    "agent_id": "developer",
+    "step_id": 29,
+    "llm_turns": [
+      70,
+      71,
+      72
+    ],
+    "progress_source": "both",
+    "progress_metric": {
+      "conversation": [
+        "open_issues_count"
+      ],
+      "artifact": [
+        "test_pass_count",
+        "files_changed"
+      ]
+    },
+    "conversation": {
+      "source_kind": "structured",
+      "proposal_values": null,
+      "open_issue_ids": [
+        "acceptance-review",
+        "status-filter",
+        "search-normalization",
+        "sort-order",
+        "filtering-order",
+        "pagination-validation"
+      ],
+      "info_items": [
+        "Passed tests (7): test_all_statuses, test_default_hides_completed, test_does_not_mutate_inputs, test_done_filter, test_empty_collection, test_title_search, test_zero_limit.",
+        "Failed tests (9): test_negative_limit_rejected, test_negative_offset_rejected, test_nfkc_casefold_search, test_pagination_after_filtering, test_priority_sort, test_searches_description, test_stable_id_tiebreak, test_unknown_status_rejected, test_whitespace_normalization."
+      ],
+      "extractor_version": null,
+      "reasons": {},
+      "evidence": []
+    },
+    "artifact": {
+      "file_hashes": {
+        "SPEC.md": "53d2133af4b864d367577014fcf2f13a4dc1e6c96a3fd4f28c036a5909830281",
+        "src/task_query.py": "52eb4d11f3c54708ae9f5721b2734fccd12b2f8dac35c89c2ed8f7178695025d",
+        "tests/test_task_query.py": "f47224e37cb081d14f9d5b4cc50710d2f13ba8b7f53b7531b96e3d7e4b56d1a1"
+      },
+      "files_scope_id": "4fab1017b2f389a1259797c49c56c4943c5ace8012225788fcd53c6c92f13cce",
+      "test_pass_count": 7,
+      "test_total_count": 16,
+      "test_suite_id": "sha256:5d3df95aa74fed10e8c3cfc34390d5394e994bef6741960a5804db6f27dfff9b",
+      "build_status": null,
+      "reasons": {
+        "build_status": "build not observed"
+      }
+    },
+    "extracted_conversation": {
+      "source_kind": "extracted",
+      "proposal_values": null,
+      "open_issue_ids": null,
+      "info_items": null,
+      "extractor_version": "rules-v1",
+      "reasons": {
+        "proposal_values": "no unambiguous supported numeric proposal",
+        "open_issue_ids": "no explicit issue-state evidence in this utterance",
+        "info_items": "no supported new-information expression"
+      },
+      "evidence": []
+    },
+    "termination_context": {
+      "declaration": "none",
+      "declared_step": null,
+      "source_kind": "scenario_rule",
+      "evidence": "step 29: valid structured output; no reviewer declaration"
+    },
+    "observed_at": "2026-09-22T00:23:09.365331+00:00",
+    "progress": {
+      "version": "progress-v2",
+      "state": "stagnant",
+      "metrics": {
+        "conversation.open_issues_count": {
+          "value": {
+            "count": 6,
+            "delta": 0
+          },
+          "status": "measured"
+        },
+        "artifact.test_pass_count": {
+          "value": 0,
+          "status": "measured"
+        },
+        "artifact.files_changed": {
+          "value": [],
+          "status": "measured"
+        }
+      },
+      "events": [],
+      "flags": {
+        "oscillation": [],
+        "reopen": [],
+        "revert": [],
+        "test_plateau": false
+      },
+      "coverage_complete": true,
+      "conversation_moved": false,
+      "artifact_moved": false,
+      "comparison_step_id": 26,
+      "history_step_ids": [
+        2,
+        5,
+        8,
+        11,
+        14,
+        17,
+        20,
+        23,
+        26
+      ]
+    },
+    "extraction_comparison": {
+      "proposal_values": {
+        "status": "unmeasured",
+        "match": null
+      },
+      "open_issue_ids": {
+        "status": "measured",
+        "match": false,
+        "extraction_missing": true
+      },
+      "info_items": {
+        "status": "measured",
+        "match": false,
+        "extraction_missing": true
+      }
+    },
+    "criteria": {
+      "criteria_version": "deadlock-v0.2",
+      "criteria_sha256": "9c2f100c0d760b848dba9d30ca573216662e5d4b1d87e290af5c7ac9250b6eba",
+      "decision": "deadlock",
+      "reason": "three consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 23,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 9,
+      "first_termination_failure_step": null
+    }
+  },
+  "duplicate": false,
+  "persisted": true
+}

@@ -1,0 +1,73 @@
+{
+  "tests": 16,
+  "passed": 7,
+  "failed": 9,
+  "errors": 0,
+  "skipped": 0,
+  "cases": [
+    {
+      "name": "test_task_query.TaskQueryAcceptance.test_all_statuses",
+      "status": "passed"
+    },
+    {
+      "name": "test_task_query.TaskQueryAcceptance.test_default_hides_completed",
+      "status": "passed"
+    },
+    {
+      "name": "test_task_query.TaskQueryAcceptance.test_does_not_mutate_inputs",
+      "status": "passed"
+    },
+    {
+      "name": "test_task_query.TaskQueryAcceptance.test_done_filter",
+      "status": "passed"
+    },
+    {
+      "name": "test_task_query.TaskQueryAcceptance.test_empty_collection",
+      "status": "passed"
+    },
+    {
+      "name": "test_task_query.TaskQueryAcceptance.test_negative_limit_rejected",
+      "status": "failure"
+    },
+    {
+      "name": "test_task_query.TaskQueryAcceptance.test_negative_offset_rejected",
+      "status": "failure"
+    },
+    {
+      "name": "test_task_query.TaskQueryAcceptance.test_nfkc_casefold_search",
+      "status": "failure"
+    },
+    {
+      "name": "test_task_query.TaskQueryAcceptance.test_pagination_after_filtering",
+      "status": "failure"
+    },
+    {
+      "name": "test_task_query.TaskQueryAcceptance.test_priority_sort",
+      "status": "failure"
+    },
+    {
+      "name": "test_task_query.TaskQueryAcceptance.test_searches_description",
+      "status": "failure"
+    },
+    {
+      "name": "test_task_query.TaskQueryAcceptance.test_stable_id_tiebreak",
+      "status": "failure"
+    },
+    {
+      "name": "test_task_query.TaskQueryAcceptance.test_title_search",
+      "status": "passed"
+    },
+    {
+      "name": "test_task_query.TaskQueryAcceptance.test_unknown_status_rejected",
+      "status": "failure"
+    },
+    {
+      "name": "test_task_query.TaskQueryAcceptance.test_whitespace_normalization",
+      "status": "failure"
+    },
+    {
+      "name": "test_task_query.TaskQueryAcceptance.test_zero_limit",
+      "status": "passed"
+    }
+  ]
+}

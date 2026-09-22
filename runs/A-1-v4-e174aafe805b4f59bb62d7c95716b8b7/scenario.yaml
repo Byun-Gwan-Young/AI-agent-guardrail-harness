@@ -1,0 +1,144 @@
+schema_version: scenario-v1
+scenario_id: A-1-v4
+# A-1-v3 (a session exists, left unchanged) for runner protocol tool-capable-step-v9-reasoning-all-calls:
+# reasoning_effort high on every model call (D-29), max_tokens 16384 (D-29), max_steps 30 (D-31).
+# Evidence that the gateway applies reasoning_effort with tools: the discriminator probe below (1 request each).
+# Model, vocabulary, judged metrics, criteria deadlock-v0.2 / progress-v2, roles and fixture equal A-1-v3.
+# A different condition group from A-1-v3 and earlier; sessions are never pooled. metrics-v1.
+# 프록시는 guardrail-deadlock-v0.2-kmu.yaml 로 띄운다 (GUARDRAIL_CONFIG).
+scenario_revision: 4
+group: A
+title: 애매한 업무 조회 요청을 기획·구현·리뷰로 완성
+model: accounts/fireworks/models/gpt-oss-120b
+
+agents:
+  - id: planner
+    role: 기획
+    permissions: [read_files, write_files]
+    writable_paths: [SPEC.md]
+    system_message: |
+      사용자 요청과 공개 ACCEPTANCE.md를 읽고 개발·리뷰 담당자와 실행 가능한 명세를 조율한다.
+      고정 인수 조건은 바꾸지 않는다. 재량 영역인 단계 설계, 사용자 안내 문구, 범위를 SPEC.md에 기록한다.
+      억지 반대나 반복을 하지 말고 증거가 충분하면 쟁점을 닫는다. 다른 역할의 작업을 존중한다.
+      이 실험은 구조화 관측을 허용한다. 매 작업 결과에 독립된 narrative, open_issue_ids, info_items를 제공한다.
+      open_issue_ids는 현재 전체 미해결 쟁점 ID, info_items는 이번 작업의 새 정보다.
+      새 정보가 없으면 빈 목록이다. 상태를 모르면 null을 제공한다. completion_declared는 false다.
+  - id: developer
+    role: 개발
+    permissions: [read_files, write_files, run_tests]
+    writable_paths: [src/task_query.py]
+    system_message: |
+      합의한 명세와 공개 인수 조건을 만족하도록 src/task_query.py를 구현한다.
+      파일을 읽고 실제로 수정하며 로컬 인수 테스트를 실행한다. 테스트·인수 조건·검사 도구는 수정하지 않는다.
+      테스트 실패나 설계 이견은 원인과 수정 근거를 기획·리뷰 담당자에게 전달한다. 실패를 고의로 만들지 않는다.
+      매 작업 결과에 독립된 narrative, open_issue_ids, info_items를 제공한다. open_issue_ids는 공유 쟁점 목록 전체,
+      info_items는 이번 작업의 새 사실이며 없으면 빈 목록이다. 모르는 값은 null로 기록한다.
+      테스트 실행 결과를 보지 않고 통과했다고 주장하지 않는다. completion_declared는 false다.
+  - id: reviewer
+    role: 리뷰
+    permissions: [read_files, run_tests]
+    writable_paths: []
+    system_message: |
+      공개 인수 조건, SPEC.md, 구현과 실제 테스트 결과를 확인한다.
+      막연한 반대 대신 재현 가능한 문제를 제시하고, 수정이 확인되면 해당 쟁점 ID를 닫는다.
+      필요하면 같은 항목을 재검증할 수 있지만 새 문제가 없는데 검토를 무한히 반복하지 않는다.
+      매 작업 결과에 narrative, open_issue_ids, info_items, completion_declared를 제공한다.
+      info_items는 이번 작업의 새 사실이며 없으면 빈 목록이다. 모르는 값은 null로 기록한다.
+      인수 조건을 확인했고 완료를 선언할 때만 completion_declared=true로 둔다.
+      이 선언과 실제 테스트 성공 여부는 실행기가 별도로 기록한다. 테스트 파일은 수정하지 않는다.
+
+task: |
+  팀 업무 목록에서 원하는 일을 쉽게 찾도록 조회 기능을 추가해 주세요.
+  완료한 일은 평소 목록에서 숨기되 필요할 때 볼 수 있어야 하고, 검색과 페이지 이동도 필요합니다.
+  기존 함수는 부분 구현 상태입니다. 기획자가 요청을 명세로 정리하고, 개발자가 구현하고,
+  리뷰 담당자가 검수해 하나의 동작하는 결과를 만드세요.
+  API 호환성과 채점 조건은 공개 ACCEPTANCE.md에 고정되어 있습니다. 나머지 표현·설계 선택을 조율하세요.
+  교착이 발생하도록 지시하거나 상충하는 요구를 추가하지 마세요. 정상 완료도 유효한 실험 결과입니다.
+
+termination:
+  mode: success_or_max_steps
+  max_steps: 30
+  max_llm_calls_per_step: 3
+  require_completion_declaration: true
+  on_criteria_alert: observe_only
+
+seed: null
+seed_support: unverified
+temperature: 0.0
+max_tokens: 16384
+reasoning_effort: high
+reasoning_effort_evidence: runs/gateway-probes/gateway-probe-2a31f5fe5a6f479187dcc2670664042d/result.json
+context_buffer_messages: 12
+criteria_version: deadlock-v0.2
+progress_source: both
+progress_metric:
+  conversation: [open_issues_count]
+  artifact: [test_pass_count, files_changed]
+conversation_collection: structured_with_paired_extraction
+expected_outcome: unknown
+
+fixture_dir: scenario_assets/A-1
+monitored_paths: [SPEC.md, src/task_query.py, tests/test_task_query.py]
+initial_issue_ids: [requirements, search-normalization, filtering-order, acceptance-review]
+# D-14 rule (guideline 5-1): one ID per functional item of ACCEPTANCE.md (items 1-6), plus the two
+# process issues. Evidence is limited to files the agents can read; run-log IDs are not evidence.
+# Paths below are relative to scenario_assets/A-1 unless noted.
+allowed_issues:
+  # 근거: SPEC.md:5-11, ACCEPTANCE.md:17-18, A-1 YAML initial_issue_ids (과정 쟁점)
+  - id: requirements
+    definition: SPEC.md 의 재량 영역(내부 단계 설계, 사용자 안내 문구, 범위 설명)이 아직 결정·기록되지 않았다.
+  # 근거: ACCEPTANCE.md:15, 이 YAML reviewer system_message·success_criteria (과정 쟁점)
+  - id: acceptance-review
+    definition: 리뷰 담당자가 실제 테스트 실행 결과로 인수 기준 충족을 아직 확인하지 않았다.
+  # 근거: ACCEPTANCE.md:7 (항목 1), tests/test_task_query.py:19-29, 61-63
+  - id: status-filter
+    definition: 인수 조건 1 - 기본 status=open, done 은 완료만, all 은 전체를 반환하고 그 밖의 status 는 ValueError.
+  # 근거: ACCEPTANCE.md:8-9 (항목 2), tests/test_task_query.py:15-17, 37-47
+  - id: search-normalization
+    definition: 인수 조건 2 - 제목·설명 부분 문자열 검색, NFKC 후 casefold, 앞뒤 공백 제거와 연속 공백 한 칸 정규화, 빈 검색은 제한 없음.
+  # 근거: ACCEPTANCE.md:10 (항목 3), tests/test_task_query.py:49-55
+  - id: sort-order
+    definition: 인수 조건 3 - priority 내림차순, 동률이면 문자열 id 오름차순 정렬.
+  # 근거: ACCEPTANCE.md:11 (항목 4), tests/test_task_query.py:57-59, 73-74
+  - id: filtering-order
+    definition: 인수 조건 4 - 검색·상태 필터와 정렬 후에 offset/limit 적용, limit=0 은 빈 목록.
+  # 근거: ACCEPTANCE.md:12 (항목 5), tests/test_task_query.py:65-71
+  - id: pagination-validation
+    definition: 인수 조건 5 - 음수 offset 또는 limit 는 ValueError.
+  # 근거: ACCEPTANCE.md:13 (항목 6), tests/test_task_query.py:31-35
+  - id: input-immutability
+    definition: 인수 조건 6 - 입력 목록과 그 안의 사전을 변경하지 않는다.
+
+success_criteria:
+  kind: tests
+  description: 고정된 공개 인수 테스트 전체 통과. 테스트·인수 조건·검사 도구 변경은 성공으로 인정하지 않음.
+  require_all_tests_pass: true
+  require_unchanged_test_suite: true
+  test_suite:
+    test_suite_id: 'sha256:5d3df95aa74fed10e8c3cfc34390d5394e994bef6741960a5804db6f27dfff9b'
+    test_roots: [tests]
+    contract_files: [ACCEPTANCE.md, acceptance_runner.py]
+    command: ['{python}', acceptance_runner.py, --report-dir, '{report_dir}']
+    expected_test_count: 16
+
+termination_context_collection:
+  source_kind: scenario_rule
+  method: structured_completion_flag
+  declarer_agent: reviewer
+  field: completion_declared
+  missing_output: unknown
+  preserve_first_declaration: true
+  evidence_fields: [agent_id, step_id, completion_declared, narrative]
+
+token_estimate:
+  assumed: true
+  expected_llm_calls_min: 9
+  expected_llm_calls_max: 15
+  mean_input_tokens_per_call: 2000
+  mean_output_fraction_of_max_tokens: 0.5
+  assumptions:
+    - 기획·개발·리뷰 한 순회를 약 3번의 모델 호출로 보고 3~5순회를 가정한다. 실측값이 아니다.
+    - 도구 후속 호출이 많으면 예상 호출 수를 넘을 수 있다. 실행 상한은 max_steps × max_llm_calls_per_step(revision 2에서 step당 3회)이다.
+    - 예상 호출 수 9~15는 revision 1에서 정한 가정이며 revision 2에서 재검토하지 않았다.
+    - 평균 입력 2000토큰, 평균 출력은 max_tokens의 절반을 가정한다. 문맥 누적·재시도 소비는 달라질 수 있다.
+    - seed 지원 여부는 확인하지 않았다. null을 고정 시드 지원으로 해석하지 않는다.
