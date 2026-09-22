@@ -21,7 +21,7 @@ from scenario_schema import load_scenario
 from scenario_checks import check_acceptance
 from suite_identity import compute_test_suite_id
 from experiments.step_execution import (FINAL_REASONING_EFFORT, NO_OUTPUT_PLACEHOLDER, PROTOCOL_V7, PROTOCOL_V8,
-                                        PROTOCOL_V9, edit_instructions, harness_facts, make_client, perform_step,
+                                        PROTOCOL_V9, PROTOCOL_V10, edit_instructions, harness_facts, make_client, perform_step,
                                         tool_instructions)
 from experiments.output_contract import AgentOutput, parse_output
 from experiments.issue_contract import (IssueContract, V1, V2, VERSIONS, PROTOCOL_V2, VOCABULARY_VIOLATIONS,
@@ -74,9 +74,10 @@ def prompt_trace(steps, session):
 
 
 class CallBudget:
-    def __init__(self, limit, contract=None, all_calls_reasoning_effort=None):
+    def __init__(self, limit, contract=None, all_calls_reasoning_effort=None, final_report_allowlist=False):
         self.contract = contract if contract is not None else IssueContract(V1)
         self.all_calls_reasoning_effort = all_calls_reasoning_effort
+        self.final_report_allowlist = final_report_allowlist
         self.limit, self.used, self.turns = limit, 0, []
         self.final_next, self.strict_used = False, False
         self.final_report = unavailable("no verified final report")
@@ -263,17 +264,18 @@ async def run(args):
     requested_protocol = getattr(args, 'runner_protocol', None)
     if contract.version != V2 and requested_protocol is not None:
         raise ValueError('--runner-protocol applies only to output-contract-v2')
-    if requested_protocol not in (None, PROTOCOL_V7, PROTOCOL_V8, PROTOCOL_V9):
+    if requested_protocol not in (None, PROTOCOL_V7, PROTOCOL_V8, PROTOCOL_V9, PROTOCOL_V10):
         raise ValueError('Unsupported runner protocol')
     # D-25: no default. Several people run sessions, so the protocol is always stated explicitly.
     if contract.version == V2 and requested_protocol is None:
         raise ValueError('--runner-protocol is required for output-contract-v2')
     runner_protocol = requested_protocol if contract.version == V2 else PROTOCOLS[collection_policy]
-    facts = runner_protocol in (PROTOCOL_V8, PROTOCOL_V9)
+    facts = runner_protocol in (PROTOCOL_V8, PROTOCOL_V9, PROTOCOL_V10)
     # The scenario's reasoning_effort and protocol v9 go together, so neither is ignored silently.
-    if (runner_protocol == PROTOCOL_V9) != (scenario.reasoning_effort is not None):
-        raise ValueError(PROTOCOL_V9 + ' requires scenario reasoning_effort, and reasoning_effort requires '
-                         + PROTOCOL_V9)
+    reasoning_protocol = runner_protocol in (PROTOCOL_V9, PROTOCOL_V10)
+    if reasoning_protocol != (scenario.reasoning_effort is not None):
+        raise ValueError('runner protocol v9 or v10 requires scenario reasoning_effort, and reasoning_effort '
+                         'requires runner protocol v9 or v10')
     evidence = scenario.reasoning_effort_evidence
     if evidence is not None and not safe_path(ROOT, evidence).is_file():
         raise ValueError('reasoning_effort_evidence file not found: ' + evidence)
@@ -342,7 +344,7 @@ async def run(args):
             # What was asked for and what is known to have taken effect are kept apart (C-11).
             effective.update(reasoning_effort={'requested': FINAL_REASONING_EFFORT, 'applied': 'unverified',
                                                'sent_on': 'final tool-free call of each step only'})
-        if runner_protocol == PROTOCOL_V9:
+        if runner_protocol in (PROTOCOL_V9, PROTOCOL_V10):
             effective.update(reasoning_effort={'requested': scenario.reasoning_effort, 'sent_on': 'all_calls',
                                                'applied': 'probe_indicated' if evidence else 'unverified',
                                                'evidence': evidence})
@@ -358,7 +360,8 @@ async def run(args):
                'X-Guardrail-Framework-Version': 'autogen-agentchat/' + versions['autogen-agentchat']}
     headers['X-Guardrail-Context-Buffer-Messages'] = str(buffer_messages) if buffer_messages is not None else 'none'
     budget = CallBudget(scenario.termination.max_llm_calls_per_step, contract,
-                        scenario.reasoning_effort if runner_protocol == PROTOCOL_V9 else None)
+                        scenario.reasoning_effort if reasoning_protocol else None,
+                        final_report_allowlist=runner_protocol == PROTOCOL_V10)
 
     base = args.proxy_url.rstrip('/').removesuffix('/v1')
     model_http = httpx.AsyncClient(event_hooks={'response': [budget.capture]})
@@ -586,7 +589,7 @@ def main():
     parser.add_argument('scenario', type=Path)
     parser.add_argument('--collection-policy', choices=tuple(PROTOCOLS), default=DEFAULT_POLICY)
     parser.add_argument('--output-contract', choices=VERSIONS, default=V2)
-    parser.add_argument('--runner-protocol', choices=(PROTOCOL_V7, PROTOCOL_V8, PROTOCOL_V9), default=None,
+    parser.add_argument('--runner-protocol', choices=(PROTOCOL_V7, PROTOCOL_V8, PROTOCOL_V9, PROTOCOL_V10), default=None,
                         help='required for output-contract-v2 (D-25). v7 reproduces G0-8; '
                              'v9 needs a scenario with reasoning_effort')
     parser.add_argument('--api-key-env', default='GROQ_API_KEY',

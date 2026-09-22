@@ -18,6 +18,8 @@ PROTOCOL_V8 = 'tool-capable-step-v8-budget-and-writable-paths'
 FINAL_REASONING_EFFORT = 'low'
 # v9 = v8 plus the scenario's reasoning_effort on every model call, tool calls included (D-29).
 PROTOCOL_V9 = 'tool-capable-step-v9-reasoning-all-calls'
+# v10 = v9 plus an allowlist for records embedded in the tool-free final-report request (S-25).
+PROTOCOL_V10 = 'tool-capable-step-v10-final-report-allowlist'
 
 
 def harness_facts(writable_paths, call_limit):
@@ -92,7 +94,24 @@ def final_instruction(contract=None):
         'Schema: ' + json.dumps(output_schema(), ensure_ascii=False))
 
 
-def final_messages(messages, contract=None):
+def allowlisted_final_record(record):
+    """Keep only inert evidence approved for a v10 final-report request."""
+    kind = record.get('type')
+    content = record.get('content')
+    # type/source are the record envelope. The evidence payload itself is restricted below.
+    result = {k: record[k] for k in ('source', 'type') if k in record}
+    if kind in ('AssistantMessage', 'ToolCallRequestEvent') and isinstance(content, list):
+        result['content'] = [{k: item[k] for k in ('name', 'arguments') if k in item}
+                             for item in content if isinstance(item, dict)]
+    elif kind in ('FunctionExecutionResultMessage', 'ToolCallExecutionEvent') and isinstance(content, list):
+        result['content'] = [{k: item[k] for k in ('name', 'content') if k in item}
+                             for item in content if isinstance(item, dict)]
+    elif isinstance(content, str):
+        result['content'] = content
+    return result
+
+
+def final_messages(messages, contract=None, allowlist=False):
     """Rebuild the reporting prompt; never carry active work/repair instructions into it."""
     from autogen_core.models import SystemMessage, UserMessage
     facts = []
@@ -108,7 +127,8 @@ def final_messages(messages, contract=None):
                 facts.append({k: data[k] for k in ('task', 'initial_issue_ids', 'acceptance', 'recent_messages') if k in data})
         else:
             # Assistant/tool records are inert evidence, never replayed as active instructions.
-            facts.append(message.model_dump())
+            dumped = message.model_dump()
+            facts.append(allowlisted_final_record(dumped) if allowlist else dumped)
     return [SystemMessage(content=final_instruction(contract)),
             UserMessage(source='user', content=json.dumps({'observed_records': facts}, ensure_ascii=False))]
 
@@ -142,9 +162,9 @@ def make_client(options, budget):
                 # The last call of a step is reserved for the final structured output.
                 kw['tools'] = []
                 if a:
-                    a = (final_messages(a[0], budget.contract), *a[1:])
+                    a = (final_messages(a[0], budget.contract, budget.final_report_allowlist), *a[1:])
                 else:
-                    kw['messages'] = final_messages(kw['messages'], budget.contract)
+                    kw['messages'] = final_messages(kw['messages'], budget.contract, budget.final_report_allowlist)
             tools = kw.get('tools', [])
             extra = dict(kw.get('extra_create_args', {}))
             extra.pop('response_format', None)
