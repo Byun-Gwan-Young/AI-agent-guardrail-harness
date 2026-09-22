@@ -36,6 +36,10 @@ class V10SnapshotTests(Runner):
         self.assertNotIn('synthetic thought', new_final['messages'][-1]['content'])
         self.assertEqual(v10['conditions']['runner_protocol'], PROTOCOL_V10)
         self.assertEqual(v9['conditions']['runner_protocol'], PROTOCOL_V9)
+        self.assertIn(v10['conditions']['git_state_status'], ('measured', 'unmeasured'))
+        self.assertIn('git_commit', v10['conditions'])
+        self.assertIn('git_dirty', v10['conditions'])
+        self.assertFalse(v10['conditions']['dataset_run'])
 
 
 class AllowlistUnitTests(unittest.TestCase):

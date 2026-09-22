@@ -44,6 +44,25 @@ def fingerprint(root):
             and '__pycache__' not in p.parts and p.suffix != '.pyc'}
 
 
+def git_state(root=ROOT):
+    """Record the exact checkout used by a run; missing Git data stays explicitly unmeasured."""
+    try:
+        commit = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=root, check=True,
+                                capture_output=True, text=True).stdout.strip()
+        status = subprocess.run(['git', 'status', '--porcelain', '--untracked-files=all'], cwd=root,
+                                check=True, capture_output=True, text=True).stdout
+    except (OSError, subprocess.CalledProcessError) as exc:
+        return {'git_commit': None, 'git_dirty': None, 'git_state_status': 'unmeasured',
+                'git_state_reason': type(exc).__name__}
+    return {'git_commit': commit, 'git_dirty': bool(status.strip()), 'git_state_status': 'measured',
+            'git_state_reason': None}
+
+
+def enforce_dataset_clean(dataset_run, state):
+    if dataset_run and state['git_dirty'] is True:
+        raise ValueError('--dataset-run requires a clean Git working tree')
+
+
 def safe_path(root, relative):
     p = Path(relative)
     target = (root / p).resolve()
@@ -312,6 +331,9 @@ async def run(args):
         raise ValueError('Context buffer must be positive')
     if args.seed_probe is not None and scenario.seed_support != 'unverified':
         raise ValueError('--seed-probe is only for unverified support')
+    repository_state = git_state()
+    dataset_run = bool(getattr(args, 'dataset_run', False))
+    enforce_dataset_clean(dataset_run, repository_state)
     versions = {p: version(p) for p in ('autogen-agentchat', 'autogen-core', 'autogen-ext', 'openai')}
     save(out / 'conditions.json', {'scenario': scenario.model_dump(), 'temperature': temperature,
          'versions': versions, 'fixture_hashes': original, 'actual_outcome': None,
@@ -332,7 +354,7 @@ async def run(args):
                                          'last call of each step carries no tools; '
                                          'step without final text: failed/no_final_output; observation uses collection_policy',
                      recent_messages_policy='parsed narrative only; placeholder when structured output missing; '
-                                            'no raw tool results')
+                                            'no raw tool results', dataset_run=dataset_run, **repository_state)
     effective.update(output_contract_version=contract.version, allowed_issues_sha256=contract.sha256)
     if contract.version == V2:
         effective.update(recent_messages_policy='parsed narrative; for a failed step the narrative of a verified '
@@ -597,6 +619,8 @@ def main():
     parser.add_argument('--proxy-url', default=os.environ.get('GUARDRAIL_PROXY_URL', 'http://127.0.0.1:8000'))
     parser.add_argument('--output-root', type=Path, default=ROOT / 'runs')
     parser.add_argument('--run-index', type=int, default=1)
+    parser.add_argument('--dataset-run', action='store_true',
+                        help='mark a pilot or collection session; refuse a dirty Git working tree before model calls')
     parser.add_argument('--temperature', type=float, default=None)
     context_options = parser.add_mutually_exclusive_group()
     context_options.add_argument('--context-buffer-messages', type=int, default=None)
