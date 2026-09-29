@@ -4,6 +4,7 @@ venv/
 __pycache__/
 *.pyc
 runs/
+logs/
 docs/handoff/
 data/raw/
 *.bak
