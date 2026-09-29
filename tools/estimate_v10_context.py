@@ -19,6 +19,12 @@ def compact(value):
     return json.dumps(value, ensure_ascii=False)
 
 
+def v10_record(record):
+    # final_messages allowlists only assistant/tool records (they carry 'type'); the task,
+    # acceptance and recent_messages facts rebuilt from user messages pass through unchanged.
+    return allowlisted_final_record(record) if 'type' in record else record
+
+
 def estimate(session_id):
     log_path = ROOT / 'logs' / f'{session_id}.json'
     steps_path = ROOT / 'runs' / session_id / 'steps.json'
@@ -42,14 +48,14 @@ def estimate(session_id):
                          'status': 'unmeasured', 'reason': 'observed_records unavailable',
                          'v9_chars': None, 'v10_estimated_chars': None, 'estimated_reduction_chars': None})
             continue
-        new_payload = {'observed_records': [allowlisted_final_record(r) for r in records if isinstance(r, dict)]}
+        new_payload = {'observed_records': [v10_record(r) for r in records if isinstance(r, dict)]}
         old_chars = len(user['content'])
         new_chars = len(compact(new_payload))
         rows.append({'step_id': step_by_turn.get(turn['turn']), 'turn': turn['turn'], 'status': 'estimated',
                      'v9_chars': old_chars, 'v10_estimated_chars': new_chars,
                      'estimated_reduction_chars': old_chars - new_chars})
     measured = [row for row in rows if row['status'] == 'estimated']
-    return {'estimate_version': 'v10-final-report-allowlist-estimate-v1',
+    return {'estimate_version': 'v10-final-report-allowlist-estimate-v2',
             'session_id': session_id,
             'basis': 'stored v9 final-request user content transformed with the v10 allowlist; hypothetical, not a run',
             'inputs': {str(log_path.relative_to(ROOT)): hashlib.sha256(log_path.read_bytes()).hexdigest(),

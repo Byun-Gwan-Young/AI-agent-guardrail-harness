@@ -1,0 +1,259 @@
+{
+  "estimate_version": "v10-final-report-allowlist-estimate-v2",
+  "session_id": "A-1-v4-e174aafe805b4f59bb62d7c95716b8b7",
+  "basis": "stored v9 final-request user content transformed with the v10 allowlist; hypothetical, not a run",
+  "inputs": {
+    "logs/A-1-v4-e174aafe805b4f59bb62d7c95716b8b7.json": "986ba75eb2683ef5868294025214b0208bcb5ffb356d61902b856834465f7fae",
+    "runs/A-1-v4-e174aafe805b4f59bb62d7c95716b8b7/steps.json": "68bd1b7c9e6a1393f1e836cb08530742b543e209c7e42b97f9b14a62dbfaf213"
+  },
+  "final_requests": [
+    {
+      "step_id": 1,
+      "turn": 3,
+      "status": "estimated",
+      "v9_chars": 3819,
+      "v10_estimated_chars": 3581,
+      "estimated_reduction_chars": 238
+    },
+    {
+      "step_id": 2,
+      "turn": 6,
+      "status": "estimated",
+      "v9_chars": 4460,
+      "v10_estimated_chars": 4222,
+      "estimated_reduction_chars": 238
+    },
+    {
+      "step_id": 3,
+      "turn": 9,
+      "status": "estimated",
+      "v9_chars": 5063,
+      "v10_estimated_chars": 4825,
+      "estimated_reduction_chars": 238
+    },
+    {
+      "step_id": 4,
+      "turn": 12,
+      "status": "estimated",
+      "v9_chars": 23171,
+      "v10_estimated_chars": 11518,
+      "estimated_reduction_chars": 11653
+    },
+    {
+      "step_id": 5,
+      "turn": 15,
+      "status": "estimated",
+      "v9_chars": 17636,
+      "v10_estimated_chars": 9402,
+      "estimated_reduction_chars": 8234
+    },
+    {
+      "step_id": 6,
+      "turn": 17,
+      "status": "estimated",
+      "v9_chars": 21394,
+      "v10_estimated_chars": 9990,
+      "estimated_reduction_chars": 11404
+    },
+    {
+      "step_id": 7,
+      "turn": 20,
+      "status": "estimated",
+      "v9_chars": 33666,
+      "v10_estimated_chars": 8695,
+      "estimated_reduction_chars": 24971
+    },
+    {
+      "step_id": 8,
+      "turn": 23,
+      "status": "estimated",
+      "v9_chars": 29207,
+      "v10_estimated_chars": 9206,
+      "estimated_reduction_chars": 20001
+    },
+    {
+      "step_id": 9,
+      "turn": 25,
+      "status": "estimated",
+      "v9_chars": 35220,
+      "v10_estimated_chars": 11079,
+      "estimated_reduction_chars": 24141
+    },
+    {
+      "step_id": 10,
+      "turn": 27,
+      "status": "estimated",
+      "v9_chars": 45493,
+      "v10_estimated_chars": 11391,
+      "estimated_reduction_chars": 34102
+    },
+    {
+      "step_id": 11,
+      "turn": 30,
+      "status": "estimated",
+      "v9_chars": 19334,
+      "v10_estimated_chars": 11358,
+      "estimated_reduction_chars": 7976
+    },
+    {
+      "step_id": 12,
+      "turn": 32,
+      "status": "estimated",
+      "v9_chars": 50905,
+      "v10_estimated_chars": 15617,
+      "estimated_reduction_chars": 35288
+    },
+    {
+      "step_id": 13,
+      "turn": 34,
+      "status": "estimated",
+      "v9_chars": 30479,
+      "v10_estimated_chars": 11944,
+      "estimated_reduction_chars": 18535
+    },
+    {
+      "step_id": 14,
+      "turn": 37,
+      "status": "estimated",
+      "v9_chars": 16327,
+      "v10_estimated_chars": 9178,
+      "estimated_reduction_chars": 7149
+    },
+    {
+      "step_id": 15,
+      "turn": 39,
+      "status": "estimated",
+      "v9_chars": 45436,
+      "v10_estimated_chars": 15926,
+      "estimated_reduction_chars": 29510
+    },
+    {
+      "step_id": 16,
+      "turn": 41,
+      "status": "estimated",
+      "v9_chars": 49206,
+      "v10_estimated_chars": 17102,
+      "estimated_reduction_chars": 32104
+    },
+    {
+      "step_id": 17,
+      "turn": 44,
+      "status": "estimated",
+      "v9_chars": 16589,
+      "v10_estimated_chars": 9327,
+      "estimated_reduction_chars": 7262
+    },
+    {
+      "step_id": 18,
+      "turn": 46,
+      "status": "estimated",
+      "v9_chars": 40341,
+      "v10_estimated_chars": 16176,
+      "estimated_reduction_chars": 24165
+    },
+    {
+      "step_id": 19,
+      "turn": 48,
+      "status": "estimated",
+      "v9_chars": 49483,
+      "v10_estimated_chars": 17366,
+      "estimated_reduction_chars": 32117
+    },
+    {
+      "step_id": 20,
+      "turn": 51,
+      "status": "estimated",
+      "v9_chars": 16344,
+      "v10_estimated_chars": 9166,
+      "estimated_reduction_chars": 7178
+    },
+    {
+      "step_id": 21,
+      "turn": 53,
+      "status": "estimated",
+      "v9_chars": 35403,
+      "v10_estimated_chars": 16370,
+      "estimated_reduction_chars": 19033
+    },
+    {
+      "step_id": 22,
+      "turn": 55,
+      "status": "estimated",
+      "v9_chars": 47029,
+      "v10_estimated_chars": 17593,
+      "estimated_reduction_chars": 29436
+    },
+    {
+      "step_id": 23,
+      "turn": 58,
+      "status": "estimated",
+      "v9_chars": 17956,
+      "v10_estimated_chars": 9636,
+      "estimated_reduction_chars": 8320
+    },
+    {
+      "step_id": 24,
+      "turn": 60,
+      "status": "estimated",
+      "v9_chars": 35326,
+      "v10_estimated_chars": 16333,
+      "estimated_reduction_chars": 18993
+    },
+    {
+      "step_id": 25,
+      "turn": 62,
+      "status": "estimated",
+      "v9_chars": 43478,
+      "v10_estimated_chars": 17593,
+      "estimated_reduction_chars": 25885
+    },
+    {
+      "step_id": 26,
+      "turn": 65,
+      "status": "estimated",
+      "v9_chars": 16896,
+      "v10_estimated_chars": 9475,
+      "estimated_reduction_chars": 7421
+    },
+    {
+      "step_id": 27,
+      "turn": 67,
+      "status": "estimated",
+      "v9_chars": 36358,
+      "v10_estimated_chars": 16333,
+      "estimated_reduction_chars": 20025
+    },
+    {
+      "step_id": 28,
+      "turn": 69,
+      "status": "estimated",
+      "v9_chars": 41204,
+      "v10_estimated_chars": 17566,
+      "estimated_reduction_chars": 23638
+    },
+    {
+      "step_id": 29,
+      "turn": 72,
+      "status": "estimated",
+      "v9_chars": 18009,
+      "v10_estimated_chars": 11552,
+      "estimated_reduction_chars": 6457
+    },
+    {
+      "step_id": 30,
+      "turn": 74,
+      "status": "estimated",
+      "v9_chars": 37346,
+      "v10_estimated_chars": 16333,
+      "estimated_reduction_chars": 21013
+    }
+  ],
+  "summary": {
+    "final_requests": 30,
+    "estimated_requests": 30,
+    "unmeasured_requests": 0,
+    "v9_chars": 882578,
+    "v10_estimated_chars": 365853,
+    "estimated_reduction_chars": 516725
+  }
+}
