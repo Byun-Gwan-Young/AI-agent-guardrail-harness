@@ -55,4 +55,27 @@ class AllowlistUnitTests(unittest.TestCase):
             'content': [{'name': 'read_file', 'arguments': '{"path":"a"}'}]})
         self.assertEqual(allowlisted_final_record(result), {
             'type': 'FunctionExecutionResultMessage',
-            'content': [{'name': 'read_file', 'content': 'file body'}]})
+            'content': [{'name': 'read_file', 'content': 'file body', 'is_error': False}]})
+
+
+def read_missing():
+    body = success(tool='read_file').json()
+    call = body['choices'][0]['message']['tool_calls'][0]
+    call['function']['arguments'] = json.dumps({'path': 'NO_SUCH_FILE.md'})
+    body['choices'][0]['message']['reasoning_content'] = 'synthetic thought'
+    return type(success())(200, json=body)
+
+
+class V10ToolErrorSnapshotTests(Runner):
+    scenario_path = A1V4
+
+    async def test_v10_final_request_keeps_tool_failure_but_not_thought(self):
+        self.runner_protocol = PROTOCOL_V10
+        run = await self.run_offline([read_missing(), success()], max_steps=1)
+        final = run['upstream_requests'][-1]['messages'][-1]['content']
+        records = json.loads(final)['observed_records']
+        results = [item for r in records if r.get('type') == 'FunctionExecutionResultMessage'
+                   for item in r['content']]
+        self.assertEqual([r['is_error'] for r in results], [True])
+        self.assertTrue(all(set(r) <= {'name', 'content', 'is_error'} for r in results))
+        self.assertNotIn('synthetic thought', final)

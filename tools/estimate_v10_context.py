@@ -55,7 +55,7 @@ def estimate(session_id):
                      'v9_chars': old_chars, 'v10_estimated_chars': new_chars,
                      'estimated_reduction_chars': old_chars - new_chars})
     measured = [row for row in rows if row['status'] == 'estimated']
-    return {'estimate_version': 'v10-final-report-allowlist-estimate-v2',
+    return {'estimate_version': 'v10-final-report-allowlist-estimate-v3',
             'session_id': session_id,
             'basis': 'stored v9 final-request user content transformed with the v10 allowlist; hypothetical, not a run',
             'inputs': {str(log_path.relative_to(ROOT)): hashlib.sha256(log_path.read_bytes()).hexdigest(),

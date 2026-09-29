@@ -104,7 +104,8 @@ def allowlisted_final_record(record):
         result['content'] = [{k: item[k] for k in ('name', 'arguments') if k in item}
                              for item in content if isinstance(item, dict)]
     elif kind in ('FunctionExecutionResultMessage', 'ToolCallExecutionEvent') and isinstance(content, list):
-        result['content'] = [{k: item[k] for k in ('name', 'content') if k in item}
+        # S-31: whether the tool failed is a fact about the run, not model reasoning.
+        result['content'] = [{k: item[k] for k in ('name', 'content', 'is_error') if k in item}
                              for item in content if isinstance(item, dict)]
     elif isinstance(content, str):
         result['content'] = content
