@@ -70,3 +70,19 @@
 - step 정의(한 역할의 한 차례), step 당 최대 호출 3, `max_steps` 는 고정 순서와 같다. 업스트림 요청 수 = step 호출 수 합 (테스트)
 - 왕복 수는 progress-v3 의 기록(`progress.handoff`, H = 4)만. 판정에 영향 없음 : 같은 관측에서 `handoff_to` 만 지운 재판정의 상태·결정이 같다 (테스트).
   설명 문장만 E4 ↔ E5 로 달라진다
+
+## 파트 3 — 통합 오프라인 테스트
+
+합성 fixture `TEST-T1-v2` (`tests/fixtures/scenario-v2-dialogue.yaml`) + 시험용 판정 함수 `tests/fixtures/scenario_judges/TEST-T1-v2.py`,
+실제 실행기·메모리 프록시·가짜 업스트림 (`tests/t1_harness.py`). 데모 시나리오는 C-18 이다.
+
+| 흐름 | 결과 (테스트) |
+|---|---|
+| 정상 (라우터) | 접수→환불 담당→접수, 3 step `success`, 판정 함수 resolved, STOP 없음 |
+| 정체 (관측) | 6 step 에 v0.3 STOP(E1-T1) 기록, 세션은 `max_steps` 까지. 문장 "최근 3 step 동안 접수·환불 담당·배송 담당 모두 처리 상태 변화·새 쟁점이 없습니다. 처리 상태 '접수'." |
+| 정체 (차단) | step 7 첫 요청 403 → `guardrail_stop`, 오류 본문·summary 문장 = STOP 기록 문장 |
+| 채택 지표 선택 | E5 "채택 항목이 1/3 에서 …" (등록된 필수 수) |
+| `escalated` | 2 step 에 `escalated` 종료, 종료 상태는 status_advance unmeasured, STOP 없음 |
+| 어휘 위반 섞임 | 위반 3 연속에도 계속, 형태 오류 2 연속에 `strict_output_failures`. 위반 값 관측 없음, 위반 수 3 |
+| CS 라우터 | 왕복 기록·판정 불변·잘못된 `handoff_to` 처리 (`tests/test_dialogue_router.py`) |
+| scenario-v1 | A-1-v4 요청 12 건 바이트 동일 (첫 요청 messages 포함) |
