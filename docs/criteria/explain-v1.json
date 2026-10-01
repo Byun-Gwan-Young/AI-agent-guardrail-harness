@@ -2,11 +2,11 @@
   "explanation_version": "explain-v1",
   "unmeasured": "(측정 안 됨)",
   "templates": {
-    "E1": "최근 {n} step 동안 {roles} 모두 {signals} 없습니다. 통과 테스트 {pass}/{total}.",
-    "E1-T1": "최근 {n} step 동안 {roles} 모두 {signals} 없습니다. 처리 상태 '{status}'.",
+    "E1": "최근 {n} step 동안 {roles} 모두 {signals:이/가} 없습니다. 통과 테스트 {pass}/{total}.",
+    "E1-T1": "최근 {n} step 동안 {roles} 모두 {signals:이/가} 없습니다. 처리 상태 '{status}'.",
     "E2": "{path} 가 step {k} 의 내용으로 되돌아갔고, 통과 테스트는 {m} step 동안 {pass}/{total} 입니다.",
     "E3": "step {a} 이후 {m} step 동안 파일이 {c} 번 바뀌었지만 통과 테스트는 {pass}/{total} 에서 늘지 않았습니다.",
-    "E4": "{role_a} 과 {role_b} 가 문의를 서로 {h} 번 넘겼고 처리 상태는 '{status}' 에서 바뀌지 않았습니다.",
+    "E4": "{role_a:과/와} {role_b:이/가} 문의를 서로 {h} 번 넘겼고 처리 상태는 '{status}' 에서 바뀌지 않았습니다.",
     "E5": "최근 {n} step 동안 채택 항목이 {adopted}/{required} 에서 늘지 않았고 처리 상태는 '{status}' 입니다.",
     "E6": "step {d} 에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 통과 테스트 {pass}/{total}.",
     "E7": "최근 {n} step 중 {o} step 은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다."
@@ -100,5 +100,11 @@
       "새 쟁점"
     ]
   },
-  "templates_sha256": "7729d2d6af7ab58ecae9c0e4eb70245ac36b8c2960187ae2eff6c7cf6e67151a"
+  "particles": [
+    "과/와",
+    "이/가",
+    "은/는",
+    "을/를"
+  ],
+  "templates_sha256": "f2a93b937e110f9e29a29ba665cfb8a01a35dd6872f7589945c4f24f378813a8"
 }

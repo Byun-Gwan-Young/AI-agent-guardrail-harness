@@ -214,3 +214,32 @@ E1-T1 `no_test_observation_in_session` → E1 `otherwise`
 
 **기존 세션 재계산** (`--previous reports/c17-3/v03-recompute.json --output reports/c17-3/v03-recompute-part2.json`) :
 첫 STOP 6 / 없음 / 9, A-1-v3 새 STOP 없음, v0.2 바이트 동일, 파트 0 대비 상태·판정 변화 0, 첫 STOP 문장 동일 (세 세션은 등록이 없는 세션이다)
+
+## C-17-4 파트 0 재동결 (DM-36 이름 뒤 조사)
+
+- **DM-36** : 역할·상태 이름 자리 뒤 조사(과/와, 이/가, 은/는, 을/를)를 DM-31 의 받침 규칙으로 고르고 이름에 붙여 쓴다
+  - 템플릿이 조사를 자리 표기로 적는다 : `{role_a:과/와}` = 받침 있으면 앞, 없으면 뒤 (`explain_v1.Slot`, 허용 쌍 `explain_v1.PARTICLES`).
+    받침 판단은 DM-31 과 같다 (`has_final_consonant` : 마지막 글자가 받침 있는 한글 음절. 역할 ID 같은 비한글은 받침 없음).
+    `(측정 안 됨)` 에는 조사를 붙이지 않는다 (DM-31 이 쓰던 그대로)
+  - 고친 자리 : **E4 만** — "{role_a:과/와} {role_b:이/가} 문의를 서로 …" ("환불 담당과 배송 담당이", "검토자와 작성자가",
+    등록 이름이 없어 ID 로 대체되면 "refund와 shipping가")
+  - 같은 표기로 옮긴 자리 : E1·E1-T1 의 `{signals:이/가}` (DM-31). 문장은 이전 `render_subject` 와 같다 (테스트)
+  - 해당 없음 (보고) : 상태 이름 자리는 모두 따옴표 뒤에 `에서`(E4)·`입니다`(E5·E6 대화형)·`.`(E1-T1) 가 온다 — 네 쌍이 아니라 고르지 않았고
+    띄어쓰기도 그대로 두었다. E2 의 "{path} 가" 는 파일 경로 자리라 이름 자리가 아니다 (그대로). E1·E1-T1 의 `{roles} 모두` 는 조사가 아니다
+- 동결 기록 `explain-v1.json` 에 `particles` 를 더했다. 선택 순서·문구는 바뀌지 않았다
+
+**이전 해시 (C-17-3 파트 2, `7ef2e5c`) → 새 해시 (C-17-4 파트 0)**
+
+| 대상 | 이전 | 새 |
+|---|---|---|
+| `docs/criteria/deadlock-v0.3.json` 파일 | `77d4c7b85e68ebc3b87a04c5c6ef0d9fe5e5a6eed30d0253f1f2d8cf14593a08` | `6bd633832e561b4caeeacaa1c1e9586144131c2f24bcf4d68b8d5b0152fe15c5` |
+| `criteria_sha256` (파라미터) | `a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50` | 같음 |
+| `deadlock_policy_v03.py` | `794f65e26211b7bcebbe4deadfa3e30f30dbaecc6fe361681854db23e2cef3b0` | 같음 |
+| `explain_v1.py` | `926e83577618ee61ea489e94abf3990a8985fbb93952c540a0345e335bbe1dc9` | `174228410523729b474621763e100a1b2f4223c0267c40b5e4d3c62cd4726027` |
+| `progress_signal_v3.py` | `dc727697e0832a305569839d3fc347f36c093a09811e93183cc4fc478a8d6c94` | 같음 |
+| `docs/criteria/explain-v1.json` 파일 | `dd877389e23b56cb82b98beb6aff5cbff48af10d3932c177b5c96230140e0eae` | `1acf469e8b7b10f6113f25d6a38e57594771aec68ea5f3b1500fbc2931aa875b` |
+| `explanation_templates_sha256` | `7729d2d6af7ab58ecae9c0e4eb70245ac36b8c2960187ae2eff6c7cf6e67151a` | `f2a93b937e110f9e29a29ba665cfb8a01a35dd6872f7589945c4f24f378813a8` |
+
+**기존 세션 재계산** (`--previous reports/c17-3/v03-recompute-part2.json --output reports/c17-4/v03-recompute.json`) :
+첫 STOP 6 / 없음 / 9, A-1-v3 새 STOP 없음, v0.2 바이트 동일, 이전 대비 상태·판정 변화 0, 첫 STOP 문장 동일
+(세 세션의 STOP 은 모두 E1 이고 E4 가 없다)

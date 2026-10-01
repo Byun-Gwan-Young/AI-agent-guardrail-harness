@@ -20,6 +20,7 @@ from progress_schema import SessionRegistration
 from pydantic import ValidationError
 from explain_v1 import STOP_DECISIONS
 
+from pathlib import Path
 from urllib.parse import urlsplit
 
 import httpx
@@ -28,6 +29,27 @@ from fastapi.responses import JSONResponse, Response
 
 logger = logging.getLogger(__name__)
 DEMO_PHASE = "demo"
+ROOT = Path(__file__).resolve().parent
+# DM-2, DM-34 for proxy logs (C-17-4): a demo-condition proxy logs only under logs/demo/ and nothing else does.
+DEMO_LOG_ROOT = ROOT / "logs" / "demo"
+
+
+def demo_condition(config):
+    """The proxy's demo condition is its criteria version: deadlock-v0.3 judges only demo sessions (DM-10, DM-37:
+    scenario-v1 refuses v0.3; registration and block mode need v0.3). The run phase arrives only with requests."""
+    return config.get("criteria_version") == BLOCK_CRITERIA_VERSION
+
+
+def log_dir_for(demo, requested):
+    """GUARDRAIL_LOG_DIR as given (default logs/demo/ for a demo proxy, logs for any other), checked both ways."""
+    directory = Path(requested) if requested is not None else DEMO_LOG_ROOT if demo else Path("logs")
+    inside_demo = directory.resolve().is_relative_to(DEMO_LOG_ROOT.resolve())
+    if demo and not inside_demo:
+        raise ValueError("A " + BLOCK_CRITERIA_VERSION + " (demo) proxy logs only under " + str(DEMO_LOG_ROOT)
+                         + " (GUARDRAIL_LOG_DIR, DM-34)")
+    if not demo and inside_demo:
+        raise ValueError(str(DEMO_LOG_ROOT) + " is reserved for " + BLOCK_CRITERIA_VERSION + " (demo) proxies (DM-2)")
+    return directory
 
 
 def session_key(request, body):
@@ -103,9 +125,11 @@ def create_app(log_dir=None, transport=None, sleep=asyncio.sleep, repository=Non
                 "base_url": settings["base_url"], "chat_path": settings["chat_path"],
                 "api_key_env": settings["api_key_env"], "config_file": config_file(config_path).name}
     app = FastAPI()
-    store = SessionStore(repository if repository is not None else JsonSessionRepository(
-        log_dir or os.environ.get("GUARDRAIL_LOG_DIR", "logs")
-    ), criteria_version=config.get("criteria_version", CRITERIA_VERSION), upstream=identity,
+    if repository is None and log_dir is None:
+        # The started proxy (uvicorn proxy:app) reads its log directory only here; checked before it serves anything.
+        log_dir = log_dir_for(demo_condition(config), os.environ.get("GUARDRAIL_LOG_DIR"))
+    store = SessionStore(repository if repository is not None else JsonSessionRepository(log_dir),
+        criteria_version=config.get("criteria_version", CRITERIA_VERSION), upstream=identity,
         criteria_parameters=config.get("criteria_parameters"), guardrail_mode=mode)
     app.state.store = store
     app.state.upstream = identity

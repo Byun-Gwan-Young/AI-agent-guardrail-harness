@@ -41,6 +41,17 @@ PM 결정 DM-7 (2026-09-29), DM-23 (C-16 결정 9), DM-32·DM-34 (C-17-2 결정,
 - `tools/analyze_session.py` 는 실행 폴더를 `runs/<id>` 에 없으면 `runs/demo/<id>` 에서, 프록시 로그를 `logs/<id>.json` 에 없으면
   `logs/demo/<id>.json` 에서 찾는다
 
+## 데모 프록시 로그 경로 (C-17-4 파트 0, DM-34 와 같은 방식)
+
+- 프록시는 실행 phase 를 요청이 와야 안다. 그래서 **데모 조건 = 설정의 `criteria_version: deadlock-v0.3`** 로 알아본다
+  (`proxy.demo_condition`). v0.3 은 데모 전용이다 : scenario-v1 은 v0.3 을 거절하고(DM-37), 세션 등록·block 모드도 v0.3 에서만 된다.
+  관측 설정 `guardrail-deadlock-v0.3-kmu.yaml` 과 차단 설정 `…-block.yaml` 둘 다 데모 조건이다. 설정 파일은 바꾸지 않았다
+- `GUARDRAIL_LOG_DIR` 가 없으면 데모 프록시는 `logs/demo/`, 그 밖의 프록시는 지금처럼 `logs` (실행 위치 기준)
+- 데모 프록시에 `logs/demo/` 밖을 주면, 데모가 아닌 프록시에 `logs/demo/` 안을 주면 **프록시 시작 전 오류** (`proxy.log_dir_for`,
+  `uvicorn proxy:app` 이 앱을 만들 때). 요청을 하나도 받지 않는다
+- 검사 대상은 시작된 프록시가 읽는 환경변수·기본값이다. 파이썬에서 `create_app(log_dir=…)` 로 경로를 직접 넘기는 것은 테스트용 입구라
+  검사하지 않는다 (실행 명령으로는 닿지 않는다)
+
 ## 차단 시점과 응답
 
 - 판정은 step 끝 관측 뒤에 나온다. 세션의 관측 중 판정이 `deadlock`/`termination_failure` 인 첫 기록이 있으면, 그 뒤의
@@ -97,5 +108,5 @@ PM 결정 DM-7 (2026-09-29), DM-23 (C-16 결정 9), DM-32·DM-34 (C-17-2 결정,
 
 - `tools/analyze_c14.py`, `tools/compare_sessions.py` 는 모든 step 에 `acceptance` 가 있다고 가정한다 (C-11·C-14 세션 전용 도구).
   차단 세션에 쓰려면 고쳐야 한다. `tools/analyze_session.py` 는 고쳤다
-- 프록시 로그 경로(`GUARDRAIL_LOG_DIR=logs/demo`)는 프록시가 실행 phase 를 시작 전에 알 수 없어 실행 명령으로 정한다.
-  코드가 강제하는 것은 실행 폴더(`runs/demo/`, DM-34)뿐이다
+- ~~프록시 로그 경로(`GUARDRAIL_LOG_DIR=logs/demo`)는 프록시가 실행 phase 를 시작 전에 알 수 없어 실행 명령으로 정한다.
+  코드가 강제하는 것은 실행 폴더(`runs/demo/`, DM-34)뿐이다~~ → C-17-4 파트 0 에서 criteria 버전으로 강제 (위 절)

@@ -55,7 +55,8 @@ class TemplateTests(unittest.TestCase):
                    "step 3 이후 9 step 동안 파일이 5 번 바뀌었지만 통과 테스트는 7/16 에서 늘지 않았습니다."),
             "E4": (signals(task_kind="dialogue", status="triage",
                            handoff={"roles": ["refund", "shipping"], "count": 4, "at_or_above_threshold": True}),
-                   "refund 과 shipping 가 문의를 서로 4 번 넘겼고 처리 상태는 'triage' 에서 바뀌지 않았습니다."),
+                   # DM-36: particles attach to the names; an ID (no Hangul) takes the no-final-consonant form.
+                   "refund와 shipping가 문의를 서로 4 번 넘겼고 처리 상태는 'triage' 에서 바뀌지 않았습니다."),
             "E5": (signals(task_kind="dialogue", status="triage", adopted_metric_selected=True, adopted_count=2,
                            adopted_required=6),
                    "최근 3 step 동안 채택 항목이 2/6 에서 늘지 않았고 처리 상태는 'triage' 입니다."),
@@ -155,7 +156,7 @@ class StopRecordTests(unittest.TestCase):
         agents = ["refund", "shipping"] * 3
         rows = replay([dialogue(s, agent=a, handoff=agents[s]) for s, a in enumerate(agents[:5], 1)], configured(), REG)
         self.assertEqual(rows[-1]["criteria"]["explanation"]["text"],
-                         "refund 과 shipping 가 문의를 서로 5 번 넘겼고 처리 상태는 'received' 에서 바뀌지 않았습니다.")
+                         "refund와 shipping가 문의를 서로 5 번 넘겼고 처리 상태는 'received' 에서 바뀌지 않았습니다.")
         rows = replay([dialogue(s, status="triage", adopted=["a"]) for s in range(1, 7)], configured(), REG)
         explanation = rows[-1]["criteria"]["explanation"]
         self.assertEqual(explanation["text"],
@@ -279,7 +280,7 @@ class RoleLabelTests(unittest.TestCase):
         result = explain(signals(), {"planner": "기획"})
         self.assertIn("기획·developer·reviewer 모두", result["text"])
         handoff = signals(task_kind="dialogue", status="triage", handoff={"roles": ["refund", "shipping"], "count": 4})
-        self.assertTrue(explain(handoff, {"shipping": "배송 담당"})["text"].startswith("refund 과 배송 담당 가 "))
+        self.assertTrue(explain(handoff, {"shipping": "배송 담당"})["text"].startswith("refund와 배송 담당이 "))
 
     def test_invalid_map_is_refused(self):
         for bad in (["planner"], {"planner": ""}, {"planner": 1}, {1: "기획"}):

@@ -6,18 +6,20 @@ explanation_version, record docs/criteria/explain-v1.json). Design: docs/design/
 plus DM-27 (E1-T1 for a session without test observations), DM-26 (optional role display names) and DM-31
 (E1 and E1-T1 name only the signals of the metrics the scenario selected). The session registration (DM-35) supplies
 role and status display names, the E5 required count (DM-29) and the selected metrics; without it, IDs and
-"(측정 안 됨)" remain.
+"(측정 안 됨)" remain. DM-36: a particle after a name slot is written in the template as "{slot:받침형/모음형}" and
+attached to the name by the DM-31 final-consonant rule.
 """
 VERSION = "explain-v1"
 UNMEASURED = "(측정 안 됨)"
 TEMPLATES = {
     # {signals} is the selected metrics' phrases joined with "·" plus the subject particle (DM-31).
-    "E1": "최근 {n} step 동안 {roles} 모두 {signals} 없습니다. 통과 테스트 {pass}/{total}.",
+    "E1": "최근 {n} step 동안 {roles} 모두 {signals:이/가} 없습니다. 통과 테스트 {pass}/{total}.",
     # DM-27: E1 for a session with no test observation (T1 dialogue task) reports the dialogue signals instead.
-    "E1-T1": "최근 {n} step 동안 {roles} 모두 {signals} 없습니다. 처리 상태 '{status}'.",
+    "E1-T1": "최근 {n} step 동안 {roles} 모두 {signals:이/가} 없습니다. 처리 상태 '{status}'.",
     "E2": "{path} 가 step {k} 의 내용으로 되돌아갔고, 통과 테스트는 {m} step 동안 {pass}/{total} 입니다.",
     "E3": "step {a} 이후 {m} step 동안 파일이 {c} 번 바뀌었지만 통과 테스트는 {pass}/{total} 에서 늘지 않았습니다.",
-    "E4": "{role_a} 과 {role_b} 가 문의를 서로 {h} 번 넘겼고 처리 상태는 '{status}' 에서 바뀌지 않았습니다.",
+    # DM-36: the particles after the two role names follow the names ("환불 담당과 배송 담당이").
+    "E4": "{role_a:과/와} {role_b:이/가} 문의를 서로 {h} 번 넘겼고 처리 상태는 '{status}' 에서 바뀌지 않았습니다.",
     "E5": "최근 {n} step 동안 채택 항목이 {adopted}/{required} 에서 늘지 않았고 처리 상태는 '{status}' 입니다.",
     "E6": "step {d} 에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 통과 테스트 {pass}/{total}.",
     "E7": "최근 {n} step 중 {o} step 은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다.",
@@ -25,6 +27,8 @@ TEMPLATES = {
 # E6 for a dialogue (T1) task: the second sentence reports the status instead of tests.
 E6_DIALOGUE = "step {d} 에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 처리 상태는 '{status}' 입니다."
 STOP_DECISIONS = ("deadlock", "termination_failure")
+# DM-31, DM-36: particle pairs a template may attach to a slot, as "after a final consonant/otherwise".
+PARTICLES = ("과/와", "이/가", "은/는", "을/를")
 # DM-31: the signal each selected progress metric reports, in sentence order. An unselected metric is never named.
 SIGNAL_PHRASES = (("artifact.files_changed", "산출물 변경"), ("artifact.test_pass_count", "테스트 증가"),
                   ("artifact.build_status", "빌드 상태 변화"), ("conversation.status_advance", "처리 상태 변화"),
@@ -160,7 +164,7 @@ def explain(signals, role_labels=None, status_labels=None):
                "o": states.count("oscillating") if isinstance(states, list) else None},
     }[template_id]
     template = E6_DIALOGUE if template_id == "E6" and signals.get("task_kind") == "dialogue" else TEMPLATES[template_id]
-    text = template.format_map({k: render_subject(v) if k == "signals" else render(v) for k, v in values.items()})
+    text = template.format_map({k: Slot(render(v)) for k, v in values.items()})
     return {"explanation_version": VERSION, "template_id": template_id, "text": text, "values": values,
             "missing_values": sorted(k for k, v in values.items() if v is None),
             "signals": signals, "role_labels": role_labels, "status_labels": status_labels}
@@ -176,14 +180,26 @@ def signal_phrases(selected, template_id):
     return phrases or None
 
 
-def render_subject(phrases):
-    """Joined phrases with the Korean subject particle of the last syllable (이 after a final consonant, else 가)."""
-    if not phrases:
-        return UNMEASURED
-    text = "·".join(phrases)
-    last = text[-1]
-    final = "가" <= last <= "힣" and (ord(last) - 0xAC00) % 28 != 0
-    return text + ("이" if final else "가")
+def has_final_consonant(text):
+    """DM-31: the last character is a Hangul syllable with a final consonant. Anything else (a role ID such as
+    "refund", digits) counts as no final consonant."""
+    last = text[-1] if text else ""
+    return "가" <= last <= "힣" and (ord(last) - 0xAC00) % 28 != 0
+
+
+class Slot(str):
+    """A rendered value. A template spec "{slot:과/와}" attaches the particle to it with no space (DM-31, DM-36);
+    "(측정 안 됨)" takes none, as DM-31 wrote it."""
+
+    def __format__(self, spec):
+        if not spec:
+            return str(self)
+        if spec not in PARTICLES:
+            raise ValueError("unknown particle pair: " + spec)
+        if self == UNMEASURED:
+            return str(self)
+        after_final, otherwise = spec.split("/")
+        return str(self) + (after_final if has_final_consonant(self) else otherwise)
 
 
 def render(value):

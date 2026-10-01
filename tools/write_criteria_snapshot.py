@@ -31,12 +31,14 @@ def canonical_sha256(value):
 
 
 def explanation_record():
-    """Templates, the E6 dialogue form, the selection order and the DM-31 signal phrases exactly as explain_v1 uses them."""
+    """Templates, the E6 dialogue form, the selection order, the DM-31 signal phrases and the DM-36 particle pairs
+    exactly as explain_v1 uses them."""
     frozen = {"explanation_version": explain_v1.VERSION, "unmeasured": explain_v1.UNMEASURED,
               "templates": explain_v1.TEMPLATES, "variants": {"E6": {"dialogue": explain_v1.E6_DIALOGUE}},
               "selection_order": [list(pair) for pair in explain_v1.SELECTION_ORDER],
               "signal_phrases": [list(pair) for pair in explain_v1.SIGNAL_PHRASES],
-              "unrecorded_selection_phrases": explain_v1.UNRECORDED_SELECTION}
+              "unrecorded_selection_phrases": explain_v1.UNRECORDED_SELECTION,
+              "particles": list(explain_v1.PARTICLES)}
     return {**frozen, "templates_sha256": canonical_sha256(frozen)}
 
 
