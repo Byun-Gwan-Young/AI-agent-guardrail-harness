@@ -54,4 +54,19 @@
   도구 구현 식별자. **매니페스트 `session-manifest-v0.6`** = v0.5 + `task`, `registration` (값·해시·재계산 해시·프록시 저장 일치),
   `vocabulary_violations`, `run.final_status`·`terminal_status`, 대화 과제용 `judgement`, `routing`. 대화 과제 세션에만 쓰고 이전 세션 매니페스트는
   그대로 (v0.5 테스트 유지). `analyze_session` 은 대화 step 의 `completion_gate` 를 판정 결과로 읽는다
-- `turn_order: router` 는 파트 2 (CS 라우터) 커밋 전까지 실행 전 오류
+
+## 파트 2 — CS 라우터 (DM-19)
+
+- `turn_order: router` (scenario-v2 가 대화 과제에만 허용. "CS 만" 은 시나리오 작성(C-18) 규칙이다 — 스키마는 과제 이름을 모른다)
+- 다음 차례 = 그 step 의 **검증된 최종 보고**의 `handoff_to` (관측·공유에 쓰는 것과 같은 값. G0-13 검증 보고가 있는 실패 step 포함).
+  설계 문서 3 절 (b) 와 같다 : LLM 을 따로 부르지 않고 모델 reasoning 을 읽지 않는다
+- 쓸 수 없는 `handoff_to` 는 **고정 순서로 되돌아간다** (= 시나리오 역할 목록에서 현재 역할의 다음. 같은 역할이 연달아 오지 않게 step 번호가 아니라
+  현재 역할 기준) :
+  - 역할 목록 밖 값 → 계약 단계에서 어휘 위반 `handoff_to_not_allowed` (step failed, 위반 수, 관측 제외. 설계 3 절과 같음), fallback 사유 같은 이름
+  - 자기 자신 → 보고는 유효(관측·공유 그대로), 차례만 무시. fallback 사유 `self_handoff`
+  - null → `no_handoff`. 검증 보고 없음 → 그 step 의 strict 실패 코드, 없으면 `no_verified_final_report`
+- step 기록 `route` = `{turn_order, from_agent, handoff_to, basis, next_agent, rule: handoff_to|fixed_order_fallback|fixed_order, fallback_reason}`,
+  summary `route_fallbacks`. 고정 순서에서도 `handoff_to` 는 관측에 기록만 한다
+- step 정의(한 역할의 한 차례), step 당 최대 호출 3, `max_steps` 는 고정 순서와 같다. 업스트림 요청 수 = step 호출 수 합 (테스트)
+- 왕복 수는 progress-v3 의 기록(`progress.handoff`, H = 4)만. 판정에 영향 없음 : 같은 관측에서 `handoff_to` 만 지운 재판정의 상태·결정이 같다 (테스트).
+  설명 문장만 E4 ↔ E5 로 달라진다

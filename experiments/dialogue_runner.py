@@ -8,7 +8,7 @@ step mechanics, unchanged). What differs:
 - the observation is built from the verified report's structured fields only (no narrative extraction, no reasoning)
 - a value outside a closed list is a vocabulary violation (D-17): the step fails, the value is not observed and the
   violation stays out of the consecutive strict-failure stop; a shape error still counts there
-- turn order: fixed (the CS router of DM-19 is C-17-4 part 2; until then a router scenario is refused)
+- turn order: fixed, or the router (DM-19, CS only) that follows the verified report's handoff_to
 - after each step the scenario judge reads the latest verified report and the tool call records
 - ends with success (last ordered status + judge + declaration), escalated (terminal status, DM-18), max_steps,
   guardrail_stop (block mode), strict_output_failures or runner_error
@@ -115,13 +115,28 @@ def checked_gate(gate):
 
 
 def next_turn(scenario, current, report, failure=None):
-    """(index of the next role, how it was chosen). Fixed order: the next role in the scenario list; handoff_to is
-    recorded only."""
+    """(index of the next role, how it was chosen). Fixed order: the next role in the scenario list. Router (DM-19):
+    the verified final report's handoff_to; without a usable one (no report, null, the same role) the fixed order.
+    No model call and no model reasoning (demo-runner-extension.md 3)."""
     ids = [a.id for a in scenario.agents]
     fallback = (current + 1) % len(ids)
-    route = {'turn_order': scenario.turn_order, 'from_agent': ids[current], 'handoff_to': (report or {}).get('handoff_to'),
+    handoff = (report or {}).get('handoff_to')
+    route = {'turn_order': scenario.turn_order, 'from_agent': ids[current], 'handoff_to': handoff,
              'basis': 'verified_final_report' if report is not None else None}
-    return fallback, {**route, 'next_agent': ids[fallback], 'rule': 'fixed_order', 'fallback_reason': None}
+    if scenario.turn_order == 'fixed':
+        return fallback, {**route, 'next_agent': ids[fallback], 'rule': 'fixed_order', 'fallback_reason': None}
+    if report is None:
+        # A handoff_to outside the roles never yields a verified report (handoff_to_not_allowed).
+        reason = failure or 'no_verified_final_report'
+    elif handoff is None:
+        reason = 'no_handoff'
+    elif handoff == ids[current]:
+        reason = 'self_handoff'
+    elif handoff not in ids:
+        reason = 'handoff_to_not_allowed'
+    else:
+        return ids.index(handoff), {**route, 'next_agent': handoff, 'rule': 'handoff_to', 'fallback_reason': None}
+    return fallback, {**route, 'next_agent': ids[fallback], 'rule': 'fixed_order_fallback', 'fallback_reason': reason}
 
 
 def system_message(agent, tool_names, scenario, schema_text):
@@ -189,8 +204,6 @@ def check_arguments(args, scenario):
     missing = dialogue_tools.missing_implementations(scenario)
     if missing:
         raise ValueError('Tools not implemented until C-17-6: ' + ', '.join(missing))
-    if scenario.turn_order == 'router':
-        raise ValueError('The router turn order (DM-19) is C-17-4 part 2')
     return mode
 
 
