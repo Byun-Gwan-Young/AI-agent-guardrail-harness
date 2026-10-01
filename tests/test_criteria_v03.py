@@ -13,6 +13,7 @@ from progress_schema import Observation
 from progress_signal import calculate_progress
 from progress_signal_v3 import calculate_progress as calculate_v3
 from proxy import create_app
+from tools import write_criteria_snapshot as snapshot_tool
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "guardrail-deadlock-v0.3-kmu.yaml"
@@ -40,6 +41,12 @@ def artifact_obs(step, files, passed=7, issues=("a",), agent=None):
                      "files_scope_id": "workspace-v1", "test_pass_count": passed, "test_total_count": 16,
                      "test_suite_id": "suite-v1"},
         "termination_context": CONTEXT}).model_dump()
+
+
+def series(passes, contents=None):
+    """One artifact observation per step: code.py content (default: new every step) and its pass count."""
+    contents = contents or [f"v{s}" for s in range(1, len(passes) + 1)]
+    return [artifact_obs(s, {"code.py": c}, passed=p) for s, (c, p) in enumerate(zip(contents, passes), 1)]
 
 
 def dialogue(step, agent=None, status="received", adopted=(), issues=("x",), handoff=None, metrics=T1):
@@ -77,7 +84,9 @@ def first_stop(rows):
 class PinTests(unittest.TestCase):
     def test_configured_pin_matches_registered_snapshot(self):
         pin = configured()
-        self.assertEqual(json.loads((ROOT / "docs/criteria/deadlock-v0.3.json").read_text(encoding="utf-8")), pin)
+        frozen = json.loads((ROOT / "docs/criteria/deadlock-v0.3.json").read_text(encoding="utf-8"))
+        self.assertEqual({k: frozen[k] for k in pin}, pin)
+        self.assertEqual(frozen, snapshot_tool.snapshot(pin))
         self.assertEqual(progress_version_for(pin), "progress-v3")
         self.assertEqual(pin["criteria_parameters"]["plateau_steps"], 6)
         self.assertEqual(pin["criteria_parameters"]["handoff_record_threshold"], 4)
@@ -102,6 +111,29 @@ class PinTests(unittest.TestCase):
                 pin_criteria("deadlock-v0.3", bad)
         with self.assertRaises(ValueError):
             pin_criteria("deadlock-v0.2", parameters)
+
+    def test_code_and_templates_match_the_frozen_record(self):
+        # C-17-2 refreeze: a later edit of the v0.3 code or of a template fails here until it is refrozen.
+        frozen = json.loads((ROOT / "docs/criteria/deadlock-v0.3.json").read_text(encoding="utf-8"))
+        self.assertEqual(sorted(frozen["implementation_sha256"]), sorted(snapshot_tool.V03_IMPLEMENTATION))
+        for name, digest in frozen["implementation_sha256"].items():
+            with self.subTest(file=name):
+                self.assertEqual(hashlib.sha256((ROOT / name).read_bytes()).hexdigest(), digest)
+        record = json.loads((ROOT / frozen["explanation_record"]).read_text(encoding="utf-8"))
+        self.assertEqual(record, snapshot_tool.explanation_record())
+        self.assertEqual(record["templates_sha256"], frozen["explanation_templates_sha256"])
+        self.assertEqual(snapshot_tool.canonical_sha256({k: v for k, v in record.items() if k != "templates_sha256"}),
+                         record["templates_sha256"])
+
+    def test_snapshot_tool_refuses_to_overwrite_without_refreeze(self):
+        with tempfile.TemporaryDirectory() as directory:
+            target = Path(directory) / "deadlock-v0.3.json"
+            target.write_text("{}\n", encoding="utf-8")
+            with self.assertRaises(ValueError):
+                snapshot_tool.write(target, "[]\n", refreeze=False)
+            before, after = snapshot_tool.write(target, "[]\n", refreeze=True)
+            self.assertEqual((before, after), (hashlib.sha256(b"{}\n").hexdigest(), hashlib.sha256(b"[]\n").hexdigest()))
+        self.assertEqual(snapshot_tool.snapshot(V02), V02)
 
     def test_tampered_pin_abstains(self):
         rows = replay([artifact_obs(s, {"a.py": "same"}) for s in range(1, 7)], configured())
@@ -163,6 +195,58 @@ class T3ArtifactTests(unittest.TestCase):
         self.assertEqual(rows[6]["progress"]["t3"]["test_max_step"], 7)
         self.assertIsNone(first_stop(rows))
         self.assertEqual(first_stop(replay(build(16), configured())), 16)
+
+    def test_new_session_maximum_is_counted_as_pass_count_progress(self):
+        # DM-28: the only pass-count progress is a count above every earlier count in the session.
+        rows = replay(series([7, 7, 7, 10]), configured())
+        record = rows[3]["progress"]["pass_count"]
+        self.assertEqual((record["role_event"], record["session_max_before"], record["new_session_max"],
+                          record["counted_as_progress"]), ("improved", 7, True, True))
+        self.assertIn("artifact.test_pass_count", [e["metric"] for e in rows[3]["progress"]["events"]])
+        self.assertEqual(rows[3]["progress"]["state"], "progress")
+
+    def test_drop_and_recovery_below_maximum_with_file_change_are_not_progress_after_k(self):
+        # DM-28: a file change with a lower pass count is judged like a file-only change, so after the K window
+        # it is stagnant. Before DM-28 the per-role 'regressed'/'improved' event kept these steps progress.
+        passes = [7, 7, 7] + [10] * 7 + [8, 8, 8, 9]
+        v02, v03 = replay(series(passes), V02), replay(series(passes), configured())
+        self.assertEqual(states(v03)[10:14], ["stagnant"] * 4)
+        self.assertEqual(first_stop(v03), 13)
+        self.assertEqual(states(v02)[10:14], ["progress"] * 4)
+        self.assertIsNone(first_stop(v02))
+        drop, recovery = v03[10]["progress"], v03[13]["progress"]
+        self.assertEqual((drop["pass_count"]["role_event"], drop["pass_count"]["counted_as_progress"]),
+                         ("regressed", False))
+        self.assertEqual((drop["t3"]["applied"], drop["t3"]["steps_since_test_max"]), ("test_plateau", 7))
+        self.assertEqual((recovery["pass_count"]["role_event"], recovery["pass_count"]["session_max_before"],
+                          recovery["pass_count"]["new_session_max"]), ("improved", 10, False))
+        self.assertNotIn("artifact.test_pass_count", [e["metric"] for e in recovery["events"]])
+
+    def test_fix_and_revert_with_pass_count_up_and_down_stops(self):
+        # DM-28 reason: files flip between two states and the pass count between 9 and 8. Every step is a
+        # global revert once the pass-count events no longer count, so v0.3 stops where v0.2 sees progress.
+        contents = ["s0", "s0", "s0", "s1", "s2", "s1", "s2", "s1"]
+        passes = [7, 7, 7, 9, 8, 9, 8, 9]
+        inputs = series(passes, contents)
+        v02, v03 = replay(inputs, V02), replay(inputs, configured())
+        self.assertEqual(states(v03)[3:], ["progress", "progress", "oscillating", "oscillating", "oscillating"])
+        self.assertEqual(first_stop(v03), 8)
+        self.assertEqual(states(v02)[3:], ["progress"] * 5)
+        self.assertIsNone(first_stop(v02))
+        back = v03[5]["progress"]
+        self.assertEqual((back["pass_count"]["role_event"], back["pass_count"]["new_session_max"],
+                          back["t3"]["applied"], back["t3"]["revert_to_step"]), ("improved", False, "global_revert", 4))
+
+    def test_drop_inside_the_k_window_stays_progress_through_the_file_change(self):
+        # The K = 6 slack absorbs a temporary drop of a legitimate edit (DM-28): the drop itself is not
+        # progress, but the file change is, until T3 (a) or (b) applies.
+        rows = replay(series([7, 7, 7, 10, 8, 9]), configured())
+        self.assertEqual(states(rows)[3:], ["progress"] * 3)
+        for row in rows[4:]:
+            with self.subTest(step=row["step_id"]):
+                self.assertFalse(row["progress"]["pass_count"]["counted_as_progress"])
+                self.assertTrue(row["progress"]["t3"]["only_file_change_progress"])
+                self.assertIsNone(row["progress"]["t3"]["applied"])
 
     def test_unchanged_t2_session_matches_v02(self):
         # Case 7: nothing changes (A-1-v4 shape) -> identical decisions.

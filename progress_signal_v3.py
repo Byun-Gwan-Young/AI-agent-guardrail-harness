@@ -2,19 +2,20 @@
 
 progress-v1/v2 stay frozen and are only called from here. Every parameter (K, H, the T1 metric names and the
 T3 global-revert switch) comes from the pinned criteria parameters (guardrail-deadlock-v0.3-kmu.yaml).
-Design: docs/design/demo-deadlock-v0.3.md.
+Pass-count progress is a new session maximum only (DM-28). Design: docs/design/demo-deadlock-v0.3.md.
 """
 import copy
 import hashlib
 import json
 
 from progress_signal import histories_by_agent
-from progress_signal_v1 import calculate_progress as calculate_v1
+from progress_signal_v1 import calculate_progress as calculate_v1, comparable_tests
 
 VERSION = "progress-v3"
 # T1 metric -> conversation field (demo-deadlock-v0.3.md 2-1, demo-runner-extension.md 4).
 T1_FIELDS = {"status_advance": "status", "adopted_items": "adopted_items", "new_issue_ids": "open_issue_ids"}
 RECURRENT = ("oscillation", "reopen", "revert")
+PASS_COUNT = "artifact.test_pass_count"
 
 
 def calculate_progress(history, current, parameters):
@@ -39,6 +40,13 @@ def calculate_progress(history, current, parameters):
     base = calculate_v1([legacy_view(o, t1) for o in selected], legacy_view(current, t1))
     result = {**base, **result}
     metrics, events, flags = dict(base["metrics"]), list(base["events"]), copy.deepcopy(base["flags"])
+    pass_count = None
+    if PASS_COUNT in metrics:
+        pass_count = session_pass_count(history, current, events)
+        if not pass_count["counted_as_progress"]:
+            # DM-28: only a new session maximum is pass-count progress. A drop or a recovery below the
+            # maximum is dropped here, so a step whose other movement is a file change goes to the T3 checks.
+            events = [e for e in events if e["metric"] != PASS_COUNT]
     if current["progress_source"] in ("conversation", "both"):
         for name in t1:
             metric, found = dialogue_metric(name, history, current)
@@ -71,7 +79,24 @@ def calculate_progress(history, current, parameters):
             "coverage_complete": not missing,
             "conversation_moved": any(e["metric"].startswith("conversation.") for e in events),
             "artifact_moved": any(e["metric"].startswith("artifact.") for e in events),
+            "pass_count": pass_count,
             "t3": t3, "handoff": handoff_exchange(history, current, parameters["handoff_record_threshold"])}
+
+
+def session_pass_count(history, current, events):
+    """DM-28: the pass count moves only when it exceeds every earlier comparable count in the session (all roles).
+
+    The per-role progress-v1 event is kept as evidence (role_event) but counts only for a new session maximum.
+    """
+    artifact = current.get("artifact") or {}
+    earlier = [(o.get("artifact") or {}) for o in history]
+    counts = [a["test_pass_count"] for a in earlier if comparable_tests(a, artifact)]
+    best = max(counts) if counts else None
+    now = artifact.get("test_pass_count")
+    new_max = None if now is None or best is None else now > best
+    role_event = next((e["kind"] for e in events if e["metric"] == PASS_COUNT), None)
+    return {"value": now, "session_max_before": best, "new_session_max": new_max, "role_event": role_event,
+            "counted_as_progress": role_event is not None and new_max is True}
 
 
 def legacy_view(observation, t1):

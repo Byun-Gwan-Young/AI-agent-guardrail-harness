@@ -21,5 +21,12 @@
     ],
     "handoff_record_threshold": 4
   },
-  "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50"
+  "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+  "implementation_sha256": {
+    "deadlock_policy_v03.py": "6656ed11a1ca0b2336e73302b2dcc3e9adc64dd64d55bf701967b08accc14f80",
+    "explain_v1.py": "c31630306c3d9f9908aecad39a3d8a90fae1a077a198d27b29bae56f4861a6ec",
+    "progress_signal_v3.py": "660b5f4f0d77ce8189e3fea6c033315b7866144c374b5ec1c00a06d8835b6245"
+  },
+  "explanation_record": "docs/criteria/explain-v1.json",
+  "explanation_templates_sha256": "48ab596444e6fa5e8e59d7c7d493c583bc06bccc8e8cde48c6a345e0edafafb9"
 }

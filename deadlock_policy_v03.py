@@ -49,7 +49,8 @@ def pin_criteria(version=VERSION, parameters=None):
     return {"criteria_version": version, "criteria_parameters": parameters, "criteria_sha256": digest}
 
 
-def evaluate_criteria(observations, pin):
+def evaluate_criteria(observations, pin, role_labels=None):
+    """role_labels (DM-26) changes only the explanation sentence, never the decision."""
     try:
         valid = pin_criteria(pin.get("criteria_version"), pin.get("criteria_parameters"))
     except (ValueError, TypeError):
@@ -121,7 +122,7 @@ def evaluate_criteria(observations, pin):
         # DM-9: every STOP record carries its sentence and the values behind it. A failure here must not
         # turn the decision itself into unmeasured.
         try:
-            result["explanation"] = explain(signals_from(observations, result, spec))
+            result["explanation"] = explain(signals_from(observations, result, spec), role_labels)
         except Exception as error:
             result["explanation"] = {"explanation_version": spec["explanation_version"], "status": "failed",
                                      "reason": type(error).__name__}

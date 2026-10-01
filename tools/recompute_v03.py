@@ -1,10 +1,11 @@
-"""C-17-1 part 3: re-judge existing sessions with deadlock-v0.3 / progress-v3 and explain-v1, offline.
+"""C-17-1 part 3 / C-17-2 part 0: re-judge existing sessions with deadlock-v0.3 / progress-v3 and explain-v1, offline.
 
 Inputs are the proxy logs only (observation input fields; stored progress/criteria are compared, never reused).
 No external call, no model text in the output (no narrative, reasoning, reasons or evidence). Also recomputes
 deadlock-v0.2 / progress-v2 and checks it reproduces the stored records byte-for-byte.
 
-Output: reports/c17-1/v03-recompute.json. The C-16 prediction is read from docs/design/demo-v03-inputs.json.
+Output: reports/c17-2/v03-recompute.json (C-17-1 wrote reports/c17-1/, kept as it was). The C-16 prediction is read
+from docs/design/demo-v03-inputs.json. --previous compares the v0.3 rows with an earlier report of this tool.
 """
 import argparse
 import hashlib
@@ -80,13 +81,16 @@ def session_report(label, session_id, pin, predictions):
                      'v03_state': new['progress'].get('state'), 'v03_decision': new['criteria'].get('decision'),
                      't3_applied': t3.get('applied'), 'global_revert': t3.get('global_revert'),
                      'test_plateau': t3.get('test_plateau'), 'steps_since_test_max': t3.get('steps_since_test_max'),
-                     'only_file_change_progress': t3.get('only_file_change_progress')})
+                     'only_file_change_progress': t3.get('only_file_change_progress'),
+                     # DM-28: a per-role pass-count event that is not a new session maximum is not progress.
+                     'pass_count_role_event': (new['progress'].get('pass_count') or {}).get('role_event'),
+                     'pass_count_counted': (new['progress'].get('pass_count') or {}).get('counted_as_progress')})
         explanation = new['criteria'].get('explanation')
         if explanation is not None:
             stops.append({'step': old['step_id'], 'decision': new['criteria']['decision'],
                           'template_id': explanation['template_id'], 'text': explanation['text'],
                           'values': explanation['values'], 'missing_values': explanation['missing_values'],
-                          # PM decision 3 (role display) is open; the proxy writes role IDs.
+                          # DM-26: display names once the runner registers them (T1 unit); the proxy writes IDs now.
                           'text_with_scenario_role_labels': explain(explanation['signals'], labels)['text']})
     v02_identical = all(dumps(a['progress']) == dumps(o['progress']) and dumps(a['criteria']) == dumps(o['criteria'])
                         for a, o in zip(v02, stored))
@@ -101,6 +105,8 @@ def session_report(label, session_id, pin, predictions):
             'steps_where_v02_v03_state_differs': [r['step'] for r in rows if r['v02_state'] != r['v03_state']],
             'steps_where_v02_v03_decision_differs': [r['step'] for r in rows if r['v02_decision'] != r['v03_decision']],
             't3_applied_steps': [r['step'] for r in rows if r['t3_applied']],
+            'dm28_uncounted_pass_count_event_steps': [r['step'] for r in rows if r['pass_count_role_event'] is not None
+                                                      and not r['pass_count_counted']],
             'role_labels_from_scenario': labels,
             'first_stop_explanation': stops[0] if stops else None,
             'stop_explanations': stops,
@@ -110,9 +116,26 @@ def session_report(label, session_id, pin, predictions):
             'rows': rows}
 
 
+def compare(previous, current):
+    """Steps whose v0.3 state or decision differs from an earlier report, and first-STOP sentence changes."""
+    result = {}
+    for label, session in current['sessions'].items():
+        old = previous['sessions'][label]
+        before = {r['step']: r for r in old['rows']}
+        first_old, first_new = old['first_stop_explanation'], session['first_stop_explanation']
+        result[label] = {
+            'v03_state_changed_steps': [r['step'] for r in session['rows'] if r['v03_state'] != before[r['step']]['v03_state']],
+            'v03_decision_changed_steps': [r['step'] for r in session['rows']
+                                           if r['v03_decision'] != before[r['step']]['v03_decision']],
+            'first_stop_before': old['v03_first_stop'], 'first_stop_now': session['v03_first_stop'],
+            'first_stop_text_unchanged': (first_old or {}).get('text') == (first_new or {}).get('text')}
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', type=Path, default=ROOT / 'reports/c17-1/v03-recompute.json')
+    parser.add_argument('--output', type=Path, default=ROOT / 'reports/c17-2/v03-recompute.json')
+    parser.add_argument('--previous', type=Path)
     args = parser.parse_args()
     config = load_config(CONFIG)
     pin = pin_criteria(config['criteria_version'], config['criteria_parameters'])
@@ -123,13 +146,18 @@ def main():
               'sessions': {label: session_report(label, session_id, pin, predictions)
                            for label, session_id in SESSIONS.items()}}
     report['normal_session_A-1-v3_new_stop'] = bool(report['sessions']['A-1-v3']['v03_stop_steps'])
+    if args.previous is not None:
+        previous = json.loads(args.previous.read_text(encoding='utf-8'))
+        report['compared_with'] = {'report': args.previous.resolve().relative_to(ROOT).as_posix(),
+                                   'sha256': sha256(args.previous),
+                                   'sessions': compare(previous, report)}
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
     summary = {label: {k: v for k, v in s.items() if k not in ('rows', 'stop_explanations', 'role_labels_from_scenario')}
                for label, s in report['sessions'].items()}
     print(json.dumps({'criteria_sha256': pin['criteria_sha256'],
                       'normal_session_A-1-v3_new_stop': report['normal_session_A-1-v3_new_stop'],
-                      'sessions': summary}, ensure_ascii=False, indent=1))
+                      'sessions': summary, 'compared_with': report.get('compared_with')}, ensure_ascii=False, indent=1))
 
 
 if __name__ == '__main__':

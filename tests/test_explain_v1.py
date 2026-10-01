@@ -1,4 +1,4 @@
-"""C-17-1 part 2: explain-v1 STOP sentences from judgement signal values only (DM-9)."""
+"""explain-v1 STOP sentences from judgement signal values only (DM-9; C-17-1 part 2, C-17-2 DM-26/DM-27)."""
 import json
 from pathlib import Path
 import string
@@ -9,7 +9,8 @@ from unittest import mock
 import httpx
 import deadlock_policy_v03
 import explain_v1
-from explain_v1 import TEMPLATES, E6_DIALOGUE, UNMEASURED, explain
+from criteria_policy import evaluate_criteria
+from explain_v1 import SELECTION_ORDER, TEMPLATES, E6_DIALOGUE, UNMEASURED, explain
 from proxy import create_app
 from test_criteria_v03 import CONFIG, CONTEXT, artifact_obs, configured, dialogue, replay
 from tools import analyze_session as tool
@@ -17,6 +18,7 @@ from tools import analyze_session as tool
 ROOT = Path(__file__).resolve().parents[1]
 V4 = "A-1-v4-e174aafe805b4f59bb62d7c95716b8b7"
 LABELS = {"planner": "기획", "developer": "개발", "reviewer": "리뷰"}
+CS_LABELS = {"planner": "접수", "developer": "환불 담당", "reviewer": "배송 담당"}
 
 
 def signals(**changes):
@@ -25,7 +27,8 @@ def signals(**changes):
             "declared_step": None, "test_pass_count": 7, "test_total_count": 16, "global_revert": None,
             "test_plateau_in_streak": False, "test_max_step": 1, "steps_since_test_max": 8,
             "file_state_changes_since_test_max": 0, "handoff": None, "handoff_threshold": 4, "status": None,
-            "adopted_metric_selected": False, "adopted_count": None, "adopted_required": None}
+            "adopted_metric_selected": False, "adopted_count": None, "adopted_required": None,
+            "test_observed_in_session": True}
     return {**base, **changes}
 
 
@@ -58,6 +61,10 @@ class TemplateTests(unittest.TestCase):
                    "step 5 에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 통과 테스트 7/16."),
             "E7": (signals(consecutive_states=["stagnant", "oscillating", "stagnant"]),
                    "최근 3 step 중 1 step 은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다."),
+            "E1-T1": (signals(task_kind="dialogue", status="received", test_observed_in_session=False,
+                              test_pass_count=None, test_total_count=None),
+                      "최근 3 step 동안 planner·developer·reviewer 모두 처리 상태 변화·채택 항목·새 쟁점이 없습니다. "
+                      "처리 상태 'received'."),
         }
         self.assertEqual(set(cases), set(TEMPLATES))
         for template_id, (values, text) in cases.items():
@@ -77,7 +84,8 @@ class TemplateTests(unittest.TestCase):
             forced = {"E1": {}, "E2": {"global_revert": {"paths": ["a"], "revert_to_step": 1}},
                       "E3": {"test_plateau_in_streak": True}, "E4": {"handoff": {"roles": ["a", "b"], "count": 9}},
                       "E5": {"adopted_metric_selected": True}, "E6": {"decision": "termination_failure"},
-                      "E7": {"consecutive_states": ["oscillating"]}}[template_id]
+                      "E7": {"consecutive_states": ["oscillating"]},
+                      "E1-T1": {"test_observed_in_session": False}}[template_id]
             with self.subTest(template=template_id, kind=kind):
                 result = explain(signals(task_kind=kind, **forced))
                 self.assertEqual(result["template_id"], template_id)
@@ -96,10 +104,12 @@ class TemplateTests(unittest.TestCase):
         handoff = {"roles": ["a", "b"], "count": 4}
         everything = signals(decision="termination_failure", global_revert={"paths": ["f"], "revert_to_step": 1},
                              test_plateau_in_streak=True, handoff=handoff, adopted_metric_selected=True,
-                             consecutive_states=["oscillating"] * 3)
-        order = ["E6", "E2", "E3", "E4", "E5", "E7", "E1"]
+                             consecutive_states=["oscillating"] * 3, test_observed_in_session=False)
+        order = ["E6", "E2", "E3", "E4", "E5", "E7", "E1-T1", "E1"]
+        self.assertEqual([t for t, _ in SELECTION_ORDER], order)
         removals = [{"decision": "deadlock"}, {"global_revert": None}, {"test_plateau_in_streak": False},
-                    {"handoff": None}, {"adopted_metric_selected": False}, {"consecutive_states": ["stagnant"] * 3}]
+                    {"handoff": None}, {"adopted_metric_selected": False}, {"consecutive_states": ["stagnant"] * 3},
+                    {"test_observed_in_session": True}]
         current = everything
         for expected, removal in zip(order, removals + [{}]):
             self.assertEqual(explain(current)["template_id"], expected)
@@ -168,11 +178,25 @@ class StopRecordTests(unittest.TestCase):
         self.assertEqual(rows[-1]["criteria"]["explanation"]["text"],
                          "최근 3 step 중 1 step 은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다.")
 
-    def test_dialogue_without_tests_reports_them_unmeasured(self):
+    def test_dialogue_without_tests_gives_the_t1_sentence(self):
+        # DM-27: no test observation in the session -> E1-T1, not E1 with "(측정 안 됨)/(측정 안 됨)" tests.
         rows = replay([dialogue(s, metrics=["status_advance", "new_issue_ids"]) for s in range(1, 7)], configured())
         explanation = rows[-1]["criteria"]["explanation"]
-        self.assertEqual(explanation["template_id"], "E1")
-        self.assertEqual(explanation["missing_values"], ["pass", "total"])
+        self.assertEqual(explanation["template_id"], "E1-T1")
+        self.assertEqual(explanation["text"], "최근 3 step 동안 planner·developer·reviewer 모두 처리 상태 변화·채택 항목·"
+                                              "새 쟁점이 없습니다. 처리 상태 'received'.")
+        self.assertEqual((explanation["missing_values"], explanation["signals"]["test_observed_in_session"]), ([], False))
+        self.assertNotIn(UNMEASURED, explanation["text"])
+        self.assertEqual(explain(explanation["signals"], CS_LABELS)["text"],
+                         "최근 3 step 동안 접수·환불 담당·배송 담당 모두 처리 상태 변화·채택 항목·새 쟁점이 없습니다. "
+                         "처리 상태 'received'.")
+
+    def test_a_test_observation_anywhere_in_the_session_keeps_e1(self):
+        inputs = [dialogue(s, metrics=["status_advance", "new_issue_ids"]) for s in range(1, 7)]
+        inputs[0] = {**inputs[0], "artifact": {"file_hashes": None, "files_scope_id": None, "test_pass_count": 3,
+                                               "test_total_count": 5, "test_suite_id": "suite-v1"}}
+        explanation = replay(inputs, configured())[-1]["criteria"]["explanation"]
+        self.assertEqual((explanation["template_id"], explanation["missing_values"]), ("E1", ["pass", "total"]))
 
     def test_model_text_never_reaches_the_sentence(self):
         marker = "MODEL-TEXT-MARKER"
@@ -196,6 +220,37 @@ class StopRecordTests(unittest.TestCase):
         self.assertEqual(result["decision"], "deadlock")
         self.assertEqual(result["explanation"],
                          {"explanation_version": "explain-v1", "status": "failed", "reason": "RuntimeError"})
+
+
+class RoleLabelTests(unittest.TestCase):
+    """DM-26: a role ID -> display name map is used when given, the ID otherwise. Registration is a later unit."""
+
+    def test_partial_map_falls_back_to_the_id(self):
+        result = explain(signals(), {"planner": "기획"})
+        self.assertIn("기획·developer·reviewer 모두", result["text"])
+        handoff = signals(task_kind="dialogue", status="triage", handoff={"roles": ["refund", "shipping"], "count": 4})
+        self.assertTrue(explain(handoff, {"shipping": "배송 담당"})["text"].startswith("refund 과 배송 담당 가 "))
+
+    def test_invalid_map_is_refused(self):
+        for bad in (["planner"], {"planner": ""}, {"planner": 1}, {1: "기획"}):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                explain(signals(), bad)
+
+    def test_criteria_evaluation_passes_labels_to_the_sentence_only(self):
+        rows = replay([artifact_obs(s, {"code.py": "same"}) for s in range(1, 7)], configured())
+        plain = evaluate_criteria(rows, configured())
+        labelled = evaluate_criteria(rows, configured(), LABELS)
+        self.assertIn("기획·개발·리뷰 모두", labelled["explanation"]["text"])
+        self.assertEqual(labelled["explanation"]["role_labels"], LABELS)
+        self.assertEqual({k: v for k, v in labelled.items() if k != "explanation"},
+                         {k: v for k, v in plain.items() if k != "explanation"})
+        self.assertIn("planner·developer·reviewer 모두", plain["explanation"]["text"])
+        broken = evaluate_criteria(rows, configured(), {"planner": ""})
+        self.assertEqual((broken["decision"], broken["explanation"]["status"]), ("deadlock", "failed"))
+
+    def test_record_without_the_dm27_signal_rebuilds_as_e1(self):
+        old = {k: v for k, v in signals(test_observed_in_session=False).items() if k != "test_observed_in_session"}
+        self.assertEqual(explain(old)["template_id"], "E1")
 
 
 class ManifestTests(unittest.TestCase):

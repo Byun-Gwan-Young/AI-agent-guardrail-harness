@@ -1,0 +1,54 @@
+{
+  "explanation_version": "explain-v1",
+  "unmeasured": "(측정 안 됨)",
+  "templates": {
+    "E1": "최근 {n} step 동안 {roles} 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 {pass}/{total}.",
+    "E1-T1": "최근 {n} step 동안 {roles} 모두 처리 상태 변화·채택 항목·새 쟁점이 없습니다. 처리 상태 '{status}'.",
+    "E2": "{path} 가 step {k} 의 내용으로 되돌아갔고, 통과 테스트는 {m} step 동안 {pass}/{total} 입니다.",
+    "E3": "step {a} 이후 {m} step 동안 파일이 {c} 번 바뀌었지만 통과 테스트는 {pass}/{total} 에서 늘지 않았습니다.",
+    "E4": "{role_a} 과 {role_b} 가 문의를 서로 {h} 번 넘겼고 처리 상태는 '{status}' 에서 바뀌지 않았습니다.",
+    "E5": "최근 {n} step 동안 채택 항목이 {adopted}/{required} 에서 늘지 않았고 처리 상태는 '{status}' 입니다.",
+    "E6": "step {d} 에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 통과 테스트 {pass}/{total}.",
+    "E7": "최근 {n} step 중 {o} step 은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다."
+  },
+  "variants": {
+    "E6": {
+      "dialogue": "step {d} 에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 처리 상태는 '{status}' 입니다."
+    }
+  },
+  "selection_order": [
+    [
+      "E6",
+      "termination_failure"
+    ],
+    [
+      "E2",
+      "global_revert_in_streak"
+    ],
+    [
+      "E3",
+      "test_plateau_in_streak"
+    ],
+    [
+      "E4",
+      "handoff_at_or_above_threshold"
+    ],
+    [
+      "E5",
+      "adopted_items_selected"
+    ],
+    [
+      "E7",
+      "oscillating_in_streak"
+    ],
+    [
+      "E1-T1",
+      "no_test_observation_in_session"
+    ],
+    [
+      "E1",
+      "otherwise"
+    ]
+  ],
+  "templates_sha256": "48ab596444e6fa5e8e59d7c7d493c583bc06bccc8e8cde48c6a345e0edafafb9"
+}

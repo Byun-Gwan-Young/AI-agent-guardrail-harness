@@ -1,6 +1,6 @@
 # DM-10 · DM-22: `deadlock-v0.3` / `progress-v3` (데모 트랙 판정 규칙)
 
-PM 결정 DM-10 (2026-09-29), DM-22 (C-16 결정 8). 설계 `docs/design/demo-deadlock-v0.3.md`. 구현 C-17-1.
+PM 결정 DM-10 (2026-09-29), DM-22 (C-16 결정 8), DM-26~DM-28 (C-17-1 결정, C-17-2 반영). 설계 `docs/design/demo-deadlock-v0.3.md`. 구현 C-17-1, 재동결 C-17-2.
 데모 실행 전에 등록·동결하고 데모 중 바꾸지 않는다. 파일럿 주 규칙(v0.2 / v0.3)은 데모 후 PM 결정이다.
 
 ## 구성
@@ -21,6 +21,7 @@ PM 결정 DM-10 (2026-09-29), DM-22 (C-16 결정 8). 설계 `docs/design/demo-de
 - 코드는 형식·범위와 버전 식별자(`progress-v3`, 단위 `global_step` 등)만 검사한다
 - 동결 기록 : `docs/criteria/deadlock-v0.3.json` (`criteria_sha256` `a93cc2d6…`). 설정이 이것과 다르면 테스트가 실패한다.
   값을 바꾸려면 새 criteria 버전을 만든다
+- C-17-2 부터 동결 기록은 **코드와 템플릿도** 고정한다 (아래 "C-17-2 재동결")
 - v0.1·v0.2 설정에 `criteria_parameters` 를 넣으면 프록시 시작 전 오류 (그 버전들은 코드에 고정)
 - v0.2 SPEC 의 `epsilon`, `k` 는 v0.1·v0.2 판정 어디에서도 읽지 않아 v0.3 에 넣지 않았다
 
@@ -42,6 +43,10 @@ PM 결정 DM-10 (2026-09-29), DM-22 (C-16 결정 8). 설계 `docs/design/demo-de
 
 - (a) 전역 되돌림 : 감시 파일 결합 해시가 직전 전역 step 과 다르고 세션의 더 이전 step 에 나온 상태 → oscillating
 - (b) 통과 수 정체 : 통과 수가 세션 최대를 넘은 마지막 step 으로부터 K step 초과 → stagnant
+- **통과 수 진전 (DM-28, C-17-2)** : progress-v1 의 역할별 `test_pass_count` 사건(`improved`/`regressed`)은 통과 수가
+  **세션의 이전 최대(모든 역할, 같은 suite·total)를 넘을 때만** 진전 사건으로 남긴다. 감소, 최대 아래(또는 최대와 같은 값)로의
+  회복은 사건에서 빠지고 progress 기록 `pass_count` 에 `role_event`, `session_max_before`, `new_session_max`,
+  `counted_as_progress` 로만 남는다. 그래서 파일 변경 + 통과 수 감소 step 은 "파일 변경만의 진전" 이 되어 (a)(b) 를 받는다
 - 둘 다면 (a). 다른 지표가 측정 안 됐으면 unmeasured (progress-v1 의 원칙)
 - progress 기록의 `t3` 에 결합 해시, 되돌아간 step, 바뀐 파일, 최대 통과 수와 그 step, 경과 step, 그 뒤 파일 상태 변화 수를 남긴다
 
@@ -66,7 +71,8 @@ PM 결정 DM-10 (2026-09-29), DM-22 (C-16 결정 8). 설계 `docs/design/demo-de
 - 입력은 판정 신호값뿐 : progress-v3 기록(`t3`, `handoff`, 지표 값)과 criteria 결과(연속 step·상태, 선언 step),
   관측의 통과 수·상태. LLM 호출 없음. narrative·reasoning·`reasons`·`evidence` 는 읽지 않는다
 - 선택 : `termination_failure` → E6, 연속 구간에 T3 (a) → E2, (b) → E3, 왕복 ≥ H → E4, 채택 지표 선택 → E5,
-  oscillating 포함 → E7, 그 외 E1. 하나만 낸다. E6 은 대화 과제(T1)면 뒷문장이 처리 상태
+  oscillating 포함 → E7, 세션에 테스트 관측 없음 → E1-T1 (DM-27, C-17-2), 그 외 E1. 하나만 낸다.
+  E6 은 대화 과제(T1)면 뒷문장이 처리 상태. 순서는 `explain_v1.SELECTION_ORDER` 한 곳에 있다
 - **값이 없으면 "(측정 안 됨)" 으로 쓰고 `missing_values` 에 이름을 남긴다** (C-17-1 지시). 설계 2-1 의 "다음 순위로 넘어간다"
   와 다르다. 선택은 조건(어떤 신호가 났는가)으로만 하고, 값이 빠졌다는 이유로 다른 템플릿을 고르지 않는다
 - 기록 : v0.3 criteria 의 STOP 기록(`deadlock`·`termination_failure`)마다 `explanation` =
@@ -75,10 +81,69 @@ PM 결정 DM-10 (2026-09-29), DM-22 (C-16 결정 8). 설계 `docs/design/demo-de
 - 설명 생성이 실패해도 판정은 남는다 (`explanation.status: failed`)
 - 매니페스트 : `session-manifest-v0.4` = v0.3 + `guardrail.first_stop_explanation` (첫 STOP 기록의 explanation 을 복사.
   다시 만들지 않는다). criteria 가 `deadlock-v0.3` 인 세션에만. 기존 매니페스트는 그대로
-- 역할 표시 : 프록시는 역할 ID(`planner`) 로 쓴다. 한국어 이름(시나리오 `role`)은 `role_labels` 로 줄 수 있으나
-  프록시가 시나리오를 모르므로 지금은 쓰지 않는다 (설계 3 절 PM 결정 3 미결)
-- 출처가 아직 없는 값 : E5 의 필수 항목 수(`adopted_required`), 상태 표시 이름 → 각각 "(측정 안 됨)", 상태 값 그대로
+- 역할 표시 (DM-26) : 한국어 표시 이름. `evaluate_criteria(observations, pin, role_labels)` 가 맵을 받으면 이름을, 맵에 없는
+  역할은 ID 를 쓴다. 등록 경로(실행기가 세션 시작 때 한 번 등록)는 실행기 T1 단위이고, 그 전까지 프록시는 역할 ID 로 쓴다
+- 출처가 아직 없는 값 (DM-29) : E5 의 필수 항목 수(`adopted_required`), 상태 표시 이름 → 실행기 T1 단위까지 각각
+  "(측정 안 됨)", 상태 값 그대로
 
 테스트 `tests/test_explain_v1.py` : 템플릿 7 개(+E6 대화형) 가짜 신호값, 자리표시자 = 기록 값, 측정 안 됨 표기, 선택 순서,
 재생성, 가짜 관측 순서로 E1~E7 이 실제 STOP 기록에 나옴, 모델 텍스트 표식이 문장에 들어가지 않음, 생성 실패 시 판정 유지,
 매니페스트 v0.4, API 경로 저장.
+
+## C-17-2 재동결 (DM-26 · DM-27 · DM-28)
+
+v0.3 으로 판정된 실행 세션이 0 개이므로 새 criteria 버전 없이 **v0.3 자리에서 고치고 다시 동결**한다 (S-31 과 같은 원칙).
+파라미터는 바뀌지 않았다. 그래서 `criteria_sha256` (파라미터 해시) 은 그대로 `a93cc2d6…` 이고, 바뀐 것은 코드와 템플릿이다.
+
+**바뀐 이유**
+
+- DM-28 : T3 (b) 는 "파일 변경만의 진전" 에만 적용되는데, progress-v1 의 역할별 `regressed`·`improved` 사건이 진전으로 남아
+  파일 변경 + 통과 수 감소(또는 최대 아래 회복) step 이 T3 를 비켜 갔다. 고쳤다 되돌렸다 하며 통과 수가 오르내리는 교착을 놓친다.
+  통과 수 진전을 "세션 최고 통과 수 갱신" 으로만 좁힌다. 정당한 리팩터링의 일시적 하락은 K = 6 step 여유가 흡수한다
+  (K 안에서는 파일 변경이 여전히 진전이다)
+- DM-27 : 테스트 관측이 없는 T1 세션에서 E1 이 "통과 테스트 (측정 안 됨)/(측정 안 됨)" 을 냈다. 같은 자리에 E1-T1
+  "최근 {n} step 동안 {roles} 모두 처리 상태 변화·채택 항목·새 쟁점이 없습니다. 처리 상태 '{status}'." 을 둔다.
+  조건은 STOP 까지의 관측 중 `artifact.test_pass_count` 가 하나도 없음 (`signals.test_observed_in_session = false`).
+  이 키가 없는 C-17-1 기록은 E1 로 다시 만들어진다
+- DM-26 : 역할 표시 이름 맵을 판정 경로에서 설명까지 넘길 수 있게만 했다 (위 "역할 표시"). 형식이 틀린 맵은 설명 생성 실패
+  (`explanation.status: failed`) 로 남고 판정은 그대로다
+
+**선택 순서 (explain-v1, 동결)** : E6 `termination_failure` → E2 `global_revert_in_streak` → E3 `test_plateau_in_streak` →
+E4 `handoff_at_or_above_threshold` → E5 `adopted_items_selected` → E7 `oscillating_in_streak` →
+E1-T1 `no_test_observation_in_session` → E1 `otherwise`
+
+**동결 기록이 담는 것 (C-17-2 부터)**
+
+- `docs/criteria/deadlock-v0.3.json` = 기존 pin (`criteria_version`, `criteria_parameters`, `criteria_sha256`) +
+  `implementation_sha256` (`deadlock_policy_v03.py`, `explain_v1.py`, `progress_signal_v3.py`) +
+  `explanation_record` + `explanation_templates_sha256`
+- `docs/criteria/explain-v1.json` (새 파일, 템플릿 동결 기록) = 템플릿, E6 대화형 문장, 선택 순서, `(측정 안 됨)` 표기,
+  그 정규 JSON 의 `templates_sha256`
+- 둘 다 `tools/write_criteria_snapshot.py --config guardrail-deadlock-v0.3-kmu.yaml --refreeze` 출력이다. `--refreeze` 없이
+  내용이 다르면 쓰지 않는다. `progress_signal.py`·`progress_signal_v1.py` 는 기존 보호 목록(`c17-1-protected-files.json`)이 고정한다
+- 테스트(`tests/test_criteria_v03.py`)가 파일 해시와 템플릿 기록을 현재 코드와 비교한다. 이후 v0.3 코드나 템플릿을 고치면
+  테스트가 실패하므로, PM 지시로 다시 동결하거나 새 버전을 만들어야 한다
+- 세션 기록에는 이 해시가 들어가지 않는다. 세션이 어떤 코드로 판정됐는지는 실행기가 기록하는 `git_commit` 으로 잇는다 (S-7)
+
+**이전 해시 (C-17-1, `060c8c4`) → 새 해시 (C-17-2)**
+
+| 대상 | 이전 | 새 |
+|---|---|---|
+| `docs/criteria/deadlock-v0.3.json` 파일 | `4dd9d26982575e2a6497d5e065a0e267b1ce6a017fc2b50c7140292d181128b6` | `9812a6687b49081134057ec7ce99cb91165a4a4af09cc8594a95c6d62e306db9` |
+| `criteria_sha256` (파라미터) | `a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50` | 같음 |
+| `deadlock_policy_v03.py` | `9f07795bbaa1a2bd634409e33bf641cf0d76d65723c3768003b148ff3e06a0bc` | `6656ed11a1ca0b2336e73302b2dcc3e9adc64dd64d55bf701967b08accc14f80` |
+| `explain_v1.py` | `90c2e518b726a7676b74edf29a20e38d9a8970ed48a2ce99aa13b4fd96567e4c` | `c31630306c3d9f9908aecad39a3d8a90fae1a077a198d27b29bae56f4861a6ec` |
+| `progress_signal_v3.py` | `47015012116560d5ed3596a17fc45ee8b67fb051828293f1c8ff6afca508ad54` | `660b5f4f0d77ce8189e3fea6c033315b7866144c374b5ec1c00a06d8835b6245` |
+| `docs/criteria/explain-v1.json` 파일 | 없음 (템플릿은 `explain_v1.py` 상수와 이 문서 서술뿐) | `9ef9dd422fcc8e3a61ebf6e70c802dd3714d0ba969200ad56097393ddf6e9e1f` |
+| `explanation_templates_sha256` | 없음 | `48ab596444e6fa5e8e59d7c7d493c583bc06bccc8e8cde48c6a345e0edafafb9` |
+
+이전 파일 해시는 `git show 060c8c4:<파일> | shasum -a 256` 출력, 새 해시는 스냅샷 도구 출력이다.
+
+**기존 세션 재계산** (`tools/recompute_v03.py --previous reports/c17-1/v03-recompute.json` → `reports/c17-2/v03-recompute.json`)
+
+- 첫 STOP G0-8 6 / A-1-v3 없음 / A-1-v4 9 그대로, A-1-v3 새 STOP 없음, v0.2 재계산 바이트 동일
+- C-17-1 보고 대비 v0.3 상태·판정이 바뀐 step 0, 첫 STOP 문장 동일
+- DM-28 이 역할별 통과 수 사건(`improved`, 세션 최대와 같은 값)을 진전에서 뺀 step : G0-8 step 15, A-1-v3 step 6·7.
+  앞 역할이 올린 통과 수를 다음 역할들이 자기 이전 관측과 비교해 다시 본 경우다 (G0-12). 셋 다 같은 step 에 A-1 대화 지표
+  `open_issues_count` 의 쟁점 닫기 사건과 파일 변경 사건이 있어 progress 로 남는다 ("파일 변경만의 진전" 이 아니라 T3 미적용).
+  세 세션에 T3 (a)(b) 적용 step 은 없다

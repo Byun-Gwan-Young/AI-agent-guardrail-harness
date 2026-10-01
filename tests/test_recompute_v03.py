@@ -36,3 +36,15 @@ class RecomputeToolTests(unittest.TestCase):
         self.assertEqual((first['step'], first['template_id']), (9, 'E1'))
         self.assertIn('planner·developer·reviewer', first['text'])
         self.assertIn('기획·개발·리뷰', first['text_with_scenario_role_labels'])
+
+    def test_dm28_refreeze_keeps_every_v03_decision_of_the_c17_1_report(self):
+        # C-17-2: the three sessions have no T3 event, so DM-28 must not change any v0.3 state or decision.
+        previous = json.loads((ROOT / 'reports/c17-1/v03-recompute.json').read_text(encoding='utf-8'))
+        current = {'sessions': {label: tool.session_report(label, session_id, self.pin, self.predictions)
+                                for label, session_id in tool.SESSIONS.items()}}
+        for label, result in tool.compare(previous, current).items():
+            with self.subTest(session=label):
+                self.assertEqual((result['v03_state_changed_steps'], result['v03_decision_changed_steps']), ([], []))
+                self.assertTrue(result['first_stop_text_unchanged'])
+        self.assertEqual({label: s['dm28_uncounted_pass_count_event_steps'] for label, s in current['sessions'].items()},
+                         {'G0-8': [15], 'A-1-v3': [6, 7], 'A-1-v4': []})

@@ -2,12 +2,15 @@
 
 No LLM call and no model text (narrative, reasoning). A value that was not measured is written as UNMEASURED,
 never guessed. Templates and their selection order are frozen with deadlock-v0.3 (criteria parameter
-explanation_version). Design: docs/design/demo-block-and-explanation.md 2.
+explanation_version, record docs/criteria/explain-v1.json). Design: docs/design/demo-block-and-explanation.md 2,
+plus DM-27 (E1-T1 for a session without test observations) and DM-26 (optional role display names).
 """
 VERSION = "explain-v1"
 UNMEASURED = "(측정 안 됨)"
 TEMPLATES = {
     "E1": "최근 {n} step 동안 {roles} 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 {pass}/{total}.",
+    # DM-27: E1 for a session with no test observation (T1 dialogue task) reports the dialogue signals instead.
+    "E1-T1": "최근 {n} step 동안 {roles} 모두 처리 상태 변화·채택 항목·새 쟁점이 없습니다. 처리 상태 '{status}'.",
     "E2": "{path} 가 step {k} 의 내용으로 되돌아갔고, 통과 테스트는 {m} step 동안 {pass}/{total} 입니다.",
     "E3": "step {a} 이후 {m} step 동안 파일이 {c} 번 바뀌었지만 통과 테스트는 {pass}/{total} 에서 늘지 않았습니다.",
     "E4": "{role_a} 과 {role_b} 가 문의를 서로 {h} 번 넘겼고 처리 상태는 '{status}' 에서 바뀌지 않았습니다.",
@@ -18,6 +21,11 @@ TEMPLATES = {
 # E6 for a dialogue (T1) task: the second sentence reports the status instead of tests.
 E6_DIALOGUE = "step {d} 에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 처리 상태는 '{status}' 입니다."
 STOP_DECISIONS = ("deadlock", "termination_failure")
+# demo-block-and-explanation.md 2-3 plus DM-27: the first template whose condition holds. Exactly one.
+SELECTION_ORDER = (("E6", "termination_failure"), ("E2", "global_revert_in_streak"),
+                   ("E3", "test_plateau_in_streak"), ("E4", "handoff_at_or_above_threshold"),
+                   ("E5", "adopted_items_selected"), ("E7", "oscillating_in_streak"),
+                   ("E1-T1", "no_test_observation_in_session"), ("E1", "otherwise"))
 
 
 def signals_from(observations, criteria, parameters):
@@ -49,33 +57,47 @@ def signals_from(observations, criteria, parameters):
         "status": next((s for s in reversed(statuses) if s is not None), None),
         "adopted_metric_selected": "adopted_items" in (stop.get("progress_metric") or {}).get("conversation", []),
         "adopted_count": (adopted.get("value") or {}).get("session_distinct"),
-        # The scenario's required item count has no observation field yet (runner T1 unit, after C-17-1).
+        "test_observed_in_session": any((o.get("artifact") or {}).get("test_pass_count") is not None
+                                        for o in observations),
+        # DM-29: the required item count and status display names come with the runner T1 unit.
         "adopted_required": None,
     }
 
 
-def select(signals):
-    """demo-block-and-explanation.md 2-3. Exactly one template."""
+def condition_holds(name, signals):
     handoff = signals.get("handoff") or {}
-    if signals["decision"] == "termination_failure":
-        return "E6"
-    if signals.get("global_revert"):
-        return "E2"
-    if signals.get("test_plateau_in_streak"):
-        return "E3"
-    if handoff.get("count") is not None and handoff["count"] >= signals["handoff_threshold"]:
-        return "E4"
-    if signals.get("adopted_metric_selected"):
-        return "E5"
-    if "oscillating" in (signals.get("consecutive_states") or []):
-        return "E7"
-    return "E1"
+    return {
+        "termination_failure": lambda: signals["decision"] == "termination_failure",
+        "global_revert_in_streak": lambda: bool(signals.get("global_revert")),
+        "test_plateau_in_streak": lambda: bool(signals.get("test_plateau_in_streak")),
+        "handoff_at_or_above_threshold": lambda: (handoff.get("count") is not None
+                                                  and handoff["count"] >= signals["handoff_threshold"]),
+        "adopted_items_selected": lambda: bool(signals.get("adopted_metric_selected")),
+        "oscillating_in_streak": lambda: "oscillating" in (signals.get("consecutive_states") or []),
+        # False only when it was checked: records made before DM-27 have no such key and keep E1.
+        "no_test_observation_in_session": lambda: signals.get("test_observed_in_session") is False,
+        "otherwise": lambda: True,
+    }[name]()
+
+
+def select(signals):
+    return next(template_id for template_id, name in SELECTION_ORDER if condition_holds(name, signals))
+
+
+def checked_labels(role_labels):
+    """DM-26: an optional role ID -> display name map (registered by the runner). A role without one keeps its ID."""
+    if role_labels is None:
+        return {}
+    if not isinstance(role_labels, dict) or any(not isinstance(k, str) or not isinstance(v, str) or not v.strip()
+                                                for k, v in role_labels.items()):
+        raise ValueError("role_labels must map role IDs to non-empty display names")
+    return role_labels
 
 
 def explain(signals, role_labels=None):
     """Sentence plus the values that produced it; explain(record['signals'], record['role_labels']) rebuilds it."""
     template_id = select(signals)
-    labels = role_labels or {}
+    labels = checked_labels(role_labels)
     def role(value):
         return labels.get(value, value) if value is not None else None
     roles = list(dict.fromkeys(role(r) for r in signals.get("streak_roles") or [] if r is not None))
@@ -86,6 +108,7 @@ def explain(signals, role_labels=None):
     tests = {"pass": signals.get("test_pass_count"), "total": signals.get("test_total_count")}
     values = {
         "E1": {"n": signals.get("consecutive_steps"), "roles": roles or None, **tests},
+        "E1-T1": {"n": signals.get("consecutive_steps"), "roles": roles or None, "status": signals.get("status")},
         "E2": {"path": ", ".join(revert["paths"]) if revert.get("paths") else None, "k": revert.get("revert_to_step"),
                "m": signals.get("steps_since_test_max"), **tests},
         "E3": {"a": signals.get("test_max_step"), "m": signals.get("steps_since_test_max"),
