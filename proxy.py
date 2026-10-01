@@ -60,7 +60,8 @@ def create_app(log_dir=None, transport=None, sleep=asyncio.sleep, repository=Non
     app = FastAPI()
     store = SessionStore(repository if repository is not None else JsonSessionRepository(
         log_dir or os.environ.get("GUARDRAIL_LOG_DIR", "logs")
-    ), criteria_version=config.get("criteria_version", CRITERIA_VERSION), upstream=identity)
+    ), criteria_version=config.get("criteria_version", CRITERIA_VERSION), upstream=identity,
+        criteria_parameters=config.get("criteria_parameters"))
     app.state.store = store
     app.state.upstream = identity
     install_health(app, store, clock, config.get("policy_version"))

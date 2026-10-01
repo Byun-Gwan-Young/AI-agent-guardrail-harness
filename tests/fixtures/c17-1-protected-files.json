@@ -1,0 +1,9 @@
+{
+  "deadlock_policy.py": "e51e269056a8837ac5e39af2b55f6adbaa1b4dea0836a029588cae5e436d04fb",
+  "deadlock_policy_v01.py": "b7d7775876f31ad16bd90c0056dbb89f1edab505f6a897c015d6864313ebda85",
+  "deadlock_policy_v02.py": "2f2864cf89232faddf60622706cea8dae24d027bdcbcafd4bfc3a0faa9f6861d",
+  "progress_signal.py": "6503029fbd837bbaad46bdc60abbf01cddc0b325fad3014e11e56794639da34f",
+  "progress_signal_v1.py": "718499bc38edab1106b2f74583e5935c675a89d22776f6cca32d7a3a187a03ea",
+  "docs/criteria/deadlock-v0.2.json": "3090436e3a92f47b5de5c8080211000e6262d34abe905493ea982b4acbd06214",
+  "guardrail-deadlock-v0.2-kmu.yaml": "cefb913bde17f07f9cf989a80a455eb1f51cb08a6b33363adf3d178ecddd9717"
+}

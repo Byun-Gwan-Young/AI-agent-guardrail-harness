@@ -8,8 +8,9 @@ from pydantic import ValidationError
 from conversation_extract import compare_extraction
 from progress_schema import Observation
 from progress_signal import calculate_progress
+from progress_signal_v3 import VERSION as PROGRESS_V3, calculate_progress as calculate_v3
 from session_store import utc_now
-from deadlock_policy import evaluate_criteria, progress_version_for
+from criteria_policy import evaluate_criteria, progress_version_for
 
 logger = logging.getLogger(__name__)
 
@@ -44,8 +45,12 @@ def install_observations(app, store, session_key, clock_ns=time.perf_counter_ns)
                 raise HTTPException(409, "Unknown or already assigned LLM turn")
             judgement_started = clock_ns()
             try:
-                result = calculate_progress(session.observations, observation,
-                                            version=progress_version_for(session.meta))
+                version = progress_version_for(session.meta)
+                if version == PROGRESS_V3:
+                    # progress-v3 reads K, H and its metric names from the pinned criteria parameters.
+                    result = calculate_v3(session.observations, observation, session.meta["criteria_parameters"])
+                else:
+                    result = calculate_progress(session.observations, observation, version=version)
             except Exception:
                 logger.warning("Progress calculation failed; observation retained", exc_info=True)
                 result = {"state": "unmeasured", "reason": "progress calculation failed"}

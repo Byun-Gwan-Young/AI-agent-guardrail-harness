@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Protocol
 
 from fastapi import HTTPException
-from deadlock_policy import VERSION as CRITERIA_VERSION, pin_criteria
+from criteria_policy import VERSION as CRITERIA_VERSION, pin_criteria
 
 logger = logging.getLogger(__name__)
 
@@ -101,9 +101,11 @@ class JsonSessionRepository:
 
 
 class SessionStore:
-    def __init__(self, repository: SessionRepository, criteria_version=CRITERIA_VERSION, upstream=None):
+    def __init__(self, repository: SessionRepository, criteria_version=CRITERIA_VERSION, upstream=None,
+                 criteria_parameters=None):
         self.repository = repository
-        self.criteria_pin = pin_criteria(criteria_version)
+        self.criteria_parameters = criteria_parameters
+        self.criteria_pin = pin_criteria(criteria_version, criteria_parameters)
         self.upstream = upstream
         self.sessions = {}
 
@@ -113,7 +115,7 @@ class SessionStore:
         session = Session(session_id)
         session.meta["started_at"] = utc_now()
         session.meta["upstream"] = self.upstream
-        session.meta.update(pin_criteria(self.criteria_pin["criteria_version"]))
+        session.meta.update(pin_criteria(self.criteria_pin["criteria_version"], self.criteria_parameters))
         try:
             self.repository.create(session.record())
         except FileExistsError:
