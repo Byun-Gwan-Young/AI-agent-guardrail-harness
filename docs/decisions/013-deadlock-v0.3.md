@@ -55,7 +55,8 @@ PM 결정 DM-10 (2026-09-29), DM-22 (C-16 결정 8), DM-26~DM-28 (C-17-1 결정,
 실행기는 아직 T1 필드를 만들지 않는다 (C-17 뒤 단위). 테스트는 설계 문서의 필드 정의대로 만든 가짜 관측값을 쓴다.
 
 - `conversation.status`, `conversation.adopted_items`, `conversation.handoff_to` : `demo-runner-extension.md` 4 절의 계약 v3 필드
-- **`conversation.status_values`** : 상태 순서 목록을 관측마다 함께 싣는다 (C-17-1 제안. 설계에 위치가 없어 정함)
+- ~~`conversation.status_values` : 상태 순서 목록을 관측마다 함께 싣는다 (C-17-1 제안)~~ → **세션 등록으로 옮겼다 (DM-35, C-17-3).**
+  progress-v3 는 상태 순서를 세션 등록에서만 읽고, 등록이 없으면 `status_advance` 는 unmeasured. 관측 스키마는 `status_values` 를 받지 않는다
 - 프록시 관측 스키마(`progress_schema.py`)는 아직 이 필드와 T1 지표 이름을 받지 않는다. 바꾸지 않았다 (17-4·17-5 범위)
 
 ## 테스트
@@ -183,3 +184,33 @@ E1-T1 `no_test_observation_in_session` → E1 `otherwise`
 `--output` 은 이제 필수라 이전 단위 보고를 덮어쓰지 않는다)
 
 - 첫 STOP 6 / 없음 / 9, A-1-v3 새 STOP 없음, v0.2 바이트 동일, C-17-2 보고 대비 v0.3 상태·판정 변화 0, 첫 STOP 문장 동일
+
+## C-17-3 파트 2 재동결 (DM-26 · DM-29 · DM-35 세션 등록)
+
+- 세션 등록(`docs/decisions/015` 의 등록 절)을 판정·설명이 읽는다
+  - `progress_signal_v3.calculate_progress(history, current, parameters, registration)` : `status_advance` 의 상태 순서는 등록의
+    `status_values` (id 순서). 관측의 `status_values` 는 읽지 않는다. 등록이 없으면 unmeasured ("status order not registered for the session")
+  - `evaluate_criteria(observations, pin, registration)` (C-17-2 의 `role_labels` 인자를 대체) → `signals_from(..., registration)`,
+    `explain(signals, role_labels, status_labels)`
+  - 신호값 : `adopted_required` = 등록의 `required_adopted_items` (없으면 "(측정 안 됨)"), `selected_metrics` = 등록의 지표 선택
+    (관측 API 가 관측의 선택이 등록과 같을 때만 받으므로 STOP 관측의 선택과 같다. 등록이 없으면 STOP 관측에서)
+  - 문장 : 역할은 등록 `role_labels`, 처리 상태(E1-T1·E4·E5·E6 대화형)는 등록 상태 이름. 신호값에는 원래 ID 가 남고 표시 이름은 `values` 에만.
+    STOP 기록은 `role_labels`·`status_labels` 를 함께 남겨 `explain(signals, role_labels, status_labels)` 로 같은 문장을 다시 만든다
+  - 등록이 없으면 지금처럼 ID·"(측정 안 됨)"
+- 판정 결과(상태·결정)는 등록의 표시 값과 무관하다 (같은 관측에 등록 유무만 바꾼 테스트)
+- 템플릿·문구는 바뀌지 않아 `explain-v1.json` 과 `explanation_templates_sha256` 은 파트 0 값 그대로다
+
+**이전 해시 (C-17-3 파트 0, `7987b38`) → 새 해시 (C-17-3 파트 2)**
+
+| 대상 | 이전 | 새 |
+|---|---|---|
+| `docs/criteria/deadlock-v0.3.json` 파일 | `1109d6c23ce27c52ad423122a3aa60e846c1c4cbc7616816a1498ee0f45d49ae` | `77d4c7b85e68ebc3b87a04c5c6ef0d9fe5e5a6eed30d0253f1f2d8cf14593a08` |
+| `criteria_sha256` (파라미터) | `a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50` | 같음 |
+| `deadlock_policy_v03.py` | `6656ed11a1ca0b2336e73302b2dcc3e9adc64dd64d55bf701967b08accc14f80` | `794f65e26211b7bcebbe4deadfa3e30f30dbaecc6fe361681854db23e2cef3b0` |
+| `explain_v1.py` | `555edeb72db658d050e77484b2e724d2487e5ac73d66fd1d9bca612b3700577f` | `926e83577618ee61ea489e94abf3990a8985fbb93952c540a0345e335bbe1dc9` |
+| `progress_signal_v3.py` | `660b5f4f0d77ce8189e3fea6c033315b7866144c374b5ec1c00a06d8835b6245` | `dc727697e0832a305569839d3fc347f36c093a09811e93183cc4fc478a8d6c94` |
+| `docs/criteria/explain-v1.json` 파일 | `dd877389e23b56cb82b98beb6aff5cbff48af10d3932c177b5c96230140e0eae` | 같음 |
+| `explanation_templates_sha256` | `7729d2d6af7ab58ecae9c0e4eb70245ac36b8c2960187ae2eff6c7cf6e67151a` | 같음 |
+
+**기존 세션 재계산** (`--previous reports/c17-3/v03-recompute.json --output reports/c17-3/v03-recompute-part2.json`) :
+첫 STOP 6 / 없음 / 9, A-1-v3 새 STOP 없음, v0.2 바이트 동일, 파트 0 대비 상태·판정 변화 0, 첫 STOP 문장 동일 (세 세션은 등록이 없는 세션이다)

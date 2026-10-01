@@ -31,8 +31,8 @@ def progress_version_for(pin):
     return expected["criteria_parameters"]["progress_version"]
 
 
-def evaluate_criteria(observations, pin, role_labels=None):
-    # role_labels (DM-26) only feeds the deadlock-v0.3 explanation; earlier versions write no sentence.
+def evaluate_criteria(observations, pin, registration=None):
+    # The session registration (DM-35) only exists for deadlock-v0.3 sessions; earlier versions never see it.
     if pin.get("criteria_version") == V03:
-        return evaluate_v03(observations, pin, role_labels)
+        return evaluate_v03(observations, pin, registration)
     return evaluate_legacy(observations, pin)

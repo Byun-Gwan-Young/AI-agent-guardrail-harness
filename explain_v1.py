@@ -4,7 +4,9 @@ No LLM call and no model text (narrative, reasoning). A value that was not measu
 never guessed. Templates and their selection order are frozen with deadlock-v0.3 (criteria parameter
 explanation_version, record docs/criteria/explain-v1.json). Design: docs/design/demo-block-and-explanation.md 2,
 plus DM-27 (E1-T1 for a session without test observations), DM-26 (optional role display names) and DM-31
-(E1 and E1-T1 name only the signals of the metrics the scenario selected).
+(E1 and E1-T1 name only the signals of the metrics the scenario selected). The session registration (DM-35) supplies
+role and status display names, the E5 required count (DM-29) and the selected metrics; without it, IDs and
+"(측정 안 됨)" remain.
 """
 VERSION = "explain-v1"
 UNMEASURED = "(측정 안 됨)"
@@ -38,8 +40,23 @@ SELECTION_ORDER = (("E6", "termination_failure"), ("E2", "global_revert_in_strea
                    ("E1-T1", "no_test_observation_in_session"), ("E1", "otherwise"))
 
 
-def signals_from(observations, criteria, parameters):
-    """Signal values behind one STOP record, read from progress-v3 records and the criteria result only."""
+def selected_metrics(source, metric):
+    """The metrics a judgement uses: conversation names only for a conversation source, artifact names likewise."""
+    return (["conversation." + m for m in metric.get("conversation", []) if source in ("conversation", "both")]
+            + ["artifact." + m for m in metric.get("artifact", []) if source in ("artifact", "both")])
+
+
+def registered_labels(registration):
+    """(role labels, status labels) from a session registration, or (None, None) without one."""
+    if not registration:
+        return None, None
+    statuses = (registration.get("status_values") or []) + (registration.get("terminal_statuses") or [])
+    return registration.get("role_labels") or None, {s["id"]: s["label"] for s in statuses} or None
+
+
+def signals_from(observations, criteria, parameters, registration=None):
+    """Signal values behind one STOP record, read from progress-v3 records, the criteria result and the
+    session registration only."""
     by_step = {o["step_id"]: o for o in observations}
     stop = observations[-1]
     progress = stop.get("progress") or {}
@@ -52,8 +69,8 @@ def signals_from(observations, criteria, parameters):
     t3 = progress.get("t3") or {}
     adopted = (progress.get("metrics") or {}).get("conversation.adopted_items") or {}
     statuses = [(o.get("conversation") or {}).get("status") for o in observations]
-    metric = stop.get("progress_metric") or {}
-    source = stop.get("progress_source")
+    # The observation API keeps a registered session's observations on the registered selection.
+    chosen = registration if registration else stop
     return {
         "decision": criteria["decision"], "stop_step": stop["step_id"],
         "task_kind": "dialogue" if stop.get("progress_source") == "conversation" else "artifact",
@@ -72,11 +89,9 @@ def signals_from(observations, criteria, parameters):
         "test_observed_in_session": any((o.get("artifact") or {}).get("test_pass_count") is not None
                                         for o in observations),
         # DM-31: the metrics the judgement used, so the sentence names only those.
-        "selected_metrics": ["conversation." + m for m in metric.get("conversation", [])
-                             if source in ("conversation", "both")]
-                            + ["artifact." + m for m in metric.get("artifact", []) if source in ("artifact", "both")],
-        # DM-29: the required item count and status display names come with the runner T1 unit.
-        "adopted_required": None,
+        "selected_metrics": selected_metrics(chosen.get("progress_source"), chosen.get("progress_metric") or {}),
+        # DM-29: the scenario's required item count, registered at session start; unmeasured without it.
+        "adopted_required": (registration or {}).get("required_adopted_items"),
     }
 
 
@@ -100,22 +115,27 @@ def select(signals):
     return next(template_id for template_id, name in SELECTION_ORDER if condition_holds(name, signals))
 
 
-def checked_labels(role_labels):
-    """DM-26: an optional role ID -> display name map (registered by the runner). A role without one keeps its ID."""
-    if role_labels is None:
+def checked_labels(labels):
+    """DM-26, DM-35: an optional ID -> display name map (session registration). An ID without one stays as is."""
+    if labels is None:
         return {}
-    if not isinstance(role_labels, dict) or any(not isinstance(k, str) or not isinstance(v, str) or not v.strip()
-                                                for k, v in role_labels.items()):
-        raise ValueError("role_labels must map role IDs to non-empty display names")
-    return role_labels
+    if not isinstance(labels, dict) or any(not isinstance(k, str) or not isinstance(v, str) or not v.strip()
+                                           for k, v in labels.items()):
+        raise ValueError("labels must map IDs to non-empty display names")
+    return labels
 
 
-def explain(signals, role_labels=None):
-    """Sentence plus the values that produced it; explain(record['signals'], record['role_labels']) rebuilds it."""
+def explain(signals, role_labels=None, status_labels=None):
+    """Sentence plus the values that produced it.
+
+    explain(record['signals'], record['role_labels'], record['status_labels']) rebuilds it.
+    """
     template_id = select(signals)
-    labels = checked_labels(role_labels)
+    labels, status_names = checked_labels(role_labels), checked_labels(status_labels)
     def role(value):
         return labels.get(value, value) if value is not None else None
+    raw_status = signals.get("status")
+    status = status_names.get(raw_status, raw_status) if raw_status is not None else None
     roles = list(dict.fromkeys(role(r) for r in signals.get("streak_roles") or [] if r is not None))
     handoff = signals.get("handoff") or {}
     pair = handoff.get("roles") or [None, None]
@@ -126,17 +146,16 @@ def explain(signals, role_labels=None):
     values = {
         "E1": {"n": signals.get("consecutive_steps"), "roles": roles or None, "signals": absent, **tests},
         "E1-T1": {"n": signals.get("consecutive_steps"), "roles": roles or None, "signals": absent,
-                  "status": signals.get("status")},
+                  "status": status},
         "E2": {"path": ", ".join(revert["paths"]) if revert.get("paths") else None, "k": revert.get("revert_to_step"),
                "m": signals.get("steps_since_test_max"), **tests},
         "E3": {"a": signals.get("test_max_step"), "m": signals.get("steps_since_test_max"),
                "c": signals.get("file_state_changes_since_test_max"), **tests},
-        "E4": {"role_a": role(pair[0]), "role_b": role(pair[1]), "h": handoff.get("count"),
-               "status": signals.get("status")},
+        "E4": {"role_a": role(pair[0]), "role_b": role(pair[1]), "h": handoff.get("count"), "status": status},
         "E5": {"n": signals.get("consecutive_steps"), "adopted": signals.get("adopted_count"),
-               "required": signals.get("adopted_required"), "status": signals.get("status")},
+               "required": signals.get("adopted_required"), "status": status},
         "E6": {"d": signals.get("declared_step"), "n": signals.get("consecutive_steps"),
-               **({"status": signals.get("status")} if signals.get("task_kind") == "dialogue" else tests)},
+               **({"status": status} if signals.get("task_kind") == "dialogue" else tests)},
         "E7": {"n": signals.get("consecutive_steps"),
                "o": states.count("oscillating") if isinstance(states, list) else None},
     }[template_id]
@@ -144,7 +163,7 @@ def explain(signals, role_labels=None):
     text = template.format_map({k: render_subject(v) if k == "signals" else render(v) for k, v in values.items()})
     return {"explanation_version": VERSION, "template_id": template_id, "text": text, "values": values,
             "missing_values": sorted(k for k, v in values.items() if v is None),
-            "signals": signals, "role_labels": role_labels}
+            "signals": signals, "role_labels": role_labels, "status_labels": status_labels}
 
 
 def signal_phrases(selected, template_id):

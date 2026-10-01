@@ -174,3 +174,38 @@ class Observation(Record):
         ):
             raise ValueError("Paired extraction requires a structured reference")
         return self
+
+
+class StatusLabel(Record):
+    id: str = Field(min_length=1)
+    label: str = Field(min_length=1)
+
+
+class SessionRegistration(Record):
+    """DM-26, DM-29, DM-35: scenario settings registered once when a session starts (deadlock-v0.3 only).
+
+    The status order is a judgement input of progress-v3; everything else only fills the STOP sentence.
+    Display names are scenario settings, not model output (DM-9).
+    """
+    registration_version: Literal["session-registration-v1"]
+    role_labels: dict[str, str]
+    status_values: list[StatusLabel] = Field(default_factory=list)  # ordered
+    terminal_statuses: list[StatusLabel] = Field(default_factory=list)  # outside the order, e.g. escalated
+    required_adopted_items: int | None = Field(default=None, ge=1)
+    progress_source: Literal["conversation", "artifact", "both"]
+    progress_metric: ObservedMetrics
+
+    @model_validator(mode="after")
+    def validate_registration(self):
+        if not self.role_labels or any(not k.strip() or not v.strip() for k, v in self.role_labels.items()):
+            raise ValueError("role_labels must map nonempty role IDs to nonempty display names")
+        ids = [s.id for s in self.status_values + self.terminal_statuses]
+        if len(ids) != len(set(ids)):
+            raise ValueError("Status IDs must be unique")
+        if "status_advance" in self.progress_metric.conversation and not self.status_values:
+            raise ValueError("status_advance needs the registered status order")
+        if self.progress_source in ("conversation", "both") and not self.progress_metric.conversation:
+            raise ValueError("Select at least one conversation metric")
+        if self.progress_source in ("artifact", "both") and not self.progress_metric.artifact:
+            raise ValueError("Select at least one artifact metric")
+        return self

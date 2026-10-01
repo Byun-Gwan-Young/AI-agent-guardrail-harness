@@ -31,6 +31,12 @@ def install_observations(app, store, session_key, clock_ns=time.perf_counter_ns)
         if model.uses_t1() and progress_version_for(session.meta) != PROGRESS_V3:
             # Earlier versions never accepted T1 input; it stays a schema error for them (C-17-3).
             raise HTTPException(422, "T1 fields and metrics require deadlock-v0.3 (progress-v3)")
+        registration = session.meta.get("registration")
+        if registration is not None and (
+                observation["progress_source"] != registration["progress_source"]
+                or observation["progress_metric"] != registration["progress_metric"]):
+            # The STOP sentence names the registered metrics (DM-31), so the judged ones must be the same.
+            raise HTTPException(422, "Observation metric selection differs from the session registration")
         async with session.lock:
             step = observation["step_id"]
             old = next((o for o in session.observations if o["step_id"] == step), None)
@@ -52,7 +58,8 @@ def install_observations(app, store, session_key, clock_ns=time.perf_counter_ns)
                 version = progress_version_for(session.meta)
                 if version == PROGRESS_V3:
                     # progress-v3 reads K, H and its metric names from the pinned criteria parameters.
-                    result = calculate_v3(session.observations, observation, session.meta["criteria_parameters"])
+                    result = calculate_v3(session.observations, observation, session.meta["criteria_parameters"],
+                                          registration)
                 else:
                     result = calculate_progress(session.observations, observation, version=version)
             except Exception:
@@ -60,7 +67,7 @@ def install_observations(app, store, session_key, clock_ns=time.perf_counter_ns)
                 result = {"state": "unmeasured", "reason": "progress calculation failed"}
             record = {**observation, "observed_at": utc_now(), "progress": result}
             try:
-                record["criteria"] = evaluate_criteria(session.observations + [record], session.meta)
+                record["criteria"] = evaluate_criteria(session.observations + [record], session.meta, registration)
             except Exception:
                 logger.warning("Criteria evaluation failed; observation retained", exc_info=True)
                 record["criteria"] = {"criteria_version": session.meta.get("criteria_version"),

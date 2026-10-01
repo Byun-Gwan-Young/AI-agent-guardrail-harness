@@ -12,7 +12,7 @@ import explain_v1
 from criteria_policy import evaluate_criteria
 from explain_v1 import SELECTION_ORDER, TEMPLATES, E6_DIALOGUE, UNMEASURED, explain
 from proxy import create_app
-from test_criteria_v03 import CONFIG, CONTEXT, artifact_obs, configured, dialogue, replay
+from test_criteria_v03 import CONFIG, CONTEXT, REG, artifact_obs, configured, dialogue, replay, t1_registration
 from tools import analyze_session as tool
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -122,10 +122,10 @@ class TemplateTests(unittest.TestCase):
 
     def test_record_rebuilds_the_same_sentence_and_labels_are_optional(self):
         record = explain(signals())
-        self.assertEqual(explain(record["signals"], record["role_labels"]), record)
+        self.assertEqual(explain(record["signals"], record["role_labels"], record["status_labels"]), record)
         labelled = explain(signals(), LABELS)
         self.assertIn("기획·개발·리뷰 모두", labelled["text"])
-        self.assertEqual(explain(labelled["signals"], labelled["role_labels"]), labelled)
+        self.assertEqual(explain(labelled["signals"], labelled["role_labels"], labelled["status_labels"]), labelled)
 
 
 class StopRecordTests(unittest.TestCase):
@@ -153,10 +153,10 @@ class StopRecordTests(unittest.TestCase):
 
     def test_t1_handoff_gives_e4_and_adopted_stagnation_gives_e5(self):
         agents = ["refund", "shipping"] * 3
-        rows = replay([dialogue(s, agent=a, handoff=agents[s]) for s, a in enumerate(agents[:5], 1)], configured())
+        rows = replay([dialogue(s, agent=a, handoff=agents[s]) for s, a in enumerate(agents[:5], 1)], configured(), REG)
         self.assertEqual(rows[-1]["criteria"]["explanation"]["text"],
                          "refund 과 shipping 가 문의를 서로 5 번 넘겼고 처리 상태는 'received' 에서 바뀌지 않았습니다.")
-        rows = replay([dialogue(s, status="triage", adopted=["a"]) for s in range(1, 7)], configured())
+        rows = replay([dialogue(s, status="triage", adopted=["a"]) for s in range(1, 7)], configured(), REG)
         explanation = rows[-1]["criteria"]["explanation"]
         self.assertEqual(explanation["text"],
                          f"최근 3 step 동안 채택 항목이 1/{UNMEASURED} 에서 늘지 않았고 처리 상태는 'triage' 입니다.")
@@ -170,7 +170,7 @@ class StopRecordTests(unittest.TestCase):
         self.assertEqual(rows[-1]["criteria"]["explanation"]["text"],
                          "step 4 에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 통과 테스트 7/16.")
         talk = [dialogue(s) for s in range(1, 8)]
-        rows = replay(talk[:3] + [declared(o, 4) for o in talk[3:]], configured())
+        rows = replay(talk[:3] + [declared(o, 4) for o in talk[3:]], configured(), REG)
         self.assertEqual(rows[-1]["criteria"]["explanation"]["text"],
                          "step 4 에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 'received' 입니다.")
 
@@ -183,7 +183,8 @@ class StopRecordTests(unittest.TestCase):
 
     def test_dialogue_without_tests_gives_the_t1_sentence(self):
         # DM-27: no test observation in the session -> E1-T1, not E1 with "(측정 안 됨)/(측정 안 됨)" tests.
-        rows = replay([dialogue(s, metrics=["status_advance", "new_issue_ids"]) for s in range(1, 7)], configured())
+        rows = replay([dialogue(s, metrics=["status_advance", "new_issue_ids"]) for s in range(1, 7)], configured(),
+                      t1_registration(["status_advance", "new_issue_ids"]))
         explanation = rows[-1]["criteria"]["explanation"]
         self.assertEqual(explanation["template_id"], "E1-T1")
         # DM-31: adopted_items is not selected here, so the sentence does not name it.
@@ -199,7 +200,8 @@ class StopRecordTests(unittest.TestCase):
         inputs = [dialogue(s, metrics=["status_advance", "new_issue_ids"]) for s in range(1, 7)]
         inputs[0] = {**inputs[0], "artifact": {"file_hashes": None, "files_scope_id": None, "test_pass_count": 3,
                                                "test_total_count": 5, "test_suite_id": "suite-v1"}}
-        explanation = replay(inputs, configured())[-1]["criteria"]["explanation"]
+        explanation = replay(inputs, configured(), t1_registration(["status_advance", "new_issue_ids"]))[-1][
+            "criteria"]["explanation"]
         self.assertEqual((explanation["template_id"], explanation["missing_values"]), ("E1", ["pass", "total"]))
 
     def test_model_text_never_reaches_the_sentence(self):
@@ -286,14 +288,18 @@ class RoleLabelTests(unittest.TestCase):
 
     def test_criteria_evaluation_passes_labels_to_the_sentence_only(self):
         rows = replay([artifact_obs(s, {"code.py": "same"}) for s in range(1, 7)], configured())
+        registration = {"registration_version": "session-registration-v1", "role_labels": LABELS,
+                        "progress_source": "both",
+                        "progress_metric": {"conversation": ["open_issues_count"],
+                                            "artifact": ["test_pass_count", "files_changed"]}}
         plain = evaluate_criteria(rows, configured())
-        labelled = evaluate_criteria(rows, configured(), LABELS)
+        labelled = evaluate_criteria(rows, configured(), registration)
         self.assertIn("기획·개발·리뷰 모두", labelled["explanation"]["text"])
         self.assertEqual(labelled["explanation"]["role_labels"], LABELS)
         self.assertEqual({k: v for k, v in labelled.items() if k != "explanation"},
                          {k: v for k, v in plain.items() if k != "explanation"})
         self.assertIn("planner·developer·reviewer 모두", plain["explanation"]["text"])
-        broken = evaluate_criteria(rows, configured(), {"planner": ""})
+        broken = evaluate_criteria(rows, configured(), {**registration, "role_labels": {"planner": ""}})
         self.assertEqual((broken["decision"], broken["explanation"]["status"]), ("deadlock", "failed"))
 
     def test_record_without_the_dm27_signal_rebuilds_as_e1(self):
@@ -313,7 +319,7 @@ class ManifestTests(unittest.TestCase):
         self.assertEqual(m["manifest_version"], "session-manifest-v0.4")
         first = m["guardrail"]["first_stop_explanation"]
         self.assertEqual(first, {"step_id": 9, **rows[8]["criteria"]["explanation"]})
-        self.assertEqual(explain(first["signals"], first["role_labels"])["text"], first["text"])
+        self.assertEqual(explain(first["signals"], first["role_labels"], first["status_labels"])["text"], first["text"])
         self.assertIsNone(tool.v04_fields(tool.v03_fields(tool.base_manifest(analysis, "measure", []), analysis,
                                                           conditions, rows[:5]), rows[:5])
                           ["guardrail"]["first_stop_explanation"])

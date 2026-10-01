@@ -7,7 +7,7 @@ import copy
 import hashlib
 import json
 
-from explain_v1 import STOP_DECISIONS, VERSION as EXPLAIN_VERSION, explain, signals_from
+from explain_v1 import STOP_DECISIONS, VERSION as EXPLAIN_VERSION, explain, registered_labels, signals_from
 
 VERSION = "deadlock-v0.3"
 # Identifiers that define this version. Tunable numbers are only type- and range-checked.
@@ -49,8 +49,8 @@ def pin_criteria(version=VERSION, parameters=None):
     return {"criteria_version": version, "criteria_parameters": parameters, "criteria_sha256": digest}
 
 
-def evaluate_criteria(observations, pin, role_labels=None):
-    """role_labels (DM-26) changes only the explanation sentence, never the decision."""
+def evaluate_criteria(observations, pin, registration=None):
+    """The session registration (DM-35) fills only the explanation sentence, never the decision."""
     try:
         valid = pin_criteria(pin.get("criteria_version"), pin.get("criteria_parameters"))
     except (ValueError, TypeError):
@@ -122,7 +122,8 @@ def evaluate_criteria(observations, pin, role_labels=None):
         # DM-9: every STOP record carries its sentence and the values behind it. A failure here must not
         # turn the decision itself into unmeasured.
         try:
-            result["explanation"] = explain(signals_from(observations, result, spec), role_labels)
+            result["explanation"] = explain(signals_from(observations, result, spec, registration),
+                                            *registered_labels(registration))
         except Exception as error:
             result["explanation"] = {"explanation_version": spec["explanation_version"], "status": "failed",
                                      "reason": type(error).__name__}

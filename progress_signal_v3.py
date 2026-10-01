@@ -2,7 +2,8 @@
 
 progress-v1/v2 stay frozen and are only called from here. Every parameter (K, H, the T1 metric names and the
 T3 global-revert switch) comes from the pinned criteria parameters (guardrail-deadlock-v0.3-kmu.yaml).
-Pass-count progress is a new session maximum only (DM-28). Design: docs/design/demo-deadlock-v0.3.md.
+Pass-count progress is a new session maximum only (DM-28). The status order comes from the session registration,
+never from observations (DM-35). Design: docs/design/demo-deadlock-v0.3.md.
 """
 import copy
 import hashlib
@@ -18,7 +19,7 @@ RECURRENT = ("oscillation", "reopen", "revert")
 PASS_COUNT = "artifact.test_pass_count"
 
 
-def calculate_progress(history, current, parameters):
+def calculate_progress(history, current, parameters, registration=None):
     agent_id = current.get("agent_id")
     if not isinstance(agent_id, str) or not agent_id:
         return {"version": VERSION, "state": "unmeasured", "reason": "agent_id missing",
@@ -49,7 +50,7 @@ def calculate_progress(history, current, parameters):
             events = [e for e in events if e["metric"] != PASS_COUNT]
     if current["progress_source"] in ("conversation", "both"):
         for name in t1:
-            metric, found = dialogue_metric(name, history, current)
+            metric, found = dialogue_metric(name, history, current, registration)
             metrics["conversation." + name] = metric
             for item, kind in found:
                 events.append({"metric": "conversation." + name, "item": item, "kind": kind})
@@ -106,7 +107,7 @@ def legacy_view(observation, t1):
     return {**observation, "progress_metric": view}
 
 
-def dialogue_metric(name, history, current):
+def dialogue_metric(name, history, current, registration=None):
     """T1 signals compare with the whole session (all roles), unlike the per-role progress-v2 metrics."""
     conv = current.get("conversation") or {}
     kind = conv.get("source_kind")
@@ -114,14 +115,13 @@ def dialogue_metric(name, history, current):
     earlier = [c for c in earlier if c.get("source_kind") == kind]
     now = conv.get(T1_FIELDS[name])
     if name == "status_advance":
-        order = conv.get("status_values")
-        if not (isinstance(order, list) and order and all(isinstance(s, str) for s in order)
-                and len(set(order)) == len(order)):
-            return unmeasured("status_values missing or invalid"), []
+        order = [s["id"] for s in (registration or {}).get("status_values") or []]
+        if not order or len(set(order)) != len(order):
+            return unmeasured("status order not registered for the session"), []
         if now not in order:
             # Includes the terminal status (e.g. escalated), which is outside the ordered list.
             return unmeasured("status missing or outside status_values"), []
-        before = [c["status"] for c in earlier if c.get("status_values") == order and c.get("status") in order]
+        before = [c["status"] for c in earlier if c.get("status") in order]
         if not before:
             return unmeasured("no earlier status in the session"), []
         index, best, previous = order.index(now), max(order.index(s) for s in before), order.index(before[-1])

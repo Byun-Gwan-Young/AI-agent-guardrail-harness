@@ -50,26 +50,38 @@ def series(passes, contents=None):
 
 
 def dialogue(step, agent=None, status="received", adopted=(), issues=("x",), handoff=None, metrics=T1):
-    """T1 observation with the field definitions of demo-runner-extension.md 4 (the runner does not emit them yet).
-
-    status_values carries the scenario's ordered status list with each observation (placement proposed in C-17-1).
-    """
+    """T1 observation with the fields of output-contract-v3. The status order is registered, not observed (DM-35)."""
     return {"agent_id": agent or ROLES[(step - 1) % 3], "step_id": step, "llm_turns": [step],
             "progress_source": "conversation", "progress_metric": {"conversation": list(metrics), "artifact": []},
-            "conversation": {"source_kind": "structured", "status": status, "status_values": STATUS,
+            "conversation": {"source_kind": "structured", "status": status,
                              "adopted_items": list(adopted), "open_issue_ids": list(issues), "handoff_to": handoff},
             "artifact": None, "termination_context": CONTEXT}
 
 
-def replay(inputs, pin):
+def t1_registration(metrics=T1, required=None, role_labels=None, status_labels=None):
+    """Session registration (DM-35). Default labels equal the IDs, so sentences read as the IDs did before."""
+    roles = ROLES + ["intake", "refund", "shipping"]
+    names = status_labels or {}
+    return {"registration_version": "session-registration-v1",
+            "role_labels": role_labels or {r: r for r in roles},
+            "status_values": [{"id": s, "label": names.get(s, s)} for s in STATUS],
+            "terminal_statuses": [{"id": "escalated", "label": names.get("escalated", "escalated")}],
+            "required_adopted_items": required, "progress_source": "conversation",
+            "progress_metric": {"conversation": list(metrics), "artifact": []}}
+
+
+REG = t1_registration()
+
+
+def replay(inputs, pin, registration=None):
     history = []
     for raw in inputs:
         if pin["criteria_version"] == "deadlock-v0.3":
-            progress = calculate_v3(history, raw, pin["criteria_parameters"])
+            progress = calculate_v3(history, raw, pin["criteria_parameters"], registration)
         else:
             progress = calculate_progress(history, raw, version=pin["criteria_parameters"]["progress_version"])
         record = {**raw, "progress": progress}
-        history.append({**record, "criteria": evaluate_criteria(history + [record], pin)})
+        history.append({**record, "criteria": evaluate_criteria(history + [record], pin, registration)})
     return history
 
 
@@ -260,12 +272,23 @@ class T3ArtifactTests(unittest.TestCase):
 class T1DialogueTests(unittest.TestCase):
     def test_status_forward_same_and_back(self):
         rows = replay([dialogue(1), dialogue(2), dialogue(3), dialogue(4, status="triage"),
-                       dialogue(5, status="triage"), dialogue(6, status="received")], configured())
+                       dialogue(5, status="triage"), dialogue(6, status="received")], configured(), REG)
         self.assertEqual(states(rows), ["baseline"] * 3 + ["progress", "stagnant", "oscillating"])
         self.assertEqual(rows[3]["progress"]["metrics"]["conversation.status_advance"]["value"]["session_max_index"], 0)
 
+    def test_status_order_comes_only_from_the_registration(self):
+        # DM-35: without a registered order status_advance is unmeasured; an observed order is not accepted.
+        inputs = [dialogue(1), dialogue(2), dialogue(3), dialogue(4, status="triage")]
+        rows = replay(inputs, configured())
+        self.assertEqual(rows[3]["progress"]["metrics"]["conversation.status_advance"],
+                         {"value": None, "status": "unmeasured", "reason": "status order not registered for the session"})
+        legacy = [{**i, "conversation": {**i["conversation"], "status_values": STATUS}} for i in inputs]
+        self.assertEqual(replay(legacy, configured())[3]["progress"]["metrics"]["conversation.status_advance"]["status"],
+                         "unmeasured")
+        self.assertEqual(replay(inputs, configured(), REG)[3]["progress"]["state"], "progress")
+
     def test_status_outside_the_order_is_unmeasured_not_stagnant(self):
-        rows = replay([dialogue(1), dialogue(2), dialogue(3), dialogue(4, status="escalated")], configured())
+        rows = replay([dialogue(1), dialogue(2), dialogue(3), dialogue(4, status="escalated")], configured(), REG)
         self.assertEqual(rows[3]["progress"]["state"], "unmeasured")
         self.assertEqual(rows[3]["criteria"]["decision"], "unmeasured")
 
@@ -273,7 +296,7 @@ class T1DialogueTests(unittest.TestCase):
         # Case 5: v0.2 only sees the unchanged issue list.
         inputs = [dialogue(1, adopted=["a"]), dialogue(2, adopted=["a"]), dialogue(3, adopted=["a"]),
                   dialogue(4, adopted=["a", "b"]), dialogue(5, adopted=["b", "a"])]
-        rows = replay(inputs, configured())
+        rows = replay(inputs, configured(), REG)
         self.assertEqual(states(rows)[3:], ["progress", "stagnant"])
         legacy = [{**i, "progress_metric": {"conversation": ["open_issues_count"], "artifact": []}} for i in inputs]
         self.assertEqual(states(replay(legacy, V02))[3], "stagnant")
@@ -281,14 +304,14 @@ class T1DialogueTests(unittest.TestCase):
     def test_issue_close_is_not_progress_but_new_id_is(self):
         inputs = [dialogue(1, issues=["x", "y"]), dialogue(2, issues=["x", "y"]), dialogue(3, issues=["x", "y"]),
                   dialogue(4, issues=["x"]), dialogue(5, issues=["x", "y"]), dialogue(6, issues=["x", "z"])]
-        self.assertEqual(states(replay(inputs, configured()))[3:], ["stagnant", "stagnant", "progress"])
+        self.assertEqual(states(replay(inputs, configured(), REG))[3:], ["stagnant", "stagnant", "progress"])
 
     def test_close_reopen_loop_stops_earlier_than_v02(self):
         # Case 4: v0.2 counts closing as progress; v0.3 does not.
         issues = [["x", "y"]] * 3 + [["x"]] * 3 + [["x", "y"]] * 3
         inputs = [dialogue(s, issues=i) for s, i in enumerate(issues, 1)]
         legacy = [{**i, "progress_metric": {"conversation": ["open_issues_count"], "artifact": []}} for i in inputs]
-        self.assertEqual(first_stop(replay(inputs, configured())), 6)
+        self.assertEqual(first_stop(replay(inputs, configured(), REG)), 6)
         self.assertEqual(first_stop(replay(legacy, V02)), 9)
 
     def test_status_advance_prevents_a_v02_stop(self):
@@ -296,28 +319,28 @@ class T1DialogueTests(unittest.TestCase):
         inputs = [dialogue(s, status=STATUS[max(0, s - 3)]) for s in range(1, 7)]
         legacy = [{**i, "progress_metric": {"conversation": ["open_issues_count"], "artifact": []}} for i in inputs]
         self.assertEqual(first_stop(replay(legacy, V02)), 6)
-        rows = replay(inputs, configured())
+        rows = replay(inputs, configured(), REG)
         self.assertEqual(states(rows)[3:], ["progress"] * 3)
         self.assertIsNone(first_stop(rows))
 
     def test_handoff_exchange_is_recorded_but_never_judged(self):
         agents = ["refund", "shipping"] * 3
         inputs = [dialogue(s, agent=a, handoff=agents[s]) for s, a in enumerate(agents[:5], 1)]
-        rows = replay(inputs, configured())
+        rows = replay(inputs, configured(), REG)
         record = rows[3]["progress"]["handoff"]
         self.assertEqual((record["roles"], record["count"], record["first_step"]), (["refund", "shipping"], 4, 1))
         self.assertTrue(record["at_or_above_threshold"])
         self.assertFalse(rows[2]["progress"]["handoff"]["at_or_above_threshold"])
-        silent = replay([{**i, "conversation": {**i["conversation"], "handoff_to": None}} for i in inputs], configured())
+        silent = replay([{**i, "conversation": {**i["conversation"], "handoff_to": None}} for i in inputs], configured(), REG)
         for pin in (configured(), configured(handoff_record_threshold=2)):
-            judged = replay(inputs, pin)
+            judged = replay(inputs, pin, REG)
             self.assertEqual([r["criteria"]["decision"] for r in judged], [r["criteria"]["decision"] for r in silent])
             self.assertEqual(states(judged), states(silent))
 
     def test_handoff_chain_breaks_on_a_third_role(self):
         inputs = [dialogue(1, "refund", handoff="shipping"), dialogue(2, "shipping", handoff="refund"),
                   dialogue(3, "refund", handoff="intake"), dialogue(4, "intake", handoff="refund")]
-        rows = replay(inputs, configured())
+        rows = replay(inputs, configured(), REG)
         self.assertEqual(rows[1]["progress"]["handoff"]["count"], 2)
         self.assertEqual(rows[2]["progress"]["handoff"]["count"], 1)
         self.assertEqual(rows[3]["progress"]["handoff"]["roles"], ["refund", "intake"])

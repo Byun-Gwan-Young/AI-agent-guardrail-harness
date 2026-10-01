@@ -322,3 +322,16 @@ def token_estimate(scenario):
             scenario.termination.max_llm_calls_per_step * scenario.max_tokens,
         "total_token_hard_cap": None,
         "reason": "Input growth and retries are not bounded by max_tokens; all estimates are assumptions"}
+
+
+def registration_for(scenario):
+    """The session registration of a scenario-v2 task (DM-26, DM-29, DM-35), sent once at session start."""
+    if getattr(scenario, "schema_version", None) != "scenario-v2":
+        raise ValueError("Session registration is defined for scenario-v2")
+    return {"registration_version": "session-registration-v1",
+            "role_labels": {a.id: a.role for a in scenario.agents},
+            "status_values": [s.model_dump() for s in scenario.status_values or []],
+            "terminal_statuses": [s.model_dump() for s in scenario.terminal_statuses],
+            "required_adopted_items": scenario.required_adopted_items,
+            "progress_source": scenario.progress_source,
+            "progress_metric": scenario.progress_metric.model_dump()}

@@ -16,6 +16,8 @@ from conversation_extract import extract_conversation
 from observation_api import install_observations
 from deadlock_policy import VERSION as CRITERIA_VERSION
 from deadlock_policy_v03 import VERSION as BLOCK_CRITERIA_VERSION
+from progress_schema import SessionRegistration
+from pydantic import ValidationError
 from explain_v1 import STOP_DECISIONS
 
 from urllib.parse import urlsplit
@@ -116,8 +118,21 @@ def create_app(log_dir=None, transport=None, sleep=asyncio.sleep, repository=Non
             raise HTTPException(400, "X-Guardrail-Session is required")
         if mode == "block" and request.headers.get(PHASE_HEADER) != DEMO_PHASE:
             return demo_only(request.headers.get(PHASE_HEADER))
-        session = store.start(session_key(request, {}))
-        return {"session_id": session.session_id}
+        registration = None
+        if await request.body():
+            # DM-26, DM-29, DM-35: optional scenario display settings, registered once with the session.
+            try:
+                payload = await request.json()
+                if not isinstance(payload, dict) or set(payload) - {"registration"}:
+                    raise ValueError("body accepts only registration")
+                if payload.get("registration") is not None:
+                    registration = SessionRegistration.model_validate(payload["registration"]).model_dump()
+            except (ValidationError, ValueError):
+                raise HTTPException(422, "Invalid session registration") from None
+            if registration is not None and store.criteria_pin["criteria_version"] != BLOCK_CRITERIA_VERSION:
+                raise HTTPException(422, "Session registration requires deadlock-v0.3")
+        session = store.start(session_key(request, {}), registration)
+        return {"session_id": session.session_id, **({"registered": True} if registration is not None else {})}
 
     @app.post("/sessions/end")
     async def end_session(request: Request):

@@ -110,7 +110,7 @@ class SessionStore:
         self.upstream = upstream
         self.sessions = {}
 
-    def start(self, session_id):
+    def start(self, session_id, registration=None):
         if session_id in self.sessions:
             raise HTTPException(409, "Session key already used; use a new key")
         session = Session(session_id)
@@ -119,6 +119,9 @@ class SessionStore:
         # Fixed per session: a later restart with another configuration does not change how it is treated.
         session.meta["guardrail_mode"] = self.guardrail_mode
         session.meta.update(pin_criteria(self.criteria_pin["criteria_version"], self.criteria_parameters))
+        if registration is not None:
+            # DM-35: registered once at session start and never changed; absent for unregistered sessions.
+            session.meta["registration"] = registration
         try:
             self.repository.create(session.record())
         except FileExistsError:

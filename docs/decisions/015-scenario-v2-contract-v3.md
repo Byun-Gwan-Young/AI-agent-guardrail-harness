@@ -54,3 +54,19 @@
   `Metrics` 는 v1 이름만 받는다 (그대로)
 - 관측 API : T1 지표나 T1 필드가 있는 관측은 그 세션의 판정이 progress-v3 (deadlock-v0.3) 일 때만 받는다. 아니면 422 —
   이전에도 스키마 오류 422 였으므로 v0.1·v0.2 세션의 동작은 같다
+
+## 세션 등록 (DM-26 · DM-29 · DM-35, C-17-3 파트 2)
+
+- 세션 시작 때 한 번 : `POST /sessions` 본문 `{"registration": {...}}`. 본문이 없으면 이전과 같다 (응답도 `{"session_id"}` 그대로).
+  등록이 있으면 응답에 `"registered": true`, 프록시 세션 메타 `registration` 에 저장하고 바꾸지 않는다
+- 형식 `session-registration-v1` (`progress_schema.SessionRegistration`) : `role_labels` (역할 ID → 표시 이름), `status_values`
+  (순서 있는 `{id, label}`), `terminal_statuses`, `required_adopted_items` (E5), `progress_source`, `progress_metric` (고른 지표).
+  `status_advance` 를 고르면 상태 순서 필수
+- **deadlock-v0.3 프록시에서만** 받는다. v0.1·v0.2 프록시는 422 (데이터셋 경로는 그대로)
+- 시나리오에서 만드는 함수 `scenario_schema.registration_for(scenario_v2)` — 역할 `role`, 상태·종료 상태 이름, `required_adopted_items`,
+  지표 선택을 옮긴다. 실행기가 이것을 보내는 것은 실행기 T1 단위 (실행기는 아직 scenario-v2 를 실행하지 않는다)
+- 관측 API : 등록된 세션의 관측은 `progress_source`·`progress_metric` 이 등록과 같아야 한다 (아니면 422). 설명 문장이 고른 지표를
+  나열하므로(DM-31) 판정에 쓰인 지표와 등록 지표가 어긋나지 않게 한다
+- 판정·설명이 등록을 읽는 방식은 `docs/decisions/013` "C-17-3 파트 2 재동결" 절
+- 테스트 `tests/test_session_registration.py` : 등록 모델·시나리오 변환, 잘못된 등록, API 저장·v0.3 전용·본문 형식, 등록과 다른 지표 선택 거절,
+  등록된 상태 순서로 `status_advance` 판정, 가짜 T1 관측으로 E1-T1·E5·E6 문장이 등록된 한국어 이름으로 나옴, 등록 없을 때 ID·"(측정 안 됨)"
