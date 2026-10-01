@@ -24,9 +24,9 @@
   "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
   "implementation_sha256": {
     "deadlock_policy_v03.py": "794f65e26211b7bcebbe4deadfa3e30f30dbaecc6fe361681854db23e2cef3b0",
-    "explain_v1.py": "174228410523729b474621763e100a1b2f4223c0267c40b5e4d3c62cd4726027",
+    "explain_v1.py": "14724019cdf72a4a48e78af119cba1d4cca44aa5fb2a2993133310e138453f32",
     "progress_signal_v3.py": "dc727697e0832a305569839d3fc347f36c093a09811e93183cc4fc478a8d6c94"
   },
   "explanation_record": "docs/criteria/explain-v1.json",
-  "explanation_templates_sha256": "f2a93b937e110f9e29a29ba665cfb8a01a35dd6872f7589945c4f24f378813a8"
+  "explanation_templates_sha256": "932ff49ab2e09966aa78f219089c6d7cf305c527a73efa02e513944773c55aff"
 }

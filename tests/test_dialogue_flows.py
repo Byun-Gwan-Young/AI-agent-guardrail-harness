@@ -58,7 +58,7 @@ class StallTests(unittest.IsolatedAsyncioTestCase):
                            scenario_changes={"turn_order": "fixed"}, max_steps=6, tests=self)
         stop = run["session"]["observations"][5]["criteria"]["explanation"]
         self.assertEqual((stop["template_id"], stop["text"]),
-                         ("E5", "최근 3 step 동안 채택 항목이 1/3 에서 늘지 않았고 처리 상태는 '분류' 입니다."))
+                         ("E5", "최근 3 step 동안 채택 항목이 1/3 에서 늘지 않았고 처리 상태는 '분류'입니다."))
 
     async def test_block_refuses_the_next_request_and_ends_with_guardrail_stop(self):
         run = await run_t1([report("received") for _ in range(8)], config=BLOCK_CONFIG, scenario_changes=STALL,
@@ -82,8 +82,10 @@ class EscalationTests(unittest.IsolatedAsyncioTestCase):
         reports = [report("triage", handoff="refund"), report("escalated", narrative="정책이 서로 떠넘깁니다")]
         run = await run_t1(reports, tests=self)
         summary = run["summary"]
-        self.assertEqual((summary["termination_reason"], summary["terminal_status"], summary["steps"], run["code"]),
-                         ("escalated", "escalated", 2, 0))
+        # DM-46: escalated is the one terminal status, so the reason names it; who escalated is kept (refund, not
+        # the declarer: any role's escalated report ends the run).
+        self.assertEqual((summary["termination_reason"], summary["escalated_by"], summary["steps"], run["code"]),
+                         ("escalated", "refund", 2, 0))
         self.assertEqual(summary["completion_gate"]["result"], "escalated")
         last = run["session"]["observations"][-1]
         self.assertEqual(last["conversation"]["status"], "escalated")
@@ -92,12 +94,12 @@ class EscalationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(summary["criteria_alerts"], [])
         self.assertEqual(run["session"]["meta"]["termination_reason"], "escalated")
 
-    async def test_another_terminal_status_ends_under_its_own_reason(self):
+    async def test_another_terminal_status_is_refused_by_the_schema(self):
+        # DM-46 (C-17-5): the terminal_status ending is gone; a second terminal status no longer loads.
         changes = {"terminal_statuses": [{"id": "escalated", "label": "에스컬레이션"},
                                          {"id": "withdrawn", "label": "철회"}]}
-        run = await run_t1([report("withdrawn")], scenario_changes=changes, tests=self)
-        self.assertEqual((run["summary"]["termination_reason"], run["summary"]["terminal_status"]),
-                         ("terminal_status", "withdrawn"))
+        with self.assertRaisesRegex(ValueError, "DM-46"):
+            await run_t1([report("withdrawn")], scenario_changes=changes, tests=self)
 
 
 class VocabularyTests(unittest.IsolatedAsyncioTestCase):

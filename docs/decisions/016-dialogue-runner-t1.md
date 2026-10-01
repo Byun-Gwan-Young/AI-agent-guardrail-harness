@@ -43,7 +43,9 @@
   모양을 검사(`machine_success` 는 resolved 일 때만). step 기록 `completion_gate`, 파일 해시는 `conditions.judge`
 - **종료** (summary `termination_reason`, 프록시 `/sessions/end`)
   - `success` : 실패하지 않은 step 의 보고가 순서 목록의 **마지막 상태**이고, 판정 함수 통과, 선언 규칙 충족 (선언 역할의 첫 선언 이후. 산출물 경로와 같은 규칙)
+    → **C-17-5 에서 바뀜 (DM-45)** : 선언 역할 자신의 보고 + 그 보고로 판정 통과. 아래 "C-17-5 파트 0" 절
   - `escalated` : 상태가 `escalated` (DM-18). 순서 밖의 다른 종료 상태는 `terminal_status` + `terminal_status` 값 (지시 목록에 없던 구분)
+    → **C-17-5 에서 없앰 (DM-46)** : 종료 상태는 `escalated` 하나
   - `max_steps`, `guardrail_stop` (차단 403, 산출물 경로와 같은 처리), `strict_output_failures`, `runner_error`, `user_interrupted`
   - 성공·에스컬레이션·교착 분류 집계는 C-19
 - **도구 자리** (`experiments/dialogue_tools.py`) : 역할의 도구 이름 목록으로 설계 5 절 인터페이스의 함수(`lookup_order(order_id)`,
@@ -64,6 +66,7 @@
   현재 역할 기준) :
   - 역할 목록 밖 값 → 계약 단계에서 어휘 위반 `handoff_to_not_allowed` (step failed, 위반 수, 관측 제외. 설계 3 절과 같음), fallback 사유 같은 이름
   - 자기 자신 → 보고는 유효(관측·공유 그대로), 차례만 무시. fallback 사유 `self_handoff`
+    → **C-17-5 (DM-44)** : 어휘 위반 `handoff_to_self` 로 세고 값은 관측에서 뺀다. 차례·공유·다른 필드는 그대로
   - null → `no_handoff`. 검증 보고 없음 → 그 step 의 strict 실패 코드, 없으면 `no_verified_final_report`
 - step 기록 `route` = `{turn_order, from_agent, handoff_to, basis, next_agent, rule: handoff_to|fixed_order_fallback|fixed_order, fallback_reason}`,
   summary `route_fallbacks`. 고정 순서에서도 `handoff_to` 는 관측에 기록만 한다
@@ -86,3 +89,36 @@
 | 어휘 위반 섞임 | 위반 3 연속에도 계속, 형태 오류 2 연속에 `strict_output_failures`. 위반 값 관측 없음, 위반 수 3 |
 | CS 라우터 | 왕복 기록·판정 불변·잘못된 `handoff_to` 처리 (`tests/test_dialogue_router.py`) |
 | scenario-v1 | A-1-v4 요청 12 건 바이트 동일 (첫 요청 messages 포함) |
+
+## C-17-5 파트 0 — DM-44 ~ DM-47
+
+- **DM-44 ① 자기 자신에게 넘김** : 검증된 보고의 `handoff_to` 가 보고한 역할 자신이면 어휘 위반 `handoff_to_self`
+  (`dialogue_runner.HANDOFF_TO_SELF`). 계약은 역할 ID 목록만 알고 보고한 역할을 모르므로 실행기가 찾는다
+  - 센다 : step 의 `vocabulary_violation`, 연속 어휘 위반 수, summary·매니페스트의 위반 수·step 목록
+  - 관측 : 그 값만 뺀다 (`handoff_to` 가 관측에 없음 → progress-v3 왕복 기록에서도 빠짐). `status`·`adopted_items`·쟁점 등 다른 필드는 관측한다
+  - 그대로 : 차례(라우터는 `self_handoff` 로 고정 순서), 다음 역할에게 공유되는 보고, step 상태(실패로 만들지 않음), strict 연속 카운터
+    (D-17 대로 0 으로 되돌림), 판정 함수 입력, step 기록의 `observed_final_report`
+  - **고정 순서에도 적용한다** (지시 범위 해석, 보고) : 계약의 닫힌 목록은 차례 방식과 무관하고, 자기 자신에게 넘긴다는 값은 어느 방식에서도 뜻이 없다
+  - 계약이 잡는 어휘 위반(허용 밖 역할 등)은 검증된 보고를 남기지 않으므로 이 위반과 한 step 에 겹치지 않는다
+- **DM-45 T1 완료 판정** : 선언 유지를 적용하지 않는다. 완료를 주장하는 보고(상태가 마지막 순서 상태이거나 `completion_declared: true`)가
+  실패하지 않은 step 에 오면 `completion_claim` 을 step 기록과 summary `completion_claims`·매니페스트 `judgement.completion_claims` 에 남긴다
+  - 판정 함수는 **그 보고 자체**에 다시 적용한다 (`judge(그 보고, tool_records, inputs_dir)`). step 마다의 `completion_gate`(최신 검증 보고) 는 그대로
+  - 받아들이는 조건 (사유 코드) : 보고한 역할이 선언 역할 (`not_declarer`), 상태가 마지막 순서 상태 (`status_not_completion`),
+    시나리오가 요구하면 `completion_declared: true` (`not_declared`), 판정 함수 `resolved` (`judge_<result>`). 하나라도 어긋나면 기록만 하고 계속 돈다
+  - `require_completion_declaration: false` 여도 선언 역할의 보고여야 한다 (판정 대상이 보고 자체라 최종 답의 주체가 바뀌지 않게, DM-45 이유)
+  - 실패한 step 의 검증된 보고는 완료 주장으로 보지 않는다 (이전과 같이 실패 step 은 종료 판정을 건너뛴다)
+  - **선언 역할이 아닌 역할의 보고** (지시 : 정해서 적고 테스트)
+    - 완료 상태(또는 `completion_declared: true`) : 성공 아님. `not_declarer` 로 기록하고 계속. 상태 값은 공유 상태로 그대로 관측한다
+    - `escalated` : **어느 역할이든 세션을 끝낸다** (종료 사유 `escalated`, summary·매니페스트 `escalated_by` = 보고한 역할).
+      에스컬레이션은 판정 함수가 채점하는 최종 답이 아니라 과제 결함 선언이고, 계속 돌리면 결함 선언 뒤의 소비가 된다
+      (`demo-runner-extension.md` 2 절). 모순은 보통 담당 역할(환불·배송)이 먼저 알아챈다
+  - E6 등 신호용 "첫 선언 step" (`termination_context`) 기록은 그대로다
+  - C-17-4 의 "선언 유지로 step 2 에 성공" 테스트는 `test_a_declaration_does_not_carry_over_to_another_role` 로 바꿨다
+- **DM-46 종료 상태** : scenario-v2 대화 과제의 `terminal_statuses` 는 정확히 `[escalated]` 이다 (스키마 오류 "DM-46"). 완료 상태는 순서 목록의
+  마지막 상태 하나다. 종료 사유 `terminal_status` 와 summary·매니페스트의 `terminal_status` 필드를 없앴다 (`escalated_by` 로 대체).
+  매니페스트는 v0.6 자리에서 고쳤다 — v0.6 매니페스트를 만든 실제 세션은 없다 (도구 구현 C-17-6 전)
+- **DM-47 전달 규칙 이름** : 차례 사이 전달(narrative + 직전 보고의 `status`·`handoff_to`·`adopted_items`·`deliverable`)을
+  `t1-handoff-v1` (`dialogue_runner.RECENT_MESSAGES_RULE`) 로 부르고 `conditions.recent_messages_rule`, summary, 매니페스트
+  `task.recent_messages_rule` 에 남긴다. 프로토콜 번호는 v10 그대로
+- 테스트 `tests/test_c17_5_part0.py` (DM-42~DM-47), 바뀐 C-17-4 테스트 : 라우터 fallback (관측에 `handoff_to` 없음), 에스컬레이션 (`escalated_by`),
+  다른 종료 상태 (스키마 거절), 선언 유지 (위)

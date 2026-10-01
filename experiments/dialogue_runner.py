@@ -10,8 +10,11 @@ step mechanics, unchanged). What differs:
   violation stays out of the consecutive strict-failure stop; a shape error still counts there
 - turn order: fixed, or the router (DM-19, CS only) that follows the verified report's handoff_to
 - after each step the scenario judge reads the latest verified report and the tool call records
-- ends with success (last ordered status + judge + declaration), escalated (terminal status, DM-18), max_steps,
-  guardrail_stop (block mode), strict_output_failures or runner_error
+- a handoff_to naming the reporting role itself is a vocabulary violation (DM-44): counted, kept out of the
+  observation; the report's other fields stay valid and the router falls back to the fixed order
+- ends with success (DM-45: the declarer's own report is in the completion status, declares completion and passes the
+  judge; a failed claim is recorded and the run goes on), escalated (the one terminal status, DM-18, DM-46),
+  max_steps, guardrail_stop (block mode), strict_output_failures or runner_error
 
 Tools are only handed on (experiments/dialogue_tools.py); their implementations are C-17-6.
 The artifact path (scenario-v1 and its requests) is untouched: experiments/run_scenario.py dispatches here only for
@@ -36,9 +39,14 @@ from experiments.observation_collection import INDEPENDENT, collection_metadata,
 from experiments.step_execution import (NO_OUTPUT_PLACEHOLDER, PROTOCOL_V10, StrictFailureStreak, harness_facts,
                                         make_client, perform_step)
 from progress_schema import Conversation, Observation
-from scenario_schema import registration_for
+from scenario_schema import ESCALATED, registration_for
 
 FLOW_VERSION = 'dialogue-flow-v1'
+# DM-47: the name of what the next role receives from a turn (SHARED_FIELDS below), recorded with the run.
+RECENT_MESSAGES_RULE = 't1-handoff-v1'
+# DM-44: a well-formed handoff_to that names the reporting role itself. Only the runner knows the reporting role, so
+# this vocabulary violation is found here, not by the contract (which checks the closed list of role IDs).
+HANDOFF_TO_SELF = 'handoff_to_self'
 # The judge and inputs_dir are repository paths; offline tests point this at their fixtures.
 SCENARIO_ROOT = common.ROOT
 CLOSED_LIST_CHECKS = ('after_receipt', 'provider_strict')
@@ -171,14 +179,28 @@ def observation(step, agent, turns, scenario, report, collection, termination, c
                        issue_report=contract.report(report)).model_dump()
 
 
-def ending(report, gate, declared, scenario):
-    """Termination reason after a non-failed step, or None to continue."""
-    terminal = {s.id for s in scenario.terminal_statuses}
-    if report['status'] in terminal:
-        # DM-18: escalated is its own outcome; another terminal status ends the run under its own name.
-        return 'escalated' if report['status'] == 'escalated' else 'terminal_status'
-    if (report['status'] == scenario.status_values[-1].id and gate['machine_success']
-            and (declared or not scenario.termination.require_completion_declaration)):
+def completion_claim(scenario, agent, report, gate):
+    """DM-45: a report claiming completion (the completion status, or completion_declared). It ends the run only when
+    it is the declarer's own report, in the completion status, declared (when the scenario requires it) and passes
+    the judge on that same report. No declaration carries over from an earlier step."""
+    declarer = scenario.termination_context_collection.declarer_agent
+    reasons = (['not_declarer'] * (agent != declarer)
+               + ['status_not_completion'] * (report['status'] != scenario.status_values[-1].id)
+               + ['not_declared'] * (scenario.termination.require_completion_declaration
+                                     and report['completion_declared'] is not True)
+               + ([] if gate['machine_success'] else ['judge_' + gate['result']]))
+    return {'agent': agent, 'declarer': declarer, 'status': report['status'],
+            'completion_declared': report['completion_declared'], 'gate': gate, 'accepted': not reasons,
+            'reasons': reasons}
+
+
+def ending(report, claim):
+    """Termination reason after a non-failed step, or None to continue. DM-46: escalated is the only terminal status;
+    any role's escalated report ends the run (DM-18: continuing would spend tokens after the task was declared
+    defective), while success needs the declarer's own accepted claim (DM-45)."""
+    if report['status'] == ESCALATED:
+        return 'escalated'
+    if claim is not None and claim['accepted']:
         return 'success'
     return None
 
@@ -259,6 +281,7 @@ async def run_dialogue(args, scenario, scenario_path):
                                  '(issue IDs, status, handoff_to) fail the step, are not observed, are excluded from '
                                  'that streak and counted separately; no automatic B fallback',
         'task_kind': 'dialogue', 'turn_order': scenario.turn_order, 'dialogue_flow': FLOW_VERSION,
+        'recent_messages_rule': RECENT_MESSAGES_RULE,
         'routing_policy': ('router: next role = handoff_to of the verified final report; fixed order when there is '
                            'none, it is null or the same role (DM-19)' if scenario.turn_order == 'router'
                            else 'fixed order; handoff_to recorded only'),
@@ -303,9 +326,9 @@ async def run_dialogue(args, scenario, scenario_path):
                              system_message=system_message(a, role_names[i], scenario, schema_text))
               for i, a in enumerate(scenario.agents)]
     declarer = scenario.termination_context_collection.declarer_agent
-    steps, missing, first, observation_first = [], [], None, None
+    steps, missing, observation_first, claims = [], [], None, []
     reason, error, session, started = 'max_steps', None, None, False
-    guardrail_block, terminal, latest_report, gate = None, None, None, None
+    guardrail_block, escalated_by, latest_report, gate = None, None, None, None
     history, cursors, pending_feedback = [], [0] * len(agents), [None] * len(agents)
     strict_streak = StrictFailureStreak()
     vocabulary_streak, vocabulary_total = StrictFailureStreak(), 0
@@ -355,8 +378,6 @@ async def run_dialogue(args, scenario, scenario_path):
                 vocabulary = outcome['strict_failure'] if outcome['strict_failure'] in VOCABULARY_VIOLATIONS_V3 else None
                 # D-17: a vocabulary violation is not a strict failure for the stop streak.
                 stop_for_strict = strict_streak.observe(outcome['strict_failure'] if vocabulary is None else None)
-                vocabulary_streak.observe(vocabulary)
-                vocabulary_total += vocabulary is not None
                 text, call_error = outcome['text'], outcome['error']
                 pending_feedback[index] = outcome['feedback']
                 if not outcome['failed']:
@@ -377,12 +398,17 @@ async def run_dialogue(args, scenario, scenario_path):
                     shared, shared_source = receipt['value'], 'verified_final_report'
                 history.append(shared_entry(name, shared))
                 cursors[index] = len(history)
-                first, termination = common.termination_context(first, parsed, step, declarer)
                 observed, _ = select_sources(INDEPENDENT, failed=outcome['failed'], legacy_parsed=parsed,
                                              final_report=receipt, artifact=None)
                 if observed is not None:
                     observed.update(agent_id=name, step_id=step)
                     latest_report = observed
+                # DM-44: a contract vocabulary violation leaves no verified report, so the two never meet.
+                self_handoff = observed is not None and observed['handoff_to'] == name
+                if self_handoff:
+                    vocabulary = HANDOFF_TO_SELF
+                vocabulary_streak.observe(vocabulary)
+                vocabulary_total += vocabulary is not None
                 # Observation declaration must not alter execution success/stop control.
                 observation_first, termination = common.termination_context(observation_first, observed, step,
                                                                              declarer)
@@ -407,14 +433,24 @@ async def run_dialogue(args, scenario, scenario_path):
                           'vocabulary_violations_total': vocabulary_total, 'collection': metadata,
                           'observed_final_report': observed, 'measurement_status': metadata['measurement_status'],
                           'route': route}
+                claim = None
+                if not outcome['failed'] and (parsed['status'] == scenario.status_values[-1].id
+                                              or parsed['completion_declared']):
+                    # DM-45: judged on this report itself, not on an earlier one or another role's.
+                    claim = completion_claim(scenario, name, parsed, checked_gate(judge(
+                        copy.deepcopy(parsed), tool_records=copy.deepcopy(dispatch.records), inputs_dir=inputs_dir)))
+                    claims.append({'step_id': step, **claim})
+                    record['completion_claim'] = claim
                 steps.append(record)
                 common.save(out / 'steps.json', steps)
                 common.save(out / 'tool-dispatch.json', dispatch.records)
                 if not budget.turns:
                     missing.append(step)
                     raise RuntimeError('No proxy turn ID; cannot submit a linked observation')
-                payload = observation(step, name, record['llm_turns'], scenario, observed, metadata, termination,
-                                      contract)
+                # DM-44: the self-naming handoff_to is left out of the observation; the other fields are observed.
+                payload = observation(step, name, record['llm_turns'], scenario,
+                                      {**observed, 'handoff_to': None} if self_handoff else observed, metadata,
+                                      termination, contract)
                 common.save(out / 'observations' / f'{step}.pending.json', payload)
                 try:
                     ack = await common.deliver(client, session_id, payload)
@@ -443,10 +479,10 @@ async def run_dialogue(args, scenario, scenario_path):
                 index = next_index
                 if outcome['failed']:
                     continue
-                ended = ending(parsed, gate, first is not None, scenario)
+                ended = ending(parsed, claim)
                 if ended is not None:
                     reason = ended
-                    terminal = parsed['status'] if ended in ('escalated', 'terminal_status') else None
+                    escalated_by = name if ended == 'escalated' else None
                     break
         except asyncio.CancelledError:
             reason, error = 'user_interrupted', 'Cancelled by user'
@@ -491,8 +527,11 @@ async def run_dialogue(args, scenario, scenario_path):
                 'vocabulary_violations_total': vocabulary_total,
                 'failed_steps': [{'step_id': s['step_id'], 'reasons': s.get('failure_reasons', [])}
                                  for s in steps if s.get('step_status') == 'failed'],
-                'final_status': (latest_report or {}).get('status'), 'terminal_status': terminal,
+                'final_status': (latest_report or {}).get('status'), 'escalated_by': escalated_by,
                 'completion_gate': gate,
+                'completion_claims': [{k: c[k] for k in ('step_id', 'agent', 'status', 'completion_declared',
+                                                         'accepted', 'reasons')} for c in claims],
+                'recent_messages_rule': RECENT_MESSAGES_RULE,
                 'route_fallbacks': [{'step_id': s['step_id'], 'reason': s['route']['fallback_reason']}
                                     for s in steps if (s.get('route') or {}).get('fallback_reason')]}
             if guardrail_block is not None:

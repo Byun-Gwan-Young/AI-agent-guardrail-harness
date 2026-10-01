@@ -243,3 +243,35 @@ E1-T1 `no_test_observation_in_session` → E1 `otherwise`
 **기존 세션 재계산** (`--previous reports/c17-3/v03-recompute-part2.json --output reports/c17-4/v03-recompute.json`) :
 첫 STOP 6 / 없음 / 9, A-1-v3 새 STOP 없음, v0.2 바이트 동일, 이전 대비 상태·판정 변화 0, 첫 STOP 문장 동일
 (세 세션의 STOP 은 모두 E1 이고 E4 가 없다)
+
+## C-17-5 파트 0 재동결 (DM-42 띄어쓰기 · DM-43 E4 선택 조건)
+
+- **DM-42** : 따옴표로 감싼 상태 이름 뒤 조사와 '입니다' 를 붙여 쓴다. 경로 자리는 "{path} 파일이" 로 바꿔 영문 끝 글자의 받침 문제를 없앤다
+  - 고친 자리 : E4 "처리 상태는 '{status}'에서", E5 "처리 상태는 '{status}'입니다", E6 대화형 "처리 상태는 '{status}'입니다",
+    E2 "{path} 파일이 step {k} 의 …" (경로 자리가 있는 템플릿은 E2 뿐)
+  - 해당 없음 : E1-T1 "처리 상태 '{status}'." (따옴표 뒤가 마침표), E1·E3·E6·E7 (상태·따옴표·경로 자리 없음)
+  - 그대로 둔 자리 (DM-42 범위 밖, 보고) : 숫자 뒤 단위 "{n} step", "{h} 번" (DM-42 가 그대로라고 정함). 숫자 뒤 조사·'입니다' —
+    E2 "step {k} 의", "{pass}/{total} 입니다", E3 "{pass}/{total} 에서", E5 "{adopted}/{required} 에서", E6 "step {d} 에" — 는
+    DM-42 의 대상(상태 이름·따옴표·경로)이 아니라 바꾸지 않았다
+- **DM-43** : E4 의 선택 조건을 `handoff_at_or_above_threshold` → `handoff_pair_and_count_at_or_above_threshold` 로 바꿨다.
+  왕복 기록의 두 역할이 모두 있고 왕복 수가 있으며 H 이상일 때만 E4. 아니면 선택 순서의 다음 템플릿 (E5 → E7 → E1-T1 → E1).
+  그래서 "(측정 안 됨) (측정 안 됨) 문의를 서로 …" 문장은 더 이상 만들어지지 않는다
+  - progress-v3 의 왕복 기록은 왕복 수가 0 일 때만 역할이 null 이므로 실제 판정에서 조건이 달라지는 경우는 없다 (방어 조건)
+  - "(측정 안 됨)" 은 다른 템플릿의 값 자리에는 여전히 나올 수 있다 (예 : 등록 없는 세션의 E5 필수 항목 수). DM-43 의 지시 범위는 E4 다
+- 선택 순서·문구 외 동결 기록(`particles`, `signal_phrases`)은 그대로다
+
+**이전 해시 (C-17-4 파트 0, `81b0102`) → 새 해시 (C-17-5 파트 0)**
+
+| 대상 | 이전 | 새 |
+|---|---|---|
+| `docs/criteria/deadlock-v0.3.json` 파일 | `6bd633832e561b4caeeacaa1c1e9586144131c2f24bcf4d68b8d5b0152fe15c5` | `7edbc82aa1b20e92bdf818ae91591ef00d1be1bb7e991c35af6f31379533b06d` |
+| `criteria_sha256` (파라미터) | `a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50` | 같음 |
+| `deadlock_policy_v03.py` | `794f65e26211b7bcebbe4deadfa3e30f30dbaecc6fe361681854db23e2cef3b0` | 같음 |
+| `explain_v1.py` | `174228410523729b474621763e100a1b2f4223c0267c40b5e4d3c62cd4726027` | `14724019cdf72a4a48e78af119cba1d4cca44aa5fb2a2993133310e138453f32` |
+| `progress_signal_v3.py` | `dc727697e0832a305569839d3fc347f36c093a09811e93183cc4fc478a8d6c94` | 같음 |
+| `docs/criteria/explain-v1.json` 파일 | `1acf469e8b7b10f6113f25d6a38e57594771aec68ea5f3b1500fbc2931aa875b` | `5fd70261593141c84d0cbcb3ad4893017eedd9076b04394b084547eb69bc7646` |
+| `explanation_templates_sha256` | `f2a93b937e110f9e29a29ba665cfb8a01a35dd6872f7589945c4f24f378813a8` | `932ff49ab2e09966aa78f219089c6d7cf305c527a73efa02e513944773c55aff` |
+
+**기존 세션 재계산** (`--previous reports/c17-4/v03-recompute.json --output reports/c17-5/v03-recompute.json`) :
+첫 STOP 6 / 없음 / 9, A-1-v3 새 STOP 없음, v0.2 바이트 동일, 이전 대비 상태·판정 변화 0, 첫 STOP 문장 동일
+(세 세션의 STOP 은 모두 E1 이라 DM-42·DM-43 이 닿는 자리가 없다)

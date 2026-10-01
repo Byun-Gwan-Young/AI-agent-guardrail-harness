@@ -496,7 +496,8 @@ def v06_fields(result, conditions, summary, log):
     result['manifest_version'] = 'session-manifest-v0.6'
     result['task'] = {k: conditions.get(k) for k in ('task_kind', 'turn_order', 'dialogue_flow', 'output_contract_version',
                                                      'contract_sha256', 'allowed_issues_sha256', 'closed_list_check',
-                                                     'judge', 'inputs_dir', 'tools', 'tool_implementations')}
+                                                     'judge', 'inputs_dir', 'tools', 'tool_implementations',
+                                                     'recent_messages_rule')}
     result['registration'] = {
         'value': registration, 'sha256': conditions.get('registration_sha256'),
         'sha256_recomputed': hashlib.sha256(json.dumps(registration, ensure_ascii=False, sort_keys=True,
@@ -505,12 +506,15 @@ def v06_fields(result, conditions, summary, log):
     result['vocabulary_violations'] = {'total': summary.get('vocabulary_violations_total'),
                                        'steps': summary.get('vocabulary_violation_steps'),
                                        'excluded_from_strict_failure_streak': True}
-    result['run'].update(final_status=summary.get('final_status'), terminal_status=summary.get('terminal_status'))
+    # DM-46: escalated is the one terminal status, so the termination reason already names it; who escalated is kept.
+    result['run'].update(final_status=summary.get('final_status'), escalated_by=summary.get('escalated_by'))
     result['judgement'] = {'before': None, 'after': {'gate': summary.get('completion_gate'),
                                                      'final_status': summary.get('final_status')},
                            'normal_session': summary.get('termination_reason') == 'success',
-                           'normal_session_rule': 'dialogue task: last ordered status, scenario judge resolved and '
-                                                  'completion declared (demo-runner-extension.md 2)'}
+                           'normal_session_rule': "dialogue task (DM-45): the declarer's own report in the last "
+                                                  'ordered status, completion declared, and the scenario judge '
+                                                  'resolved on that same report',
+                           'completion_claims': summary.get('completion_claims')}
     last = next((o for o in reversed(observations) if (o.get('progress') or {}).get('handoff') is not None), None)
     result['routing'] = {'turn_order': conditions.get('turn_order'), 'fallbacks': summary.get('route_fallbacks'),
                          'handoff_at_end': (last or {}).get('progress', {}).get('handoff'),

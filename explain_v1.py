@@ -7,7 +7,9 @@ plus DM-27 (E1-T1 for a session without test observations), DM-26 (optional role
 (E1 and E1-T1 name only the signals of the metrics the scenario selected). The session registration (DM-35) supplies
 role and status display names, the E5 required count (DM-29) and the selected metrics; without it, IDs and
 "(측정 안 됨)" remain. DM-36: a particle after a name slot is written in the template as "{slot:받침형/모음형}" and
-attached to the name by the DM-31 final-consonant rule.
+attached to the name by the DM-31 final-consonant rule. DM-42: after a quoted status name a particle or '입니다' is
+attached with no space, and a path slot reads "{path} 파일이". DM-43: E4 is chosen only when both role names and the
+round-trip count are known; otherwise selection moves on to the next template.
 """
 VERSION = "explain-v1"
 UNMEASURED = "(측정 안 됨)"
@@ -16,16 +18,17 @@ TEMPLATES = {
     "E1": "최근 {n} step 동안 {roles} 모두 {signals:이/가} 없습니다. 통과 테스트 {pass}/{total}.",
     # DM-27: E1 for a session with no test observation (T1 dialogue task) reports the dialogue signals instead.
     "E1-T1": "최근 {n} step 동안 {roles} 모두 {signals:이/가} 없습니다. 처리 상태 '{status}'.",
-    "E2": "{path} 가 step {k} 의 내용으로 되돌아갔고, 통과 테스트는 {m} step 동안 {pass}/{total} 입니다.",
+    "E2": "{path} 파일이 step {k} 의 내용으로 되돌아갔고, 통과 테스트는 {m} step 동안 {pass}/{total} 입니다.",
     "E3": "step {a} 이후 {m} step 동안 파일이 {c} 번 바뀌었지만 통과 테스트는 {pass}/{total} 에서 늘지 않았습니다.",
     # DM-36: the particles after the two role names follow the names ("환불 담당과 배송 담당이").
-    "E4": "{role_a:과/와} {role_b:이/가} 문의를 서로 {h} 번 넘겼고 처리 상태는 '{status}' 에서 바뀌지 않았습니다.",
-    "E5": "최근 {n} step 동안 채택 항목이 {adopted}/{required} 에서 늘지 않았고 처리 상태는 '{status}' 입니다.",
+    # DM-42: what follows a quoted status name is attached to it ("'접수'에서", "'분류'입니다").
+    "E4": "{role_a:과/와} {role_b:이/가} 문의를 서로 {h} 번 넘겼고 처리 상태는 '{status}'에서 바뀌지 않았습니다.",
+    "E5": "최근 {n} step 동안 채택 항목이 {adopted}/{required} 에서 늘지 않았고 처리 상태는 '{status}'입니다.",
     "E6": "step {d} 에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 통과 테스트 {pass}/{total}.",
     "E7": "최근 {n} step 중 {o} step 은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다.",
 }
 # E6 for a dialogue (T1) task: the second sentence reports the status instead of tests.
-E6_DIALOGUE = "step {d} 에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 처리 상태는 '{status}' 입니다."
+E6_DIALOGUE = "step {d} 에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 처리 상태는 '{status}'입니다."
 STOP_DECISIONS = ("deadlock", "termination_failure")
 # DM-31, DM-36: particle pairs a template may attach to a slot, as "after a final consonant/otherwise".
 PARTICLES = ("과/와", "이/가", "은/는", "을/를")
@@ -39,7 +42,7 @@ SIGNAL_PHRASES = (("artifact.files_changed", "산출물 변경"), ("artifact.tes
 UNRECORDED_SELECTION = {"E1": ["산출물 변경", "테스트 증가", "새 쟁점"], "E1-T1": ["처리 상태 변화", "채택 항목", "새 쟁점"]}
 # demo-block-and-explanation.md 2-3 plus DM-27: the first template whose condition holds. Exactly one.
 SELECTION_ORDER = (("E6", "termination_failure"), ("E2", "global_revert_in_streak"),
-                   ("E3", "test_plateau_in_streak"), ("E4", "handoff_at_or_above_threshold"),
+                   ("E3", "test_plateau_in_streak"), ("E4", "handoff_pair_and_count_at_or_above_threshold"),
                    ("E5", "adopted_items_selected"), ("E7", "oscillating_in_streak"),
                    ("E1-T1", "no_test_observation_in_session"), ("E1", "otherwise"))
 
@@ -105,8 +108,11 @@ def condition_holds(name, signals):
         "termination_failure": lambda: signals["decision"] == "termination_failure",
         "global_revert_in_streak": lambda: bool(signals.get("global_revert")),
         "test_plateau_in_streak": lambda: bool(signals.get("test_plateau_in_streak")),
-        "handoff_at_or_above_threshold": lambda: (handoff.get("count") is not None
-                                                  and handoff["count"] >= signals["handoff_threshold"]),
+        # DM-43: both role names and the count must be there; E4 never writes a role it does not know.
+        "handoff_pair_and_count_at_or_above_threshold": lambda: (
+            isinstance(handoff.get("roles"), list) and len(handoff["roles"]) == 2
+            and all(r is not None for r in handoff["roles"])
+            and handoff.get("count") is not None and handoff["count"] >= signals["handoff_threshold"]),
         "adopted_items_selected": lambda: bool(signals.get("adopted_metric_selected")),
         "oscillating_in_streak": lambda: "oscillating" in (signals.get("consecutive_states") or []),
         # False only when it was checked: records made before DM-27 have no such key and keep E1.

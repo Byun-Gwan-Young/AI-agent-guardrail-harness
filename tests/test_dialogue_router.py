@@ -67,7 +67,7 @@ class RouterRunTests(unittest.IsolatedAsyncioTestCase):
         stop = observations[5]["criteria"]
         self.assertEqual((stop["decision"], stop["explanation"]["template_id"]), ("deadlock", "E4"))
         self.assertEqual(stop["explanation"]["text"],
-                         "환불 담당과 배송 담당이 문의를 서로 5 번 넘겼고 처리 상태는 '분류' 에서 바뀌지 않았습니다.")
+                         "환불 담당과 배송 담당이 문의를 서로 5 번 넘겼고 처리 상태는 '분류'에서 바뀌지 않았습니다.")
         # The same observations without handoff_to are judged the same; only the sentence changes (DM-22).
         meta = run["session"]["meta"]
         history = []
@@ -90,9 +90,12 @@ class RouterRunTests(unittest.IsolatedAsyncioTestCase):
         # Outside the roles: a vocabulary violation, nothing observed, the fixed order next.
         self.assertEqual((steps[0]["vocabulary_violation"], steps[0]["route"]["fallback_reason"],
                           steps[0]["route"]["basis"]), ("handoff_to_not_allowed", "handoff_to_not_allowed", None))
-        # The same role: the report is valid and observed; only the turn ignores it.
-        self.assertEqual((steps[1]["step_status"], steps[1]["route"]["fallback_reason"]), ("completed", "self_handoff"))
-        self.assertEqual(run["session"]["observations"][1]["conversation"]["handoff_to"], "refund")
+        # The same role: the report is valid; the turn ignores it and, since DM-44 (C-17-5), it is a vocabulary
+        # violation whose value is left out of the observation (tests/test_c17_5_part0.py).
+        self.assertEqual((steps[1]["step_status"], steps[1]["route"]["fallback_reason"], steps[1]["vocabulary_violation"]),
+                         ("completed", "self_handoff", "handoff_to_self"))
+        self.assertNotIn("handoff_to", run["session"]["observations"][1]["conversation"])
+        self.assertEqual(run["session"]["observations"][1]["conversation"]["status"], "triage")
         self.assertEqual(run["summary"]["route_fallbacks"],
                          [{"step_id": 1, "reason": "handoff_to_not_allowed"}, {"step_id": 2, "reason": "self_handoff"},
                           {"step_id": 3, "reason": "no_handoff"}])

@@ -132,7 +132,7 @@ class RegistrationApiTests(unittest.IsolatedAsyncioTestCase):
         log = await self.run_steps(metrics, [observation(s, metrics) for s in range(1, 7)])
         explanation = log["observations"][-1]["criteria"]["explanation"]
         self.assertEqual(explanation["template_id"], "E5")
-        self.assertEqual(explanation["text"], "최근 3 step 동안 채택 항목이 1/3 에서 늘지 않았고 처리 상태는 '분류' 입니다.")
+        self.assertEqual(explanation["text"], "최근 3 step 동안 채택 항목이 1/3 에서 늘지 않았고 처리 상태는 '분류'입니다.")
         self.assertEqual(explanation["missing_values"], [])
 
     async def test_e6_with_the_registered_status_name(self):
@@ -141,7 +141,7 @@ class RegistrationApiTests(unittest.IsolatedAsyncioTestCase):
         criteria = log["observations"][-1]["criteria"]
         self.assertEqual(criteria["decision"], "termination_failure")
         self.assertEqual(criteria["explanation"]["text"],
-                         "step 4 에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 '분류' 입니다.")
+                         "step 4 에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 '분류'입니다.")
 
     async def test_without_registration_ids_and_unmeasured_remain(self):
         client = self.client(V03_CONFIG)
@@ -152,7 +152,7 @@ class RegistrationApiTests(unittest.IsolatedAsyncioTestCase):
             response = await client.post("/sessions/observations", headers=headers, json=observation(step, metrics))
         explanation = response.json()["observation"]["criteria"]["explanation"]
         self.assertEqual(explanation["text"], "최근 3 step 동안 채택 항목이 1/(측정 안 됨) 에서 늘지 않았고 처리 상태는 "
-                                              "'triage' 입니다.")
+                                              "'triage'입니다.")
         self.assertEqual((explanation["role_labels"], explanation["status_labels"]), (None, None))
 
 

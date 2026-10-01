@@ -166,6 +166,8 @@ WRITE_TOOLS = ("write_file", "replace_in_file")
 # Tool names of the T1 tasks (demo-runner-extension.md 5). Their implementation is a later unit.
 DIALOGUE_TOOLS = ("lookup_order", "read_policy", "web_search", "academic_search")
 JUDGE_PATH = re.compile(r"^scenario_judges/[A-Za-z0-9_.-]+\.py$")
+# The one terminal status of a dialogue task (DM-18, DM-46).
+ESCALATED = "escalated"
 
 
 class AgentV2(Definition):
@@ -276,6 +278,10 @@ class ScenarioV2(Definition):
         statuses = [s.id for s in self.status_values + self.terminal_statuses]
         if len(statuses) != len(set(statuses)):
             raise ValueError("Status IDs must be unique across status_values and terminal_statuses")
+        # DM-46: a dialogue ends in one completion status (the last ordered status) or in escalated, nothing else,
+        # so the outcome classes (success / deadlock / escalation / other) never overlap.
+        if [s.id for s in self.terminal_statuses] != [ESCALATED]:
+            raise ValueError("A dialogue task has exactly one terminal status, escalated (DM-46)")
         if self.deliverable_schema is None:
             raise ValueError("deliverable_schema required for a dialogue task")
         json_subset.check_schema(self.deliverable_schema)

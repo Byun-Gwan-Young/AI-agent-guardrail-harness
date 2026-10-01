@@ -16,6 +16,7 @@
   - 도구는 `lookup_order`, `read_policy`, `web_search`, `academic_search` 만, 쓰기 경로 없음
   - `judge` 는 `scenario_judges/<이름>.py` (에이전트가 읽는 `inputs_dir` 밖. `inputs_dir` 가 `scenario_judges` 를 가리키면 오류)
   - `status_values` (순서 있는 처리 상태, 각 `{id, label}`) 필수, `terminal_statuses` (순서 밖 종료 상태, 예 `escalated`) 선택. ID 는 둘을 합쳐 유일
+    → **C-17-5 (DM-46)** : `terminal_statuses` 는 정확히 `[escalated]` (필수). 완료 상태는 `status_values` 의 마지막 하나
   - `deliverable_schema` 필수 (아래 부분집합), `inputs_dir` 필수
   - `adopted_items` 지표를 고르면 `required_adopted_items` 필수 (E5 의 `{required}`, DM-29)
   - `turn_order: router` 는 dialogue 에서만 (DM-19 : CS 만 라우터)

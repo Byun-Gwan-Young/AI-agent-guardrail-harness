@@ -204,14 +204,22 @@ class FixedFlowTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(gates[0]["missing"], ["order_id_not_looked_up"])
         self.assertEqual(run["summary"]["termination_reason"], "max_steps")
 
-    async def test_a_declaration_persists_as_in_the_artifact_path(self):
-        # The declarer's first declaration counts from then on (termination_context, as T2): the judge passes at
-        # step 2, after intake declared at step 1, so the run succeeds on refund's report.
+    async def test_a_declaration_does_not_carry_over_to_another_role(self):
+        # DM-45 (C-17-5, replaces the C-17-4 carry-over test): intake declares at step 1 but the judge fails on that
+        # report; refund's report passes the judge at step 2 but refund is not the declarer; intake declares again at
+        # step 4 and that report passes, so the run succeeds there.
         reports = [report("resolved", deliverable=DELIVERABLE, issues=(), declared=True),
-                   report("resolved", deliverable=DELIVERABLE, issues=())]
+                   report("resolved", deliverable=DELIVERABLE, issues=()),
+                   report("resolved", deliverable=DELIVERABLE, issues=()),
+                   report("resolved", deliverable=DELIVERABLE, issues=(), declared=True)]
         run = await run_t1(reports, tools={2: ("lookup_order", {"order_id": "A-100"})}, scenario_changes=FIXED,
-                           max_steps=3, tests=self)
-        self.assertEqual((run["summary"]["termination_reason"], run["summary"]["steps"]), ("success", 2))
+                           max_steps=5, tests=self)
+        self.assertEqual((run["summary"]["termination_reason"], run["summary"]["steps"]), ("success", 4))
+        claims = run["summary"]["completion_claims"]
+        self.assertEqual([(c["step_id"], c["agent"], c["accepted"], c["reasons"]) for c in claims],
+                         [(1, "intake", False, ["judge_unfinished"]), (2, "refund", False, ["not_declarer", "not_declared"]),
+                          (3, "shipping", False, ["not_declarer", "not_declared"]), (4, "intake", True, [])])
+        # The first-declaration record for signals (E6) is unchanged (DM-45).
         self.assertEqual(run["session"]["observations"][1]["termination_context"]["declared_step"], 1)
 
 

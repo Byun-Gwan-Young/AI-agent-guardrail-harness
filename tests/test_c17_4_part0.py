@@ -29,7 +29,7 @@ class ParticleTests(unittest.TestCase):
 
     def test_registered_names_with_a_final_consonant(self):
         text = explain(e4(), {"refund": "환불 담당", "shipping": "배송 담당"}, {"triage": "분류"})["text"]
-        self.assertEqual(text, "환불 담당과 배송 담당이 문의를 서로 4 번 넘겼고 처리 상태는 '분류' 에서 바뀌지 않았습니다.")
+        self.assertEqual(text, "환불 담당과 배송 담당이 문의를 서로 4 번 넘겼고 처리 상태는 '분류'에서 바뀌지 않았습니다.")
 
     def test_names_without_a_final_consonant(self):
         text = explain(e4(), {"refund": "검토자", "shipping": "작성자"})["text"]
@@ -53,7 +53,7 @@ class ParticleTests(unittest.TestCase):
                                    status_labels={"received": "접수"})
         explanation = replay(inputs, configured(), labelled)[-1]["criteria"]["explanation"]
         self.assertEqual(explanation["template_id"], "E4")
-        self.assertEqual(explanation["text"], "환불 담당과 배송 담당이 문의를 서로 5 번 넘겼고 처리 상태는 '접수' 에서 "
+        self.assertEqual(explanation["text"], "환불 담당과 배송 담당이 문의를 서로 5 번 넘겼고 처리 상태는 '접수'에서 "
                                               "바뀌지 않았습니다.")
         # The record still rebuilds the same sentence.
         rebuilt = explain(explanation["signals"], explanation["role_labels"], explanation["status_labels"])
@@ -76,15 +76,16 @@ class ParticleTests(unittest.TestCase):
                 self.assertEqual(("{x:" + spec + "}").format_map({"x": Slot(name)}), expected)
         # DM-31 wrote "(측정 안 됨)" with no particle; the same here.
         self.assertEqual(format(Slot(UNMEASURED), "과/와"), UNMEASURED)
-        self.assertEqual(explain(e4(handoff={"roles": None, "count": 4}))["text"],
-                         f"{UNMEASURED} {UNMEASURED} 문의를 서로 4 번 넘겼고 처리 상태는 'triage' 에서 바뀌지 않았습니다.")
+        # DM-43 (C-17-5): E4 is no longer chosen without both roles, so that sentence is not built any more
+        # (tests/test_c17_5_part0.py).
+        self.assertNotEqual(explain(e4(handoff={"roles": None, "count": 4}))["template_id"], "E4")
         self.assertEqual(format(Slot("배송 담당"), ""), "배송 담당")
         with self.assertRaises(ValueError):
             format(Slot("배송 담당"), "의/의")
 
     def test_templates_attach_every_particle_after_a_name_slot(self):
         """The slots followed by a 과/와, 이/가, 은/는 or 을/를 particle, listed: only E4's two role names carry a
-        particle spec; E1/E1-T1 {signals} also uses it (DM-31). E2's "{path} 가" is a file path, not a name slot."""
+        particle spec; E1/E1-T1 {signals} also uses it (DM-31). E2's path slot reads "{path} 파일이" since DM-42."""
         templates = {**TEMPLATES, "E6-dialogue": E6_DIALOGUE}
         specs = sorted((t, slot, spec) for t, text in templates.items()
                        for slot, spec in re.findall(r"\{(\w+):([^}]+)\}", text))
@@ -93,7 +94,7 @@ class ParticleTests(unittest.TestCase):
         self.assertTrue(all(spec in PARTICLES for _, _, spec in specs))
         loose = sorted((t, slot, particle) for t, text in templates.items()
                        for slot, particle in re.findall(r"\{(\w+)\} (과|와|이|가|은|는|을|를) ", text))
-        self.assertEqual(loose, [("E2", "path", "가")])
+        self.assertEqual(loose, [])
 
     def test_signal_sentences_are_unchanged_by_the_particle_spec(self):
         # DM-31 sentences, as written by the previous render_subject.
