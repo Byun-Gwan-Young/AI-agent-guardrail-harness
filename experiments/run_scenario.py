@@ -310,6 +310,9 @@ async def run(args):
         raise ValueError("Unsupported collection policy")
     scenario_path = args.scenario.resolve()
     scenario = load_scenario(scenario_path)
+    if scenario.schema_version != 'scenario-v1':
+        # scenario-v2 (C-17-3) is defined but its run path (T1 turns, router, tools) is the next runner unit.
+        raise ValueError(scenario.schema_version + ' is not runnable by this runner yet')
     contract = for_scenario(getattr(args, 'output_contract', V2), scenario)
     if contract.version == V2 and collection_policy != INDEPENDENT:
         # v7 extends the v6 independent-observation protocol; no other combination is labelled.

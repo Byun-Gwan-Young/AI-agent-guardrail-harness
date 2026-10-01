@@ -21,12 +21,16 @@ def install_observations(app, store, session_key, clock_ns=time.perf_counter_ns)
         if not request.headers.get("X-Guardrail-Session"):
             raise HTTPException(400, "X-Guardrail-Session is required")
         try:
-            observation = Observation.model_validate(await request.json()).model_dump()
+            model = Observation.model_validate(await request.json())
         except (ValidationError, ValueError):
             raise HTTPException(422, "Invalid observation schema") from None
+        observation = model.model_dump()
         session = store.get(session_key(request, {}))
         if session is None:
             raise HTTPException(404, "Unknown session")
+        if model.uses_t1() and progress_version_for(session.meta) != PROGRESS_V3:
+            # Earlier versions never accepted T1 input; it stays a schema error for them (C-17-3).
+            raise HTTPException(422, "T1 fields and metrics require deadlock-v0.3 (progress-v3)")
         async with session.lock:
             step = observation["step_id"]
             old = next((o for o in session.observations if o["step_id"] == step), None)

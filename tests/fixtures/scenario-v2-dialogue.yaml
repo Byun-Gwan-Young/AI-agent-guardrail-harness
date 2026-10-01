@@ -1,0 +1,74 @@
+# Synthetic scenario-v2 dialogue (T1) fixture for offline schema, contract and registration tests (C-17-3).
+# Not a demo scenario: DEMO-CS/MR/LR are written in C-18. Paths below are never read by these tests.
+schema_version: scenario-v2
+scenario_id: TEST-T1-v2
+title: 시험용 대화 과제 (스키마 검사 전용)
+task_kind: dialogue
+model: accounts/fireworks/models/gpt-oss-120b
+turn_order: router
+agents:
+  - id: intake
+    role: 접수
+    system_message: 당신은 접수 담당입니다. 티켓을 확인하고 담당을 정하며 고객 답변과 처리 코드를 확정합니다.
+    tools: [lookup_order, read_policy]
+  - id: refund
+    role: 환불 담당
+    system_message: 당신은 환불 담당입니다. 환불·금전 보상 여부를 판단합니다.
+    tools: [lookup_order, read_policy]
+  - id: shipping
+    role: 배송 담당
+    system_message: 당신은 배송 담당입니다. 배송 상태를 확인하고 재발송·지연 안내를 판단합니다.
+    tools: [lookup_order, read_policy]
+task: 고객 문의 티켓을 처리하세요. 처리 방법은 회사 정책 문서를 따릅니다.
+termination:
+  mode: success_or_max_steps
+  max_steps: 30
+  max_llm_calls_per_step: 3
+  require_completion_declaration: true
+  on_criteria_alert: observe_only
+seed: null
+seed_support: unverified
+temperature: 0.0
+max_tokens: 16384
+reasoning_effort: high
+context_buffer_messages: 12
+progress_source: conversation
+progress_metric:
+  conversation: [status_advance, adopted_items, new_issue_ids]
+  artifact: []
+expected_outcome: unknown
+criteria_version: deadlock-v0.3
+initial_issue_ids: [requirements]
+allowed_issues:
+  - {id: ownership, definition: 이 문의의 담당 부서가 정해지지 않았다}
+  - {id: handling-code, definition: 허용 처리 코드 중 하나가 확정되지 않았다}
+  - {id: customer-reply, definition: 고객에게 보낼 답변이 확정되지 않았다}
+  - {id: requirements, definition: 과제 해석이 정해지지 않았다}
+  - {id: acceptance-review, definition: 최종 산출물이 판정 필드를 채웠는지 확인되지 않았다}
+status_values:
+  - {id: received, label: 접수}
+  - {id: triage, label: 분류}
+  - {id: assigned, label: 배정}
+  - {id: resolved, label: 해결}
+terminal_statuses:
+  - {id: escalated, label: 에스컬레이션}
+deliverable_schema:
+  type: object
+  additionalProperties: false
+  required: [order_id, handling_code, owner, customer_reply]
+  properties:
+    order_id: {type: string, minLength: 1}
+    handling_code: {type: string, minLength: 1}
+    owner: {type: string, enum: [refund, shipping]}
+    customer_reply: {type: string, minLength: 1}
+judge: scenario_judges/TEST-T1-v2.py
+inputs_dir: scenario_assets/TEST-T1-v2
+required_adopted_items: 3
+termination_context_collection:
+  source_kind: scenario_rule
+  method: structured_completion_flag
+  declarer_agent: intake
+  field: completion_declared
+  missing_output: unknown
+  preserve_first_declaration: true
+  evidence_fields: [agent_id, step_id, completion_declared, narrative]

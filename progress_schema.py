@@ -5,6 +5,11 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator, model_serial
 
 CONVERSATION_METRICS = ["proposal_value_delta", "open_issues_count", "new_info_ratio"]
 ARTIFACT_METRICS = ["test_pass_count", "files_changed", "build_status"]
+# T1 dialogue metrics, judged only by progress-v3 (deadlock-v0.3). Scenario-v1 keeps the names above only.
+T1_METRICS = ["status_advance", "adopted_items", "new_issue_ids"]
+# T1 conversation fields (output-contract-v3). Omitted from the serialized record when None, so a legacy
+# observation keeps exactly its earlier shape.
+T1_FIELDS = ("status", "adopted_items", "handoff_to")
 
 
 class Record(BaseModel):
@@ -19,6 +24,24 @@ class Conversation(Record):
     extractor_version: str | None = None
     reasons: dict[str, str] = Field(default_factory=dict)
     evidence: list[dict[str, str]] = Field(default_factory=list)
+    status: str | None = Field(default=None, min_length=1)
+    adopted_items: list[str] | None = None
+    handoff_to: str | None = Field(default=None, min_length=1)
+
+    @model_validator(mode="after")
+    def validate_t1(self):
+        items = self.adopted_items or []
+        if any(not i.strip() or len(i.splitlines()) != 1 for i in items) or len(items) != len(set(items)):
+            raise ValueError("adopted_items must be unique nonempty single-line IDs")
+        return self
+
+    @model_serializer(mode="wrap")
+    def preserve_legacy_shape(self, handler):
+        data = handler(self)
+        for name in T1_FIELDS:
+            if data.get(name) is None:
+                data.pop(name, None)
+        return data
 
 
 class Artifact(Record):
@@ -56,6 +79,24 @@ class Metrics(Record):
         default_factory=lambda: list(ARTIFACT_METRICS))
 
 
+class ObservedMetrics(Record):
+    """Metric selection of an observation and of scenario-v2: the scenario-v1 names plus the T1 names."""
+    conversation: list[Literal["proposal_value_delta", "open_issues_count", "new_info_ratio",
+                               "status_advance", "adopted_items", "new_issue_ids"]] = Field(
+        default_factory=lambda: list(CONVERSATION_METRICS))
+    artifact: list[Literal["test_pass_count", "files_changed", "build_status"]] = Field(
+        default_factory=lambda: list(ARTIFACT_METRICS))
+
+    @model_validator(mode="after")
+    def distinct(self):
+        if len(set(self.conversation)) != len(self.conversation) or len(set(self.artifact)) != len(self.artifact):
+            raise ValueError("Metric names must not repeat")
+        return self
+
+    def uses_t1(self):
+        return any(m in T1_METRICS for m in self.conversation)
+
+
 class TerminationContext(Record):
     declaration: Literal["none", "declared", "unknown"]
     declared_step: int | None = Field(default=None, ge=1)
@@ -80,7 +121,7 @@ class CollectionMetadata(Record):
 
 
 class IssueReport(Record):
-    output_contract_version: Literal['output-contract-v2']
+    output_contract_version: Literal['output-contract-v2', 'output-contract-v3']
     allowed_issues_sha256: str = Field(pattern=r'^[0-9a-f]{64}$')
     unlisted_issues: list[str] | None
 
@@ -94,7 +135,7 @@ class Observation(Record):
     step_id: int = Field(ge=1)
     llm_turns: list[int] = Field(min_length=1)
     progress_source: Literal["conversation", "artifact", "both"]
-    progress_metric: Metrics = Field(default_factory=Metrics)
+    progress_metric: ObservedMetrics = Field(default_factory=ObservedMetrics)
     conversation: Conversation | None = None
     artifact: Artifact | None = None
     # Paired B output for evaluation against A; never used in A's progress verdict.
@@ -107,6 +148,12 @@ class Observation(Record):
         if self.issue_report is None:
             data.pop('issue_report', None)
         return data
+
+    def uses_t1(self):
+        """T1 metric names or T1 conversation fields: input only progress-v3 may judge."""
+        return self.progress_metric.uses_t1() or any(
+            getattr(c, name) is not None for c in (self.conversation, self.extracted_conversation) if c is not None
+            for name in T1_FIELDS)
 
     @model_validator(mode="after")
     def validate_observation(self):
