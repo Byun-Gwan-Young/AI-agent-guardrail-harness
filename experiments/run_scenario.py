@@ -66,6 +66,9 @@ def enforce_dataset_clean(dataset_run, state):
 
 
 DEMO_PHASE = 'demo'
+# DM-2, DM-34: demo runs live under runs/demo/ and nothing else does.
+DEFAULT_OUTPUT_ROOT = ROOT / 'runs'
+DEMO_OUTPUT_ROOT = ROOT / 'runs' / 'demo'
 
 
 def enforce_demo_separation(dataset_run, phase):
@@ -74,6 +77,18 @@ def enforce_demo_separation(dataset_run, phase):
         raise ValueError('Unsupported phase: ' + str(phase))
     if dataset_run and phase == DEMO_PHASE:
         raise ValueError('--dataset-run cannot be combined with --phase ' + DEMO_PHASE)
+
+
+def output_root_for(phase, requested):
+    """The run folder root: runs/demo/ for a demo run, runs/ otherwise; a requested root must keep that split."""
+    root = (requested if requested is not None else
+            DEMO_OUTPUT_ROOT if phase == DEMO_PHASE else DEFAULT_OUTPUT_ROOT).resolve()
+    inside_demo = root.is_relative_to(DEMO_OUTPUT_ROOT.resolve())
+    if phase == DEMO_PHASE and not inside_demo:
+        raise ValueError('--phase demo writes only under ' + str(DEMO_OUTPUT_ROOT) + ' (DM-34)')
+    if phase != DEMO_PHASE and inside_demo:
+        raise ValueError(str(DEMO_OUTPUT_ROOT) + ' is reserved for --phase demo runs (DM-2)')
+    return root
 
 
 def enforce_observe_proxy(dataset_run, mode):
@@ -340,9 +355,10 @@ async def run(args):
     dataset_run = bool(getattr(args, 'dataset_run', False))
     phase = getattr(args, 'phase', None)
     enforce_demo_separation(dataset_run, phase)
+    output_root = output_root_for(phase, getattr(args, 'output_root', None))
     enforce_dataset_clean(dataset_run, repository_state)
     session_id = scenario.scenario_id + '-' + uuid.uuid4().hex
-    out = args.output_root.resolve() / session_id
+    out = output_root / session_id
     if out.is_relative_to(source):
         raise ValueError('Output must not be inside the source fixture')
     out.mkdir(parents=True, exist_ok=False)
@@ -442,7 +458,9 @@ async def run(args):
     async with httpx.AsyncClient(base_url=base, headers=headers, timeout=60) as client:
         try:
             response = await client.post('/sessions')
-            response.raise_for_status()
+            if response.is_error:
+                # e.g. a block-mode proxy refusing a non-demo run (DM-32): keep the proxy's reason in the error.
+                raise ValueError(f'Proxy refused the session ({response.status_code}): {response.text[:300]}')
             started = True
             pin_response = await client.get('/log')
             pin_response.raise_for_status()
@@ -660,7 +678,8 @@ def main():
     parser.add_argument('--api-key-env', default='GROQ_API_KEY',
                         help='environment variable holding the provider key; must match the proxy config')
     parser.add_argument('--proxy-url', default=os.environ.get('GUARDRAIL_PROXY_URL', 'http://127.0.0.1:8000'))
-    parser.add_argument('--output-root', type=Path, default=ROOT / 'runs')
+    parser.add_argument('--output-root', type=Path, default=None,
+                        help='default runs/ (runs/demo/ with --phase demo); demo runs must stay under runs/demo/')
     parser.add_argument('--run-index', type=int, default=1)
     parser.add_argument('--dataset-run', action='store_true',
                         help='mark a pilot or collection session; refuse a dirty Git working tree before model calls')

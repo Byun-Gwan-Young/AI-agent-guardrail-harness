@@ -31,6 +31,19 @@ def load(path):
     return json.loads(Path(path).read_text(encoding='utf-8'))
 
 
+def log_file(session_id):
+    """Proxy log: logs/<id>.json, or logs/demo/<id>.json for a demo proxy started with GUARDRAIL_LOG_DIR=logs/demo."""
+    plain = ROOT / 'logs' / f'{session_id}.json'
+    demo = ROOT / 'logs' / 'demo' / f'{session_id}.json'
+    return demo if not plain.exists() and demo.exists() else plain
+
+
+def run_dir(session_id):
+    """Runner folder: runs/<id>, or runs/demo/<id> for a --phase demo run (DM-34)."""
+    plain, demo = ROOT / 'runs' / session_id, ROOT / 'runs' / 'demo' / session_id
+    return demo if not plain.exists() and demo.exists() else plain
+
+
 def turn_calls(turn):
     """Tool calls returned by one 200 response: name, path argument, argument length."""
     body = turn.get('response_body') or {}
@@ -226,7 +239,7 @@ def secret_scan(paths, env_names=()):
 
 
 def analyse(session_id):
-    log_path, run = ROOT / 'logs' / f'{session_id}.json', ROOT / 'runs' / session_id
+    log_path, run = log_file(session_id), run_dir(session_id)
     log, steps, summary = load(log_path), load(run / 'steps.json'), load(run / 'summary.json')
     conditions, session_copy = load(run / 'conditions.json'), load(run / 'session.json')
     scenario = load_scenario(run / 'scenario.yaml')
@@ -314,11 +327,11 @@ def analyse(session_id):
 
 
 def base_manifest(a, phase, notes):
-    scenario = load_scenario(ROOT / 'runs' / a['session_id'] / 'scenario.yaml')
+    scenario = load_scenario(run_dir(a['session_id']) / 'scenario.yaml')
     return {'manifest_version': 'session-manifest-v0.1', 'session_id': a['session_id'], 'rerun_of': None,
             'scenario': {'id': a['scenario']['id'], 'version': a['scenario']['id'], 'hash': a['scenario']['sha256']},
             'code': {'git_commit': None, 'criteria_version': a['meta']['criteria_version'],
-                     'progress_version': (load(ROOT / 'logs' / f"{a['session_id']}.json")['meta'].get('criteria_parameters')
+                     'progress_version': (load(log_file(a['session_id']))['meta'].get('criteria_parameters')
                                           or {}).get('progress_version'),
                      'metrics_version': None},
             'condition': {'phase': phase, 'temperature': a['conditions']['temperature'],
@@ -352,10 +365,10 @@ def base_manifest(a, phase, notes):
 def reasoning_effort(session_id):
     """Requested vs applied reasoning_effort (C-11). conditions.json first; older v8 sessions fall back to the
     values actually present in the request bodies. Applied is never inferred from the response."""
-    recorded = load(ROOT / 'runs' / session_id / 'conditions.json').get('reasoning_effort')
+    recorded = load(run_dir(session_id) / 'conditions.json').get('reasoning_effort')
     if recorded:
         return {**recorded, 'source': 'conditions.json'}
-    sent = sorted({t['request_body']['reasoning_effort'] for t in load(ROOT / 'logs' / f'{session_id}.json')['turns']
+    sent = sorted({t['request_body']['reasoning_effort'] for t in load(log_file(session_id))['turns']
                    if t['request_body'].get('reasoning_effort') is not None})
     return {'requested': sent[0] if len(sent) == 1 else sent or None, 'applied': 'unverified',
             'source': 'request bodies in the proxy log (conditions.json predates this field)'}
@@ -474,10 +487,10 @@ def v05_fields(result, conditions, log):
 
 def manifest(a, phase, notes):
     result = base_manifest(a, phase, notes)
-    conditions = load(ROOT / 'runs' / a['session_id'] / 'conditions.json')
+    conditions = load(run_dir(a['session_id']) / 'conditions.json')
     if 'git_state_status' in conditions:
         # v0.3 only for sessions recorded by the Git-aware runner; earlier manifests are never rewritten.
-        log = load(ROOT / 'logs' / f"{a['session_id']}.json")
+        log = load(log_file(a['session_id']))
         observations = log['observations']
         result = v03_fields(result, a, conditions, observations)
         if a['meta']['criteria_version'] != 'deadlock-v0.3':

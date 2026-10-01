@@ -1,4 +1,4 @@
-"""explain-v1 STOP sentences from judgement signal values only (DM-9; C-17-1 part 2, C-17-2 DM-26/DM-27)."""
+"""explain-v1 STOP sentences from judgement signal values only (DM-9; C-17-1 part 2, C-17-2 DM-26/DM-27, C-17-3 DM-31)."""
 import json
 from pathlib import Path
 import string
@@ -19,6 +19,8 @@ ROOT = Path(__file__).resolve().parents[1]
 V4 = "A-1-v4-e174aafe805b4f59bb62d7c95716b8b7"
 LABELS = {"planner": "기획", "developer": "개발", "reviewer": "리뷰"}
 CS_LABELS = {"planner": "접수", "developer": "환불 담당", "reviewer": "배송 담당"}
+A1_METRICS = ["conversation.open_issues_count", "artifact.test_pass_count", "artifact.files_changed"]
+T1_METRICS = ["conversation.status_advance", "conversation.adopted_items", "conversation.new_issue_ids"]
 
 
 def signals(**changes):
@@ -28,7 +30,7 @@ def signals(**changes):
             "test_plateau_in_streak": False, "test_max_step": 1, "steps_since_test_max": 8,
             "file_state_changes_since_test_max": 0, "handoff": None, "handoff_threshold": 4, "status": None,
             "adopted_metric_selected": False, "adopted_count": None, "adopted_required": None,
-            "test_observed_in_session": True}
+            "test_observed_in_session": True, "selected_metrics": A1_METRICS}
     return {**base, **changes}
 
 
@@ -62,7 +64,7 @@ class TemplateTests(unittest.TestCase):
             "E7": (signals(consecutive_states=["stagnant", "oscillating", "stagnant"]),
                    "최근 3 step 중 1 step 은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다."),
             "E1-T1": (signals(task_kind="dialogue", status="received", test_observed_in_session=False,
-                              test_pass_count=None, test_total_count=None),
+                              test_pass_count=None, test_total_count=None, selected_metrics=T1_METRICS),
                       "최근 3 step 동안 planner·developer·reviewer 모두 처리 상태 변화·채택 항목·새 쟁점이 없습니다. "
                       "처리 상태 'received'."),
         }
@@ -132,7 +134,8 @@ class StopRecordTests(unittest.TestCase):
         record = rows[5]["criteria"]
         self.assertEqual(record["explanation"]["template_id"], "E1")
         self.assertEqual(record["explanation"]["values"],
-                         {"n": 3, "roles": ["planner", "developer", "reviewer"], "pass": 7, "total": 16})
+                         {"n": 3, "roles": ["planner", "developer", "reviewer"],
+                          "signals": ["산출물 변경", "테스트 증가", "새 쟁점"], "pass": 7, "total": 16})
         self.assertTrue(all("explanation" not in r["criteria"] for r in rows[:5]))
 
     def test_t3_global_revert_in_streak_gives_e2(self):
@@ -183,12 +186,13 @@ class StopRecordTests(unittest.TestCase):
         rows = replay([dialogue(s, metrics=["status_advance", "new_issue_ids"]) for s in range(1, 7)], configured())
         explanation = rows[-1]["criteria"]["explanation"]
         self.assertEqual(explanation["template_id"], "E1-T1")
-        self.assertEqual(explanation["text"], "최근 3 step 동안 planner·developer·reviewer 모두 처리 상태 변화·채택 항목·"
+        # DM-31: adopted_items is not selected here, so the sentence does not name it.
+        self.assertEqual(explanation["text"], "최근 3 step 동안 planner·developer·reviewer 모두 처리 상태 변화·"
                                               "새 쟁점이 없습니다. 처리 상태 'received'.")
         self.assertEqual((explanation["missing_values"], explanation["signals"]["test_observed_in_session"]), ([], False))
         self.assertNotIn(UNMEASURED, explanation["text"])
         self.assertEqual(explain(explanation["signals"], CS_LABELS)["text"],
-                         "최근 3 step 동안 접수·환불 담당·배송 담당 모두 처리 상태 변화·채택 항목·새 쟁점이 없습니다. "
+                         "최근 3 step 동안 접수·환불 담당·배송 담당 모두 처리 상태 변화·새 쟁점이 없습니다. "
                          "처리 상태 'received'.")
 
     def test_a_test_observation_anywhere_in_the_session_keeps_e1(self):
@@ -220,6 +224,50 @@ class StopRecordTests(unittest.TestCase):
         self.assertEqual(result["decision"], "deadlock")
         self.assertEqual(result["explanation"],
                          {"explanation_version": "explain-v1", "status": "failed", "reason": "RuntimeError"})
+
+
+class SelectedSignalTests(unittest.TestCase):
+    """DM-31: E1 and E1-T1 name only the signals of the metrics the judgement used."""
+
+    def test_unselected_signals_never_appear(self):
+        cases = [(["artifact.files_changed"], "모두 산출물 변경이 없습니다."),
+                 (["artifact.test_pass_count"], "모두 테스트 증가가 없습니다."),
+                 (["conversation.open_issues_count", "artifact.files_changed"], "모두 산출물 변경·새 쟁점이 없습니다.")]
+        for selected, phrase in cases:
+            with self.subTest(selected=selected):
+                text = explain(signals(selected_metrics=selected))["text"]
+                self.assertIn(phrase, text)
+                for name, word in (("artifact.test_pass_count", "테스트 증가"), ("artifact.files_changed", "산출물 변경"),
+                                   ("conversation.open_issues_count", "새 쟁점")):
+                    if name not in selected:
+                        self.assertNotIn(word, text)
+        t1 = explain(signals(task_kind="dialogue", status="triage", test_observed_in_session=False,
+                             selected_metrics=["conversation.adopted_items"]))
+        self.assertEqual(t1["text"], "최근 3 step 동안 planner·developer·reviewer 모두 채택 항목이 없습니다. "
+                                     "처리 상태 'triage'.")
+        self.assertEqual(t1["values"]["signals"], ["채택 항목"])
+
+    def test_selection_comes_from_the_judged_observations_and_their_source(self):
+        inputs = [artifact_obs(s, {"code.py": "same"}) for s in range(1, 7)]
+        for o in inputs:
+            o["progress_metric"] = {"conversation": ["open_issues_count"], "artifact": ["files_changed"]}
+        explanation = replay(inputs, configured())[-1]["criteria"]["explanation"]
+        self.assertEqual(explanation["signals"]["selected_metrics"],
+                         ["conversation.open_issues_count", "artifact.files_changed"])
+        self.assertEqual(explanation["text"], "최근 3 step 동안 planner·developer·reviewer 모두 산출물 변경·새 쟁점이 "
+                                              "없습니다. 통과 테스트 7/16.")
+        for o in inputs:
+            o["progress_source"] = "artifact"
+        explanation = replay(inputs, configured())[-1]["criteria"]["explanation"]
+        # An inactive source's metrics were not judged, so they are not named either.
+        self.assertEqual(explanation["signals"]["selected_metrics"], ["artifact.files_changed"])
+        self.assertIn("모두 산출물 변경이 없습니다.", explanation["text"])
+
+    def test_record_without_a_selection_rebuilds_its_original_sentence(self):
+        old = {k: v for k, v in signals().items() if k != "selected_metrics"}
+        self.assertIn("모두 산출물 변경·테스트 증가·새 쟁점이 없습니다.", explain(old)["text"])
+        old_t1 = {**old, "test_observed_in_session": False, "status": "triage"}
+        self.assertIn("모두 처리 상태 변화·채택 항목·새 쟁점이 없습니다.", explain(old_t1)["text"])
 
 
 class RoleLabelTests(unittest.TestCase):

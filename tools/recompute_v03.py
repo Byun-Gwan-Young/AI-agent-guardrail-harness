@@ -4,7 +4,7 @@ Inputs are the proxy logs only (observation input fields; stored progress/criter
 No external call, no model text in the output (no narrative, reasoning, reasons or evidence). Also recomputes
 deadlock-v0.2 / progress-v2 and checks it reproduces the stored records byte-for-byte.
 
-Output: reports/c17-2/v03-recompute.json (C-17-1 wrote reports/c17-1/, kept as it was). The C-16 prediction is read
+Output: the --output path (C-17-1 wrote reports/c17-1/, C-17-2 reports/c17-2/). The C-16 prediction is read
 from docs/design/demo-v03-inputs.json. --previous compares the v0.3 rows with an earlier report of this tool.
 """
 import argparse
@@ -134,7 +134,8 @@ def compare(previous, current):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', type=Path, default=ROOT / 'reports/c17-2/v03-recompute.json')
+    # Required so a rerun never overwrites an earlier unit's report (reports/c17-1/, reports/c17-2/ stay as they were).
+    parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--previous', type=Path)
     args = parser.parse_args()
     config = load_config(CONFIG)

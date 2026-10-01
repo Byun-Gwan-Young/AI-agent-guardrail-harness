@@ -1,6 +1,7 @@
 # DM-7 · DM-23: 데모 차단 모드 (block)
 
-PM 결정 DM-7 (2026-09-29), DM-23 (C-16 결정 9). 설계 `docs/design/demo-block-and-explanation.md` 1 절. 구현 C-17-2 파트 1.
+PM 결정 DM-7 (2026-09-29), DM-23 (C-16 결정 9), DM-32·DM-34 (C-17-2 결정, C-17-3 반영). 설계 `docs/design/demo-block-and-explanation.md` 1 절.
+구현 C-17-2 파트 1, 개정 C-17-3 파트 0.
 데모에서만 쓴다. 데이터셋 수집은 계속 observe 만 한다 (14 장). 복구 개입(INJECT 등)은 범위 밖 (DM-8).
 
 ## 켜는 방법
@@ -15,16 +16,30 @@ PM 결정 DM-7 (2026-09-29), DM-23 (C-16 결정 9). 설계 `docs/design/demo-blo
 
 ## 안전장치 두 개 (DM-23)
 
-1. **phase 헤더** : 요청의 `X-Guardrail-Phase` 가 `demo` 일 때만 차단한다. 그 밖의 요청은 관측과 똑같이 업스트림으로 보낸다
+1. **phase 헤더 — block 프록시는 demo phase 전용 (DM-32, C-17-3)** : `X-Guardrail-Phase` 가 `demo` 가 아닌 요청은 **409** 로
+   거절한다. 본문 `{"error": {"type": "guardrail_block_requires_demo_phase", "code": "block_mode_requires_demo_phase",
+   "message": "차단 프록시는 demo phase 전용입니다 (X-Guardrail-Phase: demo)", "phase": <받은 값>}}`, 헤더 `x-should-retry: false`
+   - `POST /sessions` 와 `/v1/chat/completions` 둘 다. 판단은 그 세션 메타의 모드(없는 세션이면 이 프록시의 모드)로 한다
+   - 업스트림으로 아무것도 보내지 않고, 턴으로 남기지 않으며, 세션이 없으면 세션 파일도 만들지 않는다
+   - 실행기는 세션 시작 응답이 오류면 프록시 사유를 붙여 `runner_error` 로 끝낸다 (`Proxy refused the session (409): …`). 모델 호출 0 회
+   - **C-17-2 와 다른 점** : C-17-2 는 지시대로 비데모 요청을 관측처럼 통과시켰다. 조용히 통과시키면 잘못된 조건군(v0.3·block)의
+     세션이 섞이므로 DM-32 로 바꿨다 (S-12 : 프록시 1 개 = 조건군 1 개). 설계 1-1 의 409 제안과 같아졌다
    - 실행기는 `--phase demo` 일 때만 이 헤더를 보낸다. phase 는 프록시가 기록하는 실행 조건(`request_params.phase`, 메타 `phase`)이
      되어 세션 안에서 바뀌면 `conditions_mixed` 로 잡힌다. 값은 짧은 소문자 토큰만 받는다 (그 밖은 400)
-   - **설계와 다른 점** : 설계 1-1 은 block 프록시가 demo 가 아닌 세션의 첫 요청을 409 로 거부하자고 제안했다. C-17-2 지시
-     ("아니면 관측과 같게 통과")를 따랐다. 그래서 block 프록시를 거친 비데모 세션은 관측 세션처럼 흐르고, 메타에는
-     `guardrail_mode: block`, `phase: null` 로 남는다 (조건군은 다르므로 관측 세션과 섞지 않는다, S-12)
 2. **`--dataset-run` 배제** (실행기, 모델 호출 전)
    - `--dataset-run` + `--phase demo` → 실행 폴더를 만들기 전에 오류
-   - `--dataset-run` 인데 프록시 세션 메타가 `guardrail_mode: block` → 세션을 연 직후, 모델 호출 0 회에서 `runner_error` 로 끝난다
-     (`conditions.json` 에 `guardrail_mode` 를 남긴 뒤). 모드는 세션을 열어야 알 수 있어서 이 시점이다
+   - `--dataset-run` 은 demo phase 를 가질 수 없으므로 block 프록시에서는 세션 시작부터 409 로 거절된다 (DM-32).
+     세션을 연 직후 메타가 `guardrail_mode: block` 이면 실행기가 한 번 더 거부하는 검사(`enforce_observe_proxy`)는 두 번째
+     안전장치로 남겨 두었다
+
+## 데모 출력 경로 (DM-34, C-17-3)
+
+- `--phase demo` 실행의 실행 폴더는 `runs/demo/` 아래만 허용한다. `--output-root` 를 주지 않으면 `runs/demo/`, 다른 경로를 주면
+  실행 폴더를 만들기 전에 오류
+- 반대로 demo 가 아닌 실행이 `runs/demo/` 아래에 쓰려 하면 같은 시점에 오류 (DM-2 : 데이터셋과 섞지 않는다. 지시에 없던 반대 방향 검사)
+- `--output-root` 기본값은 phase 로 정한다 (`runs/` 또는 `runs/demo/`). 기존 비데모 실행의 실효 기본값 `runs/` 는 그대로
+- `tools/analyze_session.py` 는 실행 폴더를 `runs/<id>` 에 없으면 `runs/demo/<id>` 에서, 프록시 로그를 `logs/<id>.json` 에 없으면
+  `logs/demo/<id>.json` 에서 찾는다
 
 ## 차단 시점과 응답
 
@@ -72,13 +87,15 @@ PM 결정 DM-7 (2026-09-29), DM-23 (C-16 결정 9). 설계 `docs/design/demo-blo
 
 `tests/test_block_mode.py` : 가짜 업스트림 + 메모리 프록시. STOP 다음 요청 403·업스트림 미전달·본문 문장 = STOP 기록 문장·
 거절 턴 기록·메타 `guardrail_block`·`judgement_ns`, phase 없음/다른 phase 는 통과, 관측 설정은 demo phase 여도 통과,
-설명 실패 시 문장 지어내지 않음, phase 헤더 형식, 설정 차이·v0.3 전용·모드 값 검사, 안전장치 두 개, `guardrail_stop` 판별,
+설명 실패 시 문장 지어내지 않음, phase 헤더 형식, block 프록시의 비데모 요청 409 (세션 시작·대화·데모 세션의 phase 없는 요청),
+설정 차이·v0.3 전용·모드 값 검사, 안전장치 두 개, `guardrail_stop` 판별, 데모 출력 경로 규칙,
 `perform_step` 의 blocked 결과와 다른 403 의 abort 유지, 실제 실행기 오프라인 실행 (step 6 STOP → step 7 거절 → `guardrail_stop`,
-매니페스트 v0.5), demo phase 없이 같은 실행은 차단 없음, `--dataset-run` 두 경로.
+매니페스트 v0.5, 실행 폴더 `runs/demo/`), demo phase 없는 실행은 block 프록시에서 세션 시작 409·관측 프록시에서는 차단 없음,
+`--dataset-run` 두 경로.
 
 ## 알려진 한계
 
 - `tools/analyze_c14.py`, `tools/compare_sessions.py` 는 모든 step 에 `acceptance` 가 있다고 가정한다 (C-11·C-14 세션 전용 도구).
   차단 세션에 쓰려면 고쳐야 한다. `tools/analyze_session.py` 는 고쳤다
-- 데모 세션 폴더·로그 분리(`runs/demo/`, `GUARDRAIL_LOG_DIR=logs/demo`, DM-2)는 실행 명령의 경로 선택이며 이번 범위에서 코드로
-  강제하지 않았다
+- 프록시 로그 경로(`GUARDRAIL_LOG_DIR=logs/demo`)는 프록시가 실행 phase 를 시작 전에 알 수 없어 실행 명령으로 정한다.
+  코드가 강제하는 것은 실행 폴더(`runs/demo/`, DM-34)뿐이다

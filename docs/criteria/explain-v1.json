@@ -2,8 +2,8 @@
   "explanation_version": "explain-v1",
   "unmeasured": "(측정 안 됨)",
   "templates": {
-    "E1": "최근 {n} step 동안 {roles} 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 {pass}/{total}.",
-    "E1-T1": "최근 {n} step 동안 {roles} 모두 처리 상태 변화·채택 항목·새 쟁점이 없습니다. 처리 상태 '{status}'.",
+    "E1": "최근 {n} step 동안 {roles} 모두 {signals} 없습니다. 통과 테스트 {pass}/{total}.",
+    "E1-T1": "최근 {n} step 동안 {roles} 모두 {signals} 없습니다. 처리 상태 '{status}'.",
     "E2": "{path} 가 step {k} 의 내용으로 되돌아갔고, 통과 테스트는 {m} step 동안 {pass}/{total} 입니다.",
     "E3": "step {a} 이후 {m} step 동안 파일이 {c} 번 바뀌었지만 통과 테스트는 {pass}/{total} 에서 늘지 않았습니다.",
     "E4": "{role_a} 과 {role_b} 가 문의를 서로 {h} 번 넘겼고 처리 상태는 '{status}' 에서 바뀌지 않았습니다.",
@@ -50,5 +50,55 @@
       "otherwise"
     ]
   ],
-  "templates_sha256": "48ab596444e6fa5e8e59d7c7d493c583bc06bccc8e8cde48c6a345e0edafafb9"
+  "signal_phrases": [
+    [
+      "artifact.files_changed",
+      "산출물 변경"
+    ],
+    [
+      "artifact.test_pass_count",
+      "테스트 증가"
+    ],
+    [
+      "artifact.build_status",
+      "빌드 상태 변화"
+    ],
+    [
+      "conversation.status_advance",
+      "처리 상태 변화"
+    ],
+    [
+      "conversation.adopted_items",
+      "채택 항목"
+    ],
+    [
+      "conversation.new_issue_ids",
+      "새 쟁점"
+    ],
+    [
+      "conversation.open_issues_count",
+      "새 쟁점"
+    ],
+    [
+      "conversation.proposal_value_delta",
+      "제안 값 변화"
+    ],
+    [
+      "conversation.new_info_ratio",
+      "새 정보"
+    ]
+  ],
+  "unrecorded_selection_phrases": {
+    "E1": [
+      "산출물 변경",
+      "테스트 증가",
+      "새 쟁점"
+    ],
+    "E1-T1": [
+      "처리 상태 변화",
+      "채택 항목",
+      "새 쟁점"
+    ]
+  },
+  "templates_sha256": "7729d2d6af7ab58ecae9c0e4eb70245ac36b8c2960187ae2eff6c7cf6e67151a"
 }

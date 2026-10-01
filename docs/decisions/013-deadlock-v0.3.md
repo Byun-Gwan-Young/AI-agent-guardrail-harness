@@ -147,3 +147,39 @@ E1-T1 `no_test_observation_in_session` → E1 `otherwise`
   앞 역할이 올린 통과 수를 다음 역할들이 자기 이전 관측과 비교해 다시 본 경우다 (G0-12). 셋 다 같은 step 에 A-1 대화 지표
   `open_issues_count` 의 쟁점 닫기 사건과 파일 변경 사건이 있어 progress 로 남는다 ("파일 변경만의 진전" 이 아니라 T3 미적용).
   세 세션에 T3 (a)(b) 적용 step 은 없다
+
+## C-17-3 파트 0 재동결 (DM-30 · DM-31 · DM-33)
+
+- **DM-30** : C-17-2 의 DM-28 해석(K 안의 "파일 변경 + 통과 수 감소" 는 파일 변경 때문에 진전, 최고값과 같은 값으로의 회복은
+  진전 아님)을 그대로 확정. 코드 변경 없음
+- **DM-31** : E1·E1-T1 은 판정에 쓰인 지표의 신호만 나열한다. 고르지 않은 신호를 "없다" 고 쓰지 않는다
+  - 신호 기록에 `selected_metrics` 를 넣는다 = STOP 관측의 `progress_metric` 중 `progress_source` 로 실제 판정된 것
+    (`conversation.*` 는 source 가 conversation/both 일 때만, `artifact.*` 는 artifact/both 일 때만)
+  - 지표 → 문구 (이 순서로 나열, 같은 문구는 한 번) : `artifact.files_changed` 산출물 변경, `artifact.test_pass_count` 테스트 증가,
+    `artifact.build_status` 빌드 상태 변화, `conversation.status_advance` 처리 상태 변화, `conversation.adopted_items` 채택 항목,
+    `conversation.new_issue_ids` 새 쟁점, `conversation.open_issues_count` 새 쟁점, `conversation.proposal_value_delta` 제안 값 변화,
+    `conversation.new_info_ratio` 새 정보
+  - 템플릿은 `{signals}` 자리 하나로 바뀌었다 : E1 "최근 {n} step 동안 {roles} 모두 {signals} 없습니다. 통과 테스트 {pass}/{total}.",
+    E1-T1 "… 모두 {signals} 없습니다. 처리 상태 '{status}'." `{signals}` 는 문구를 "·" 로 잇고 마지막 음절의 받침으로 조사 이/가를 붙인다
+  - A-1 계열(대화 `open_issues_count`, 산출물 `test_pass_count`·`files_changed`)은 세 신호를 다 고르므로 문장이 이전과 같다
+  - `selected_metrics` 가 없는 이전 기록은 만들어질 때의 문장(세 신호 모두)으로 다시 만들어진다
+- **DM-33** : C-17 단위에서 코드가 바뀔 때마다 재동결하고 이전 해시를 여기에 남긴다. 최종 동결은 C-19 본 실행 직전
+
+**이전 해시 (C-17-2, `2847d62`) → 새 해시 (C-17-3 파트 0)**
+
+| 대상 | 이전 | 새 |
+|---|---|---|
+| `docs/criteria/deadlock-v0.3.json` 파일 | `9812a6687b49081134057ec7ce99cb91165a4a4af09cc8594a95c6d62e306db9` | `1109d6c23ce27c52ad423122a3aa60e846c1c4cbc7616816a1498ee0f45d49ae` |
+| `criteria_sha256` (파라미터) | `a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50` | 같음 |
+| `deadlock_policy_v03.py` | `6656ed11a1ca0b2336e73302b2dcc3e9adc64dd64d55bf701967b08accc14f80` | 같음 |
+| `explain_v1.py` | `c31630306c3d9f9908aecad39a3d8a90fae1a077a198d27b29bae56f4861a6ec` | `555edeb72db658d050e77484b2e724d2487e5ac73d66fd1d9bca612b3700577f` |
+| `progress_signal_v3.py` | `660b5f4f0d77ce8189e3fea6c033315b7866144c374b5ec1c00a06d8835b6245` | 같음 |
+| `docs/criteria/explain-v1.json` 파일 | `9ef9dd422fcc8e3a61ebf6e70c802dd3714d0ba969200ad56097393ddf6e9e1f` | `dd877389e23b56cb82b98beb6aff5cbff48af10d3932c177b5c96230140e0eae` |
+| `explanation_templates_sha256` | `48ab596444e6fa5e8e59d7c7d493c583bc06bccc8e8cde48c6a345e0edafafb9` | `7729d2d6af7ab58ecae9c0e4eb70245ac36b8c2960187ae2eff6c7cf6e67151a` |
+
+템플릿 동결 기록에 `signal_phrases` 와 `unrecorded_selection_phrases` 를 더했다.
+
+**기존 세션 재계산** (`tools/recompute_v03.py --previous reports/c17-2/v03-recompute.json --output reports/c17-3/v03-recompute.json`.
+`--output` 은 이제 필수라 이전 단위 보고를 덮어쓰지 않는다)
+
+- 첫 STOP 6 / 없음 / 9, A-1-v3 새 STOP 없음, v0.2 바이트 동일, C-17-2 보고 대비 v0.3 상태·판정 변화 0, 첫 STOP 문장 동일

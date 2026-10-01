@@ -1,4 +1,4 @@
-"""C-17-2 part 1: demo block mode (DM-7, DM-23). Offline only: fake upstream, in-memory proxy."""
+"""Demo block mode (C-17-2 part 1, DM-7, DM-23; C-17-3 DM-32, DM-34). Offline only: fake upstream, in-memory proxy."""
 import contextlib
 import io
 import json
@@ -12,7 +12,8 @@ import httpx
 import deadlock_policy_v03
 from experiment_config import load_config
 from experiments.step_execution import PROTOCOL_V10, guardrail_stop, perform_step
-from experiments.run_scenario import enforce_demo_separation, enforce_observe_proxy
+from experiments import run_scenario
+from experiments.run_scenario import enforce_demo_separation, enforce_observe_proxy, output_root_for
 from proxy import create_app
 from test_criteria_v03 import CONFIG as OBSERVE_CONFIG, artifact_obs
 import test_harness_facts as facts
@@ -87,18 +88,33 @@ class ProxyBlockTests(unittest.IsolatedAsyncioTestCase):
         stored = json.loads((Path(self.directory) / "logs" / "blocked.json").read_text(encoding="utf-8"))
         self.assertEqual(stored["meta"]["guardrail_block"]["refused_requests"], 2)
 
-    async def test_without_demo_phase_a_block_proxy_passes_like_observe(self):
+    async def test_without_demo_phase_a_block_proxy_refuses_with_409(self):
+        # DM-32: no silent observe run on the block proxy; nothing is forwarded and no session file is made.
+        client = httpx.AsyncClient(transport=httpx.ASGITransport(app=self.app(BLOCK_CONFIG)), base_url="http://test")
+        self.addAsyncCleanup(client.aclose)
         for phase in (None, "measure"):
             with self.subTest(phase=phase):
                 headers = {"X-Guardrail-Session": f"plain-{phase}", **({"X-Guardrail-Phase": phase} if phase else {})}
-                before = len(self.upstream)
-                client, stop = await self.stop_session(BLOCK_CONFIG, headers)
-                self.assertEqual(stop["criteria"]["decision"], "deadlock")
-                response = await client.post("/v1/chat/completions", json={"messages": []}, headers=headers)
-                self.assertEqual((response.status_code, len(self.upstream) - before), (200, 7))
-                meta = (await client.get("/log", headers=headers)).json()["meta"]
-                self.assertEqual((meta["guardrail_mode"], meta["phase"]), ("block", phase))
-                self.assertNotIn("guardrail_block", meta)
+                for path, body in (("/sessions", None), ("/v1/chat/completions", {"messages": []})):
+                    response = await client.post(path, json=body, headers=headers)
+                    self.assertEqual(response.status_code, 409)
+                    self.assertEqual(response.headers["x-should-retry"], "false")
+                    error = response.json()["error"]
+                    self.assertEqual((error["code"], error["phase"]), ("block_mode_requires_demo_phase", phase))
+                    self.assertIn("demo phase 전용", error["message"])
+                self.assertEqual((await client.get("/log", headers=headers)).status_code, 404)
+        self.assertEqual(self.upstream, [])
+        self.assertFalse((Path(self.directory) / "logs").exists() and any((Path(self.directory) / "logs").iterdir()))
+
+    async def test_a_demo_session_on_the_block_proxy_refuses_a_later_request_without_the_phase(self):
+        headers = {"X-Guardrail-Session": "mixed", **DEMO}
+        client, _ = await self.stop_session(BLOCK_CONFIG, headers, steps=2)
+        response = await client.post("/v1/chat/completions", json={"messages": []},
+                                     headers={"X-Guardrail-Session": "mixed"})
+        self.assertEqual((response.status_code, len(self.upstream)), (409, 2))
+        self.assertEqual(len((await client.get("/log", headers=headers)).json()["turns"]), 2)
+        started = await client.post("/sessions", headers={"X-Guardrail-Session": "fresh", **DEMO})
+        self.assertEqual(started.status_code, 200)
 
     async def test_observe_proxy_never_refuses_even_for_the_demo_phase(self):
         headers = {"X-Guardrail-Session": "observe", **DEMO}
@@ -238,19 +254,23 @@ class BlockRunTests(unittest.IsolatedAsyncioTestCase):
             artifact.update(test_pass_count=7, test_total_count=16)
             return {"summary": {"passed": 7, "tests": 16}, "gate": {"machine_success": False},
                     "artifact": artifact, "error": None}
-        args = SimpleNamespace(scenario=A1V4, run_index=1, temperature=0.0, output_root=root / "runs",
+        # DM-34: the demo root is runs/demo/ of this temporary tree.
+        demo_root = root / "runs" / "demo"
+        output_root = demo_root if phase == "demo" else root / "runs"
+        args = SimpleNamespace(scenario=A1V4, run_index=1, temperature=0.0, output_root=output_root,
                                no_context_buffer=False, context_buffer_messages=12, seed_probe=None,
                                proxy_url="http://mock", collection_policy=facts.INDEPENDENT,
                                output_contract=facts.V2, runner_protocol=PROTOCOL_V10, api_key_env="KMU_API_KEY",
                                phase=phase, dataset_run=dataset_run)
         clean = {"git_commit": "0" * 40, "git_dirty": False, "git_state_status": "measured", "git_state_reason": None}
         with mock.patch.object(runner, "load_scenario", return_value=scenario), \
+                mock.patch.object(runner, "DEMO_OUTPUT_ROOT", demo_root), \
                 mock.patch.object(runner.Workspace, "acceptance", acceptance), \
                 mock.patch.object(runner, "git_state", return_value=clean), \
                 mock.patch("httpx.AsyncClient", OfflineClient), mock.patch.dict("os.environ", {"KMU_API_KEY": "fake"}), \
                 contextlib.redirect_stdout(io.StringIO()):
             code = await runner.run(args)
-        out = next((root / "runs").iterdir())
+        out = next(p for p in output_root.iterdir() if p.name != "demo")
         read = lambda name: json.loads((out / name).read_text(encoding="utf-8")) if (out / name).exists() else None
         return {"code": code, "root": root, "session_id": out.name, "steps": read("steps.json"),
                 "summary": read("summary.json"), "session": read("session.json"), "conditions": read("conditions.json"),
@@ -295,13 +315,22 @@ class BlockRunTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((savings["status"], savings["value"], savings["observe_session_ids"]), ("unmeasured", None, None))
         self.assertEqual(savings["blocked_session_total_tokens"], manifest["tokens"]["total"])
 
-    async def test_without_demo_phase_the_same_run_is_not_blocked(self):
+    async def test_without_demo_phase_the_block_proxy_refuses_the_session(self):
+        # DM-32: the run fails at session start, before any model call, with the proxy's reason.
         run = await self.run_offline(phase=None)
+        self.assertEqual(run["summary"]["termination_reason"], "runner_error")
+        self.assertIn("Proxy refused the session (409)", run["summary"]["error"])
+        self.assertIn("block_mode_requires_demo_phase", run["summary"]["error"])
+        self.assertEqual((run["upstream_requests"], run["steps"], run["session"]), ([], None, None))
+        self.assertIsNone(run["conditions"]["phase"])
+
+    async def test_without_demo_phase_an_observe_proxy_runs_unblocked(self):
+        run = await self.run_offline(phase=None, config=OBSERVE_CONFIG)
         self.assertEqual(run["summary"]["termination_reason"], "max_steps")
         self.assertNotIn("guardrail_stop", run["summary"])
         self.assertEqual((len(run["upstream_requests"]), len(run["steps"])), (16, 8))
         self.assertNotIn("guardrail_block", run["session"]["meta"])
-        self.assertIsNone(run["conditions"]["phase"])
+        self.assertEqual((run["conditions"]["phase"], run["conditions"]["guardrail_mode"]), (None, "observe"))
 
     async def test_dataset_run_with_demo_phase_fails_before_the_run_directory(self):
         import experiments.run_scenario as runner
@@ -317,11 +346,32 @@ class BlockRunTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(list(output.iterdir()), [])
 
     async def test_dataset_run_through_a_block_proxy_stops_before_any_model_call(self):
+        # Refused at session start by DM-32; enforce_observe_proxy remains as a second check (unit test above).
         run = await self.run_offline(phase=None, dataset_run=True)
         self.assertEqual(run["summary"]["termination_reason"], "runner_error")
-        self.assertIn("block-mode proxy", run["summary"]["error"])
-        self.assertEqual((run["upstream_requests"], run["steps"], run["session"]["turns"]), ([], None, []))
-        self.assertEqual(run["conditions"]["guardrail_mode"], "block")
+        self.assertIn("block_mode_requires_demo_phase", run["summary"]["error"])
+        self.assertEqual((run["upstream_requests"], run["steps"], run["session"]), ([], None, None))
+
+
+class DemoOutputRootTests(unittest.TestCase):
+    """DM-34: --phase demo writes only under runs/demo/; runs/demo/ holds nothing else (DM-2)."""
+
+    def test_defaults_and_allowed_roots(self):
+        demo = run_scenario.DEMO_OUTPUT_ROOT.resolve()
+        self.assertEqual(output_root_for("demo", None), demo)
+        self.assertEqual(output_root_for(None, None), run_scenario.DEFAULT_OUTPUT_ROOT.resolve())
+        self.assertEqual(output_root_for("demo", demo / "cl"), demo / "cl")
+        with tempfile.TemporaryDirectory() as directory:
+            self.assertEqual(output_root_for(None, Path(directory)), Path(directory).resolve())
+
+    def test_demo_elsewhere_and_non_demo_inside_runs_demo_fail(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, "DM-34"):
+                output_root_for("demo", Path(directory))
+        with self.assertRaisesRegex(ValueError, "DM-34"):
+            output_root_for("demo", run_scenario.DEFAULT_OUTPUT_ROOT)
+        with self.assertRaisesRegex(ValueError, "reserved for --phase demo"):
+            output_root_for(None, run_scenario.DEMO_OUTPUT_ROOT / "x")
 
 
 if __name__ == "__main__":

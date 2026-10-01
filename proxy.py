@@ -10,7 +10,7 @@ import time
 import uuid
 from session_store import JsonSessionRepository, SessionStore, utc_now
 from health import install_health
-from experiment_config import (config_file, load_config, conditions, guardrail_mode, tool_call_count,
+from experiment_config import (PHASE_HEADER, config_file, load_config, conditions, guardrail_mode, tool_call_count,
                                truncate_text, upstream)
 from conversation_extract import extract_conversation
 from observation_api import install_observations
@@ -52,10 +52,20 @@ def session_key(request, body):
     return key
 
 
+def demo_only(phase):
+    """DM-32: a block-mode proxy serves only the demo phase. Anything else fails loudly instead of running as observe."""
+    return JSONResponse({"error": {"type": "guardrail_block_requires_demo_phase",
+                                   "code": "block_mode_requires_demo_phase",
+                                   "message": "차단 프록시는 demo phase 전용입니다 (" + PHASE_HEADER + ": " + DEMO_PHASE + ")",
+                                   "phase": phase}},
+                        status_code=409, headers={"x-should-retry": "false"})
+
+
 def blocking_stop(session, params):
     """DM-7, DM-23: the first STOP record of a block-mode session, for a request that declares the demo phase.
 
-    Any other request passes exactly as in observe mode. The STOP comes from the same judgement as observe mode.
+    A block-mode request without the demo phase never gets here (DM-32). The STOP comes from the same judgement
+    as observe mode.
     """
     if session.meta.get("guardrail_mode") != "block" or params.get("phase") != DEMO_PHASE:
         return None
@@ -104,6 +114,8 @@ def create_app(log_dir=None, transport=None, sleep=asyncio.sleep, repository=Non
     async def start_session(request: Request):
         if not request.headers.get("X-Guardrail-Session"):
             raise HTTPException(400, "X-Guardrail-Session is required")
+        if mode == "block" and request.headers.get(PHASE_HEADER) != DEMO_PHASE:
+            return demo_only(request.headers.get(PHASE_HEADER))
         session = store.start(session_key(request, {}))
         return {"session_id": session.session_id}
 
@@ -133,7 +145,13 @@ def create_app(log_dir=None, transport=None, sleep=asyncio.sleep, repository=Non
         upstream_body = dict(body)
         if params["seed_status"] == "unsupported":
             upstream_body.pop("seed", None)
-        session = store.get_or_start(session_key(request, body))
+        key = session_key(request, body)
+        existing = store.get(key)
+        # The session's own recorded mode, or this proxy's mode for a session that does not exist yet.
+        session_mode = existing.meta.get("guardrail_mode") if existing is not None else mode
+        if session_mode == "block" and params["phase"] != DEMO_PHASE:
+            return demo_only(params["phase"])
+        session = store.get_or_start(key)
         async with session.lock:
             if session.status == "ended":
                 raise HTTPException(409, "Session is closed; use a new key")
