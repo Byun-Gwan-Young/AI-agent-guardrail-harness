@@ -265,9 +265,13 @@ def correction(kind, names, allowed):
     return text
 
 
-async def perform_step(agent, context, budget, allowed, budget_notes=False):
+async def perform_step(agent, context, budget, allowed, budget_notes=False, tool_text=None, correct=None):
+    """tool_text and correct replace the artifact-task tool wording (tool_instructions, correction) for a dialogue
+    task (C-17-4); left out, every message is the one v7-v10 send."""
     from autogen_agentchat.messages import TextMessage, ToolCallRequestEvent
     from autogen_core import CancellationToken
+    tool_text = tool_text or tool_instructions
+    correct = correct or correction
     errors, text, feedback, executions = [], '', None, []
     abort, error, final_output = False, None, False
     strict_failure, blocked = None, None
@@ -320,7 +324,7 @@ async def perform_step(agent, context, budget, allowed, budget_notes=False):
             if detail:
                 entry.update(detail)
             errors.append(entry)
-            feedback = correction(kind, names, allowed)
+            feedback = correct(kind, names, allowed)
             counted = [e['kind'] for e in errors if e['kind'] in COUNTED_KINDS]
             if len(counted) >= 2:
                 abort = True
@@ -337,7 +341,7 @@ async def perform_step(agent, context, budget, allowed, budget_notes=False):
             budget.final_next = True
             incoming = FINAL_ONLY
             continue
-        incoming = ('Continue from the tool results. ' + tool_instructions(allowed) +
+        incoming = ('Continue from the tool results. ' + tool_text(allowed) +
                     'If ready, return the final structured JSON; otherwise use a registered tool.')
     reasons = list(dict.fromkeys(e['kind'] for e in errors if e['kind'] in COUNTED_KINDS))
     if strict_failure:

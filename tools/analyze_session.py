@@ -253,7 +253,10 @@ def analyse(session_id):
     finish = [((t.get('response_body') or {}).get('choices') or [{}])[0].get('finish_reason') for t in ok]
     system_prompts = {s['agent']: turns_by_id[s['llm_turns'][0]]['request_body']['messages'][0]['content']
                       for s in steps if s['llm_turns']}
-    gate_at_end = next(s['acceptance']['gate'] for s in reversed(steps) if s.get('acceptance') is not None)
+    # A dialogue (T1) step has the scenario judge's gate instead of an acceptance run (C-17-4).
+    gate_at_end = next((s['acceptance']['gate'] if s.get('acceptance') is not None else s['completion_gate']
+                        for s in reversed(steps)
+                        if s.get('acceptance') is not None or s.get('completion_gate') is not None), {})
     return {
         'session_id': session_id,
         'isolation': {
@@ -485,6 +488,36 @@ def v05_fields(result, conditions, log):
     return result
 
 
+def v06_fields(result, conditions, summary, log):
+    """session-manifest-v0.6 = v0.5 + a scenario-v2 dialogue (T1) run (C-17-4): the session registration and its
+    hash, the output contract, vocabulary violations, routing and how the run ended. Earlier sessions keep theirs."""
+    registration = conditions.get('registration')
+    observations = log['observations']
+    result['manifest_version'] = 'session-manifest-v0.6'
+    result['task'] = {k: conditions.get(k) for k in ('task_kind', 'turn_order', 'dialogue_flow', 'output_contract_version',
+                                                     'contract_sha256', 'allowed_issues_sha256', 'closed_list_check',
+                                                     'judge', 'inputs_dir', 'tools', 'tool_implementations')}
+    result['registration'] = {
+        'value': registration, 'sha256': conditions.get('registration_sha256'),
+        'sha256_recomputed': hashlib.sha256(json.dumps(registration, ensure_ascii=False, sort_keys=True,
+                                                       separators=(',', ':')).encode('utf-8')).hexdigest(),
+        'proxy_stored_same': log['meta'].get('registration') == registration}
+    result['vocabulary_violations'] = {'total': summary.get('vocabulary_violations_total'),
+                                       'steps': summary.get('vocabulary_violation_steps'),
+                                       'excluded_from_strict_failure_streak': True}
+    result['run'].update(final_status=summary.get('final_status'), terminal_status=summary.get('terminal_status'))
+    result['judgement'] = {'before': None, 'after': {'gate': summary.get('completion_gate'),
+                                                     'final_status': summary.get('final_status')},
+                           'normal_session': summary.get('termination_reason') == 'success',
+                           'normal_session_rule': 'dialogue task: last ordered status, scenario judge resolved and '
+                                                  'completion declared (demo-runner-extension.md 2)'}
+    last = next((o for o in reversed(observations) if (o.get('progress') or {}).get('handoff') is not None), None)
+    result['routing'] = {'turn_order': conditions.get('turn_order'), 'fallbacks': summary.get('route_fallbacks'),
+                         'handoff_at_end': (last or {}).get('progress', {}).get('handoff'),
+                         'handoff_note': 'recorded only; not a judgement input (DM-22)'}
+    return result
+
+
 def manifest(a, phase, notes):
     result = base_manifest(a, phase, notes)
     conditions = load(run_dir(a['session_id']) / 'conditions.json')
@@ -497,7 +530,13 @@ def manifest(a, phase, notes):
             return result
         result = v04_fields(result, observations)
         # v0.5 for sessions whose proxy recorded its guardrail mode (C-17-2 onward).
-        return v05_fields(result, conditions, log) if 'guardrail_mode' in log['meta'] else result
+        if 'guardrail_mode' not in log['meta']:
+            return result
+        result = v05_fields(result, conditions, log)
+        # v0.6 for scenario-v2 dialogue runs (C-17-4 onward).
+        if conditions.get('task_kind') != 'dialogue':
+            return result
+        return v06_fields(result, conditions, load(run_dir(a['session_id']) / 'summary.json'), log)
     if a['conditions']['runner_protocol'] in (PROTOCOL_V8, PROTOCOL_V9, PROTOCOL_V10):
         # v0.2 adds condition.runner_protocol and condition.reasoning_effort; v7 sessions keep v0.1 unchanged.
         result['manifest_version'] = 'session-manifest-v0.2'

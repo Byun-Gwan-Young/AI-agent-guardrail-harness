@@ -26,6 +26,7 @@ from experiments.step_execution import (FINAL_REASONING_EFFORT, NO_OUTPUT_PLACEH
 from experiments.output_contract import AgentOutput, parse_output
 from experiments.issue_contract import (IssueContract, V1, V2, VERSIONS, PROTOCOL_V2, VOCABULARY_VIOLATIONS,
                                         for_scenario)
+from experiments.dialogue_contract import V3
 from experiments.step_execution import StrictFailureStreak
 from experiments.observation_collection import (DEFAULT_POLICY, INDEPENDENT, LEGACY, PROTOCOLS,
     unavailable, validate_final_response, select_sources, collection_metadata)
@@ -311,8 +312,14 @@ async def run(args):
     scenario_path = args.scenario.resolve()
     scenario = load_scenario(scenario_path)
     if scenario.schema_version != 'scenario-v1':
-        # scenario-v2 (C-17-3) is defined but its run path (T1 turns, router, tools) is the next runner unit.
-        raise ValueError(scenario.schema_version + ' is not runnable by this runner yet')
+        if scenario.task_kind != 'dialogue':
+            # scenario-v2 artifact tasks (CT, CL, CT-N) are the next runner unit (C-17-5, DM-39).
+            raise ValueError(scenario.schema_version + ' artifact tasks are not runnable by this runner yet')
+        # T1 dialogue tasks (C-17-4) have their own flow; everything below is the unchanged artifact path.
+        from experiments.dialogue_runner import run_dialogue
+        return await run_dialogue(args, scenario, scenario_path)
+    if getattr(args, 'output_contract', V2) == V3 or getattr(args, 'closed_list_check', None) is not None:
+        raise ValueError(V3 + ' and --closed-list-check are for scenario-v2 dialogue tasks')
     contract = for_scenario(getattr(args, 'output_contract', V2), scenario)
     if contract.version == V2 and collection_policy != INDEPENDENT:
         # v7 extends the v6 independent-observation protocol; no other combination is labelled.
@@ -674,10 +681,15 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('scenario', type=Path)
     parser.add_argument('--collection-policy', choices=tuple(PROTOCOLS), default=DEFAULT_POLICY)
-    parser.add_argument('--output-contract', choices=VERSIONS, default=V2)
+    parser.add_argument('--output-contract', choices=VERSIONS + (V3,), default=V2,
+                        help=V3 + ' for scenario-v2 dialogue tasks only')
     parser.add_argument('--runner-protocol', choices=(PROTOCOL_V7, PROTOCOL_V8, PROTOCOL_V9, PROTOCOL_V10), default=None,
-                        help='required for output-contract-v2 (D-25). v7 reproduces G0-8; '
-                             'v9 needs a scenario with reasoning_effort')
+                        help='required for output-contract-v2 and v3 (D-25). v7 reproduces G0-8; '
+                             'v9 needs a scenario with reasoning_effort; dialogue tasks run v10')
+    parser.add_argument('--closed-list-check', choices=('after_receipt', 'provider_strict'), default=None,
+                        help='dialogue tasks (DM-20): send status/handoff_to/deliverable enums in the strict schema '
+                             '(provider_strict) or check them after receipt (after_receipt, the default until a '
+                             'gateway strict probe)')
     parser.add_argument('--api-key-env', default='GROQ_API_KEY',
                         help='environment variable holding the provider key; must match the proxy config')
     parser.add_argument('--proxy-url', default=os.environ.get('GUARDRAIL_PROXY_URL', 'http://127.0.0.1:8000'))
@@ -696,8 +708,8 @@ def main():
     parser.add_argument('--seed-probe', type=int, default=None,
                         help='Explicit unverified seed probe; does not change support status')
     args = parser.parse_args()
-    if args.output_contract == V2 and args.runner_protocol is None:
-        parser.error('--runner-protocol is required for --output-contract ' + V2)
+    if args.output_contract in (V2, V3) and args.runner_protocol is None:
+        parser.error('--runner-protocol is required for --output-contract ' + args.output_contract)
     return asyncio.run(run(args))
 
 

@@ -1,0 +1,490 @@
+"""scenario-v2 dialogue (T1) runs (C-17-4): docs/design/demo-runner-extension.md 2-4, decision 015, DM-16..DM-39.
+
+One step is one role's turn with at most max_llm_calls_per_step model calls, as in the artifact path (protocol v10
+step mechanics, unchanged). What differs:
+- the session starts with the scenario's registration (DM-26, DM-29, DM-35); no registration, no run
+- every turn's final report is output-contract-v3; the closed lists (status, handoff_to, deliverable enums) are sent
+  to the provider only with --closed-list-check provider_strict, else checked after receipt (DM-20)
+- the observation is built from the verified report's structured fields only (no narrative extraction, no reasoning)
+- a value outside a closed list is a vocabulary violation (D-17): the step fails, the value is not observed and the
+  violation stays out of the consecutive strict-failure stop; a shape error still counts there
+- turn order: fixed (the CS router of DM-19 is C-17-4 part 2; until then a router scenario is refused)
+- after each step the scenario judge reads the latest verified report and the tool call records
+- ends with success (last ordered status + judge + declaration), escalated (terminal status, DM-18), max_steps,
+  guardrail_stop (block mode), strict_output_failures or runner_error
+
+Tools are only handed on (experiments/dialogue_tools.py); their implementations are C-17-6.
+The artifact path (scenario-v1 and its requests) is untouched: experiments/run_scenario.py dispatches here only for
+scenario-v2 dialogue tasks.
+"""
+import asyncio
+import copy
+import hashlib
+import importlib.util
+import json
+import os
+import shutil
+import uuid
+from importlib.metadata import version
+
+import httpx
+
+from experiments import dialogue_tools
+from experiments import run_scenario as common
+from experiments.dialogue_contract import V3, VOCABULARY_VIOLATIONS_V3, for_dialogue_scenario
+from experiments.observation_collection import INDEPENDENT, collection_metadata, select_sources
+from experiments.step_execution import (NO_OUTPUT_PLACEHOLDER, PROTOCOL_V10, StrictFailureStreak, harness_facts,
+                                        make_client, perform_step)
+from progress_schema import Conversation, Observation
+from scenario_schema import registration_for
+
+FLOW_VERSION = 'dialogue-flow-v1'
+# The judge and inputs_dir are repository paths; offline tests point this at their fixtures.
+SCENARIO_ROOT = common.ROOT
+CLOSED_LIST_CHECKS = ('after_receipt', 'provider_strict')
+# DM-20: gateway strict-schema support with enums is not probed yet, so values are checked after receipt.
+DEFAULT_CLOSED_LIST_CHECK = 'after_receipt'
+JUDGE_RESULTS = ('resolved', 'escalated', 'unfinished')
+# The verified report's state fields the next roles see with its narrative (recent_messages, kept by v10).
+SHARED_FIELDS = ('status', 'handoff_to', 'adopted_items', 'deliverable')
+OBSERVED_FIELDS = ('open_issue_ids', 'info_items', 'status', 'adopted_items', 'handoff_to')
+STOP_DECISIONS = ('deadlock', 'termination_failure')
+
+
+def canonical_sha256(value):
+    return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True,
+                                     separators=(',', ':')).encode('utf-8')).hexdigest()
+
+
+def without_enums(schema):
+    """The schema with every enum keyword removed; property names are kept even when one is called enum."""
+    if isinstance(schema, list):
+        return [without_enums(s) for s in schema]
+    if not isinstance(schema, dict):
+        return schema
+    result = {}
+    for key, value in schema.items():
+        if key == 'enum':
+            continue
+        result[key] = ({name: without_enums(sub) for name, sub in value.items()}
+                       if key in ('properties', '$defs') and isinstance(value, dict) else without_enums(value))
+    return result
+
+
+class SentContract:
+    """output-contract-v3 as requested from the provider (DM-20). provider_strict sends the v3 strict schema as is;
+    after_receipt sends the same strict shape without its enums. Parsing, instructions and reports are the
+    contract's own in both modes, so a value outside a closed list is always caught after receipt."""
+
+    def __init__(self, contract, mode):
+        if mode not in CLOSED_LIST_CHECKS:
+            raise ValueError('Unsupported closed-list check: ' + str(mode))
+        self.contract, self.mode = contract, mode
+
+    def __getattr__(self, name):
+        return getattr(self.contract, name)
+
+    def response_format(self):
+        sent = self.contract.response_format()
+        if self.mode == 'after_receipt':
+            sent['json_schema']['schema'] = without_enums(sent['json_schema']['schema'])
+        return sent
+
+
+def load_judge(scenario, root):
+    """The scenario's completion judge: judge(report, *, tool_records, inputs_dir) -> gate."""
+    path = common.safe_path(root, scenario.judge)
+    if not path.is_file():
+        raise ValueError('Judge not found: ' + scenario.judge)
+    spec = importlib.util.spec_from_file_location('scenario_judge_' + path.stem.replace('-', '_'), path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    if not callable(getattr(module, 'judge', None)):
+        raise ValueError('Judge module must define judge(report, *, tool_records, inputs_dir)')
+    return module.judge, {'path': scenario.judge, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+
+
+def checked_gate(gate):
+    """demo-runner-extension.md 2: {machine_success, result: resolved|escalated|unfinished, missing}."""
+    if (not isinstance(gate, dict) or set(gate) != {'machine_success', 'result', 'missing'}
+            or type(gate['machine_success']) is not bool or gate['result'] not in JUDGE_RESULTS
+            or not isinstance(gate['missing'], list) or not all(isinstance(m, str) for m in gate['missing'])
+            or gate['machine_success'] != (gate['result'] == 'resolved')):
+        raise ValueError('Judge must return {machine_success, result, missing} with machine_success only for resolved')
+    return gate
+
+
+def next_turn(scenario, current, report, failure=None):
+    """(index of the next role, how it was chosen). Fixed order: the next role in the scenario list; handoff_to is
+    recorded only."""
+    ids = [a.id for a in scenario.agents]
+    fallback = (current + 1) % len(ids)
+    route = {'turn_order': scenario.turn_order, 'from_agent': ids[current], 'handoff_to': (report or {}).get('handoff_to'),
+             'basis': 'verified_final_report' if report is not None else None}
+    return fallback, {**route, 'next_agent': ids[fallback], 'rule': 'fixed_order', 'fallback_reason': None}
+
+
+def system_message(agent, tool_names, scenario, schema_text):
+    """Facts only: role text, its tools, the v8 harness facts (no writable files, call budget) and the contract."""
+    return (agent.system_message + '\n' + dialogue_tools.tool_instructions(tool_names)
+            + harness_facts(agent.writable_paths, scenario.termination.max_llm_calls_per_step)
+            + "Final response must be one JSON object matching this schema. Report the full shared state, "
+              "not only this role's issues.\n" + schema_text)
+
+
+def shared_entry(agent, report):
+    if report is None:
+        return {'agent': agent, 'narrative': NO_OUTPUT_PLACEHOLDER}
+    return {'agent': agent, 'narrative': report['narrative'], **{k: report[k] for k in SHARED_FIELDS}}
+
+
+def step_context(scenario, tools, feedback, recent):
+    return json.dumps({'task': scenario.task, 'registered_tools': tools, 'tool_feedback': feedback,
+                       'initial_issue_ids': scenario.initial_issue_ids, 'recent_messages': recent}, ensure_ascii=False)
+
+
+def observation(step, agent, turns, scenario, report, collection, termination, contract):
+    """T1 observation from the verified report's structured fields only. Without one (a vocabulary violation, a
+    shape error) every field is unobserved, so a violating value is neither an advance nor a retreat."""
+    fields = ({k: report[k] for k in OBSERVED_FIELDS} if report is not None else
+              {'open_issue_ids': None, 'info_items': None,
+               'reasons': {'output': 'invalid or missing structured output'}})
+    return Observation(step_id=step, agent_id=agent, llm_turns=turns, progress_source=scenario.progress_source,
+                       progress_metric=scenario.progress_metric.model_dump(),
+                       conversation=Conversation(source_kind='structured', **fields).model_dump(), artifact=None,
+                       termination_context=termination, collection=collection,
+                       issue_report=contract.report(report)).model_dump()
+
+
+def ending(report, gate, declared, scenario):
+    """Termination reason after a non-failed step, or None to continue."""
+    terminal = {s.id for s in scenario.terminal_statuses}
+    if report['status'] in terminal:
+        # DM-18: escalated is its own outcome; another terminal status ends the run under its own name.
+        return 'escalated' if report['status'] == 'escalated' else 'terminal_status'
+    if (report['status'] == scenario.status_values[-1].id and gate['machine_success']
+            and (declared or not scenario.termination.require_completion_declaration)):
+        return 'success'
+    return None
+
+
+def check_arguments(args, scenario):
+    """Everything refused before a run folder exists."""
+    if getattr(args, 'collection_policy', INDEPENDENT) != INDEPENDENT:
+        raise ValueError('A dialogue task uses the independent collection policy')
+    if getattr(args, 'output_contract', None) != V3:
+        raise ValueError('A scenario-v2 dialogue task needs --output-contract ' + V3)
+    if getattr(args, 'runner_protocol', None) != PROTOCOL_V10:
+        raise ValueError('A scenario-v2 dialogue task runs with --runner-protocol ' + PROTOCOL_V10)
+    if scenario.reasoning_effort is None:
+        raise ValueError('runner protocol v10 requires scenario reasoning_effort')
+    mode = getattr(args, 'closed_list_check', None) or DEFAULT_CLOSED_LIST_CHECK
+    if mode not in CLOSED_LIST_CHECKS:
+        raise ValueError('Unsupported closed-list check')
+    evidence = scenario.reasoning_effort_evidence
+    if evidence is not None and not common.safe_path(common.ROOT, evidence).is_file():
+        raise ValueError('reasoning_effort_evidence file not found: ' + evidence)
+    if args.run_index < 1 or (args.temperature is not None and not 0 <= args.temperature <= 2):
+        raise ValueError('Invalid run index or temperature')
+    missing = dialogue_tools.missing_implementations(scenario)
+    if missing:
+        raise ValueError('Tools not implemented until C-17-6: ' + ', '.join(missing))
+    if scenario.turn_order == 'router':
+        raise ValueError('The router turn order (DM-19) is C-17-4 part 2')
+    return mode
+
+
+async def run_dialogue(args, scenario, scenario_path):
+    from autogen_agentchat.agents import AssistantAgent
+
+    mode = check_arguments(args, scenario)
+    key_env = getattr(args, 'api_key_env', None) or 'GROQ_API_KEY'
+    key = os.environ.get(key_env)
+    if not key:
+        raise ValueError(key_env + ' is required')
+    judge, judge_record = load_judge(scenario, SCENARIO_ROOT)
+    inputs_dir = common.safe_path(SCENARIO_ROOT, scenario.inputs_dir)
+    contract = for_dialogue_scenario(scenario)
+    sent = SentContract(contract, mode)
+    registration = registration_for(scenario)
+    repository_state = common.git_state()
+    dataset_run = bool(getattr(args, 'dataset_run', False))
+    phase = getattr(args, 'phase', None)
+    common.enforce_demo_separation(dataset_run, phase)
+    if dataset_run:
+        raise ValueError('scenario-v2 is the demo track (DM-37); --dataset-run is refused')
+    if phase != common.DEMO_PHASE:
+        # deadlock-v0.3 judges only demo sessions (DM-10): a scenario-v2 run is never on the dataset path (DM-2).
+        raise ValueError('scenario-v2 runs only with --phase ' + common.DEMO_PHASE + ' (DM-2, DM-37)')
+    output_root = common.output_root_for(phase, getattr(args, 'output_root', None))
+    session_id = scenario.scenario_id + '-' + uuid.uuid4().hex
+    out = output_root / session_id
+    out.mkdir(parents=True, exist_ok=False)
+    temperature = scenario.temperature if args.temperature is None else args.temperature
+    buffer_messages = (None if args.no_context_buffer else args.context_buffer_messages
+                       if args.context_buffer_messages is not None else scenario.context_buffer_messages)
+    if buffer_messages is not None and buffer_messages < 1:
+        raise ValueError('Context buffer must be positive')
+    if args.seed_probe is not None and scenario.seed_support != 'unverified':
+        raise ValueError('--seed-probe is only for unverified support')
+    versions = {p: version(p) for p in ('autogen-agentchat', 'autogen-core', 'autogen-ext', 'openai')}
+    dispatch = dialogue_tools.ToolDispatch(dialogue_tools.IMPLEMENTATIONS, inputs_dir)
+    evidence = scenario.reasoning_effort_evidence
+    effective = {
+        'scenario': scenario.model_dump(), 'temperature': temperature, 'versions': versions, 'actual_outcome': None,
+        'seed_support': scenario.seed_support, 'session_id': session_id, 'run_index': args.run_index,
+        'context_buffer_messages': buffer_messages, 'seed_probe': args.seed_probe,
+        'requested_seed': args.seed_probe if args.seed_probe is not None else scenario.seed,
+        'runner_protocol': PROTOCOL_V10, 'collection_policy': INDEPENDENT, 'output_contract': V3,
+        'output_contract_version': V3, 'allowed_issues_sha256': contract.sha256,
+        'contract_sha256': contract.contract_sha256,
+        'closed_list_check': {'mode': mode, 'decision': 'DM-20', 'enums_sent_to_provider': mode == 'provider_strict',
+                              'basis': ('default until a gateway strict probe (DM-20)' if mode == DEFAULT_CLOSED_LIST_CHECK
+                                        else 'run condition')},
+        'strict_support': 'unverified', 'strict_probe': None,
+        'strict_failure_policy': 'fail step; abort after two consecutive strict-failed steps; vocabulary violations '
+                                 '(issue IDs, status, handoff_to) fail the step, are not observed, are excluded from '
+                                 'that streak and counted separately; no automatic B fallback',
+        'task_kind': 'dialogue', 'turn_order': scenario.turn_order, 'dialogue_flow': FLOW_VERSION,
+        'routing_policy': ('router: next role = handoff_to of the verified final report; fixed order when there is '
+                           'none, it is null or the same role (DM-19)' if scenario.turn_order == 'router'
+                           else 'fixed order; handoff_to recorded only'),
+        'recent_messages_policy': 'narrative plus status, handoff_to, adopted_items, deliverable of the parsed or '
+                                  'verified final report; placeholder narrative only without one; no raw tool results',
+        'harness_facts_policy': 'system message states writable files (none) and the per-step call limit; each '
+                                'non-final call carries its call number and remaining calls (G0-14)',
+        'reasoning_effort': {'requested': scenario.reasoning_effort, 'sent_on': 'all_calls',
+                             'applied': 'probe_indicated' if evidence else 'unverified', 'evidence': evidence},
+        'registration': registration, 'registration_sha256': canonical_sha256(registration),
+        'judge': judge_record, 'inputs_dir': scenario.inputs_dir,
+        'tools': {a.id: list(a.tools) for a in scenario.agents}, 'tool_implementations': dispatch.identity(),
+        'dataset_run': dataset_run, 'phase': phase, **repository_state}
+    conditions_path = out / 'conditions.json'
+    common.save(conditions_path, effective)
+    print('session_id:', session_id, 'run_directory:', out, flush=True)
+    shutil.copy2(scenario_path, out / 'scenario.yaml')
+    headers = {'X-Guardrail-Session': session_id, 'X-Guardrail-Scenario': scenario.scenario_id,
+               'X-Guardrail-Run-Index': str(args.run_index),
+               'X-Guardrail-Framework-Version': 'autogen-agentchat/' + versions['autogen-agentchat'],
+               'X-Guardrail-Context-Buffer-Messages': str(buffer_messages) if buffer_messages is not None else 'none',
+               'X-Guardrail-Phase': phase}
+    budget = common.CallBudget(scenario.termination.max_llm_calls_per_step, sent, scenario.reasoning_effort,
+                               final_report_allowlist=True)
+    base = args.proxy_url.rstrip('/').removesuffix('/v1')
+    model_http = httpx.AsyncClient(event_hooks={'response': [budget.capture]})
+    options = dict(model=scenario.model, api_key=key, base_url=base + '/v1', default_headers=headers,
+                   http_client=model_http, max_retries=0, temperature=temperature, max_tokens=scenario.max_tokens,
+                   model_info={'vision': False, 'function_calling': True, 'json_output': True,
+                               'structured_output': True, 'family': 'unknown'})
+    if scenario.seed_support == 'supported':
+        options['seed'] = scenario.seed
+    elif args.seed_probe is not None:
+        options['seed'] = args.seed_probe
+    model = make_client(options, budget)
+    schema_text = json.dumps(contract.schema(), ensure_ascii=False) + '\n' + contract.instructions()
+    role_names = [list(a.tools) for a in scenario.agents]
+    common.save(out / 'registered-tools.json', dict(zip([a.id for a in scenario.agents], role_names)))
+    agents = [AssistantAgent(a.id, model_client=model, tools=dispatch.tools(role_names[i]),
+                             model_context=common.make_model_context(buffer_messages),
+                             reflect_on_tool_use=False, model_client_stream=False,
+                             system_message=system_message(a, role_names[i], scenario, schema_text))
+              for i, a in enumerate(scenario.agents)]
+    declarer = scenario.termination_context_collection.declarer_agent
+    steps, missing, first, observation_first = [], [], None, None
+    reason, error, session, started = 'max_steps', None, None, False
+    guardrail_block, terminal, latest_report, gate = None, None, None, None
+    history, cursors, pending_feedback = [], [0] * len(agents), [None] * len(agents)
+    strict_streak = StrictFailureStreak()
+    vocabulary_streak, vocabulary_total = StrictFailureStreak(), 0
+    index = 0
+    async with httpx.AsyncClient(base_url=base, headers=headers, timeout=60) as client:
+        try:
+            # Registered once, with the session (DM-35). A scenario-v2 session never runs unregistered.
+            response = await client.post('/sessions', json={'registration': registration})
+            if response.is_error:
+                raise ValueError(f'Proxy refused the session ({response.status_code}): {response.text[:300]}')
+            started = True
+            if response.json().get('registered') is not True:
+                raise ValueError('The proxy did not register the session')
+            pin_response = await client.get('/log')
+            pin_response.raise_for_status()
+            meta = pin_response.json()['meta']
+            if meta.get('criteria_version') != scenario.criteria_version:
+                raise ValueError('Proxy criteria version differs from scenario')
+            if meta.get('registration') != registration:
+                raise ValueError('The proxy stored a different registration')
+            common.ensure_key_env(meta.get('upstream'), key_env)
+            effective.update(api_key_env=key_env, upstream=meta.get('upstream'),
+                             guardrail_mode=meta.get('guardrail_mode'))
+            common.save(conditions_path, effective)
+            common.enforce_observe_proxy(dataset_run, meta.get('guardrail_mode'))
+            for step in range(1, scenario.termination.max_steps + 1):
+                name = agents[index].name
+                budget.reset()
+                dispatch.step_id, dispatch.agent_id = step, name
+                text, parsed, call_error = '', None, None
+                context = step_context(scenario, role_names[index], pending_feedback[index], history[cursors[index]:])
+                outcome = await perform_step(agents[index], context, budget, role_names[index], budget_notes=True,
+                                             tool_text=dialogue_tools.tool_instructions,
+                                             correct=dialogue_tools.correction)
+                if outcome['blocked'] is not None:
+                    # Block mode refused this step's request after a STOP (DM-7, DM-23); no output, no observation.
+                    guardrail_block = {**outcome['blocked'], 'blocked_step': step}
+                    steps.append({'step_id': step, 'agent': name, 'text': '', 'llm_calls': budget.used,
+                                  'llm_turns': sorted(set(budget.turns)), 'completion_gate': None, 'call_error': None,
+                                  'step_status': 'blocked', 'measurement_status': 'unmeasured',
+                                  'tool_errors': outcome['tool_errors'], 'tool_executions': outcome['tool_executions'],
+                                  'final_output': False, 'failure_reasons': outcome['failure_reasons'],
+                                  'guardrail_stop': guardrail_block})
+                    common.save(out / 'steps.json', steps)
+                    reason = 'guardrail_stop'
+                    break
+                vocabulary = outcome['strict_failure'] if outcome['strict_failure'] in VOCABULARY_VIOLATIONS_V3 else None
+                # D-17: a vocabulary violation is not a strict failure for the stop streak.
+                stop_for_strict = strict_streak.observe(outcome['strict_failure'] if vocabulary is None else None)
+                vocabulary_streak.observe(vocabulary)
+                vocabulary_total += vocabulary is not None
+                text, call_error = outcome['text'], outcome['error']
+                pending_feedback[index] = outcome['feedback']
+                if not outcome['failed']:
+                    try:
+                        parsed = contract.parse(text)
+                        parsed.update(agent_id=name, step_id=step)
+                    except (ValueError, TypeError) as exc:
+                        outcome['failed'] = True
+                        outcome['final_output'] = False
+                        outcome['failure_reasons'].append(getattr(exc, 'code', 'no_final_output'))
+                        outcome['feedback'] = '최종 구조화 JSON이 유효하지 않다. 다음 차례에는 지정된 스키마로 응답하라.'
+                        pending_feedback[index] = outcome['feedback']
+                        call_error = 'invalid_final_output: ' + type(exc).__name__
+                receipt = outcome['observation_report']
+                shared, shared_source = parsed, 'parsed' if parsed else 'placeholder'
+                if shared is None and receipt['status'] == 'valid':
+                    # G0-13: a verified final report of a failed step is shared, not hidden.
+                    shared, shared_source = receipt['value'], 'verified_final_report'
+                history.append(shared_entry(name, shared))
+                cursors[index] = len(history)
+                first, termination = common.termination_context(first, parsed, step, declarer)
+                observed, _ = select_sources(INDEPENDENT, failed=outcome['failed'], legacy_parsed=parsed,
+                                             final_report=receipt, artifact=None)
+                if observed is not None:
+                    observed.update(agent_id=name, step_id=step)
+                    latest_report = observed
+                # Observation declaration must not alter execution success/stop control.
+                observation_first, termination = common.termination_context(observation_first, observed, step,
+                                                                             declarer)
+                gate = checked_gate(judge(copy.deepcopy(latest_report), tool_records=copy.deepcopy(dispatch.records),
+                                          inputs_dir=inputs_dir))
+                metadata = collection_metadata(INDEPENDENT, receipt, observed, None, scenario.progress_source,
+                                               scenario.progress_metric.model_dump())
+                next_index, route = next_turn(scenario, index, observed, outcome['strict_failure'])
+                tool_execution_error = any(e['is_error'] for e in outcome['tool_executions'])
+                record = {'step_id': step, 'agent': name, 'text': text, 'llm_calls': budget.used,
+                          'llm_turns': sorted(set(budget.turns)), 'completion_gate': gate, 'call_error': call_error,
+                          'step_status': 'failed' if outcome['failed'] or tool_execution_error else 'completed',
+                          'tool_errors': outcome['tool_errors'], 'tool_feedback': outcome['feedback'],
+                          'tool_executions': outcome['tool_executions'],
+                          'tool_dispatch_seq': [r['seq'] for r in dispatch.records_for(step)],
+                          'final_output': outcome['final_output'],
+                          'failure_reasons': outcome['failure_reasons'] + ['tool_execution_error'] * tool_execution_error,
+                          'strict_used': outcome['strict_used'], 'strict_failure': outcome['strict_failure'],
+                          'consecutive_strict_failures': strict_streak.count, 'shared_narrative_source': shared_source,
+                          'vocabulary_violation': vocabulary,
+                          'consecutive_vocabulary_violations': vocabulary_streak.count,
+                          'vocabulary_violations_total': vocabulary_total, 'collection': metadata,
+                          'observed_final_report': observed, 'measurement_status': metadata['measurement_status'],
+                          'route': route}
+                steps.append(record)
+                common.save(out / 'steps.json', steps)
+                common.save(out / 'tool-dispatch.json', dispatch.records)
+                if not budget.turns:
+                    missing.append(step)
+                    raise RuntimeError('No proxy turn ID; cannot submit a linked observation')
+                payload = observation(step, name, record['llm_turns'], scenario, observed, metadata, termination,
+                                      contract)
+                common.save(out / 'observations' / f'{step}.pending.json', payload)
+                try:
+                    ack = await common.deliver(client, session_id, payload)
+                except Exception:
+                    missing.append(step)
+                    raise
+                common.save(out / 'observations' / f'{step}.ack.json', ack)
+                record['observation'] = ack['observation']
+                try:
+                    log_response = await client.get('/log')
+                    log_response.raise_for_status()
+                    trace = common.prompt_trace(steps, log_response.json())
+                    record['prompt_tokens'] = trace[-1]
+                    common.save(out / 'prompt-trend.json', trace)
+                    print(json.dumps({'step_id': step, 'agent': name, 'next_agent': route['next_agent'],
+                                      'prompt_tokens_sum': trace[-1]['prompt_tokens_sum']}, ensure_ascii=False),
+                          flush=True)
+                except (httpx.HTTPError, ValueError, KeyError) as exc:
+                    record['prompt_trace_error'] = type(exc).__name__
+                common.save(out / 'steps.json', steps)
+                if stop_for_strict:
+                    reason, error = 'strict_output_failures', 'two_consecutive_strict_failed_steps'
+                    break
+                if outcome['abort']:
+                    raise RuntimeError(call_error or 'step_aborted')
+                index = next_index
+                if outcome['failed']:
+                    continue
+                ended = ending(parsed, gate, first is not None, scenario)
+                if ended is not None:
+                    reason = ended
+                    terminal = parsed['status'] if ended in ('escalated', 'terminal_status') else None
+                    break
+        except asyncio.CancelledError:
+            reason, error = 'user_interrupted', 'Cancelled by user'
+        except Exception as exc:
+            reason, error = 'runner_error', type(exc).__name__ + ': ' + str(exc)
+        finally:
+            cleanup_errors = []
+            if started:
+                for attempt in range(3):
+                    try:
+                        response = await client.post('/sessions/end', json={'termination_reason': reason})
+                        response.raise_for_status()
+                        break
+                    except httpx.HTTPError as exc:
+                        if attempt == 2:
+                            cleanup_errors.append('end: ' + str(exc))
+                try:
+                    response = await client.get('/log')
+                    response.raise_for_status()
+                    session = response.json()
+                    common.save(out / 'session.json', session)
+                    common.save(out / 'prompt-trend.json', common.prompt_trace(steps, session))
+                except httpx.HTTPError as exc:
+                    cleanup_errors.append('log: ' + str(exc))
+            await model.close()
+            await model_http.aclose()
+            turns = session.get('turns', []) if session else []
+            values = [t.get('tokens') for t in turns]
+            criteria = [s['observation']['criteria'] for s in steps if 'observation' in s]
+            summary = {
+                'session_id': session_id, 'steps': len(steps), 'termination_reason': reason,
+                'total_tokens': sum(values) if session is not None and
+                    len(turns) == sum(s['llm_calls'] for s in steps) and all(v is not None for v in values) else None,
+                'known_tokens_subtotal': sum(v for v in values if v is not None),
+                'criteria_latest': criteria[-1] if criteria else {'decision': 'unmeasured'},
+                'criteria_alerts': [c for c in criteria if c.get('decision') in STOP_DECISIONS],
+                'missing_observation_steps': missing, 'missing_observation_count': len(missing), 'error': error,
+                'cleanup_errors': cleanup_errors, 'actual_outcome': None, 'context_buffer_messages': buffer_messages,
+                'task_kind': 'dialogue', 'turn_order': scenario.turn_order, 'output_contract_version': V3,
+                'registration_sha256': effective['registration_sha256'],
+                'vocabulary_violation_steps': [s['step_id'] for s in steps if s.get('vocabulary_violation')],
+                'vocabulary_violations_total': vocabulary_total,
+                'failed_steps': [{'step_id': s['step_id'], 'reasons': s.get('failure_reasons', [])}
+                                 for s in steps if s.get('step_status') == 'failed'],
+                'final_status': (latest_report or {}).get('status'), 'terminal_status': terminal,
+                'completion_gate': gate,
+                'route_fallbacks': [{'step_id': s['step_id'], 'reason': s['route']['fallback_reason']}
+                                    for s in steps if (s.get('route') or {}).get('fallback_reason')]}
+            if guardrail_block is not None:
+                summary['guardrail_stop'] = guardrail_block
+            common.save(out / 'summary.json', summary)
+            print(json.dumps(summary, ensure_ascii=False, indent=2))
+            print('run_directory:', out)
+    return 1 if error or cleanup_errors else 0

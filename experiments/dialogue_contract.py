@@ -16,7 +16,7 @@ V3 = 'output-contract-v3'
 STATUS_NOT_ALLOWED = 'status_not_allowed'
 HANDOFF_NOT_ALLOWED = 'handoff_to_not_allowed'
 # Like D-17: well-formed output whose closed-list value is outside the scenario's list. The step fails, but the
-# runner keeps these out of the consecutive strict-failure stop (applied by the runner T1 unit).
+# runner keeps these out of the consecutive strict-failure stop (experiments/dialogue_runner.py, C-17-4).
 VOCABULARY_VIOLATIONS_V3 = VOCABULARY_VIOLATIONS + (STATUS_NOT_ALLOWED, HANDOFF_NOT_ALLOWED)
 T1_FIELDS = ('status', 'handoff_to', 'adopted_items', 'deliverable', 'spec_approved')
 

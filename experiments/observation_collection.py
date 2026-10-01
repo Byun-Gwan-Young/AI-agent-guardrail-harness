@@ -58,7 +58,9 @@ def collection_metadata(policy, receipt, parsed, artifact, progress_source, metr
     sources = ('conversation', 'artifact') if progress_source == 'both' else (progress_source,)
     fields = {'proposal_value_delta':'proposal_values', 'open_issues_count':'open_issue_ids',
               'new_info_ratio':'info_items', 'files_changed':'file_hashes',
-              'test_pass_count':'test_pass_count', 'build_status':'build_status'}
+              'test_pass_count':'test_pass_count', 'build_status':'build_status',
+              # T1 metrics (output-contract-v3 fields, C-17-4); the same field names progress-v3 reads.
+              'status_advance':'status', 'adopted_items':'adopted_items', 'new_issue_ids':'open_issue_ids'}
     for source in sources:
         values = parsed if source == 'conversation' else artifact
         for metric in metrics.get(source, []):

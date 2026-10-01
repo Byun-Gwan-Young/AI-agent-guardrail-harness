@@ -124,11 +124,23 @@ class ScenarioV2Tests(unittest.TestCase):
 
 
 class RunnerRefusalTests(unittest.IsolatedAsyncioTestCase):
-    async def test_runner_refuses_scenario_v2_before_anything_else(self):
+    async def test_runner_refuses_scenario_v2_artifact_tasks_before_anything_else(self):
+        # C-17-4 runs scenario-v2 dialogue tasks; artifact tasks stay refused until C-17-5 (DM-39).
+        import experiments.run_scenario as runner
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "artifact.yaml"
+            path.write_text(yaml.safe_dump(artifact_data(), allow_unicode=True), encoding="utf-8")
+            output = Path(directory) / "runs"
+            args = SimpleNamespace(scenario=path, output_root=output)
+            with self.assertRaisesRegex(ValueError, "scenario-v2 artifact tasks are not runnable"):
+                await runner.run(args)
+            self.assertFalse(output.exists())
+
+    async def test_a_dialogue_task_without_its_run_options_fails_before_a_run_folder(self):
         import experiments.run_scenario as runner
         with tempfile.TemporaryDirectory() as directory:
             args = SimpleNamespace(scenario=DIALOGUE, output_root=Path(directory))
-            with self.assertRaisesRegex(ValueError, "scenario-v2 is not runnable"):
+            with self.assertRaisesRegex(ValueError, "output-contract-v3"):
                 await runner.run(args)
             self.assertEqual(list(Path(directory).iterdir()), [])
 
