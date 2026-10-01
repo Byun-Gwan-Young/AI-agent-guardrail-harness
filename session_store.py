@@ -102,8 +102,9 @@ class JsonSessionRepository:
 
 class SessionStore:
     def __init__(self, repository: SessionRepository, criteria_version=CRITERIA_VERSION, upstream=None,
-                 criteria_parameters=None):
+                 criteria_parameters=None, guardrail_mode="observe"):
         self.repository = repository
+        self.guardrail_mode = guardrail_mode
         self.criteria_parameters = criteria_parameters
         self.criteria_pin = pin_criteria(criteria_version, criteria_parameters)
         self.upstream = upstream
@@ -115,6 +116,8 @@ class SessionStore:
         session = Session(session_id)
         session.meta["started_at"] = utc_now()
         session.meta["upstream"] = self.upstream
+        # Fixed per session: a later restart with another configuration does not change how it is treated.
+        session.meta["guardrail_mode"] = self.guardrail_mode
         session.meta.update(pin_criteria(self.criteria_pin["criteria_version"], self.criteria_parameters))
         try:
             self.repository.create(session.record())

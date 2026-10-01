@@ -1,4 +1,5 @@
 import asyncio
+import copy
 import hashlib
 import json
 import logging
@@ -9,10 +10,13 @@ import time
 import uuid
 from session_store import JsonSessionRepository, SessionStore, utc_now
 from health import install_health
-from experiment_config import config_file, load_config, conditions, tool_call_count, truncate_text, upstream
+from experiment_config import (config_file, load_config, conditions, guardrail_mode, tool_call_count,
+                               truncate_text, upstream)
 from conversation_extract import extract_conversation
 from observation_api import install_observations
 from deadlock_policy import VERSION as CRITERIA_VERSION
+from deadlock_policy_v03 import VERSION as BLOCK_CRITERIA_VERSION
+from explain_v1 import STOP_DECISIONS
 
 from urllib.parse import urlsplit
 
@@ -21,6 +25,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse, Response
 
 logger = logging.getLogger(__name__)
+DEMO_PHASE = "demo"
 
 
 def session_key(request, body):
@@ -47,10 +52,38 @@ def session_key(request, body):
     return key
 
 
+def blocking_stop(session, params):
+    """DM-7, DM-23: the first STOP record of a block-mode session, for a request that declares the demo phase.
+
+    Any other request passes exactly as in observe mode. The STOP comes from the same judgement as observe mode.
+    """
+    if session.meta.get("guardrail_mode") != "block" or params.get("phase") != DEMO_PHASE:
+        return None
+    return next((o for o in session.observations
+                 if (o.get("criteria") or {}).get("decision") in STOP_DECISIONS), None)
+
+
+def stop_error(session, stop):
+    criteria = stop["criteria"]
+    explanation = criteria.get("explanation") or {}
+    # DM-9: the sentence of the STOP record itself, copied and never rebuilt, so body, log and manifest match.
+    return {"error": {"type": "guardrail_stop", "code": "guardrail_stop",
+                      "message": explanation.get("text") or "guardrail_stop",
+                      "stop_step": stop["step_id"], "decision": criteria["decision"],
+                      "criteria_version": criteria.get("criteria_version"),
+                      "criteria_sha256": criteria.get("criteria_sha256"),
+                      "explanation_version": explanation.get("explanation_version"),
+                      "template_id": explanation.get("template_id"), "session_id": session.session_id}}
+
+
 def create_app(log_dir=None, transport=None, sleep=asyncio.sleep, repository=None,
                config_path=None, clock=time.monotonic, jitter=random.uniform,
                judgement_clock_ns=time.perf_counter_ns):
     config = load_config(config_path)
+    mode = guardrail_mode(config)
+    if mode == "block" and config.get("criteria_version") != BLOCK_CRITERIA_VERSION:
+        # Block is a demo device (DM-7); the dataset criteria versions never run with it.
+        raise ValueError("guardrail_mode block requires criteria_version " + BLOCK_CRITERIA_VERSION)
     settings = upstream(config)
     endpoint = settings["base_url"] + settings["chat_path"]
     # Identifiers only: the key itself is never read here, only forwarded from the caller.
@@ -61,7 +94,7 @@ def create_app(log_dir=None, transport=None, sleep=asyncio.sleep, repository=Non
     store = SessionStore(repository if repository is not None else JsonSessionRepository(
         log_dir or os.environ.get("GUARDRAIL_LOG_DIR", "logs")
     ), criteria_version=config.get("criteria_version", CRITERIA_VERSION), upstream=identity,
-        criteria_parameters=config.get("criteria_parameters"))
+        criteria_parameters=config.get("criteria_parameters"), guardrail_mode=mode)
     app.state.store = store
     app.state.upstream = identity
     install_health(app, store, clock, config.get("policy_version"))
@@ -110,6 +143,42 @@ def create_app(log_dir=None, transport=None, sleep=asyncio.sleep, repository=Non
             elif any(session.meta.get(k) != v for k, v in params.items()):
                 session.meta["conditions_mixed"] = True
             t0 = clock()
+            stop = blocking_stop(session, params)
+            if stop is not None:
+                # Nothing goes upstream. The refusal is a logged turn so the runner can link it to its step.
+                error = stop_error(session, stop)
+                turn = len(session.turns) + 1
+                block = session.meta.get("guardrail_block")
+                if block is None:
+                    block = session.meta["guardrail_block"] = {
+                        "stop_step": stop["step_id"], "decision": error["error"]["decision"],
+                        "criteria_version": error["error"]["criteria_version"],
+                        "criteria_sha256": error["error"]["criteria_sha256"],
+                        "explanation": copy.deepcopy(stop["criteria"].get("explanation")),
+                        # Observations arrive after each step, so the refused request belongs to the next step.
+                        "blocked_at_step": len(session.observations) + 1, "first_blocked_turn": turn,
+                        "refused_requests": 0}
+                block["refused_requests"] += 1
+                messages = body.get("messages") or []
+                session.turns.append({
+                    "turn": turn, "forwarded": False, "blocked": True,
+                    "upstream_ms": 0.0, "retry_wait_ms": 0.0, "total_ms": (clock() - t0) * 1000,
+                    "retry_delays_ms": [], "retry_count": 0, "request_params": params, "request_body": body,
+                    "upstream_request_body": None, "response_body": error,
+                    "seed_audit": {"requested_seed": body.get("seed"), "forwarded_seed": None, "forwarded": False,
+                                   "response_status": 403, "request_succeeded": False, "model_applied_seed": None,
+                                   "note": "Refused by guardrail block mode; nothing was sent upstream"},
+                    "conversation_extracted": None, "tool_calls": None, "status_code": 403,
+                    "in": truncate_text(messages[-1].get("content", "") if messages else "",
+                                        config.get("log", {}).get("truncate")),
+                    "out": "", "empty": None,
+                    # Not forwarded, so the provider consumed nothing for this request.
+                    "prompt_tokens": 0, "completion_tokens": 0, "tokens": 0,
+                })
+                store.save(session)
+                return JSONResponse(error, status_code=403,
+                                    headers={"X-Guardrail-Session": session.session_id, "X-Guardrail-Turn": str(turn),
+                                             "x-should-retry": "false"})
             upstream_ms, retry_wait_ms = 0.0, 0.0
             retry_delays_ms = []
             try:

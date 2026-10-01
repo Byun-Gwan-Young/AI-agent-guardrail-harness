@@ -9,6 +9,9 @@ import yaml
 DEFAULT_UPSTREAM = {"base_url": "https://api.groq.com/openai/v1",
                     "chat_path": "/chat/completions",
                     "api_key_env": "GROQ_API_KEY"}
+# DM-7: block exists for the demo only. Without the key a configuration is observe, as every earlier one was.
+GUARDRAIL_MODES = ("observe", "block")
+PHASE_HEADER = "X-Guardrail-Phase"
 
 
 def config_file(path=None):
@@ -31,6 +34,13 @@ def upstream(config):
     return settings
 
 
+def guardrail_mode(config):
+    mode = config.get("guardrail_mode", "observe")
+    if mode not in GUARDRAIL_MODES:
+        raise ValueError("guardrail_mode must be one of " + ", ".join(GUARDRAIL_MODES))
+    return mode
+
+
 def load_config(path=None):
     path = config_file(path)
     data = yaml.safe_load(path.read_text(encoding="utf-8")) if path.exists() else {}
@@ -39,6 +49,7 @@ def load_config(path=None):
     if truncate is not None and (type(truncate) is not int or truncate < 0):
         raise ValueError("log.truncate must be null or a non-negative integer")
     upstream(data)
+    guardrail_mode(data)
     for model in data.get("models", {}).values():
         if model.get("seed_supported") is not None and type(model["seed_supported"]) is not bool:
             raise ValueError("models.*.seed_supported must be true, false or null")
@@ -65,13 +76,17 @@ def conditions(body, headers, config):
         run_index = int(run_index)
         if run_index < 1:
             raise ValueError("run_index must be positive")
+    # The run phase is a recorded condition like the scenario ID; block mode acts only on "demo" (DM-23).
+    phase = headers.get(PHASE_HEADER)
+    if phase is not None and not re.fullmatch(r"[a-z][a-z0-9_-]{0,31}", phase):
+        raise ValueError("phase must be a short lowercase token")
     return {
         "model": body.get("model"), "temperature": body.get("temperature"),
         "seed": seed, "seed_status": seed_status, "seed_note": seed_note,
         "requested_seed": requested_seed, "max_tokens": body.get("max_tokens"),
         "scenario_id": headers.get("X-Guardrail-Scenario"), "run_index": run_index,
         "framework_version": headers.get("X-Guardrail-Framework-Version"),
-        "context_buffer_messages": buffer,
+        "context_buffer_messages": buffer, "phase": phase,
     }
 
 

@@ -205,6 +205,21 @@ def make_client(options, budget):
     return LimitedClient(**options)
 
 
+def guardrail_stop(exc):
+    """The proxy's block-mode refusal after a STOP (DM-7, DM-23): 403 with code guardrail_stop, else None.
+
+    It is neither a provider error nor a model failure, so it never reaches the tool-failure recovery below.
+    """
+    if getattr(exc, 'status_code', None) != 403:
+        return None
+    body = getattr(exc, 'body', None)
+    error = body.get('error', body) if isinstance(body, dict) else None
+    if not isinstance(error, dict) or error.get('code') != 'guardrail_stop':
+        return None
+    return {k: error.get(k) for k in ('message', 'stop_step', 'decision', 'criteria_version', 'criteria_sha256',
+                                      'explanation_version', 'template_id', 'session_id')}
+
+
 def classify_tool_failure(exc, allowed, final_call):
     """Return (kind, detail) for a recoverable provider tool failure, or (None, None)."""
     # Other 400s (bad parameters, seed, authentication etc.) are not recoverable here.
@@ -255,7 +270,7 @@ async def perform_step(agent, context, budget, allowed, budget_notes=False):
     from autogen_core import CancellationToken
     errors, text, feedback, executions = [], '', None, []
     abort, error, final_output = False, None, False
-    strict_failure = None
+    strict_failure, blocked = None, None
     incoming = context
     # Each on_messages performs one model call (reflection disabled by the runner).
     while budget.used < budget.limit:
@@ -285,6 +300,9 @@ async def perform_step(agent, context, budget, allowed, budget_notes=False):
             break
         except Exception as exc:
             final_output = False
+            blocked = guardrail_stop(exc)
+            if blocked is not None:
+                break
             kind, detail = classify_tool_failure(exc, allowed, final_call)
             if kind is None:
                 error, abort = type(exc).__name__ + ': ' + str(exc), True
@@ -324,12 +342,14 @@ async def perform_step(agent, context, budget, allowed, budget_notes=False):
     reasons = list(dict.fromkeys(e['kind'] for e in errors if e['kind'] in COUNTED_KINDS))
     if strict_failure:
         reasons.append(strict_failure)
+    if blocked is not None:
+        reasons.append('guardrail_stop')
     if abort:
         reasons.append('aborted')
-    elif not final_output:
+    elif not final_output and blocked is None:
         # Budget ended on a tool result or a tool attempt: no final answer was produced.
         reasons.append('no_final_output')
-    return {'text': text, 'failed': bool(reasons), 'abort': abort, 'error': error,
+    return {'text': text, 'failed': bool(reasons), 'abort': abort, 'error': error, 'blocked': blocked,
             'tool_errors': errors, 'tool_executions': executions, 'feedback': feedback, 'final_output': final_output,
             'failure_reasons': reasons, 'strict_failure': strict_failure, 'strict_used': budget.strict_used,
             'observation_report': budget.observation_report()}

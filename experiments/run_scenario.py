@@ -65,6 +65,23 @@ def enforce_dataset_clean(dataset_run, state):
                          + (' (Git state unmeasured)' if state['git_dirty'] is None else ''))
 
 
+DEMO_PHASE = 'demo'
+
+
+def enforce_demo_separation(dataset_run, phase):
+    # DM-7, DM-23: block mode acts only on the demo phase, so a dataset session can never carry it.
+    if phase not in (None, DEMO_PHASE):
+        raise ValueError('Unsupported phase: ' + str(phase))
+    if dataset_run and phase == DEMO_PHASE:
+        raise ValueError('--dataset-run cannot be combined with --phase ' + DEMO_PHASE)
+
+
+def enforce_observe_proxy(dataset_run, mode):
+    # The proxy's mode is known only from the session it starts; this runs before any model call.
+    if dataset_run and mode == 'block':
+        raise ValueError('--dataset-run is refused by a block-mode proxy (demo only, DM-7)')
+
+
 def safe_path(root, relative):
     p = Path(relative)
     target = (root / p).resolve()
@@ -321,6 +338,8 @@ async def run(args):
     # Checked before the run directory exists, so a refused dataset run leaves nothing behind.
     repository_state = git_state()
     dataset_run = bool(getattr(args, 'dataset_run', False))
+    phase = getattr(args, 'phase', None)
+    enforce_demo_separation(dataset_run, phase)
     enforce_dataset_clean(dataset_run, repository_state)
     session_id = scenario.scenario_id + '-' + uuid.uuid4().hex
     out = args.output_root.resolve() / session_id
@@ -357,7 +376,8 @@ async def run(args):
                                          'last call of each step carries no tools; '
                                          'step without final text: failed/no_final_output; observation uses collection_policy',
                      recent_messages_policy='parsed narrative only; placeholder when structured output missing; '
-                                            'no raw tool results', dataset_run=dataset_run, **repository_state)
+                                            'no raw tool results', dataset_run=dataset_run, phase=phase,
+                     **repository_state)
     effective.update(output_contract_version=contract.version, allowed_issues_sha256=contract.sha256)
     if contract.version == V2:
         effective.update(recent_messages_policy='parsed narrative; for a failed step the narrative of a verified '
@@ -384,6 +404,8 @@ async def run(args):
                'X-Guardrail-Run-Index': str(args.run_index),
                'X-Guardrail-Framework-Version': 'autogen-agentchat/' + versions['autogen-agentchat']}
     headers['X-Guardrail-Context-Buffer-Messages'] = str(buffer_messages) if buffer_messages is not None else 'none'
+    if phase is not None:
+        headers['X-Guardrail-Phase'] = phase
     budget = CallBudget(scenario.termination.max_llm_calls_per_step, contract,
                         scenario.reasoning_effort if reasoning_protocol else None,
                         final_report_allowlist=runner_protocol == PROTOCOL_V10)
@@ -412,6 +434,7 @@ async def run(args):
     steps, missing, first, latest, baseline = [], [], None, None, None
     observation_first = None
     reason, error, session, started = 'max_steps', None, None, False
+    guardrail_block = None
     history, cursors = [], [0] * len(agents)
     pending_feedback = [None] * len(agents)
     strict_streak = StrictFailureStreak()
@@ -427,8 +450,10 @@ async def run(args):
             if meta.get('criteria_version') != scenario.criteria_version:
                 raise ValueError('Proxy criteria version differs from scenario')
             ensure_key_env(meta.get('upstream'), key_env)
-            effective.update(api_key_env=key_env, upstream=meta.get('upstream'))
+            effective.update(api_key_env=key_env, upstream=meta.get('upstream'),
+                             guardrail_mode=meta.get('guardrail_mode'))
             save(conditions_path, effective)
+            enforce_observe_proxy(dataset_run, meta.get('guardrail_mode'))
             baseline = await asyncio.to_thread(work.acceptance)
             latest = baseline
             for step in range(1, scenario.termination.max_steps + 1):
@@ -443,6 +468,19 @@ async def run(args):
                     'acceptance': {k: latest[k] for k in ('summary', 'gate')},
                     'recent_messages': history[cursors[index]:]}, ensure_ascii=False)
                 outcome = await perform_step(agents[index], context, budget, role_names[index], budget_notes=facts)
+                if outcome['blocked'] is not None:
+                    # Block mode refused this step's request after a STOP (DM-7, DM-23). There is no model output,
+                    # so no acceptance run and no observation. The session ends normally, not as a runner error.
+                    guardrail_block = {**outcome['blocked'], 'blocked_step': step}
+                    steps.append({'step_id': step, 'agent': agents[index].name, 'text': '', 'llm_calls': budget.used,
+                                  'llm_turns': sorted(set(budget.turns)), 'acceptance': None, 'call_error': None,
+                                  'step_status': 'blocked', 'measurement_status': 'unmeasured',
+                                  'tool_errors': outcome['tool_errors'], 'tool_executions': outcome['tool_executions'],
+                                  'final_output': False, 'failure_reasons': outcome['failure_reasons'],
+                                  'guardrail_stop': guardrail_block})
+                    save(out / 'steps.json', steps)
+                    reason = 'guardrail_stop'
+                    break
                 vocabulary = outcome['strict_failure'] if outcome['strict_failure'] in VOCABULARY_VIOLATIONS else None
                 # A vocabulary-violation step is not a strict failure for the stop streak (D-17).
                 stop_for_strict = strict_streak.observe(outcome['strict_failure'] if vocabulary is None else None)
@@ -603,6 +641,8 @@ async def run(args):
                 summary['vocabulary_violations_total'] = vocabulary_total
             summary['failed_steps'] = [{'step_id': s['step_id'], 'reasons': s.get('failure_reasons', [])}
                                        for s in steps if s.get('step_status') == 'failed']
+            if guardrail_block is not None:
+                summary['guardrail_stop'] = guardrail_block
             save(out / 'summary.json', summary)
             print(json.dumps(summary, ensure_ascii=False, indent=2))
             print('run_directory:', out)
@@ -624,6 +664,9 @@ def main():
     parser.add_argument('--run-index', type=int, default=1)
     parser.add_argument('--dataset-run', action='store_true',
                         help='mark a pilot or collection session; refuse a dirty Git working tree before model calls')
+    parser.add_argument('--phase', choices=(DEMO_PHASE,), default=None,
+                        help='demo session (DM-2); sends X-Guardrail-Phase so a block-mode proxy may stop it. '
+                             'Not allowed with --dataset-run')
     parser.add_argument('--temperature', type=float, default=None)
     context_options = parser.add_mutually_exclusive_group()
     context_options.add_argument('--context-buffer-messages', type=int, default=None)

@@ -88,7 +88,8 @@ def step_rows(steps, turns_by_id, agents):
     rows, previous_hashes, previous_tests = [], None, None
     last_by_role = {}
     for step in steps:
-        artifact = step['acceptance']['artifact'] or {}
+        # A block-mode refused step has no acceptance run (DM-7).
+        artifact = (step.get('acceptance') or {}).get('artifact') or {}
         hashes = artifact.get('file_hashes') or {}
         tests = artifact.get('test_pass_count')
         changed = sorted(p for p in hashes if previous_hashes is not None and previous_hashes.get(p) != hashes[p])
@@ -167,7 +168,7 @@ def classify(rows):
 
 def all_tests_passed(step):
     """Full suite passed at this step: pass count equals the suite total (not the largest count seen)."""
-    artifact = step['acceptance']['artifact'] or {}
+    artifact = (step.get('acceptance') or {}).get('artifact') or {}
     total = artifact.get('test_total_count')
     return total is not None and artifact.get('test_pass_count') == total
 
@@ -239,6 +240,7 @@ def analyse(session_id):
     finish = [((t.get('response_body') or {}).get('choices') or [{}])[0].get('finish_reason') for t in ok]
     system_prompts = {s['agent']: turns_by_id[s['llm_turns'][0]]['request_body']['messages'][0]['content']
                       for s in steps if s['llm_turns']}
+    gate_at_end = next(s['acceptance']['gate'] for s in reversed(steps) if s.get('acceptance') is not None)
     return {
         'session_id': session_id,
         'isolation': {
@@ -257,8 +259,8 @@ def analyse(session_id):
         'termination': {'reason': summary['termination_reason'], 'steps_reached': summary['steps'],
                         'started_at': log['meta'].get('started_at'), 'ended_at': log['meta'].get('ended_at')},
         'judgement': {'tests_before': summary.get('tests_passed_before'), 'tests_after': summary.get('tests_passed_after'),
-                      'machine_success_at_end': steps[-1]['acceptance']['gate'].get('machine_success'),
-                      'gate_at_end': steps[-1]['acceptance']['gate']},
+                      'machine_success_at_end': gate_at_end.get('machine_success'),
+                      'gate_at_end': gate_at_end},
         'steps': rows,
         'first_stop_step': stop,
         'stagnant_classification': classify(rows),
@@ -440,14 +442,49 @@ def v04_fields(result, observations):
     return result
 
 
+def v05_fields(result, conditions, log):
+    """session-manifest-v0.5 = v0.4 + run phase, the proxy's guardrail mode and, in block mode, what it refused.
+
+    DM-23: a blocked session's saving is reported only as a difference from the same scenario's observe sessions,
+    so this session alone leaves that field unmeasured. Its own tokens are the measured tokens section.
+    """
+    meta, block = log['meta'], log['meta'].get('guardrail_block')
+    result['manifest_version'] = 'session-manifest-v0.5'
+    # The proxy's record, not the scenario's on_criteria_alert, says whether requests could be refused.
+    result['condition'].update(phase=conditions.get('phase'), guardrail_mode=meta.get('guardrail_mode'),
+                               guardrail_mode_source='proxy session meta')
+    result['guardrail']['mode'] = meta.get('guardrail_mode')
+    first = result['guardrail'].get('first_stop_explanation') or {}
+    explanation = (block or {}).get('explanation') or {}
+    result['guardrail']['block'] = None if block is None else {
+        'stop_step': block['stop_step'], 'blocked_at_step': block['blocked_at_step'],
+        'first_blocked_turn': block['first_blocked_turn'], 'refused_requests': block['refused_requests'],
+        'refused_turns': [t['turn'] for t in log['turns'] if t.get('blocked')],
+        'forwarded_turns': sum(not t.get('blocked') for t in log['turns']),
+        'explanation_text': explanation.get('text'),
+        'same_text_as_first_stop_record': explanation.get('text') is not None and explanation.get('text') == first.get('text'),
+        'tokens_used': {k: result['tokens'][k] for k in ('known_total', 'total', 'total_status')}}
+    result['guardrail']['savings_vs_observe'] = None if meta.get('guardrail_mode') != 'block' else {
+        'status': 'unmeasured', 'value': None, 'basis': 'DM-23: same-scenario observe sessions total tokens '
+        '(median, range) minus this session total tokens', 'observe_session_ids': None,
+        'observe_total_tokens': None, 'blocked_session_total_tokens': result['tokens']['total'],
+        'reason': 'needs the same scenario observe sessions (demo aggregation, C-19); not computable from one session'}
+    return result
+
+
 def manifest(a, phase, notes):
     result = base_manifest(a, phase, notes)
     conditions = load(ROOT / 'runs' / a['session_id'] / 'conditions.json')
     if 'git_state_status' in conditions:
         # v0.3 only for sessions recorded by the Git-aware runner; earlier manifests are never rewritten.
-        observations = load(ROOT / 'logs' / f"{a['session_id']}.json")['observations']
+        log = load(ROOT / 'logs' / f"{a['session_id']}.json")
+        observations = log['observations']
         result = v03_fields(result, a, conditions, observations)
-        return v04_fields(result, observations) if a['meta']['criteria_version'] == 'deadlock-v0.3' else result
+        if a['meta']['criteria_version'] != 'deadlock-v0.3':
+            return result
+        result = v04_fields(result, observations)
+        # v0.5 for sessions whose proxy recorded its guardrail mode (C-17-2 onward).
+        return v05_fields(result, conditions, log) if 'guardrail_mode' in log['meta'] else result
     if a['conditions']['runner_protocol'] in (PROTOCOL_V8, PROTOCOL_V9, PROTOCOL_V10):
         # v0.2 adds condition.runner_protocol and condition.reasoning_effort; v7 sessions keep v0.1 unchanged.
         result['manifest_version'] = 'session-manifest-v0.2'
