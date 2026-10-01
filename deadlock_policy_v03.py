@@ -7,9 +7,11 @@ import copy
 import hashlib
 import json
 
+from explain_v1 import STOP_DECISIONS, VERSION as EXPLAIN_VERSION, explain, signals_from
+
 VERSION = "deadlock-v0.3"
 # Identifiers that define this version. Tunable numbers are only type- and range-checked.
-FIXED = {"criteria_version": VERSION, "progress_version": "progress-v3", "explanation_version": "explain-v1",
+FIXED = {"criteria_version": VERSION, "progress_version": "progress-v3", "explanation_version": EXPLAIN_VERSION,
          "comparison_scope": "same_agent_id",
          "consecutive_steps_unit": "global_step", "grace_steps_unit": "global_step",
          "missing_review_steps_unit": "global_step", "plateau_steps_unit": "global_step"}
@@ -109,9 +111,18 @@ def evaluate_criteria(observations, pin):
                     first_termination = step
         else:
             decision, reason = "continue", "insufficient consecutive evidence"
-    return {"criteria_version": VERSION, "criteria_sha256": valid["criteria_sha256"],
-            "decision": decision, "reason": reason, "consecutive_steps": streak,
-            "consecutive_states": states, "consecutive_step_ids": streak_steps, "unmeasured_steps": missing,
-            "needs_observation_review": missing >= spec["missing_review_steps"],
-            "first_deadlock_step": first_deadlock, "first_termination_failure_step": first_termination,
-            "declared_step": declaration}
+    result = {"criteria_version": VERSION, "criteria_sha256": valid["criteria_sha256"],
+              "decision": decision, "reason": reason, "consecutive_steps": streak,
+              "consecutive_states": states, "consecutive_step_ids": streak_steps, "unmeasured_steps": missing,
+              "needs_observation_review": missing >= spec["missing_review_steps"],
+              "first_deadlock_step": first_deadlock, "first_termination_failure_step": first_termination,
+              "declared_step": declaration}
+    if decision in STOP_DECISIONS:
+        # DM-9: every STOP record carries its sentence and the values behind it. A failure here must not
+        # turn the decision itself into unmeasured.
+        try:
+            result["explanation"] = explain(signals_from(observations, result, spec))
+        except Exception as error:
+            result["explanation"] = {"explanation_version": spec["explanation_version"], "status": "failed",
+                                     "reason": type(error).__name__}
+    return result

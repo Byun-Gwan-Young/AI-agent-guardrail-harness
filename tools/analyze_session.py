@@ -427,13 +427,27 @@ def v03_fields(result, a, conditions, observations):
     return result
 
 
+def v04_fields(result, observations):
+    """session-manifest-v0.4 = v0.3 + the first STOP's DM-9 sentence and the values behind it (deadlock-v0.3).
+
+    Copied from the proxy's criteria record, never rebuilt here: dashboard, block body and manifest share one string.
+    """
+    result['manifest_version'] = 'session-manifest-v0.4'
+    result['guardrail']['first_stop_explanation'] = next(
+        ({'step_id': o['step_id'], **o['criteria']['explanation']} for o in observations
+         if (o.get('criteria') or {}).get('decision') in ('deadlock', 'termination_failure')
+         and 'explanation' in o['criteria']), None)
+    return result
+
+
 def manifest(a, phase, notes):
     result = base_manifest(a, phase, notes)
     conditions = load(ROOT / 'runs' / a['session_id'] / 'conditions.json')
     if 'git_state_status' in conditions:
         # v0.3 only for sessions recorded by the Git-aware runner; earlier manifests are never rewritten.
         observations = load(ROOT / 'logs' / f"{a['session_id']}.json")['observations']
-        return v03_fields(result, a, conditions, observations)
+        result = v03_fields(result, a, conditions, observations)
+        return v04_fields(result, observations) if a['meta']['criteria_version'] == 'deadlock-v0.3' else result
     if a['conditions']['runner_protocol'] in (PROTOCOL_V8, PROTOCOL_V9, PROTOCOL_V10):
         # v0.2 adds condition.runner_protocol and condition.reasoning_effort; v7 sessions keep v0.1 unchanged.
         result['manifest_version'] = 'session-manifest-v0.2'
