@@ -58,3 +58,46 @@
 **오류 본문 읽기 수정** : 게이트웨이의 오류 본문은 OpenAI 모양(`{"error": {...}}`)이 아니라 `{"detail": {"code", "message"}}` 일 수 있다.
 2026-09-29 probe (`gateway-probe-9d2b2053…`) 의 HTTP 400 두 건이 이 모양이어서 `error_message` 가 null 로 남았다. `error_text` 가 두 모양을 모두 읽는다.
 기존 결과 파일은 고치지 않는다 (원인 기록은 파트 3).
+
+## 파트 3 — probe `gateway-probe-9d2b2053…` 기록 (DM-25)
+
+값은 `tools/c17_7_evidence.py` → `reports/c17-7/evidence.json` (파일만 읽는다. 네트워크 없음, 모델 reasoning 문장은 읽지 않는다).
+
+**gpt-6 계열 HTTP 400 원인 (재시도 없음)**
+
+| 모델 | 짧은 요청 (도구·`reasoning_effort` 없음) | 도구 요청 (`tools` 4 개, `tool_choice: auto`, `reasoning_effort: high`) |
+|---|---|---|
+| `gpt-6-sol` | 200 | **400**, `param: reasoning_effort` |
+| `gpt-6-luna` | 200 | **400**, `param: reasoning_effort` |
+
+- 오류 문구 (응답 파일 원문, 게이트웨이가 업스트림 오류를 감싼 `detail.message`) : 이 모델은 `/v1/chat/completions` 에서
+  함수 도구와 `reasoning_effort` 를 함께 받지 않는다. 도구를 쓰려면 `/v1/responses` 를 쓰거나 `reasoning_effort` 를 `'none'` 으로 하라는 안내
+- 즉 **모델이 없거나 키·권한 문제가 아니라, 요청 조합(도구 + 추론 강도)을 이 엔드포인트가 받지 않는 것**이다. 짧은 요청은 두 모델 모두 200
+- 실행기는 v9·v10 에서 모든 호출에 `reasoning_effort` 를 보내고 `/chat/completions` 만 쓴다 (D-29, DM-25 조건). 따라서 현재 데모·데이터셋
+  조건으로는 gpt-6 계열을 돌릴 수 없다. 안내된 두 길(엔드포인트 변경, 추론 끔)은 모두 조건을 바꾸는 일이라 이번에 하지 않았다 (D-32 때 PM 결정)
+- 이 probe 의 `result.json` 은 두 400 의 `error_message` 를 null 로 남겼다 (파트 2 의 오류 본문 모양 문제). 결과 파일은 고치지 않고 위 표가 원인 기록이다
+
+**D-11 커밋** : 같은 폴더를 `secret_scan` 으로 검사했다 — 파일 25 개, 패턴 4 종 hit 0. 이 환경에는 `KMU_API_KEY` 가 없어 **키 값 자체 검사는 하지 못했다**
+(`environment_variables_checked: not set in this environment`). probe 는 키를 헤더로만 보내고 요청 파일은 본문만 저장하며 응답은 `redact` 를 거친다.
+PM 이 키 값 검사를 다시 돌리는 명령은 보고서에 있다. 걸리면 이 커밋을 되돌린다.
+
+## 파트 3 — 한 응답의 다중 도구 호출 (확인만, D-32 전까지 변경 없음)
+
+**기록된 세션** (`evidence.json` `multi_tool_calls`) : G0-8·A-1-v3·A-1-v4 의 200 응답에서 도구 호출이 2 개 이상인 응답 **0 건**
+(응답별 도구 호출 수 0 또는 1). `parallel_tool_calls` 를 보낸 요청 0 건. 실행기 기록에서 한 모델 호출이 도구를 2 번 이상 실행한 경우 0 건.
+
+**probe 9d2b2053 의 도구 요청** (같은 요청, 모델만 다름) : gpt-oss 1 개, Claude Sonnet 5·Claude Haiku 4.5·gpt-5.5 는 **각각 3 개** (모두 `read_file`).
+교차검증 모델에서는 다중 호출이 흔할 수 있다.
+
+**현재 실행기 동작** (코드 읽기 + 특성 테스트 `tests/test_multi_tool_calls.py`)
+
+- autogen `AssistantAgent` 가 한 응답의 호출을 모두 실행한다 (`asyncio.gather`, 동시 실행). `reflect_on_tool_use=False` 라 그 뒤 모델 호출은
+  다음 루프에서 일어난다. **도구 호출 수와 무관하게 모델 호출 1 회로 센다** (step 당 3 회 예산은 모델 호출 단위, 테스트 확인)
+- `tool_executions` 에 호출마다 한 건, 같은 `llm_call_in_step`. 하나라도 `is_error` 면 그 step 은 G0-6 대로 `tool_execution_error` 실패 (단일 호출과 같음)
+- 다음 요청에 결과가 응답의 호출 순서대로 모두 실린다. 프록시 턴 기록 `tool_calls` 는 응답의 호출 수다. `parallel_tool_calls` 는 보내지 않는다
+- 미등록 도구는 응답 안의 모든 미등록 이름을 모아 한 번의 교정으로 처리한다 (`perform_step`, 기존 동작)
+- **산출물 과제의 파일 도구**(`read_file`·`write_file`·`replace_in_file`)는 동기 함수라 스레드에서 동시에 돈다. 잠금이 없어서
+  한 응답이 같은 파일을 두 번 쓰면 순서가 정해지지 않는다. 승인 게이트(DM-16) 검사는 호출마다 한다
+- **대화 과제 도구**는 `ToolDispatch` 잠금으로 한 번에 하나씩 돈다. 기록 순번(`seq`)은 잠금을 잡은 순서라 응답의 호출 순서와 다를 수 있다.
+  검색 호출 상한·arXiv 간격은 호출마다 적용된다
+- gpt-oss 세션에서는 일어난 적이 없으므로 지금 고치지 않는다. D-32 전에 정할 선택지는 보고서 6 절

@@ -48,6 +48,28 @@ class ErrorTextTests(unittest.TestCase):
         self.assertIn('Function tools with reasoning_effort are not supported for gpt-6-sol', result['error_message'])
 
 
+    def test_evidence_script_reads_the_cause_from_the_saved_response(self):
+        from tools import c17_7_evidence as evidence
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory) / 'probe'
+            folder.mkdir()
+            message = GATEWAY_400['detail']['message'].replace("\"}}", "\", 'param': 'reasoning_effort'}}")
+            (folder / 'result.json').write_text(json.dumps({
+                'created_at': 't', 'scenario_id': 'A-1-v4', 'models': ['gpt-6-sol'],
+                'results': [{'model': 'gpt-6-sol', 'variant': probe.TOOLS_HIGH, 'http_status': 400,
+                             'error_message': None}]}))
+            (folder / ('gpt-6-sol--' + probe.TOOLS_HIGH + '.request.json')).write_text(json.dumps(
+                {'model': 'gpt-6-sol', 'tools': [{}, {}], 'tool_choice': 'auto', 'reasoning_effort': 'high'}))
+            (folder / ('gpt-6-sol--' + probe.TOOLS_HIGH + '.response.json')).write_text(json.dumps(
+                {'detail': {'code': 400, 'message': message}}))
+            with patch.object(evidence, 'ROOT', Path(directory)):
+                row = evidence.probe_requests(folder)['http_400'][0]
+        self.assertEqual((row['error_message_in_result'], row['error_param'], row['tool_calls_returned']),
+                         (None, 'reasoning_effort', None))
+        self.assertEqual(row['sent_fields'], {'tools': 2, 'tool_choice': 'auto', 'reasoning_effort': 'high'})
+        self.assertIn('gpt-6-sol', row['error_message_from_response'])
+
+
 class StrictVariantTests(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory(); self.addCleanup(self.directory.cleanup)

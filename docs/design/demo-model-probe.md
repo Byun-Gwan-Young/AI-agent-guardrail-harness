@@ -40,3 +40,11 @@
 - 오류가 있으면 그 메시지 : `reasoning_effort` 미지원, `tools` 미지원 등
 - `token_rates` 와 위 환산값
 - 한 모델당 요청 2 회라 신뢰성은 확인하지 않는다
+
+## 4. probe 결과 기록 (`gateway-probe-9d2b2053…`, 2026-09-29, C-17-7)
+
+- 단가(1M 토큰당 크레딧, 요청 2 개로 푼 값) : gpt-oss 150 / 600, Claude Sonnet 5 2,000 / 10,000, Claude Haiku 4.5 1,000 / 5,000, gpt-5.5 5,000 / 30,000 (DM-25 표와 같음)
+- 도구 요청에서 돌려준 도구 호출 수 : gpt-oss 1, Claude Sonnet 5·Haiku 4.5·gpt-5.5 각 3 (한 응답의 다중 호출, 결정 문서 019 파트 3)
+- gpt-6-sol·gpt-6-luna : 짧은 요청 200, 도구 요청 400 (`param: reasoning_effort`, `/chat/completions` 에서 도구와 추론 강도를 함께 받지 않음). 재시도하지 않았다. 원인 기록은 결정 문서 019 파트 3
+- 값의 출처 : `reports/c17-7/evidence.json` (`tools/c17_7_evidence.py`)
+
