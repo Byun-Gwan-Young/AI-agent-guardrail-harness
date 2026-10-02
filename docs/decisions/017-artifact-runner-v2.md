@@ -50,3 +50,36 @@
 테스트 `tests/test_artifact_v2.py` (하네스 `tests/t2_harness.py`) : fixture 비교, 등가 조건, 등록·기록·관측(v0.3 판정), v3 계약 필드·지시문,
 v3 보고의 `spec_approved` 누락 = 형태 오류, 파일 도구가 작업 공간을 바꾸고 관측이 그 값을 봄, 매니페스트 v0.6, 안전장치·계약·프로토콜 거절,
 v0.2 프록시의 등록 거절, 차단 프록시.
+
+## 파트 2 — CT 승인 강제 (DM-16)
+
+- 시나리오 필드 `write_gate: {role, requires: spec_approved, set_by, spec_path}` — 설계 문서 6 절의 정의 (`role`·`requires`·`set_by`) 에
+  승인 때 해시를 남길 파일 `spec_path` 를 더했다. **기본은 끔** (필드 없음). CT-N·CL 은 끈 채로 등가 조건을 지킨다
+  - 검사 : 산출물 과제만, `output_contract: output-contract-v3` 필수 (`spec_approved` 는 v3 필드), `role`·`set_by` 는 서로 다른 시나리오 역할,
+    `role` 에 쓰기 도구가 있어야 함, `spec_path` 는 상대 경로이고 감시 파일 (`monitored_paths`)
+- 실행 (`experiments/approval_gate.py`, `run_scenario.Workspace`)
+  - 승인 전 `role` 의 `write_file`·`replace_in_file` 은 **실행하지 않는다**. 도구 안에서 첫 줄에 막고 예외를 올리면 프레임워크가
+    `is_error` 도구 결과로 돌려준다. 파일은 바뀌지 않는다. 다른 역할(기획의 SPEC.md 쓰기 등)은 영향 없음
+  - 거절 문구 (사실만) : "Not executed: SPEC.md has not been approved yet (no final report of role reviewer with spec_approved: true).
+    No file was changed." — 도구 설명(docstring)은 그대로라 요청의 도구 정의는 바뀌지 않는다
+  - v10 최종 보고 요청에 거절 결과와 `is_error` 가 그대로 남는다 (S-31, 테스트)
+  - **승인 규칙** (설계 6 절 + 지시) : `set_by` 역할의 **검증된 최종 보고**(`observed_final_report`, 실패 step 의 G0-13 검증 보고 포함 —
+    라우터의 DM-44 ③ 과 같은 기준) 에 `spec_approved: true` 가 처음 나온 step 에 승인. 다른 역할의 `true` 는 세지 않는다.
+    한 번 난 승인은 유지 (이후 `false` 나 SPEC.md 변경으로 해제하지 않음). 그 step 이 끝난 상태의 `spec_path` sha256 을 기록. 승인은 다음 step 부터 효력
+- **연속 중단 카운터·runner_error 와 분리** : 거절은 도구 결과일 뿐 strict 실패가 아니므로 strict 연속 카운터에 들어가지 않고,
+  예외가 실행기로 올라가지 않아 `runner_error` 가 되지 않는다. 정체판은 교착(`max_steps` / `guardrail_stop`)으로 끝난다 (테스트)
+- step 기록 : 거절된 실행 기록에 `approval_refused: true`. step 은 G0-6 원칙대로 `failed` 로 남기되 사유는 `tool_execution_error` 가 아닌
+  `write_refused_before_approval` (다른 도구 오류가 같이 있으면 둘 다). `approval` = `{reported_spec_approved, counted, approved, approved_step,
+  refused_writes}` (게이트가 있을 때만)
+- **규칙 고지** : 세션 시작 때 모든 역할의 시스템 메시지에 v8 사실 문장 뒤로 **한 문장** — "Approval rule enforced by the harness: write_file and
+  replace_in_file calls of role developer are not executed, return an error result and change no file until a final report of role reviewer
+  has spec_approved: true (approval of SPEC.md), which then stays in effect for the rest of the session."
+  - 반복·지연·거절을 지시하지 않는다 (DM-5, 테스트가 명령형 단어를 검사). 문장 틀은 `approval_gate.NOTICE` 한 곳, 값은 `write_gate` 에서만 오므로
+    같은 게이트를 쓰는 정상판·교착판은 같은 문장 (테스트 : 과제 문장이 달라도 같음)
+  - 계약 v3 지시문에도 `spec_approved` 의 사실 한 문장 ("Only the spec_approved of role reviewer is read: true from that role approves SPEC.md
+    under the approval rule.")
+- 기록 : `conditions.write_gate` = 규칙 버전 `write-gate-v1`, 게이트, 고지 문장과 sha256, 거절 문구와 sha256. summary `approval` =
+  승인 step (없으면 null), `spec_path`, 승인 때 해시, 거절한 쓰기 수와 step 별 수. 매니페스트 v0.6 `approval` (게이트 없으면 null)
+
+테스트 `tests/test_approval_gate.py` : 스키마 규칙, 고지 문장(모든 역할·한 문장·명령형 없음·같은 게이트면 같은 문장·게이트 없으면 없음),
+승인 전 거절·후 실행, 승인 역할만 셈·승인 유지, `replace_in_file` 거절, 최종 요청의 `is_error`, 다른 도구 오류와 구분, 매니페스트.

@@ -185,6 +185,14 @@ class StatusValue(Definition):
     label: str = Field(min_length=1)
 
 
+class WriteGate(Definition):
+    """DM-16 (CT): role's write tools wait for set_by's spec_approved: true (experiments/approval_gate.py)."""
+    role: str = Field(pattern=ID)
+    requires: Literal["spec_approved"]
+    set_by: str = Field(pattern=ID)
+    spec_path: str = Field(min_length=1)
+
+
 def relative_path(value, name):
     path = PurePosixPath(value)
     if not value or path.is_absolute() or ".." in path.parts or "\\" in value:
@@ -220,6 +228,8 @@ class ScenarioV2(Definition):
     # DM-37: an artifact task picks its output contract (CT: v3 for spec_approved; CT-N and CL: v2, as A-1-v4).
     # A dialogue task always reports output-contract-v3; the field may be left out there.
     output_contract: Literal["output-contract-v2", "output-contract-v3"] | None = None
+    # DM-16: the CT approval rule, enforced by the runner. Off unless given (CT-N and CL keep it off, DM-37).
+    write_gate: WriteGate | None = None
     # artifact tasks (T2/T3): the scenario-v1 acceptance fixture
     success_criteria: SuccessCriteria | None = None
     fixture_dir: str | None = None
@@ -266,6 +276,8 @@ class ScenarioV2(Definition):
             raise ValueError("A dialogue task is judged on the conversation only")
         if self.output_contract not in (None, "output-contract-v3"):
             raise ValueError("A dialogue task reports output-contract-v3")
+        if self.write_gate is not None:
+            raise ValueError("write_gate belongs to artifact tasks")
         if self.success_criteria is not None or self.fixture_dir is not None or self.monitored_paths:
             raise ValueError("A dialogue task has no acceptance tests, fixture or monitored files")
         for agent in self.agents:
@@ -300,6 +312,8 @@ class ScenarioV2(Definition):
             raise ValueError("An artifact task needs executable acceptance tests")
         if self.output_contract is None:
             raise ValueError("An artifact task names its output_contract (DM-37)")
+        if self.write_gate is not None:
+            self.write_gate_rules()
         if self.progress_metric.uses_t1():
             raise ValueError("T1 metrics belong to dialogue tasks")
         if self.turn_order != "fixed":
@@ -312,6 +326,19 @@ class ScenarioV2(Definition):
         if (self.status_values is not None or self.terminal_statuses or self.deliverable_schema is not None
                 or self.judge is not None or self.inputs_dir is not None or self.required_adopted_items is not None):
             raise ValueError("Status, deliverable, judge and inputs fields belong to dialogue tasks")
+
+
+    def write_gate_rules(self):
+        gate, agents = self.write_gate, {a.id: a for a in self.agents}
+        if self.output_contract != "output-contract-v3":
+            raise ValueError("write_gate reads spec_approved, an output-contract-v3 field (DM-37)")
+        if gate.role not in agents or gate.set_by not in agents or gate.role == gate.set_by:
+            raise ValueError("write_gate role and set_by must be two different roles of the scenario")
+        if not set(agents[gate.role].tools) & set(WRITE_TOOLS):
+            raise ValueError("write_gate role has no write tool to wait")
+        relative_path(gate.spec_path, "write_gate.spec_path")
+        if gate.spec_path not in self.monitored_paths:
+            raise ValueError("write_gate.spec_path must be a monitored path (its hash is recorded at approval)")
 
 
 def load_scenario(path):

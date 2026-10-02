@@ -27,6 +27,7 @@ from experiments.output_contract import AgentOutput, parse_output
 from experiments.issue_contract import (IssueContract, V1, V2, VERSIONS, PROTOCOL_V2, VOCABULARY_VIOLATIONS,
                                         for_scenario)
 from experiments.dialogue_contract import V3, for_artifact_scenario
+from experiments.approval_gate import REFUSED as WRITE_REFUSED, ApprovalGate
 from experiments.step_execution import StrictFailureStreak
 from experiments.observation_collection import (DEFAULT_POLICY, INDEPENDENT, LEGACY, PROTOCOLS,
     unavailable, validate_final_response, select_sources, collection_metadata)
@@ -233,11 +234,13 @@ def ensure_key_env(upstream, key_env):
         raise ValueError('Proxy expects the key from ' + configured + ', not ' + key_env)
 
 
-def role_system_message(agent, tool_names, scenario, schema_text, facts):
-    """Role system prompt. Shared with the offline provider probe so the two cannot drift."""
+def role_system_message(agent, tool_names, scenario, schema_text, facts, notice=''):
+    """Role system prompt. Shared with the offline provider probe so the two cannot drift. notice is the CT approval
+    rule sentence (DM-16), the same for every role; empty without a write gate."""
     return (agent.system_message + '\nUse tools to inspect/edit the actual workspace. '
             + tool_instructions(tool_names) + edit_instructions(tool_names)
-            + (harness_facts(agent.writable_paths, scenario.termination.max_llm_calls_per_step) if facts else '') +
+            + (harness_facts(agent.writable_paths, scenario.termination.max_llm_calls_per_step) if facts else '')
+            + notice +
             'Final response must be one JSON object matching this schema. Report the full shared state, '
             'not only this role\'s issues. Never claim tests passed without running them.\n' + schema_text)
 
@@ -250,8 +253,10 @@ def schema_instructions(contract, root=ROOT):
 
 
 class Workspace:
-    def __init__(self, scenario, root):
+    def __init__(self, scenario, root, gate=None):
         self.scenario, self.root, self.counter = scenario, root, 0
+        # CT approval rule (DM-16, experiments/approval_gate.py); None keeps every write tool as it was.
+        self.gate = gate
 
     def acceptance(self):
         self.counter += 1
@@ -296,11 +301,15 @@ class Workspace:
 
         def write_file(path: str, content: str) -> str:
             """Replace an authorized candidate file with complete UTF-8 content."""
+            if self.gate is not None:
+                self.gate.check_write(agent.id, 'write_file', path)
             writable(path).write_text(content, encoding='utf-8')
             return 'written: ' + path
 
         def replace_in_file(path: str, old: str, new: str) -> str:
             """Replace exactly one occurrence of old with new in an authorized candidate file."""
+            if self.gate is not None:
+                self.gate.check_write(agent.id, 'replace_in_file', path)
             target = writable(path)
             text = target.read_text(encoding='utf-8')
             count = text.count(old) if old else 0
@@ -407,7 +416,8 @@ async def run(args):
     out.mkdir(parents=True, exist_ok=False)
     candidate = out / 'workspace'
     shutil.copytree(source, candidate, ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
-    work = Workspace(scenario, candidate)
+    gate = ApprovalGate(scenario.write_gate, candidate) if artifact_v2 and scenario.write_gate is not None else None
+    work = Workspace(scenario, candidate, gate)
     temperature = scenario.temperature if args.temperature is None else args.temperature
     buffer_messages = (None if args.no_context_buffer else args.context_buffer_messages
                        if args.context_buffer_messages is not None else scenario.context_buffer_messages)
@@ -464,7 +474,8 @@ async def run(args):
         effective.update(task_kind='artifact', turn_order=scenario.turn_order,
                          contract_sha256=getattr(contract, 'contract_sha256', None),
                          registration=registration, registration_sha256=canonical_sha256(registration),
-                         tools={a.id: list(a.tools) for a in scenario.agents})
+                         tools={a.id: list(a.tools) for a in scenario.agents},
+                         write_gate=gate.conditions() if gate is not None else None)
     save(conditions_path, effective)
     print('session_id:', session_id, 'run_directory:', out, flush=True)
     shutil.copy2(scenario_path, out / 'scenario.yaml')
@@ -497,7 +508,8 @@ async def run(args):
     agents = [AssistantAgent(a.id, model_client=model, tools=role_tools[i],
         model_context=make_model_context(buffer_messages),
         reflect_on_tool_use=False, model_client_stream=False,
-        system_message=role_system_message(a, role_names[i], scenario, schema_text, facts))
+        system_message=role_system_message(a, role_names[i], scenario, schema_text, facts,
+                                           gate.notice if gate is not None else ''))
         for i, a in enumerate(scenario.agents)]
     steps, missing, first, latest, baseline = [], [], None, None, None
     observation_first = None
@@ -534,6 +546,8 @@ async def run(args):
             for step in range(1, scenario.termination.max_steps + 1):
                 index = (step - 1) % len(agents)
                 budget.reset()
+                if gate is not None:
+                    gate.step = step
                 text, parsed, call_error = '', None, None
                 context = json.dumps({'task': scenario.task,
                     'monitored_paths': scenario.monitored_paths,
@@ -600,19 +614,30 @@ async def run(args):
                         observed_parsed, step, scenario.termination_context_collection.declarer_agent)
                 metadata = collection_metadata(collection_policy, receipt, observed_parsed,
                     observed_artifact, scenario.progress_source, scenario.progress_metric.model_dump())
+                # DM-16: the approving role's verified final report, after the step (spec hash at that state).
+                approval = gate.observe(step, agents[index].name, observed_parsed) if gate is not None else None
                 record = {'step_id': step, 'agent': agents[index].name, 'text': text,
                           'llm_calls': budget.used, 'llm_turns': sorted(set(budget.turns)),
                           'acceptance': latest, 'call_error': call_error}
                 # G0-6: executed tool errors fail the recorded step only. outcome['failed'] still drives
                 # parsing, placeholders, source selection and the success check, so control flow is unchanged.
-                tool_execution_error = any(e['is_error'] for e in outcome['tool_executions'])
-                record.update(step_status='failed' if outcome['failed'] or tool_execution_error else 'completed',
+                # A write refused before approval (DM-16) is marked and named apart from other tool errors.
+                refused = [e for e in outcome['tool_executions'] if gate is not None and gate.is_refusal(e)]
+                for execution in refused:
+                    execution['approval_refused'] = True
+                tool_execution_error = any(e['is_error'] and not e.get('approval_refused')
+                                           for e in outcome['tool_executions'])
+                record.update(step_status='failed' if outcome['failed'] or tool_execution_error or refused
+                              else 'completed',
                               measurement_status='unmeasured' if outcome['failed'] else 'observed',
                               tool_errors=outcome['tool_errors'], tool_feedback=outcome['feedback'],
                               tool_executions=outcome['tool_executions'],
                               final_output=outcome['final_output'],
                               failure_reasons=outcome['failure_reasons']
-                                              + ['tool_execution_error'] * tool_execution_error)
+                                              + ['tool_execution_error'] * tool_execution_error
+                                              + [WRITE_REFUSED] * bool(refused))
+                if gate is not None:
+                    record['approval'] = approval
                 record.update(strict_used=outcome['strict_used'], strict_failure=outcome['strict_failure'],
                               consecutive_strict_failures=strict_streak.count)
                 if closed:
@@ -719,7 +744,8 @@ async def run(args):
             if artifact_v2:
                 summary.update(task_kind='artifact', turn_order=scenario.turn_order,
                                output_contract_version=contract.version,
-                               registration_sha256=effective['registration_sha256'])
+                               registration_sha256=effective['registration_sha256'],
+                               approval=gate.summary() if gate is not None else None)
             if guardrail_block is not None:
                 summary['guardrail_stop'] = guardrail_block
             save(out / 'summary.json', summary)

@@ -508,6 +508,12 @@ def v06_fields(result, conditions, summary, log):
                                        'steps': summary.get('vocabulary_violation_steps'),
                                        'excluded_from_strict_failure_streak': True}
     if conditions.get('task_kind') != 'dialogue':
+        # CT approval rule (DM-16): the gate, its notice hash, the approval step and the writes refused before it.
+        gate = conditions.get('write_gate')
+        result['approval'] = None if gate is None else {
+            **{k: gate[k] for k in ('rule_version', 'gate', 'notice_sha256', 'refusal_sha256')},
+            **(summary.get('approval') or {}),
+            'refused_writes_excluded_from': ['strict_failure_streak', 'runner_error']}
         return result
     # DM-46: escalated is the one terminal status, so the termination reason already names it; who escalated is kept.
     result['run'].update(final_status=summary.get('final_status'), escalated_by=summary.get('escalated_by'))
