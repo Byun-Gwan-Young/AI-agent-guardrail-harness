@@ -32,7 +32,7 @@ from importlib.metadata import version
 
 import httpx
 
-from experiments import dialogue_tools, search_tools
+from experiments import cs_tools, dialogue_tools, search_tools
 from experiments import run_scenario as common
 from experiments.dialogue_contract import V3, VOCABULARY_VIOLATIONS_V3, for_dialogue_scenario
 from experiments.observation_collection import INDEPENDENT, collection_metadata, select_sources
@@ -221,16 +221,36 @@ def check_arguments(args, scenario):
         raise ValueError('reasoning_effort_evidence file not found: ' + evidence)
     if args.run_index < 1 or (args.temperature is not None and not 0 <= args.temperature <= 2):
         raise ValueError('Invalid run index or temperature')
-    missing = dialogue_tools.missing_implementations(scenario)
-    if missing:
-        raise ValueError('Tools without an implementation: ' + ', '.join(missing))
     return mode
+
+
+def tool_preflight(scenario, root, environ):
+    """C-17-6 part 3, before any external call and before a run folder exists: every tool of every role has an
+    implementation, every key a used tool needs is in the environment (presence only; no value is read out or
+    printed), and inputs_dir holds what the used tools read. Returns the record kept in conditions.json; raises
+    ValueError naming every problem."""
+    used = sorted({t for a in scenario.agents for t in a.tools})
+    missing = dialogue_tools.missing_implementations(scenario)
+    keys = {env: 'present' if environ.get(env) else 'missing'
+            for env in sorted({search_tools.KEY_ENVS[t] for t in used if t in search_tools.KEY_ENVS})}
+    inputs_dir = common.safe_path(root, scenario.inputs_dir)
+    inputs = {t: cs_tools.input_problems(t, inputs_dir) for t in used if t in cs_tools.TOOLS}
+    problems = (['Tools without an implementation: ' + ', '.join(missing)] * bool(missing)
+                + ['Key environment variable not set: ' + env for env, state in keys.items() if state == 'missing']
+                + ([] if inputs_dir.is_dir() else ['inputs_dir not found: ' + scenario.inputs_dir])
+                + [f'{tool} input: {problem}' for tool, found in inputs.items() for problem in found
+                   if problem != 'inputs_dir not found'])
+    if problems:
+        raise ValueError('Pre-run check failed: ' + '; '.join(problems))
+    return {'check': 'dialogue-tool-preflight-v1', 'tools_implemented': used, 'keys': keys,
+            'inputs_dir': scenario.inputs_dir, 'input_problems': inputs}
 
 
 async def run_dialogue(args, scenario, scenario_path):
     from autogen_agentchat.agents import AssistantAgent
 
     mode = check_arguments(args, scenario)
+    preflight = tool_preflight(scenario, SCENARIO_ROOT, os.environ)
     key_env = getattr(args, 'api_key_env', None) or 'GROQ_API_KEY'
     key = os.environ.get(key_env)
     if not key:
@@ -292,7 +312,7 @@ async def run_dialogue(args, scenario, scenario_path):
         'registration': registration, 'registration_sha256': canonical_sha256(registration),
         'judge': judge_record, 'inputs_dir': scenario.inputs_dir,
         'tools': {a.id: list(a.tools) for a in scenario.agents}, 'tool_implementations': dispatch.identity(),
-        'tool_settings': tool_settings or None,
+        'tool_settings': tool_settings or None, 'tool_preflight': preflight,
         'search': search_tools.conditions_record(tool_settings) if tool_settings else None,
         'dataset_run': dataset_run, 'phase': phase, **repository_state}
     conditions_path = out / 'conditions.json'

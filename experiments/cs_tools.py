@@ -15,6 +15,7 @@ import re
 
 from experiments.tool_results import Result, ToolFactError
 
+TOOLS = ('lookup_order', 'read_policy')
 ORDERS_FILE = 'orders.json'
 POLICY_DIR = 'policies'
 POLICY_SUFFIX = '.md'

@@ -168,3 +168,51 @@ seconds, and limit requests to a single connection at a time". 사용 설명서�
 테스트 `tests/test_search_tools.py` (가짜 HTTP 계층 `tests/search_fixtures.py`, 응답 fixture `tests/fixtures/search/` — 모양의 출처는 그 폴더 README) :
 Tavily 요청·원문 바이트 저장·정규화·모델 텍스트·호출 참조, 되돌아온 키 가림, arXiv 요청 파라미터·정규화(옛 형식 ID 포함)·간격, 상한, 실패 7 경우(재시도 없음),
 빈 질의·키 없음, 자르기(균일 자르기·결과 빼기·결정적), replay(원문만, 전송 없음, 판정 동일, 변조 거부), 설정 스키마, 도구 인자.
+
+## 파트 3 — 실행 전 검사 · PM 검색 확인 도구 · 통합 테스트
+
+**실행 전 검사** (`dialogue_runner.tool_preflight`, 검사 이름 `dialogue-tool-preflight-v1`)
+
+- 위치 : 대화 과제 실행의 인자 검사 바로 뒤. **모델·검색·프록시 호출 전, 세션 ID 와 실행 폴더를 만들기 전**이다 (테스트 : 세션 ID 생성에 닿으면 실패)
+- 검사 : ① 시나리오 역할들이 쓰는 도구마다 구현이 있는가 ② 쓰는 도구가 요구하는 키 환경 변수가 있는가 (지금은 `web_search` → `TAVILY_API_KEY`.
+  값은 읽어 보이지 않고 `present`/`missing` 만) ③ `inputs_dir` 가 있는가, 쓰는 로컬 도구의 입력이 파트 1 형식에 맞는가 (`cs_tools.input_problems`)
+- 하나라도 안 되면 문제를 **모두** 이어 쓴 실행 전 오류 : `Pre-run check failed: Tools without an implementation: …; Key environment variable not set: TAVILY_API_KEY; lookup_order input: orders.json not found; …`
+- 통과하면 결과를 `conditions.tool_preflight` 와 매니페스트 v0.6 `task.tool_preflight` 에 남긴다 (`{check, tools_implemented, keys, inputs_dir, input_problems}`)
+- 검색 설정의 유무는 시나리오 스키마가 이미 막는다 (파트 2). 모델 호출 키(`KMU_API_KEY`) 검사는 이전 그대로 이 뒤에 있다
+
+**PM 검색 확인 도구** (`tools/probe_search.py`, `search-probe-v1`) — 코딩 에이전트는 실행하지 않고 오프라인 테스트만 했다
+
+- LLM 호출 없이 Tavily 1 회 (`multi-agent LLM system failure causes`, 결과 5, basic, general), arXiv 1 회 (`all:"multi-agent" AND all:failure`, 결과 5, relevance)
+  — 고정 질의·설정은 도구 안의 상수이고 결과에 기록된다. 요청은 실행기와 **같은 요청 조립 함수**(`search_tools.build_request`)로 만든다
+- 저장 : `runs/search-probes/search-probe-<id>/` 에 `tavily-response.json`, `arxiv-response.xml` (받은 그대로, 키가 섞여 오면 가림), `result.json`
+- 비교 : 응답과 fixture(`tests/fixtures/search/`) 의 **모양**(JSON 경로·타입, XML 요소·속성 경로)을 비교해 응답에 없는 경로, 응답에만 있는 경로,
+  타입 차이, 도구가 읽는 필드의 존재, 도구 정규화 결과(건수·첫 결과)를 낸다. arXiv 항목에 없을 수 있는 요소(`arxiv:comment`·`journal_ref`·`doi`·`affiliation`)가
+  빠진 것은 변화로 치지 않는다. 판정 `all_ok` = 두 응답 모두 200 + 모양 같음 + 도구 필드 있음 + 정규화 성공
+- 키 : `TAVILY_API_KEY` 에서만 읽는다. 없으면 아무것도 보내지 않고 종료 코드 2. 끝에 결과 폴더의 모든 파일에서 키 값을 찾아 `secret_scan` 에 남긴다
+- 종료 코드 : 0 (모두 통과, 결과 폴더에 키 값 없음), 1 (모양 차이·HTTP 오류·응답 없음·키 값 발견), 2 (`TAVILY_API_KEY` 미설정, 전송 0)
+
+**통합 오프라인 테스트** (`tests/test_dialogue_tool_flows.py`, 실제 실행기 + 메모리 프록시 + 가짜 업스트림 + 실제 도구, 검색은 가짜 HTTP 계층)
+
+| 흐름 | 확인한 것 |
+|---|---|
+| CS 형태 (라우터) | 접수 `lookup_order`(A-100) → 환불 담당 `read_policy`(refund.md) → 접수 완료 선언 `success`. 판정 함수가 호출 기록에서 주문 조회를 확인. 재판정 전부 같음 |
+| CS 조회 실패 | 없는 주문만 조회하고 그 주문으로 완료 선언 → 완료 주장 거절 (`order_id_not_looked_up`), 세션은 `max_steps` |
+| MR 형태 (가짜 Tavily) | 검색 1 회, 원문 바이트 저장·호출 기록의 해시 참조, 출처 URL 이 저장된 결과에 있어 `success`. 재판정은 전송 계층이 막힌 상태에서 전부 같음 (`searched_again: false`). 실행 루트 전체(실행 폴더·프록시 로그) 어디에도 키 문자열 없음 |
+| MR 결과 밖 출처 | 저장된 결과에 없는 URL → 완료 주장 거절, `max_steps` |
+| MR 검색 실패 | 시간 초과 → 오류 결과, step `failed`·세션 계속, 재시도 없음 (요청 1 번) |
+| LR 형태 (가짜 arXiv) | 검색 2 회 (step 2·5), 두 번째는 3 초 간격을 기다림, 논문 ID 2 개가 결과에 있어 `success`. 매니페스트 v0.6 의 `task.tool_settings`·`task.search`·`search`·`task.tool_preflight`, D-11 검사에 Tavily 패턴 포함·깨끗함 |
+| 실행 전 검사 | 키 없음 (요청 0, 실행 폴더 없음), 구현 없음 + 입력 없음을 한 문장에 모두, `inputs_dir` 없음, 통과 기록 |
+| 검색 확인 도구 | fixture 모양 응답 통과·저장, 모양 변화 보고, arXiv 선택 요소 없음은 통과, 키 없으면 전송 0, 네트워크 오류·되돌아온 키 가림 |
+
+- 네트워크 : 전체 오프라인 테스트의 감사 훅(`tools/run_offline_tests.py`)이 소켓 접속 0 (`network_attempts: []`) 을 확인한다
+
+**PM 실행 명령 (검색 확인, C-18 시험 실행 전)** — 한 줄에 명령 하나. 키는 Tavily 콘솔에서 복사한 뒤 직접 입력한다
+
+```bash
+cd ~/AI-agent-guardrail-harness
+export TAVILY_API_KEY="$(pbpaste)"
+echo ${#TAVILY_API_KEY} ${TAVILY_API_KEY:0:4}
+venv/bin/python tools/probe_search.py
+```
+
+- 결과 폴더는 `runs/search-probes/` 아래 (`runs/` 는 `.gitignore` 대상). 커밋은 D-11 검사 뒤 `git add -f` (기존 probe 와 같은 절차)

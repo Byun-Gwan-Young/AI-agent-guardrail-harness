@@ -505,7 +505,8 @@ def v06_fields(result, conditions, summary, log):
     result['task'] = {k: conditions.get(k) for k in ('task_kind', 'turn_order', 'dialogue_flow', 'output_contract_version',
                                                      'contract_sha256', 'allowed_issues_sha256', 'closed_list_check',
                                                      'judge', 'inputs_dir', 'tools', 'tool_implementations',
-                                                     'recent_messages_rule', 'tool_settings', 'search')}
+                                                     'recent_messages_rule', 'tool_settings', 'search',
+                                                     'tool_preflight')}
     result['registration'] = {
         'value': registration, 'sha256': conditions.get('registration_sha256'),
         'sha256_recomputed': hashlib.sha256(json.dumps(registration, ensure_ascii=False, sort_keys=True,

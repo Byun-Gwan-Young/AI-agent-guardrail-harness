@@ -311,13 +311,20 @@ class SearchSession:
                       truncation=truncation)
         return text
 
-    @staticmethod
-    def redact(text, key):
-        return text.replace(key, REDACTED) if key and isinstance(text, str) else text
+    def secrets(self):
+        return [v for v in (self.environ.get(env) for env in sorted(set(KEY_ENVS.values()))) if v]
+
+    def redact(self, text, key=None):
+        """Every configured search key replaced, whichever provider the text came from."""
+        for secret in self.secrets() + ([key] if key else []):
+            text = text.replace(secret, REDACTED) if isinstance(text, str) else text
+        return text
 
     def store(self, provider, data, content_type, key):
-        """Write the response body as received (key replaced if it is in it) under its sha256."""
-        stored = data.replace(key.encode('utf-8'), REDACTED.encode('utf-8')) if key else data
+        """Write the response body as received (any search key replaced if it is in it) under its sha256."""
+        stored = data
+        for secret in self.secrets() + ([key] if key else []):
+            stored = stored.replace(secret.encode('utf-8'), REDACTED.encode('utf-8'))
         digest = sha256(stored)
         path = RESPONSES_DIR + '/' + digest + EXTENSIONS[provider]
         target = self.session_dir / path
