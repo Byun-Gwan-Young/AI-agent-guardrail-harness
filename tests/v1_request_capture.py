@@ -45,7 +45,7 @@ async def capture_v2(steps=STEPS):
     return await offline_run(A1V4_V2, V03_CONFIG, steps, phase="demo")
 
 
-async def offline_run(path, config, steps, phase=None):
+async def offline_run(path, config, steps, phase=None, model=None):
     import experiments.run_scenario as runner
     from artifact_hook import capture_artifact
     from experiments.step_execution import PROTOCOL_V10
@@ -81,7 +81,7 @@ async def offline_run(path, config, steps, phase=None):
                                no_context_buffer=False, context_buffer_messages=12, seed_probe=None,
                                proxy_url="http://mock", collection_policy=facts.INDEPENDENT,
                                output_contract=facts.V2, runner_protocol=PROTOCOL_V10, api_key_env="KMU_API_KEY",
-                               phase=phase, dataset_run=False)
+                               phase=phase, dataset_run=False, model=model)
         clean = {"git_commit": "0" * 40, "git_dirty": False, "git_state_status": "measured", "git_state_reason": None}
         with mock.patch.object(runner, "load_scenario", return_value=scenario), \
                 mock.patch.object(runner, "DEMO_OUTPUT_ROOT", root / "runs" / "demo"), \
@@ -91,8 +91,11 @@ async def offline_run(path, config, steps, phase=None):
                 contextlib.redirect_stdout(io.StringIO()):
             code = await runner.run(args)
         runs = root / "runs" / "demo" if phase else root / "runs"
-        summary = json.loads(next(runs.iterdir()).joinpath("summary.json").read_text(encoding="utf-8"))
-    return {"exit_code": code, "termination_reason": summary["termination_reason"], "requests": requests}
+        folder = next(runs.iterdir())
+        summary = json.loads(folder.joinpath("summary.json").read_text(encoding="utf-8"))
+        conditions = json.loads(folder.joinpath("conditions.json").read_text(encoding="utf-8"))
+    return {"exit_code": code, "termination_reason": summary["termination_reason"], "requests": requests,
+            "conditions": conditions}
 
 
 def differences(a, b, path=""):

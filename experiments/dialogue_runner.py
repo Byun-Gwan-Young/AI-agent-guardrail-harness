@@ -250,6 +250,7 @@ async def run_dialogue(args, scenario, scenario_path):
     from autogen_agentchat.agents import AssistantAgent
 
     mode = check_arguments(args, scenario)
+    model_name, model_record = common.run_model(scenario, args)
     preflight = tool_preflight(scenario, SCENARIO_ROOT, os.environ)
     key_env = getattr(args, 'api_key_env', None) or 'GROQ_API_KEY'
     key = os.environ.get(key_env)
@@ -284,7 +285,8 @@ async def run_dialogue(args, scenario, scenario_path):
                                            {'search': search} if search is not None else None)
     evidence = scenario.reasoning_effort_evidence
     effective = {
-        'scenario': scenario.model_dump(), 'temperature': temperature, 'versions': versions, 'actual_outcome': None,
+        'scenario': scenario.model_dump(), 'model': model_record, 'temperature': temperature, 'versions': versions,
+        'actual_outcome': None,
         'seed_support': scenario.seed_support, 'session_id': session_id, 'run_index': args.run_index,
         'context_buffer_messages': buffer_messages, 'seed_probe': args.seed_probe,
         'requested_seed': args.seed_probe if args.seed_probe is not None else scenario.seed,
@@ -328,7 +330,7 @@ async def run_dialogue(args, scenario, scenario_path):
                                final_report_allowlist=True)
     base = args.proxy_url.rstrip('/').removesuffix('/v1')
     model_http = httpx.AsyncClient(event_hooks={'response': [budget.capture]})
-    options = dict(model=scenario.model, api_key=key, base_url=base + '/v1', default_headers=headers,
+    options = dict(model=model_name, api_key=key, base_url=base + '/v1', default_headers=headers,
                    http_client=model_http, max_retries=0, temperature=temperature, max_tokens=scenario.max_tokens,
                    model_info={'vision': False, 'function_calling': True, 'json_output': True,
                                'structured_output': True, 'family': 'unknown'})

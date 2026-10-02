@@ -428,8 +428,48 @@ def validity_evidence(a):
             'unmeasured_steps': sum(r['criteria_decision'] == 'unmeasured' for r in rows)}
 
 
-def v03_fields(result, a, conditions, observations):
-    """session-manifest-v0.3 (S-8, S-1, S-23) for sessions whose runner recorded the Git state."""
+CONDITION_GROUP_RULE = 'condition-group-v1'
+
+
+def condition_group(result, conditions, meta):
+    """The run conditions sessions must share to be counted together (C-17-7; S-12 one proxy = one group, D-32 another
+    model = another group, DM-40 one closed-list check per group). Scenario, code commit and run index are not in it:
+    one group holds many scenarios and runs. Values come from conditions.json and the proxy's session meta only."""
+    reasoning = conditions.get('reasoning_effort') or {}
+    upstream = meta.get('upstream') or {}
+    closed_list = conditions.get('closed_list_check')
+    fields = {'model': meta.get('model'), 'provider_host': upstream.get('base_url_host'),
+              'proxy_config_file': upstream.get('config_file'),
+              'criteria_version': meta.get('criteria_version'), 'criteria_sha256': meta.get('criteria_sha256'),
+              'guardrail_mode': meta.get('guardrail_mode'), 'phase': conditions.get('phase'),
+              'runner_protocol': conditions.get('runner_protocol'),
+              'collection_policy': conditions.get('collection_policy'),
+              'output_contract_version': conditions.get('output_contract_version'),
+              'dialogue_flow': conditions.get('dialogue_flow'),
+              'closed_list_check': closed_list.get('mode') if isinstance(closed_list, dict) else None,
+              'temperature': conditions.get('temperature'), 'max_tokens': meta.get('max_tokens'),
+              'max_steps': result['condition']['max_steps'],
+              'max_llm_calls_per_step': result['condition']['max_llm_calls_per_step'],
+              'context_buffer_messages': conditions.get('context_buffer_messages'),
+              'reasoning_effort': {'requested': reasoning.get('requested'), 'sent_on': reasoning.get('sent_on')},
+              'requested_seed': conditions.get('requested_seed')}
+    digest = hashlib.sha256(json.dumps(fields, ensure_ascii=False, sort_keys=True,
+                                       separators=(',', ':')).encode('utf-8')).hexdigest()
+    return {'rule': CONDITION_GROUP_RULE, 'id': 'cg-' + digest[:12], 'sha256': digest, 'fields': fields,
+            'missing_fields': sorted(k for k, v in fields.items() if v is None)}
+
+
+def model_record(result, conditions, meta):
+    """Which model was sent and where it came from (C-17-7). The proxy's record is the model actually sent."""
+    recorded = conditions.get('model') or {}
+    return {**result['model'], 'source': recorded.get('source'), 'scenario_model': recorded.get('scenario_model'),
+            'runner_model': recorded.get('name'),
+            'runner_matches_proxy': None if not recorded else recorded.get('name') == meta.get('model')}
+
+
+def v03_fields(result, a, conditions, observations, meta=None):
+    """session-manifest-v0.3 (S-8, S-1, S-23) for sessions whose runner recorded the Git state. Condition group and
+    model source (C-17-7) were added in place: no session with a v0.3 or later manifest exists (DM-51 principle)."""
     result['manifest_version'] = 'session-manifest-v0.3'
     result['scenario'].pop('version', None)
     result['code'].update(git_commit=conditions.get('git_commit'), git_dirty=conditions.get('git_dirty'),
@@ -439,6 +479,9 @@ def v03_fields(result, a, conditions, observations):
                                                  'source': 'conditions.json'} if conditions.get('reasoning_effort')
                                else None,
                                dataset_run=conditions.get('dataset_run'))
+    meta = a['meta'] if meta is None else meta
+    result['model'] = model_record(result, conditions, meta)
+    result['condition']['group'] = condition_group(result, conditions, meta)
     result['run']['parallel_group'] = conditions.get('parallel_group')
     result['judgement']['normal_session'] = a['termination']['reason'] == 'success'
     result['judgement']['normal_session_rule'] = 'S-1: all acceptance tests pass and completion declared'
@@ -548,7 +591,7 @@ def manifest(a, phase, notes):
         # v0.3 only for sessions recorded by the Git-aware runner; earlier manifests are never rewritten.
         log = load(log_file(a['session_id']))
         observations = log['observations']
-        result = v03_fields(result, a, conditions, observations)
+        result = v03_fields(result, a, conditions, observations, log['meta'])
         if a['meta']['criteria_version'] != 'deadlock-v0.3':
             return result
         result = v04_fields(result, observations)

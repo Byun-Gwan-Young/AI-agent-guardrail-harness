@@ -234,6 +234,21 @@ def ensure_key_env(upstream, key_env):
         raise ValueError('Proxy expects the key from ' + configured + ', not ' + key_env)
 
 
+MODEL_RULE = 'model-run-condition-v1'
+
+
+def run_model(scenario, args):
+    """The model is a run condition (C-17-7, DM-25, D-32): --model names it for this run, otherwise the scenario's
+    model is sent. The runner fixes no model of its own. Which one was sent and where it came from are recorded,
+    so a cross-check run with another model is never read as a run of the scenario's model."""
+    requested = getattr(args, 'model', None)
+    if requested is not None and (not isinstance(requested, str) or not requested.strip() or requested != requested.strip()):
+        raise ValueError('--model must name a model ID without surrounding spaces')
+    name = requested if requested is not None else scenario.model
+    return name, {'rule': MODEL_RULE, 'name': name, 'source': 'run_condition' if requested is not None else 'scenario',
+                  'scenario_model': scenario.model}
+
+
 def role_system_message(agent, tool_names, scenario, schema_text, facts, notice=''):
     """Role system prompt. Shared with the offline provider probe so the two cannot drift. notice is the CT approval
     rule sentence (DM-16), the same for every role; empty without a write gate."""
@@ -390,6 +405,7 @@ async def run(args):
         raise ValueError('Executable artifact fixture required')
     if args.run_index < 1 or (args.temperature is not None and not 0 <= args.temperature <= 2):
         raise ValueError('Invalid run index or temperature')
+    model_name, model_record = run_model(scenario, args)
     # The provider is chosen by the proxy config; the runner only forwards the key it is told to read.
     key_env = getattr(args, 'api_key_env', None) or 'GROQ_API_KEY'
     key = os.environ.get(key_env)
@@ -431,7 +447,7 @@ async def run(args):
          'seed_support': scenario.seed_support, 'session_id': session_id, 'run_index': args.run_index})
     conditions_path = out / 'conditions.json'
     effective = json.loads(conditions_path.read_text(encoding='utf-8'))
-    effective.update(context_buffer_messages=buffer_messages, seed_probe=args.seed_probe,
+    effective.update(model=model_record, context_buffer_messages=buffer_messages, seed_probe=args.seed_probe,
                      requested_seed=args.seed_probe if args.seed_probe is not None else scenario.seed,
                      runner_protocol=runner_protocol, collection_policy=collection_policy,
                      output_contract='flat-state-v2', strict_support='single_probe_passed',
@@ -491,7 +507,7 @@ async def run(args):
 
     base = args.proxy_url.rstrip('/').removesuffix('/v1')
     model_http = httpx.AsyncClient(event_hooks={'response': [budget.capture]})
-    options = dict(model=scenario.model, api_key=key, base_url=base + '/v1',
+    options = dict(model=model_name, api_key=key, base_url=base + '/v1',
         default_headers=headers, http_client=model_http, max_retries=0,
         temperature=temperature, max_tokens=scenario.max_tokens,
         model_info={'vision': False, 'function_calling': True, 'json_output': True,
@@ -780,6 +796,9 @@ def main():
                         help='demo session (DM-2); sends X-Guardrail-Phase so a block-mode proxy may stop it. '
                              'Not allowed with --dataset-run')
     parser.add_argument('--temperature', type=float, default=None)
+    parser.add_argument('--model', default=None,
+                        help="model ID sent for this run (C-17-7); default the scenario's model. Recorded in "
+                             'conditions.json and the manifest condition group')
     context_options = parser.add_mutually_exclusive_group()
     context_options.add_argument('--context-buffer-messages', type=int, default=None)
     context_options.add_argument('--no-context-buffer', action='store_true')

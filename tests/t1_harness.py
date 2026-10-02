@@ -94,7 +94,7 @@ def scenario_file(directory, **changes):
 
 async def run_t1(reports, *, tools=None, config=OBSERVE_CONFIG, phase="demo", dataset_run=False,
                  closed_list_check=None, output_contract=V3, runner_protocol=PROTOCOL_V10, implementations=None,
-                 output_root=None, scenario_changes=None, max_steps=8, tests=None):
+                 output_root=None, scenario_changes=None, max_steps=8, tests=None, model=None):
     """Returns the run folder files, the proxy log and every upstream request."""
     import experiments.run_scenario as runner
     import experiments.dialogue_runner as dialogue
@@ -116,7 +116,7 @@ async def run_t1(reports, *, tools=None, config=OBSERVE_CONFIG, phase="demo", da
                            proxy_url="http://mock", collection_policy="independent-sources-v1",
                            output_contract=output_contract, runner_protocol=runner_protocol,
                            api_key_env="KMU_API_KEY", phase=phase, dataset_run=dataset_run,
-                           closed_list_check=closed_list_check)
+                           closed_list_check=closed_list_check, model=model)
     clean = {"git_commit": "0" * 40, "git_dirty": False, "git_state_status": "measured", "git_state_reason": None}
     stdout = io.StringIO()
     with mock.patch.object(runner, "DEMO_OUTPUT_ROOT", demo_root), \
