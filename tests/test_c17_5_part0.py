@@ -30,14 +30,14 @@ class SpacingTests(unittest.TestCase):
 
     def test_the_three_sentences_of_the_instruction(self):
         e5 = explain(signals(adopted_metric_selected=True, adopted_count=1, adopted_required=3), *LABELS)
-        self.assertEqual(e5["text"], "최근 3 step 동안 채택 항목이 1/3 에서 늘지 않았고 처리 상태는 '분류'입니다.")
+        self.assertEqual(e5["text"], "최근 3 step 동안 채택 항목이 1/3에서 늘지 않았고 처리 상태는 '분류'입니다.")
         e4 = explain(signals(status="received", handoff={"roles": ["refund", "shipping"], "count": 4}), *LABELS)
         self.assertEqual(e4["text"], "환불 담당과 배송 담당이 문의를 서로 4 번 넘겼고 처리 상태는 '접수'에서 바뀌지 않았습니다.")
         e2 = explain({"decision": "deadlock", "stop_step": 9, "global_revert": {"paths": ["src/x.py"], "revert_to_step": 4},
                       "steps_since_test_max": 6, "test_pass_count": 12, "test_total_count": 16})
-        self.assertEqual(e2["text"], "src/x.py 파일이 step 4 의 내용으로 되돌아갔고, 통과 테스트는 6 step 동안 12/16 입니다.")
+        self.assertEqual(e2["text"], "src/x.py 파일이 step 4의 내용으로 되돌아갔고, 통과 테스트는 6 step 동안 12/16입니다.")
         e6 = explain(signals(decision="termination_failure", declared_step=4), *LABELS)
-        self.assertEqual(e6["text"], "step 4 에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 '분류'입니다.")
+        self.assertEqual(e6["text"], "step 4에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 '분류'입니다.")
 
     def test_no_template_leaves_a_space_after_a_quote_or_path_slot(self):
         templates = {**TEMPLATES, "E6-dialogue": E6_DIALOGUE}

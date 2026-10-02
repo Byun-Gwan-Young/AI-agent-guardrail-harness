@@ -275,3 +275,72 @@ E1-T1 `no_test_observation_in_session` → E1 `otherwise`
 **기존 세션 재계산** (`--previous reports/c17-4/v03-recompute.json --output reports/c17-5/v03-recompute.json`) :
 첫 STOP 6 / 없음 / 9, A-1-v3 새 STOP 없음, v0.2 바이트 동일, 이전 대비 상태·판정 변화 0, 첫 STOP 문장 동일
 (세 세션의 STOP 은 모두 E1 이라 DM-42·DM-43 이 닿는 자리가 없다)
+
+## C-17-6 파트 0 재동결 (DM-49 숫자 뒤 조사 · DM-50 필수 값·보조 값)
+
+- **DM-49** : 숫자 뒤 조사와 '입니다' 를 붙여 쓴다. 숫자 뒤 단위("{n} step", "{h} 번", "{c} 번")는 그대로
+  - 고친 자리 : E2 "step {k}의", "{pass}/{total}입니다", E3 "{pass}/{total}에서", E5 "{adopted}/{required}에서",
+    E6·E6 대화형 "step {d}에" (C-17-5 파트 0 에서 범위 밖으로 남긴 다섯 자리)
+  - 받침 규칙 : 받침에 따라 바뀌는 조사(과/와 등)가 숫자 뒤에 오면 숫자를 읽은 소리로 고른다. `has_final_consonant` 가 마지막 글자가
+    숫자면 0·1·3·6·7·8 (영 일 삼 육 칠 팔) 을 받침 있음으로 본다 (`explain_v1.DIGITS_WITH_FINAL_CONSONANT`)
+  - 해당 자리 (보고) : 지금 템플릿에는 **숫자 자리 뒤에 받침형 조사가 오는 곳이 없다** (조사 표기가 붙은 자리는 `signals`·`role_a`·`role_b`
+    뿐, 테스트). 규칙이 실제로 닿는 곳은 숫자로 끝나는 역할 ID 다 : 등록 이름이 없는 "agent1" 은 이전 "agent1와" → 이제 "agent1과"
+  - 그대로 둔 자리 (DM-49 범위 밖, 보고) : E7 "{o} step 은" — 조사가 숫자가 아니라 단위 낱말 "step" 뒤에 온다
+- **DM-50** : 템플릿마다 필수 값·보조 값을 나눈다. 필수 값이 하나라도 없으면 그 템플릿을 고르지 않고 선택 순서의 다음으로 넘어간다.
+  보조 값이 하나라도 없으면 보조 구절을 뺀 문장(`explain_v1.REDUCED`)을 쓴다. "(측정 안 됨)" 은 마지막 대체 문장 E1 에서만 쓴다
+
+| 템플릿 | 필수 값 | 보조 값 | 보조 값이 없을 때 문장 |
+|---|---|---|---|
+| E6 | `d`, `n` | `pass`, `total` (대화형 : `status`) | "step {d}에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다." |
+| E2 | `path`, `k` | `m`, `pass`, `total` | "{path} 파일이 step {k}의 내용으로 되돌아갔습니다." |
+| E3 | `a`, `m`, `c` | `pass`, `total` | "step {a} 이후 {m} step 동안 파일이 {c} 번 바뀌었지만 통과 테스트는 늘지 않았습니다." |
+| E4 | `role_a`, `role_b`, `h` | `status` | "{role_a:과/와} {role_b:이/가} 문의를 서로 {h} 번 넘겼습니다." |
+| E5 | `n`, `adopted`, `required` | `status` | "최근 {n} step 동안 채택 항목이 {adopted}/{required}에서 늘지 않았습니다." |
+| E7 | `n`, `o` | 없음 | — |
+| E1-T1 | `n`, `roles`, `signals` | `status` | "최근 {n} step 동안 {roles} 모두 {signals:이/가} 없습니다." |
+| E1 (대체) | 없음 | — | 값이 없으면 "(측정 안 됨)" (지금과 같음) |
+
+  - 보조 값은 템플릿마다 한 묶음이다. 하나라도 없으면 그 구절 전체를 뺀다 (예 : E2 에서 `m` 만 없어도 통과 테스트 구절 전체)
+  - 필수 값은 문장의 주장 자체(무엇이 되돌아갔나, 몇 step 정체인가, 누가 몇 번 넘겼나)이고, 보조 값은 덧붙이는 현재 수준(통과 수·처리 상태)이다.
+    E3 의 통과 수는 "늘지 않았다" 는 주장을 숫자 없이도 할 수 있어 보조 값으로 두었다. E5 의 필수 항목 수는 "{adopted}/{required}" 가
+    문장의 주어라 필수 값이다 (DM-29 : scenario-v2 대화 과제가 `adopted_items` 를 고르면 스키마가 `required_adopted_items` 를 요구하므로
+    실제 v2 세션에서는 항상 있다)
+  - E4 는 DM-43 의 선택 조건이 이미 두 역할·왕복 수를 요구한다. 그 조건은 그대로 두고 필수 값 표에도 같은 값을 적었다
+  - 판정·선택 순서·조건 이름은 바뀌지 않았다. 표시 이름(등록)은 값의 유무를 바꾸지 않으므로 선택은 신호값만으로 정해진다
+- 기록 : STOP 기록의 `explanation` 에 `form` (`full` / `reduced` / `fallback`) 과 `skipped_templates`
+  (조건은 맞았지만 필수 값이 없어 넘어간 템플릿과 빠진 필수 값) 를 더했다. `explain(signals, role_labels, status_labels)` 로 같은 기록을 다시 만든다
+- 동결 기록 `explain-v1.json` 에 `digits_with_final_consonant`, `required_values`, `reduced_templates`, `fallback` 을 더했다
+
+**템플릿 선택이 바뀌는 경우 (보고)** — DM-50 전에는 조건만 보고 골랐다. 이제 아래처럼 조건이 맞은 템플릿의 필수 값이 없으면 다음으로 넘어간다
+(`tests/test_c17_6_part0.py` `test_selection_changes_are_exactly_missing_required_values` 가 이 목록 전체를 확인한다. 괄호는 그 시험 신호에서 고른 다음 템플릿).
+
+| 이전 선택 | 빠진 필수 값 | 지금 |
+|---|---|---|
+| E6 | `d` 또는 `n` | 다음 템플릿 (시험 신호에서 E1) |
+| E2 | `path` 또는 `k` | 〃 |
+| E3 | `a`, `m` 또는 `c` | 〃 |
+| E5 | `n`, `adopted` 또는 `required` | 〃 (테스트 관측이 없는 T1 세션이면 E1-T1) |
+| E7 | `n` | 〃 |
+| E1-T1 | `n`, `roles` 또는 `signals` | E1 |
+
+- 실제로 생길 수 있는 경우는 **등록 없는 세션의 E5** 뿐이다 (필수 항목 수는 등록에서만 온다). 이전에는 "채택 항목이 1/(측정 안 됨) 에서 …" 를 냈고
+  이제 E7 / E1-T1 / E1 중 하나가 된다. 바꾼 기존 테스트 : `test_explain_v1` 의 E5 두 곳(등록 있는 경우를 더해 E5 를 계속 확인),
+  `test_session_registration.test_without_registration_ids_and_unmeasured_remain` (E1-T1). scenario-v2 실행기는 등록 없이 세션을 시작하지 않는다
+- 나머지 필수 값은 그 템플릿의 조건을 만든 같은 progress 기록에서 오므로 실제 판정에서는 빠지지 않는다 (방어 조건)
+- 보조 구절이 빠지는 경우 (선택은 그대로) : 산출물 세션에서 통과 수가 측정되지 않은 E2·E3·E6, 처리 상태가 한 번도 관측되지 않은 E4·E5·E6 대화형·E1-T1
+
+**이전 해시 (C-17-5 파트 0, `11b9cfe`) → 새 해시 (C-17-6 파트 0)**
+
+| 대상 | 이전 | 새 |
+|---|---|---|
+| `docs/criteria/deadlock-v0.3.json` 파일 | `7edbc82aa1b20e92bdf818ae91591ef00d1be1bb7e991c35af6f31379533b06d` | `5c1ce57602b4904a918c766d67a8a37e9d56599594b5a270d464b424178eb7bf` |
+| `criteria_sha256` (파라미터) | `a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50` | 같음 |
+| `deadlock_policy_v03.py` | `794f65e26211b7bcebbe4deadfa3e30f30dbaecc6fe361681854db23e2cef3b0` | 같음 |
+| `explain_v1.py` | `14724019cdf72a4a48e78af119cba1d4cca44aa5fb2a2993133310e138453f32` | `f009b56dd55b53618bb42ad1327754a711df4793a4b4115502f8d0795c6c8e42` |
+| `progress_signal_v3.py` | `dc727697e0832a305569839d3fc347f36c093a09811e93183cc4fc478a8d6c94` | 같음 |
+| `docs/criteria/explain-v1.json` 파일 | `5fd70261593141c84d0cbcb3ad4893017eedd9076b04394b084547eb69bc7646` | `47da1ef21c8f9b4675b729ac7d9e7143efca32fbbb8d782c6d90222011e53631` |
+| `explanation_templates_sha256` | `932ff49ab2e09966aa78f219089c6d7cf305c527a73efa02e513944773c55aff` | `485aec746740f6ecf59126fe122b6e210c6048515a186057f7146b6327800ac8` |
+
+**기존 세션 재계산** (`--previous reports/c17-5/v03-recompute.json --output reports/c17-6/v03-recompute.json`) :
+첫 STOP 6 / 없음 / 9, A-1-v3 새 STOP 없음, v0.2 바이트 동일, 이전 대비 상태·판정 변화 0, 첫 STOP 문장 동일.
+STOP 기록 전체(G0-8 8 건, A-1-v4 22 건)의 문장도 이전 보고와 같다 — 모두 E1 이고 E1 에는 숫자 뒤 조사 자리가 없다

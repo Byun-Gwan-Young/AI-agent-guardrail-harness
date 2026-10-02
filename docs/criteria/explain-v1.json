@@ -4,16 +4,16 @@
   "templates": {
     "E1": "최근 {n} step 동안 {roles} 모두 {signals:이/가} 없습니다. 통과 테스트 {pass}/{total}.",
     "E1-T1": "최근 {n} step 동안 {roles} 모두 {signals:이/가} 없습니다. 처리 상태 '{status}'.",
-    "E2": "{path} 파일이 step {k} 의 내용으로 되돌아갔고, 통과 테스트는 {m} step 동안 {pass}/{total} 입니다.",
-    "E3": "step {a} 이후 {m} step 동안 파일이 {c} 번 바뀌었지만 통과 테스트는 {pass}/{total} 에서 늘지 않았습니다.",
+    "E2": "{path} 파일이 step {k}의 내용으로 되돌아갔고, 통과 테스트는 {m} step 동안 {pass}/{total}입니다.",
+    "E3": "step {a} 이후 {m} step 동안 파일이 {c} 번 바뀌었지만 통과 테스트는 {pass}/{total}에서 늘지 않았습니다.",
     "E4": "{role_a:과/와} {role_b:이/가} 문의를 서로 {h} 번 넘겼고 처리 상태는 '{status}'에서 바뀌지 않았습니다.",
-    "E5": "최근 {n} step 동안 채택 항목이 {adopted}/{required} 에서 늘지 않았고 처리 상태는 '{status}'입니다.",
-    "E6": "step {d} 에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 통과 테스트 {pass}/{total}.",
+    "E5": "최근 {n} step 동안 채택 항목이 {adopted}/{required}에서 늘지 않았고 처리 상태는 '{status}'입니다.",
+    "E6": "step {d}에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 통과 테스트 {pass}/{total}.",
     "E7": "최근 {n} step 중 {o} step 은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다."
   },
   "variants": {
     "E6": {
-      "dialogue": "step {d} 에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 처리 상태는 '{status}'입니다."
+      "dialogue": "step {d}에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 처리 상태는 '{status}'입니다."
     }
   },
   "selection_order": [
@@ -106,5 +106,50 @@
     "은/는",
     "을/를"
   ],
-  "templates_sha256": "932ff49ab2e09966aa78f219089c6d7cf305c527a73efa02e513944773c55aff"
+  "digits_with_final_consonant": "013678",
+  "required_values": {
+    "E1": [],
+    "E1-T1": [
+      "n",
+      "roles",
+      "signals"
+    ],
+    "E2": [
+      "path",
+      "k"
+    ],
+    "E3": [
+      "a",
+      "m",
+      "c"
+    ],
+    "E4": [
+      "role_a",
+      "role_b",
+      "h"
+    ],
+    "E5": [
+      "n",
+      "adopted",
+      "required"
+    ],
+    "E6": [
+      "d",
+      "n"
+    ],
+    "E7": [
+      "n",
+      "o"
+    ]
+  },
+  "reduced_templates": {
+    "E1-T1": "최근 {n} step 동안 {roles} 모두 {signals:이/가} 없습니다.",
+    "E2": "{path} 파일이 step {k}의 내용으로 되돌아갔습니다.",
+    "E3": "step {a} 이후 {m} step 동안 파일이 {c} 번 바뀌었지만 통과 테스트는 늘지 않았습니다.",
+    "E4": "{role_a:과/와} {role_b:이/가} 문의를 서로 {h} 번 넘겼습니다.",
+    "E5": "최근 {n} step 동안 채택 항목이 {adopted}/{required}에서 늘지 않았습니다.",
+    "E6": "step {d}에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다."
+  },
+  "fallback": "E1",
+  "templates_sha256": "485aec746740f6ecf59126fe122b6e210c6048515a186057f7146b6327800ac8"
 }

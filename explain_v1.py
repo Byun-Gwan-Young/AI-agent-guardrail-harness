@@ -9,7 +9,11 @@ role and status display names, the E5 required count (DM-29) and the selected me
 "(측정 안 됨)" remain. DM-36: a particle after a name slot is written in the template as "{slot:받침형/모음형}" and
 attached to the name by the DM-31 final-consonant rule. DM-42: after a quoted status name a particle or '입니다' is
 attached with no space, and a path slot reads "{path} 파일이". DM-43: E4 is chosen only when both role names and the
-round-trip count are known; otherwise selection moves on to the next template.
+round-trip count are known; otherwise selection moves on to the next template. DM-49: a particle or '입니다' after a
+number is attached too ("step 1의", "12/16입니다"); number units keep their space ("3 step", "5 번"), and a particle
+that follows a final consonant is chosen by the number read aloud. DM-50: each template has required values (without
+one, selection moves on to the next template) and auxiliary values (without one, its phrase is left out: the
+REDUCED sentence). "(측정 안 됨)" is written only in the last fallback E1.
 """
 VERSION = "explain-v1"
 UNMEASURED = "(측정 안 됨)"
@@ -18,20 +22,39 @@ TEMPLATES = {
     "E1": "최근 {n} step 동안 {roles} 모두 {signals:이/가} 없습니다. 통과 테스트 {pass}/{total}.",
     # DM-27: E1 for a session with no test observation (T1 dialogue task) reports the dialogue signals instead.
     "E1-T1": "최근 {n} step 동안 {roles} 모두 {signals:이/가} 없습니다. 처리 상태 '{status}'.",
-    "E2": "{path} 파일이 step {k} 의 내용으로 되돌아갔고, 통과 테스트는 {m} step 동안 {pass}/{total} 입니다.",
-    "E3": "step {a} 이후 {m} step 동안 파일이 {c} 번 바뀌었지만 통과 테스트는 {pass}/{total} 에서 늘지 않았습니다.",
+    # DM-49: what follows a number is attached to it ("step 1의", "12/16입니다", "12/16에서", "step 4에").
+    "E2": "{path} 파일이 step {k}의 내용으로 되돌아갔고, 통과 테스트는 {m} step 동안 {pass}/{total}입니다.",
+    "E3": "step {a} 이후 {m} step 동안 파일이 {c} 번 바뀌었지만 통과 테스트는 {pass}/{total}에서 늘지 않았습니다.",
     # DM-36: the particles after the two role names follow the names ("환불 담당과 배송 담당이").
     # DM-42: what follows a quoted status name is attached to it ("'접수'에서", "'분류'입니다").
     "E4": "{role_a:과/와} {role_b:이/가} 문의를 서로 {h} 번 넘겼고 처리 상태는 '{status}'에서 바뀌지 않았습니다.",
-    "E5": "최근 {n} step 동안 채택 항목이 {adopted}/{required} 에서 늘지 않았고 처리 상태는 '{status}'입니다.",
-    "E6": "step {d} 에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 통과 테스트 {pass}/{total}.",
+    "E5": "최근 {n} step 동안 채택 항목이 {adopted}/{required}에서 늘지 않았고 처리 상태는 '{status}'입니다.",
+    "E6": "step {d}에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 통과 테스트 {pass}/{total}.",
     "E7": "최근 {n} step 중 {o} step 은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다.",
 }
 # E6 for a dialogue (T1) task: the second sentence reports the status instead of tests.
-E6_DIALOGUE = "step {d} 에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 처리 상태는 '{status}'입니다."
+E6_DIALOGUE = "step {d}에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 처리 상태는 '{status}'입니다."
+# DM-50: a template is chosen only with all of its required values. Every other value of a template is auxiliary.
+# E1 is the last fallback and has none: it alone writes "(측정 안 됨)".
+FALLBACK = "E1"
+REQUIRED_VALUES = {"E1": (), "E1-T1": ("n", "roles", "signals"), "E2": ("path", "k"), "E3": ("a", "m", "c"),
+                   "E4": ("role_a", "role_b", "h"), "E5": ("n", "adopted", "required"), "E6": ("d", "n"),
+                   "E7": ("n", "o")}
+# DM-50: the sentence without the auxiliary phrase, used when any auxiliary value is missing (both E6 forms).
+REDUCED = {
+    "E1-T1": "최근 {n} step 동안 {roles} 모두 {signals:이/가} 없습니다.",
+    "E2": "{path} 파일이 step {k}의 내용으로 되돌아갔습니다.",
+    "E3": "step {a} 이후 {m} step 동안 파일이 {c} 번 바뀌었지만 통과 테스트는 늘지 않았습니다.",
+    "E4": "{role_a:과/와} {role_b:이/가} 문의를 서로 {h} 번 넘겼습니다.",
+    "E5": "최근 {n} step 동안 채택 항목이 {adopted}/{required}에서 늘지 않았습니다.",
+    "E6": "step {d}에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다.",
+}
 STOP_DECISIONS = ("deadlock", "termination_failure")
 # DM-31, DM-36: particle pairs a template may attach to a slot, as "after a final consonant/otherwise".
 PARTICLES = ("과/와", "이/가", "은/는", "을/를")
+# DM-49: the last digit of a number, read aloud, decides the particle.
+DIGITS = "0123456789"
+DIGITS_WITH_FINAL_CONSONANT = "013678"
 # DM-31: the signal each selected progress metric reports, in sentence order. An unselected metric is never named.
 SIGNAL_PHRASES = (("artifact.files_changed", "산출물 변경"), ("artifact.test_pass_count", "테스트 증가"),
                   ("artifact.build_status", "빌드 상태 변화"), ("conversation.status_advance", "처리 상태 변화"),
@@ -40,7 +63,8 @@ SIGNAL_PHRASES = (("artifact.files_changed", "산출물 변경"), ("artifact.tes
                   ("conversation.new_info_ratio", "새 정보"))
 # Records made before DM-31 carry no selection; they rebuild with the sentence they were made with.
 UNRECORDED_SELECTION = {"E1": ["산출물 변경", "테스트 증가", "새 쟁점"], "E1-T1": ["처리 상태 변화", "채택 항목", "새 쟁점"]}
-# demo-block-and-explanation.md 2-3 plus DM-27: the first template whose condition holds. Exactly one.
+# demo-block-and-explanation.md 2-3 plus DM-27: the first template whose condition holds and, DM-50, whose required
+# values are all there. Exactly one.
 SELECTION_ORDER = (("E6", "termination_failure"), ("E2", "global_revert_in_streak"),
                    ("E3", "test_plateau_in_streak"), ("E4", "handoff_pair_and_count_at_or_above_threshold"),
                    ("E5", "adopted_items_selected"), ("E7", "oscillating_in_streak"),
@@ -121,8 +145,25 @@ def condition_holds(name, signals):
     }[name]()
 
 
+def choose(signals, role_labels=None, status_labels=None):
+    """(template ID, its values, the earlier templates whose condition held but a required value was missing).
+
+    DM-50: the first template in SELECTION_ORDER whose condition holds and whose required values are all there.
+    A display name never makes a value missing, so the choice depends on the signal values only."""
+    skipped = []
+    for template_id, name in SELECTION_ORDER:
+        if not condition_holds(name, signals):
+            continue
+        values = template_values(template_id, signals, role_labels, status_labels)
+        missing = [k for k in REQUIRED_VALUES[template_id] if values[k] is None]
+        if not missing:
+            return template_id, values, skipped
+        skipped.append({"template_id": template_id, "missing_required": missing})
+    raise AssertionError("the fallback E1 has no condition and no required value")
+
+
 def select(signals):
-    return next(template_id for template_id, name in SELECTION_ORDER if condition_holds(name, signals))
+    return choose(signals)[0]
 
 
 def checked_labels(labels):
@@ -140,7 +181,25 @@ def explain(signals, role_labels=None, status_labels=None):
 
     explain(record['signals'], record['role_labels'], record['status_labels']) rebuilds it.
     """
-    template_id = select(signals)
+    template_id, values, skipped = choose(signals, role_labels, status_labels)
+    # DM-50: a missing auxiliary value leaves its phrase out; only the fallback E1 writes "(측정 안 됨)".
+    reduced = template_id != FALLBACK and any(values[k] is None for k in values
+                                              if k not in REQUIRED_VALUES[template_id])
+    if reduced:
+        template = REDUCED[template_id]
+    else:
+        template = (E6_DIALOGUE if template_id == "E6" and signals.get("task_kind") == "dialogue"
+                    else TEMPLATES[template_id])
+    text = template.format_map({k: Slot(render(v)) for k, v in values.items()})
+    return {"explanation_version": VERSION, "template_id": template_id, "text": text, "values": values,
+            "missing_values": sorted(k for k, v in values.items() if v is None),
+            "form": "fallback" if template_id == FALLBACK else "reduced" if reduced else "full",
+            "skipped_templates": skipped,
+            "signals": signals, "role_labels": role_labels, "status_labels": status_labels}
+
+
+def template_values(template_id, signals, role_labels=None, status_labels=None):
+    """The values a template writes, display names applied; None where a value was not measured."""
     labels, status_names = checked_labels(role_labels), checked_labels(status_labels)
     def role(value):
         return labels.get(value, value) if value is not None else None
@@ -153,7 +212,7 @@ def explain(signals, role_labels=None, status_labels=None):
     states = signals.get("consecutive_states")
     tests = {"pass": signals.get("test_pass_count"), "total": signals.get("test_total_count")}
     absent = signal_phrases(signals.get("selected_metrics"), template_id)
-    values = {
+    return {
         "E1": {"n": signals.get("consecutive_steps"), "roles": roles or None, "signals": absent, **tests},
         "E1-T1": {"n": signals.get("consecutive_steps"), "roles": roles or None, "signals": absent,
                   "status": status},
@@ -169,11 +228,6 @@ def explain(signals, role_labels=None, status_labels=None):
         "E7": {"n": signals.get("consecutive_steps"),
                "o": states.count("oscillating") if isinstance(states, list) else None},
     }[template_id]
-    template = E6_DIALOGUE if template_id == "E6" and signals.get("task_kind") == "dialogue" else TEMPLATES[template_id]
-    text = template.format_map({k: Slot(render(v)) for k, v in values.items()})
-    return {"explanation_version": VERSION, "template_id": template_id, "text": text, "values": values,
-            "missing_values": sorted(k for k, v in values.items() if v is None),
-            "signals": signals, "role_labels": role_labels, "status_labels": status_labels}
 
 
 def signal_phrases(selected, template_id):
@@ -187,9 +241,11 @@ def signal_phrases(selected, template_id):
 
 
 def has_final_consonant(text):
-    """DM-31: the last character is a Hangul syllable with a final consonant. Anything else (a role ID such as
-    "refund", digits) counts as no final consonant."""
+    """DM-31: the last character is a Hangul syllable with a final consonant. DM-49: a last digit is read aloud, and
+    0, 1, 3, 6, 7, 8 (영 일 삼 육 칠 팔) end in one. Anything else (a role ID such as "refund") counts as none."""
     last = text[-1] if text else ""
+    if last in DIGITS:
+        return last in DIGITS_WITH_FINAL_CONSONANT
     return "가" <= last <= "힣" and (ord(last) - 0xAC00) % 28 != 0
 
 

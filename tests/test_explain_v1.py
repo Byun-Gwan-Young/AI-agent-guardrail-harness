@@ -49,19 +49,19 @@ class TemplateTests(unittest.TestCase):
                               "통과 테스트 7/16."),
             "E2": (signals(global_revert={"step": 6, "paths": ["src/x.py"], "revert_to_step": 4}, steps_since_test_max=6,
                            test_pass_count=12),
-                   "src/x.py 파일이 step 4 의 내용으로 되돌아갔고, 통과 테스트는 6 step 동안 12/16 입니다."),
+                   "src/x.py 파일이 step 4의 내용으로 되돌아갔고, 통과 테스트는 6 step 동안 12/16입니다."),
             "E3": (signals(test_plateau_in_streak=True, test_max_step=3, steps_since_test_max=9,
                            file_state_changes_since_test_max=5),
-                   "step 3 이후 9 step 동안 파일이 5 번 바뀌었지만 통과 테스트는 7/16 에서 늘지 않았습니다."),
+                   "step 3 이후 9 step 동안 파일이 5 번 바뀌었지만 통과 테스트는 7/16에서 늘지 않았습니다."),
             "E4": (signals(task_kind="dialogue", status="triage",
                            handoff={"roles": ["refund", "shipping"], "count": 4, "at_or_above_threshold": True}),
                    # DM-36: particles attach to the names; an ID (no Hangul) takes the no-final-consonant form.
                    "refund와 shipping가 문의를 서로 4 번 넘겼고 처리 상태는 'triage'에서 바뀌지 않았습니다."),
             "E5": (signals(task_kind="dialogue", status="triage", adopted_metric_selected=True, adopted_count=2,
                            adopted_required=6),
-                   "최근 3 step 동안 채택 항목이 2/6 에서 늘지 않았고 처리 상태는 'triage'입니다."),
+                   "최근 3 step 동안 채택 항목이 2/6에서 늘지 않았고 처리 상태는 'triage'입니다."),
             "E6": (signals(decision="termination_failure", declared_step=5),
-                   "step 5 에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 통과 테스트 7/16."),
+                   "step 5에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 통과 테스트 7/16."),
             "E7": (signals(consecutive_states=["stagnant", "oscillating", "stagnant"]),
                    "최근 3 step 중 1 step 은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다."),
             "E1-T1": (signals(task_kind="dialogue", status="received", test_observed_in_session=False,
@@ -77,16 +77,18 @@ class TemplateTests(unittest.TestCase):
                 self.assertEqual(result["missing_values"], [])
         dialogue_e6 = explain(signals(decision="termination_failure", declared_step=5, task_kind="dialogue",
                                       status="assigned"))
-        self.assertEqual(dialogue_e6["text"], "step 5 에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. "
+        self.assertEqual(dialogue_e6["text"], "step 5에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. "
                                               "처리 상태는 'assigned'입니다.")
 
     def test_placeholders_match_recorded_values(self):
         for template_id, template in list(TEMPLATES.items()) + [("E6", E6_DIALOGUE)]:
             fields = {f for _, f, _, _ in string.Formatter().parse(template) if f}
             kind = "dialogue" if template is E6_DIALOGUE else "artifact"
+            # DM-50: each forced template gets its required values, or selection would move on.
             forced = {"E1": {}, "E2": {"global_revert": {"paths": ["a"], "revert_to_step": 1}},
                       "E3": {"test_plateau_in_streak": True}, "E4": {"handoff": {"roles": ["a", "b"], "count": 9}},
-                      "E5": {"adopted_metric_selected": True}, "E6": {"decision": "termination_failure"},
+                      "E5": {"adopted_metric_selected": True, "adopted_count": 1, "adopted_required": 3},
+                      "E6": {"decision": "termination_failure", "declared_step": 4},
                       "E7": {"consecutive_states": ["oscillating"]},
                       "E1-T1": {"test_observed_in_session": False}}[template_id]
             with self.subTest(template=template_id, kind=kind):
@@ -99,15 +101,18 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual(result["text"], f"최근 3 step 동안 {UNMEASURED} 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. "
                                          f"통과 테스트 {UNMEASURED}/{UNMEASURED}.")
         self.assertEqual(result["missing_values"], ["pass", "roles", "total"])
+        # DM-50: E5 without its required count is not chosen; "(측정 안 됨)" stays in the fallback E1.
         e5 = explain(signals(task_kind="dialogue", adopted_metric_selected=True, adopted_count=1, status="triage"))
-        self.assertIn(f"1/{UNMEASURED}", e5["text"])
-        self.assertEqual(e5["missing_values"], ["required"])
+        self.assertEqual((e5["template_id"], e5["skipped_templates"]),
+                         ("E1", [{"template_id": "E5", "missing_required": ["required"]}]))
+        self.assertNotIn(f"1/{UNMEASURED}", e5["text"])
 
     def test_selection_order(self):
         handoff = {"roles": ["a", "b"], "count": 4}
         everything = signals(decision="termination_failure", global_revert={"paths": ["f"], "revert_to_step": 1},
                              test_plateau_in_streak=True, handoff=handoff, adopted_metric_selected=True,
-                             consecutive_states=["oscillating"] * 3, test_observed_in_session=False)
+                             consecutive_states=["oscillating"] * 3, test_observed_in_session=False,
+                             declared_step=5, adopted_count=1, adopted_required=3)
         order = ["E6", "E2", "E3", "E4", "E5", "E7", "E1-T1", "E1"]
         self.assertEqual([t for t, _ in SELECTION_ORDER], order)
         removals = [{"decision": "deadlock"}, {"global_revert": None}, {"test_plateau_in_streak": False},
@@ -145,23 +150,30 @@ class StopRecordTests(unittest.TestCase):
         record = stop_record(rows)
         self.assertEqual(record["criteria"]["first_deadlock_step"], 8)
         self.assertEqual(record["criteria"]["explanation"]["text"],
-                         "code.py 파일이 step 4 의 내용으로 되돌아갔고, 통과 테스트는 7 step 동안 7/16 입니다.")
+                         "code.py 파일이 step 4의 내용으로 되돌아갔고, 통과 테스트는 7 step 동안 7/16입니다.")
 
     def test_t3_plateau_gives_e3(self):
         rows = replay([artifact_obs(s, {"code.py": f"v{s}"}) for s in range(1, 11)], configured())
         self.assertEqual(rows[-1]["criteria"]["explanation"]["text"],
-                         "step 1 이후 9 step 동안 파일이 9 번 바뀌었지만 통과 테스트는 7/16 에서 늘지 않았습니다.")
+                         "step 1 이후 9 step 동안 파일이 9 번 바뀌었지만 통과 테스트는 7/16에서 늘지 않았습니다.")
 
     def test_t1_handoff_gives_e4_and_adopted_stagnation_gives_e5(self):
         agents = ["refund", "shipping"] * 3
         rows = replay([dialogue(s, agent=a, handoff=agents[s]) for s, a in enumerate(agents[:5], 1)], configured(), REG)
         self.assertEqual(rows[-1]["criteria"]["explanation"]["text"],
                          "refund와 shipping가 문의를 서로 5 번 넘겼고 처리 상태는 'received'에서 바뀌지 않았습니다.")
+        rows = replay([dialogue(s, status="triage", adopted=["a"]) for s in range(1, 7)], configured(),
+                      t1_registration(required=3))
+        explanation = rows[-1]["criteria"]["explanation"]
+        self.assertEqual(explanation["text"], "최근 3 step 동안 채택 항목이 1/3에서 늘지 않았고 처리 상태는 'triage'입니다.")
+        self.assertEqual(explanation["missing_values"], [])
+        # DM-50: without the registered required count E5 is skipped (it used to write "1/(측정 안 됨) 에서").
         rows = replay([dialogue(s, status="triage", adopted=["a"]) for s in range(1, 7)], configured(), REG)
         explanation = rows[-1]["criteria"]["explanation"]
-        self.assertEqual(explanation["text"],
-                         f"최근 3 step 동안 채택 항목이 1/{UNMEASURED} 에서 늘지 않았고 처리 상태는 'triage'입니다.")
-        self.assertEqual(explanation["missing_values"], ["required"])
+        self.assertEqual((explanation["template_id"], explanation["skipped_templates"]),
+                         ("E1-T1", [{"template_id": "E5", "missing_required": ["required"]}]))
+        self.assertEqual(explanation["text"], "최근 3 step 동안 planner·developer·reviewer 모두 처리 상태 변화·채택 항목·"
+                                              "새 쟁점이 없습니다. 처리 상태 'triage'.")
 
     def test_termination_failure_gives_e6_in_both_forms(self):
         inputs = [artifact_obs(s, {"code.py": "same"}) for s in range(1, 8)]
@@ -169,11 +181,11 @@ class StopRecordTests(unittest.TestCase):
         rows = replay(inputs, configured())
         self.assertEqual(rows[-1]["criteria"]["decision"], "termination_failure")
         self.assertEqual(rows[-1]["criteria"]["explanation"]["text"],
-                         "step 4 에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 통과 테스트 7/16.")
+                         "step 4에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 통과 테스트 7/16.")
         talk = [dialogue(s) for s in range(1, 8)]
         rows = replay(talk[:3] + [declared(o, 4) for o in talk[3:]], configured(), REG)
         self.assertEqual(rows[-1]["criteria"]["explanation"]["text"],
-                         "step 4 에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 'received'입니다.")
+                         "step 4에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 'received'입니다.")
 
     def test_oscillation_in_streak_gives_e7(self):
         issues = [["a", "b"], ["a"], ["a"], ["a"], ["a"], ["a"], ["a", "b"]]

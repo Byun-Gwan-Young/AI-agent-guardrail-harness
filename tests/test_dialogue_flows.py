@@ -58,7 +58,7 @@ class StallTests(unittest.IsolatedAsyncioTestCase):
                            scenario_changes={"turn_order": "fixed"}, max_steps=6, tests=self)
         stop = run["session"]["observations"][5]["criteria"]["explanation"]
         self.assertEqual((stop["template_id"], stop["text"]),
-                         ("E5", "최근 3 step 동안 채택 항목이 1/3 에서 늘지 않았고 처리 상태는 '분류'입니다."))
+                         ("E5", "최근 3 step 동안 채택 항목이 1/3에서 늘지 않았고 처리 상태는 '분류'입니다."))
 
     async def test_block_refuses_the_next_request_and_ends_with_guardrail_stop(self):
         run = await run_t1([report("received") for _ in range(8)], config=BLOCK_CONFIG, scenario_changes=STALL,

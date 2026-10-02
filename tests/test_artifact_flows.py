@@ -93,7 +93,7 @@ class T3FlowTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(decisions(run).index("deadlock"), 10)
         stop = observations[10]["criteria"]["explanation"]
         self.assertEqual((stop["template_id"], stop["text"]),
-                         ("E2", "src/task_query.py 파일이 step 1 의 내용으로 되돌아갔고, 통과 테스트는 9 step 동안 7/16 입니다."))
+                         ("E2", "src/task_query.py 파일이 step 1의 내용으로 되돌아갔고, 통과 테스트는 9 step 동안 7/16입니다."))
         self.assertEqual(run["summary"]["termination_reason"], "max_steps")
 
     async def test_a_role_returning_to_its_own_earlier_file_is_not_progress(self):
@@ -113,7 +113,7 @@ class T3FlowTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([o["progress"]["t3"]["applied"] for o in observations[8:]], ["test_plateau"] * 3)
         stop = first_stop(run)
         self.assertEqual((stop["step_id"], stop["criteria"]["explanation"]["text"]),
-                         (11, "step 2 이후 9 step 동안 파일이 3 번 바뀌었지만 통과 테스트는 8/16 에서 늘지 않았습니다."))
+                         (11, "step 2 이후 9 step 동안 파일이 3 번 바뀌었지만 통과 테스트는 8/16에서 늘지 않았습니다."))
 
 
 if __name__ == "__main__":
