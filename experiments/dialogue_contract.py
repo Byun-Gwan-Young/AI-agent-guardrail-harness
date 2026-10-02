@@ -3,6 +3,9 @@
 v2 is unchanged and reused as is: the v2 fields are parsed by the v2 contract, with its codes. The v3 fields are
 status (closed list, sent to the provider as an enum), handoff_to, adopted_items, deliverable and spec_approved.
 Only facts go into the instructions; no advice on what to report (C-9 principle).
+
+A scenario-v2 artifact task (T2/T3, C-17-5) that picks v3 (DM-37) reports the v2 fields plus spec_approved only
+(ArtifactContract): it has no status list, deliverable schema or router, so the other v3 fields cannot be defined.
 """
 import copy
 from dataclasses import dataclass
@@ -123,6 +126,85 @@ class DialogueContract:
     def report(self, parsed):
         return {'output_contract_version': V3, 'allowed_issues_sha256': self.sha256,
                 'unlisted_issues': parsed['unlisted_issues'] if parsed is not None else None}
+
+
+APPROVAL_FIELD = 'spec_approved'
+
+
+@dataclass(frozen=True)
+class ArtifactContract:
+    """output-contract-v3 of a scenario-v2 artifact task: the v2 report plus spec_approved (bool or null).
+
+    approval is (approving role, spec path) of the scenario's write gate, or None without one; it only changes the
+    fact sentence about spec_approved. The v2 fields are parsed by the v2 contract, with its codes.
+    """
+    allowed: tuple[tuple[str, str], ...]
+    approval: tuple[str, str] | None = None
+    version: str = V3
+    task_kind: str = 'artifact'
+
+    @property
+    def issues(self):
+        return IssueContract(V2, self.allowed)
+
+    @property
+    def sha256(self):
+        """Allowed issues hash, as in v2, so IssueReport keeps one meaning."""
+        return self.issues.sha256
+
+    @property
+    def contract_sha256(self):
+        canonical = json.dumps({'allowed_issues_sha256': self.sha256, 'task_kind': self.task_kind,
+                                'fields': [APPROVAL_FIELD], 'approval': self.approval},
+                               ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+        return hashlib.sha256(canonical.encode('utf-8')).hexdigest()
+
+    def schema(self):
+        schema = copy.deepcopy(self.issues.schema())
+        schema['properties'][APPROVAL_FIELD] = nullable({'type': 'boolean'})
+        schema['required'] = schema['required'] + [APPROVAL_FIELD]
+        schema['title'] = 'AgentOutputV3Artifact'
+        return schema
+
+    def response_format(self):
+        return {'type': 'json_schema', 'json_schema': {'name': 'state_report_v3_artifact', 'strict': True,
+                                                       'schema': self.schema()}}
+
+    def parse(self, text):
+        if text.startswith('```') and text.rstrip().endswith('```'):
+            text = '\n'.join(text.strip().splitlines()[1:-1])
+        data = json.loads(text)
+        if not isinstance(data, dict):
+            raise ValueError('Final report must be a JSON object')
+        if APPROVAL_FIELD not in data:
+            raise ValueError('Missing output-contract-v3 field: ' + APPROVAL_FIELD)
+        approved = data.pop(APPROVAL_FIELD)
+        if approved is not None and not isinstance(approved, bool):
+            raise ValueError('spec_approved must be true, false or null')
+        value = self.issues.parse(json.dumps(data, ensure_ascii=False))
+        return {**value, APPROVAL_FIELD: approved}
+
+    def instructions(self):
+        if self.approval is None:
+            return self.issues.instructions() + ' spec_approved is null unless the scenario has an approval rule.'
+        approver, spec = self.approval
+        return (self.issues.instructions() + ' Report spec_approved as true, false or null. Only the spec_approved '
+                'of role ' + approver + ' is read: true from that role approves ' + spec + ' under the approval rule.')
+
+    def report(self, parsed):
+        return {'output_contract_version': V3, 'allowed_issues_sha256': self.sha256,
+                'unlisted_issues': parsed['unlisted_issues'] if parsed is not None else None}
+
+
+def for_artifact_scenario(scenario):
+    """The output contract a scenario-v2 artifact task picks (DM-37): v2 as is, or the artifact form of v3."""
+    if getattr(scenario, 'schema_version', None) != 'scenario-v2' or scenario.task_kind != 'artifact':
+        raise ValueError('for_artifact_scenario is for scenario-v2 artifact tasks')
+    allowed = tuple((i.id, i.definition) for i in scenario.allowed_issues)
+    if scenario.output_contract == V2:
+        return IssueContract(V2, allowed)
+    gate = getattr(scenario, 'write_gate', None)
+    return ArtifactContract(allowed, (gate.set_by, gate.spec_path) if gate is not None else None)
 
 
 def for_dialogue_scenario(scenario):

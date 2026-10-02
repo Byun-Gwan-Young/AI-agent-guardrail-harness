@@ -35,7 +35,7 @@ def artifact_data():
     for agent in data["agents"]:
         agent["tools"] = [t for p in agent.pop("permissions") for t in TOOLS[p]]
     return {**data, "schema_version": "scenario-v2", "scenario_id": "TEST-T3-v2", "task_kind": "artifact",
-            "turn_order": "fixed", "criteria_version": "deadlock-v0.3"}
+            "turn_order": "fixed", "criteria_version": "deadlock-v0.3", "output_contract": "output-contract-v2"}
 
 
 def t1_observation(step, status="triage", adopted=("a",), issues=("requirements",), handoff=None):
@@ -113,6 +113,7 @@ class ScenarioV2Tests(unittest.TestCase):
             "status list": lambda d: d.update(status_values=[{"id": "a", "label": "b"}]),
             "writable without write tool": lambda d: d["agents"][2].update(writable_paths=["SPEC.md"]),
             "no tests": lambda d: d.pop("success_criteria"),
+            "no output contract (DM-37)": lambda d: d.pop("output_contract"),
         }
         for name, change in cases.items():
             with self.subTest(case=name), self.assertRaises(ValidationError):
@@ -124,15 +125,15 @@ class ScenarioV2Tests(unittest.TestCase):
 
 
 class RunnerRefusalTests(unittest.IsolatedAsyncioTestCase):
-    async def test_runner_refuses_scenario_v2_artifact_tasks_before_anything_else(self):
-        # C-17-4 runs scenario-v2 dialogue tasks; artifact tasks stay refused until C-17-5 (DM-39).
+    async def test_an_artifact_task_without_its_run_options_fails_before_a_run_folder(self):
+        # C-17-5 runs scenario-v2 artifact tasks (DM-39); the contract the scenario names must be stated (DM-37).
         import experiments.run_scenario as runner
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "artifact.yaml"
             path.write_text(yaml.safe_dump(artifact_data(), allow_unicode=True), encoding="utf-8")
             output = Path(directory) / "runs"
             args = SimpleNamespace(scenario=path, output_root=output)
-            with self.assertRaisesRegex(ValueError, "scenario-v2 artifact tasks are not runnable"):
+            with self.assertRaisesRegex(ValueError, "run it with --output-contract output-contract-v2"):
                 await runner.run(args)
             self.assertFalse(output.exists())
 

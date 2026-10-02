@@ -489,8 +489,9 @@ def v05_fields(result, conditions, log):
 
 
 def v06_fields(result, conditions, summary, log):
-    """session-manifest-v0.6 = v0.5 + a scenario-v2 dialogue (T1) run (C-17-4): the session registration and its
-    hash, the output contract, vocabulary violations, routing and how the run ended. Earlier sessions keep theirs."""
+    """session-manifest-v0.6 = v0.5 + a scenario-v2 run: the session registration and its hash, the output contract
+    and vocabulary violations. A dialogue (T1, C-17-4) run adds routing and how it ended; an artifact (T2/T3, C-17-5)
+    run keeps the acceptance-test judgement of v0.3. Earlier sessions keep theirs."""
     registration = conditions.get('registration')
     observations = log['observations']
     result['manifest_version'] = 'session-manifest-v0.6'
@@ -506,6 +507,8 @@ def v06_fields(result, conditions, summary, log):
     result['vocabulary_violations'] = {'total': summary.get('vocabulary_violations_total'),
                                        'steps': summary.get('vocabulary_violation_steps'),
                                        'excluded_from_strict_failure_streak': True}
+    if conditions.get('task_kind') != 'dialogue':
+        return result
     # DM-46: escalated is the one terminal status, so the termination reason already names it; who escalated is kept.
     result['run'].update(final_status=summary.get('final_status'), escalated_by=summary.get('escalated_by'))
     result['judgement'] = {'before': None, 'after': {'gate': summary.get('completion_gate'),
@@ -537,8 +540,8 @@ def manifest(a, phase, notes):
         if 'guardrail_mode' not in log['meta']:
             return result
         result = v05_fields(result, conditions, log)
-        # v0.6 for scenario-v2 dialogue runs (C-17-4 onward).
-        if conditions.get('task_kind') != 'dialogue':
+        # v0.6 for scenario-v2 runs: dialogue (C-17-4 onward) and artifact (C-17-5 onward) tasks.
+        if conditions.get('task_kind') not in ('dialogue', 'artifact'):
             return result
         return v06_fields(result, conditions, load(run_dir(a['session_id']) / 'summary.json'), log)
     if a['conditions']['runner_protocol'] in (PROTOCOL_V8, PROTOCOL_V9, PROTOCOL_V10):

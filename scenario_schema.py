@@ -217,6 +217,9 @@ class ScenarioV2(Definition):
     criteria_version: Literal["deadlock-v0.3"]
     initial_issue_ids: list[str] = Field(default_factory=list)
     allowed_issues: list[AllowedIssue] = Field(min_length=1)
+    # DM-37: an artifact task picks its output contract (CT: v3 for spec_approved; CT-N and CL: v2, as A-1-v4).
+    # A dialogue task always reports output-contract-v3; the field may be left out there.
+    output_contract: Literal["output-contract-v2", "output-contract-v3"] | None = None
     # artifact tasks (T2/T3): the scenario-v1 acceptance fixture
     success_criteria: SuccessCriteria | None = None
     fixture_dir: str | None = None
@@ -261,6 +264,8 @@ class ScenarioV2(Definition):
     def dialogue_rules(self):
         if self.progress_source != "conversation":
             raise ValueError("A dialogue task is judged on the conversation only")
+        if self.output_contract not in (None, "output-contract-v3"):
+            raise ValueError("A dialogue task reports output-contract-v3")
         if self.success_criteria is not None or self.fixture_dir is not None or self.monitored_paths:
             raise ValueError("A dialogue task has no acceptance tests, fixture or monitored files")
         for agent in self.agents:
@@ -293,6 +298,8 @@ class ScenarioV2(Definition):
             raise ValueError("An artifact task needs an artifact source and a fixture")
         if self.success_criteria is None or self.success_criteria.kind != "tests":
             raise ValueError("An artifact task needs executable acceptance tests")
+        if self.output_contract is None:
+            raise ValueError("An artifact task names its output_contract (DM-37)")
         if self.progress_metric.uses_t1():
             raise ValueError("T1 metrics belong to dialogue tasks")
         if self.turn_order != "fixed":

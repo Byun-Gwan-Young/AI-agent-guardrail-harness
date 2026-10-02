@@ -3,6 +3,8 @@
 설계 `docs/design/demo-runner-extension.md` 2·4 절, 작업 단위 `demo-work-plan.md` 17-4. 13 장 DM-26·DM-29·DM-30~DM-35 가 우선한다.
 이 단위는 **정의와 검증만** 만든다. 실행기의 T1 차례 진행·라우터·도구는 다음 단위다 (실행기는 scenario-v2 를 실행 전 오류로 거절).
 → C-17-4 부터 scenario-v2 **대화 과제**는 실행한다 (등록 전송·계약 v3·어휘 위반·라우터, `docs/decisions/016`). 산출물 과제는 C-17-5 까지 거절.
+→ C-17-5 부터 scenario-v2 **산출물 과제**도 실행한다 (`docs/decisions/017`). 산출물 과제는 `output_contract` 로 계약을 고르고 (DM-37),
+  v3 를 고르면 v2 필드 + `spec_approved` 만 보고한다
 
 ## scenario-v2 (`scenario_schema.ScenarioV2`)
 

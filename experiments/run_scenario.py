@@ -17,7 +17,7 @@ import httpx
 from pydantic import BaseModel, ConfigDict
 from progress_schema import Conversation
 from artifact_hook import capture_artifact, make_observation, submit_observation
-from scenario_schema import load_scenario
+from scenario_schema import load_scenario, registration_for
 from scenario_checks import check_acceptance
 from suite_identity import compute_test_suite_id
 from experiments.step_execution import (FINAL_REASONING_EFFORT, NO_OUTPUT_PLACEHOLDER, PROTOCOL_V7, PROTOCOL_V8,
@@ -26,7 +26,7 @@ from experiments.step_execution import (FINAL_REASONING_EFFORT, NO_OUTPUT_PLACEH
 from experiments.output_contract import AgentOutput, parse_output
 from experiments.issue_contract import (IssueContract, V1, V2, VERSIONS, PROTOCOL_V2, VOCABULARY_VIOLATIONS,
                                         for_scenario)
-from experiments.dialogue_contract import V3
+from experiments.dialogue_contract import V3, for_artifact_scenario
 from experiments.step_execution import StrictFailureStreak
 from experiments.observation_collection import (DEFAULT_POLICY, INDEPENDENT, LEGACY, PROTOCOLS,
     unavailable, validate_final_response, select_sources, collection_metadata)
@@ -37,6 +37,11 @@ def save(path, value):
     temporary = path.with_suffix(path.suffix + '.tmp')
     temporary.write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding='utf-8')
     temporary.replace(path)
+
+
+def canonical_sha256(value):
+    return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True,
+                                     separators=(',', ':')).encode('utf-8')).hexdigest()
 
 
 def fingerprint(root):
@@ -78,6 +83,17 @@ def enforce_demo_separation(dataset_run, phase):
         raise ValueError('Unsupported phase: ' + str(phase))
     if dataset_run and phase == DEMO_PHASE:
         raise ValueError('--dataset-run cannot be combined with --phase ' + DEMO_PHASE)
+
+
+def enforce_demo_track(dataset_run, phase):
+    """scenario-v2 is the demo track (DM-2, DM-37): deadlock-v0.3 judges it, so it runs only with --phase demo and
+    never as a dataset run. Dialogue (C-17-4) and artifact (C-17-5) tasks alike."""
+    enforce_demo_separation(dataset_run, phase)
+    if dataset_run:
+        raise ValueError('scenario-v2 is the demo track (DM-37); --dataset-run is refused')
+    if phase != DEMO_PHASE:
+        # A scenario-v2 run is never on the dataset path (DM-2): runs/ and deadlock-v0.3 do not meet.
+        raise ValueError('scenario-v2 runs only with --phase ' + DEMO_PHASE + ' (DM-2, DM-37)')
 
 
 def output_root_for(phase, requested):
@@ -227,8 +243,8 @@ def role_system_message(agent, tool_names, scenario, schema_text, facts):
 
 
 def schema_instructions(contract, root=ROOT):
-    """The schema block appended to every role prompt, per output contract version."""
-    if contract.version == V2:
+    """The schema block appended to every role prompt, per output contract version (v3: scenario-v2 artifact task)."""
+    if contract.version in (V2, V3):
         return json.dumps(contract.schema(), ensure_ascii=False) + '\n' + contract.instructions()
     return (root / 'scenarios/agent-output.schema.json').read_text(encoding='utf-8')
 
@@ -298,8 +314,12 @@ class Workspace:
             measured = await asyncio.to_thread(self.acceptance)
             return json.dumps({k: measured[k] for k in ('summary', 'gate')}, ensure_ascii=False)
 
-        return [tool for permission, tool in [('read_files', read_file), ('write_files', write_file),
-                ('write_files', replace_in_file), ('run_tests', run_tests)] if permission in agent.permissions]
+        tools = [('read_files', read_file), ('write_files', write_file), ('write_files', replace_in_file),
+                 ('run_tests', run_tests)]
+        if not hasattr(agent, 'permissions'):
+            # scenario-v2 roles list tool names (C-17-5); the order stays the one the permission path gives.
+            return [tool for _, tool in tools if tool.__name__ in agent.tools]
+        return [tool for permission, tool in tools if permission in agent.permissions]
 
 
 async def run(args):
@@ -311,28 +331,41 @@ async def run(args):
         raise ValueError("Unsupported collection policy")
     scenario_path = args.scenario.resolve()
     scenario = load_scenario(scenario_path)
-    if scenario.schema_version != 'scenario-v1':
-        if scenario.task_kind != 'dialogue':
-            # scenario-v2 artifact tasks (CT, CL, CT-N) are the next runner unit (C-17-5, DM-39).
-            raise ValueError(scenario.schema_version + ' artifact tasks are not runnable by this runner yet')
-        # T1 dialogue tasks (C-17-4) have their own flow; everything below is the unchanged artifact path.
+    # scenario-v2 artifact tasks (CT, CL, CT-N; C-17-5, DM-37) run on this artifact path, unchanged for scenario-v1.
+    artifact_v2 = scenario.schema_version != 'scenario-v1'
+    if artifact_v2 and scenario.task_kind == 'dialogue':
+        # T1 dialogue tasks (C-17-4) have their own flow.
         from experiments.dialogue_runner import run_dialogue
         return await run_dialogue(args, scenario, scenario_path)
-    if getattr(args, 'output_contract', V2) == V3 or getattr(args, 'closed_list_check', None) is not None:
-        raise ValueError(V3 + ' and --closed-list-check are for scenario-v2 dialogue tasks')
-    contract = for_scenario(getattr(args, 'output_contract', V2), scenario)
-    if contract.version == V2 and collection_policy != INDEPENDENT:
+    if artifact_v2:
+        # The scenario picks the contract (DM-37); the command line states the same one (D-25: nothing implicit).
+        contract = for_artifact_scenario(scenario)
+        if getattr(args, 'output_contract', None) != contract.version:
+            raise ValueError('This scenario-v2 artifact task reports ' + contract.version
+                             + '; run it with --output-contract ' + contract.version)
+        if getattr(args, 'closed_list_check', None) is not None:
+            raise ValueError('--closed-list-check is for scenario-v2 dialogue tasks')
+        if getattr(args, 'runner_protocol', None) != PROTOCOL_V10:
+            # The demo common condition (DM-25), as for dialogue tasks.
+            raise ValueError('A scenario-v2 artifact task runs with --runner-protocol ' + PROTOCOL_V10)
+    else:
+        if getattr(args, 'output_contract', V2) == V3 or getattr(args, 'closed_list_check', None) is not None:
+            raise ValueError(V3 + ' and --closed-list-check are for scenario-v2 dialogue tasks')
+        contract = for_scenario(getattr(args, 'output_contract', V2), scenario)
+    # A closed issue vocabulary: output-contract-v2, or v3 for a scenario-v2 artifact task (v2 fields plus spec_approved).
+    closed = contract.version in (V2, V3)
+    if closed and collection_policy != INDEPENDENT:
         # v7 extends the v6 independent-observation protocol; no other combination is labelled.
-        raise ValueError('output-contract-v2 requires the independent collection policy')
+        raise ValueError(contract.version + ' requires the independent collection policy')
     requested_protocol = getattr(args, 'runner_protocol', None)
-    if contract.version != V2 and requested_protocol is not None:
+    if not closed and requested_protocol is not None:
         raise ValueError('--runner-protocol applies only to output-contract-v2')
     if requested_protocol not in (None, PROTOCOL_V7, PROTOCOL_V8, PROTOCOL_V9, PROTOCOL_V10):
         raise ValueError('Unsupported runner protocol')
     # D-25: no default. Several people run sessions, so the protocol is always stated explicitly.
-    if contract.version == V2 and requested_protocol is None:
-        raise ValueError('--runner-protocol is required for output-contract-v2')
-    runner_protocol = requested_protocol if contract.version == V2 else PROTOCOLS[collection_policy]
+    if closed and requested_protocol is None:
+        raise ValueError('--runner-protocol is required for ' + contract.version)
+    runner_protocol = requested_protocol if closed else PROTOCOLS[collection_policy]
     facts = runner_protocol in (PROTOCOL_V8, PROTOCOL_V9, PROTOCOL_V10)
     # The scenario's reasoning_effort and protocol v9 go together, so neither is ignored silently.
     reasoning_protocol = runner_protocol in (PROTOCOL_V9, PROTOCOL_V10)
@@ -364,7 +397,7 @@ async def run(args):
     repository_state = git_state()
     dataset_run = bool(getattr(args, 'dataset_run', False))
     phase = getattr(args, 'phase', None)
-    enforce_demo_separation(dataset_run, phase)
+    (enforce_demo_track if artifact_v2 else enforce_demo_separation)(dataset_run, phase)
     output_root = output_root_for(phase, getattr(args, 'output_root', None))
     enforce_dataset_clean(dataset_run, repository_state)
     session_id = scenario.scenario_id + '-' + uuid.uuid4().hex
@@ -405,7 +438,7 @@ async def run(args):
                                             'no raw tool results', dataset_run=dataset_run, phase=phase,
                      **repository_state)
     effective.update(output_contract_version=contract.version, allowed_issues_sha256=contract.sha256)
-    if contract.version == V2:
+    if closed:
         effective.update(recent_messages_policy='parsed narrative; for a failed step the narrative of a verified '
                                                 'final report (G0-13); otherwise placeholder; no raw tool results')
         if facts:
@@ -423,6 +456,15 @@ async def run(args):
                          strict_failure_policy='fail step; abort after two consecutive strict-failed steps; '
                                                'vocabulary violations fail the step but are excluded from that '
                                                'streak and counted separately; no automatic B fallback')
+    registration = None
+    if artifact_v2:
+        # Registered once at session start (DM-26, DM-35): role display names and the selected metrics. The
+        # dialogue-only values (status order, E5 required count) are empty for an artifact task.
+        registration = registration_for(scenario)
+        effective.update(task_kind='artifact', turn_order=scenario.turn_order,
+                         contract_sha256=getattr(contract, 'contract_sha256', None),
+                         registration=registration, registration_sha256=canonical_sha256(registration),
+                         tools={a.id: list(a.tools) for a in scenario.agents})
     save(conditions_path, effective)
     print('session_id:', session_id, 'run_directory:', out, flush=True)
     shutil.copy2(scenario_path, out / 'scenario.yaml')
@@ -467,16 +509,21 @@ async def run(args):
     vocabulary_streak, vocabulary_total = StrictFailureStreak(), 0
     async with httpx.AsyncClient(base_url=base, headers=headers, timeout=60) as client:
         try:
-            response = await client.post('/sessions')
+            response = await client.post('/sessions', **({'json': {'registration': registration}}
+                                                           if artifact_v2 else {}))
             if response.is_error:
                 # e.g. a block-mode proxy refusing a non-demo run (DM-32): keep the proxy's reason in the error.
                 raise ValueError(f'Proxy refused the session ({response.status_code}): {response.text[:300]}')
             started = True
+            if artifact_v2 and response.json().get('registered') is not True:
+                raise ValueError('The proxy did not register the session')
             pin_response = await client.get('/log')
             pin_response.raise_for_status()
             meta = pin_response.json()['meta']
             if meta.get('criteria_version') != scenario.criteria_version:
                 raise ValueError('Proxy criteria version differs from scenario')
+            if artifact_v2 and meta.get('registration') != registration:
+                raise ValueError('The proxy stored a different registration')
             ensure_key_env(meta.get('upstream'), key_env)
             effective.update(api_key_env=key_env, upstream=meta.get('upstream'),
                              guardrail_mode=meta.get('guardrail_mode'))
@@ -532,7 +579,7 @@ async def run(args):
                 # Other roles see only parsed narratives; tool results stay with the agent that read them.
                 shared, shared_source = parsed, 'parsed' if parsed else 'placeholder'
                 receipt = outcome['observation_report']
-                if shared is None and contract.version == V2 and receipt['status'] == 'valid':
+                if shared is None and closed and receipt['status'] == 'valid':
                     # G0-13 (v7 only): a verified final report of a failed step is shared, not hidden.
                     # Vocabulary violations never yield a valid receipt, so they keep the placeholder.
                     shared, shared_source = receipt['value'], 'verified_final_report'
@@ -568,7 +615,7 @@ async def run(args):
                                               + ['tool_execution_error'] * tool_execution_error)
                 record.update(strict_used=outcome['strict_used'], strict_failure=outcome['strict_failure'],
                               consecutive_strict_failures=strict_streak.count)
-                if contract.version == V2:
+                if closed:
                     record.update(shared_narrative_source=shared_source)
                     record.update(vocabulary_violation=vocabulary,
                                   consecutive_vocabulary_violations=vocabulary_streak.count,
@@ -664,11 +711,15 @@ async def run(args):
                 'fixture_unchanged': fingerprint(source) == original, 'error': error,
                 'cleanup_errors': cleanup_errors, 'actual_outcome': None}
             summary['context_buffer_messages'] = buffer_messages
-            if contract.version == V2:
+            if closed:
                 summary['vocabulary_violation_steps'] = [s['step_id'] for s in steps if s.get('vocabulary_violation')]
                 summary['vocabulary_violations_total'] = vocabulary_total
             summary['failed_steps'] = [{'step_id': s['step_id'], 'reasons': s.get('failure_reasons', [])}
                                        for s in steps if s.get('step_status') == 'failed']
+            if artifact_v2:
+                summary.update(task_kind='artifact', turn_order=scenario.turn_order,
+                               output_contract_version=contract.version,
+                               registration_sha256=effective['registration_sha256'])
             if guardrail_block is not None:
                 summary['guardrail_stop'] = guardrail_block
             save(out / 'summary.json', summary)
@@ -682,7 +733,8 @@ def main():
     parser.add_argument('scenario', type=Path)
     parser.add_argument('--collection-policy', choices=tuple(PROTOCOLS), default=DEFAULT_POLICY)
     parser.add_argument('--output-contract', choices=VERSIONS + (V3,), default=V2,
-                        help=V3 + ' for scenario-v2 dialogue tasks only')
+                        help=V3 + ' for scenario-v2 tasks only; a scenario-v2 artifact task is run with the contract '
+                             'its scenario names (DM-37)')
     parser.add_argument('--runner-protocol', choices=(PROTOCOL_V7, PROTOCOL_V8, PROTOCOL_V9, PROTOCOL_V10), default=None,
                         help='required for output-contract-v2 and v3 (D-25). v7 reproduces G0-8; '
                              'v9 needs a scenario with reasoning_effort; dialogue tasks run v10')

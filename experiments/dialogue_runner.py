@@ -59,9 +59,7 @@ OBSERVED_FIELDS = ('open_issue_ids', 'info_items', 'status', 'adopted_items', 'h
 STOP_DECISIONS = ('deadlock', 'termination_failure')
 
 
-def canonical_sha256(value):
-    return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True,
-                                     separators=(',', ':')).encode('utf-8')).hexdigest()
+canonical_sha256 = common.canonical_sha256
 
 
 def without_enums(schema):
@@ -245,12 +243,8 @@ async def run_dialogue(args, scenario, scenario_path):
     repository_state = common.git_state()
     dataset_run = bool(getattr(args, 'dataset_run', False))
     phase = getattr(args, 'phase', None)
-    common.enforce_demo_separation(dataset_run, phase)
-    if dataset_run:
-        raise ValueError('scenario-v2 is the demo track (DM-37); --dataset-run is refused')
-    if phase != common.DEMO_PHASE:
-        # deadlock-v0.3 judges only demo sessions (DM-10): a scenario-v2 run is never on the dataset path (DM-2).
-        raise ValueError('scenario-v2 runs only with --phase ' + common.DEMO_PHASE + ' (DM-2, DM-37)')
+    # deadlock-v0.3 judges only demo sessions (DM-10): a scenario-v2 run is never on the dataset path (DM-2).
+    common.enforce_demo_track(dataset_run, phase)
     output_root = common.output_root_for(phase, getattr(args, 'output_root', None))
     session_id = scenario.scenario_id + '-' + uuid.uuid4().hex
     out = output_root / session_id
