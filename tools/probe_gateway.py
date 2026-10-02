@@ -11,6 +11,10 @@ Model comparison (C-16, DM-12): --model (repeatable) sends the same requests to 
 short tool-free request and the runner's tool request at the scenario's reasoning_effort — and reports tokens,
 reasoning_tokens, whether a tool call came back and the credit difference per request. --list-models prints the
 gateway's model IDs. Which models join the demo is decided by the PM.
+Closed-list strict probe (C-17-7, DM-20, DM-40): --with-v3-strict takes a scenario-v2 dialogue task as --scenario and
+sends its final output-contract-v3 request twice, once with the closed lists as enums in the strict schema
+(provider_strict) and once without them (after_receipt), the two request shapes the dialogue runner can send.
+Error bodies are read in the OpenAI shape ({"error": {...}}) and the gateway's own shape ({"detail": {...}}).
 The API key is read from the environment variable named in the proxy config and never written.
 """
 import argparse
@@ -29,9 +33,11 @@ import uuid
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from experiment_config import load_config, upstream
+from experiments.dialogue_contract import for_dialogue_scenario
+from experiments.dialogue_runner import SentContract
 from experiments.issue_contract import V2, for_scenario
 from experiments.run_scenario import Workspace, role_system_message, safe_path, schema_instructions
-from experiments.step_execution import PROTOCOL_V8, call_budget, final_instruction, harness_facts
+from experiments.step_execution import PROTOCOL_V8, PROTOCOL_V10, call_budget, final_instruction, harness_facts
 from scenario_schema import load_scenario
 from tools.probe_gateway_support import EXCERPT_CHARS, default_user_agent, redact
 
@@ -47,6 +53,10 @@ REASONING_SET = (REASON_NO_TOOLS_LOW, REASON_NO_TOOLS_HIGH, REASON_TOOLS_LOW, RE
 SHORT = 'short-no-tools'
 SHORT_PROMPT = 'Reply with the single word OK.'
 MODELS_PATH = '/models/'
+# The two final-request shapes of a dialogue task (DM-20): closed lists sent as enums, or checked after receipt.
+V3_STRICT_ENUMS, V3_STRICT_NO_ENUMS = 'v3-final-strict-enums', 'v3-final-strict-no-enums'
+V3_STRICT = {V3_STRICT_NO_ENUMS: 'after_receipt', V3_STRICT_ENUMS: 'provider_strict'}
+STRICT_VARIANTS = (FINAL, *V3_STRICT)
 REASONING_QUESTION = ('How many integers n with 1 <= n <= 1000 are divisible by 3 or 5 but not by 7? '
                       'Work it out, then reply with the integer only. Do not call any tool.')
 
@@ -94,6 +104,48 @@ def request_bodies(scenario, agent, workspace, variants):
                                             {'role': 'user', 'content': context}],
                                'tools': copy.deepcopy(tools), 'tool_choice': 'auto'}
     return bodies, contract
+
+
+def is_dialogue(scenario):
+    return scenario.schema_version != 'scenario-v1' and scenario.task_kind == 'dialogue'
+
+
+def dialogue_request_bodies(scenario, variants):
+    """The dialogue runner's final request (v10 sends reasoning_effort on every call) in each closed-list mode.
+
+    Same system text, schema and settings as the runner's final call; the observed record is the task and its
+    initial issue IDs only, as in the v2 final variant. Returns the bodies and the contract each one is checked with.
+    """
+    unsupported = [v for v in variants if v not in V3_STRICT]
+    if unsupported:
+        raise ValueError('A dialogue scenario takes only the v3 strict variants, not: ' + ', '.join(unsupported))
+    contract = for_dialogue_scenario(scenario)
+    records = [{'task': scenario.task, 'initial_issue_ids': scenario.initial_issue_ids}]
+    bodies = {}
+    for variant in variants:
+        sent = SentContract(contract, V3_STRICT[variant])
+        bodies[variant] = {'model': scenario.model, 'temperature': scenario.temperature,
+                           'max_tokens': scenario.max_tokens, 'stream': False,
+                           'reasoning_effort': scenario.reasoning_effort,
+                           'messages': [{'role': 'system', 'content': final_instruction(contract)},
+                                        {'role': 'user', 'content': json.dumps({'observed_records': records},
+                                                                               ensure_ascii=False)}],
+                           'response_format': sent.response_format()}
+    return bodies, contract
+
+
+def error_text(body):
+    """The error message of an error body: OpenAI {"error": {"message"}} or the gateway's {"detail": {"message"}}.
+
+    The probe of 2026-09-29 (gateway-probe-9d2b2053…) got the gateway shape for its HTTP 400s and kept no message.
+    """
+    for field in ('error', 'detail'):
+        value = body.get(field)
+        if isinstance(value, dict) and value.get('message') is not None:
+            return str(value['message'])
+        if value is not None:
+            return value if isinstance(value, str) else json.dumps(value, ensure_ascii=False)
+    return None
 
 
 def send(url, api_key, body, user_agent, method='POST'):
@@ -207,6 +259,21 @@ def reasoning_comparison(results):
             'note': 'One request each. Numbers only; whether the gateway drops reasoning_effort is decided by the PM.'}
 
 
+def closed_list_comparison(results):
+    """The two closed-list modes side by side (DM-20). One request each; which mode the demo uses is the PM's (DM-40)."""
+    rows = {}
+    for r in results:
+        if r['variant'] in V3_STRICT and r.get('sent', True):
+            rows.setdefault(r.get('model'), {})[V3_STRICT[r['variant']]] = {
+                k: r.get(k) for k in ('http_status', 'error_message', 'finish_reason', 'contract_valid',
+                                      'contract_violation')}
+    if not rows:
+        return None
+    return {'by_model': rows if any(m is not None for m in rows) else rows[None],
+            'note': 'One request per mode. provider_strict sends the closed lists as enums; after_receipt sends the '
+                    'same schema without them and checks after receipt. DM-20 is decided by the PM (DM-40).'}
+
+
 def assess(contract, variant, status, body):
     result = {'http_status': status, 'error_message': None, 'finish_reason': None, 'usage': None,
               'tool_calls': None, 'contract_valid': None, 'contract_violation': None,
@@ -215,9 +282,7 @@ def assess(contract, variant, status, body):
         result['error_message'] = 'non-JSON response'
         return result
     result['usage'] = body.get('usage')
-    error = body.get('error')
-    if error is not None:
-        result['error_message'] = error.get('message') if isinstance(error, dict) else str(error)
+    result['error_message'] = error_text(body)
     if status != 200:
         return result
     try:
@@ -230,7 +295,7 @@ def assess(contract, variant, status, body):
     result['reasoning_content_present'] = bool(message.get('reasoning_content') or message.get('reasoning'))
     result['tool_calls'] = [{'name': c['function']['name'], 'argument_chars': len(c['function']['arguments'])}
                             for c in message.get('tool_calls') or []]
-    if variant != FINAL:
+    if variant not in STRICT_VARIANTS:
         return result
     try:
         contract.parse(message['content'])
@@ -250,15 +315,23 @@ def probe(scenario_path, config_path, variants, output_root, role, api_key=None,
     """
     scenario = load_scenario(scenario_path)
     settings = upstream(load_config(config_path))
-    agent = next(a for a in scenario.agents if a.id == role)
     user_agent = user_agent or default_user_agent()
+    dialogue = is_dialogue(scenario)
+    if dialogue:
+        # No workspace, tools or role: only the final request of a dialogue task is probed (C-17-7).
+        bodies, contract = dialogue_request_bodies(scenario, variants)
+        role = None
+    elif any(v in V3_STRICT for v in variants):
+        raise ValueError('The v3 strict variants need a scenario-v2 dialogue task as the scenario')
     folder = output_root / ('gateway-probe-' + uuid.uuid4().hex)
     folder.mkdir(parents=True, exist_ok=False)
-    with tempfile.TemporaryDirectory() as directory:
-        workspace = Path(directory) / 'workspace'
-        shutil.copytree(safe_path(ROOT, scenario.fixture_dir), workspace,
-                        ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
-        bodies, contract = request_bodies(scenario, agent, workspace, variants)
+    if not dialogue:
+        agent = next(a for a in scenario.agents if a.id == role)
+        with tempfile.TemporaryDirectory() as directory:
+            workspace = Path(directory) / 'workspace'
+            shutil.copytree(safe_path(ROOT, scenario.fixture_dir), workspace,
+                            ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
+            bodies, contract = request_bodies(scenario, agent, workspace, variants)
     endpoint = settings['base_url'] + settings['chat_path']
     results = []
     plan = [(None, v) for v in variants] if models is None else [(m, v) for m in models for v in variants]
@@ -292,12 +365,13 @@ def probe(scenario_path, config_path, variants, output_root, role, api_key=None,
     report = {'scenario_id': scenario.scenario_id, 'model': scenario.model, 'role': role,
               'config_file': Path(config_path).name, 'endpoint': endpoint,
               'api_key_env': settings['api_key_env'], 'user_agent': user_agent,
-              'runner_protocol': PROTOCOL_V8, 'output_contract_version': contract.version,
+              'runner_protocol': PROTOCOL_V10 if dialogue else PROTOCOL_V8, 'output_contract_version': contract.version,
               'allowed_issues_sha256': contract.sha256, 'max_tokens': scenario.max_tokens,
               'created_at': datetime.now(timezone.utc).isoformat(), 'dry_run': api_key is None,
               'note': 'One request per variant does not establish reliability. Compare the '
                       'reasoning_tokens of the two tool variants to see whether reasoning_effort was applied.',
-              'results': results, 'reasoning_comparison': reasoning_comparison(results)}
+              'results': results, 'reasoning_comparison': reasoning_comparison(results),
+              'closed_list_comparison': closed_list_comparison(results) if dialogue else None}
     if models is not None:
         report['models'] = list(models)
         report['model_summary'] = model_summary(results)
@@ -318,6 +392,9 @@ def main():
     parser.add_argument('--with-tools-high', action='store_true', help='also send the tool variant (reasoning high)')
     parser.add_argument('--with-reasoning-set', action='store_true',
                         help='also send the four reasoning_effort discriminator requests (C-11)')
+    parser.add_argument('--with-v3-strict', action='store_true',
+                        help='send the dialogue final request with and without closed-list enums (C-17-7, DM-20); '
+                             '--scenario must be a scenario-v2 dialogue task. No other variant is sent')
     parser.add_argument('--model', action='append', default=None,
                         help='send the requests to this model (repeatable, C-16). Default variants per model: '
                              'short tool-free request + tool request at the scenario reasoning_effort')
@@ -328,7 +405,13 @@ def main():
     args = parser.parse_args()
     variants = ([FINAL] + [TOOLS_LOW] * args.with_tools_low + [TOOLS_HIGH] * args.with_tools_high
                 + list(REASONING_SET) * args.with_reasoning_set)
-    if args.model:
+    if args.with_v3_strict:
+        if args.with_tools_low or args.with_tools_high or args.with_reasoning_set:
+            parser.error('--with-v3-strict sends only the two v3 strict variants')
+        if not is_dialogue(load_scenario(args.scenario)):
+            parser.error('--with-v3-strict needs a scenario-v2 dialogue task as --scenario')
+        variants = [V3_STRICT_NO_ENUMS, V3_STRICT_ENUMS]
+    elif args.model:
         effort = load_scenario(args.scenario).reasoning_effort
         variants = [SHORT, TOOLS_HIGH if effort == 'high' else TOOLS_LOW]
     key = None

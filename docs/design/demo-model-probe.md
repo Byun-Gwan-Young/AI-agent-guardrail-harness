@@ -9,6 +9,7 @@
 |---|---|
 | `--list-models` | 게이트웨이 `GET /models/` 의 모델 ID 목록만 출력. 다른 필드는 버린다 |
 | `--model <ID>` (반복 가능) | 모델마다 같은 요청 2 개를 보낸다. 요청 본문의 차이는 `model` 필드뿐 |
+| `--with-v3-strict` (C-17-7) | `--scenario` 의 대화 과제 최종 요청을 닫힌 목록 enum 있음·없음으로 한 번씩 보낸다 (DM-20). 결정 문서 019 파트 2 |
 
 `--model` 을 주면 모델마다 보내는 요청 :
 - `short-no-tools` : 도구·`response_format`·`reasoning_effort` 없이 "Reply with the single word OK." 한 줄. 어떤 채팅 모델도 받을 수 있는 최소 요청
