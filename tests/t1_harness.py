@@ -2,7 +2,7 @@
 
 The fake upstream answers a request that carries response_format (the step's final call) with the next scripted
 output-contract-v3 report, and any other request with a short text, or with a scripted tool call. Tools are fakes
-injected into experiments.dialogue_tools.IMPLEMENTATIONS (the real ones are C-17-6).
+injected into experiments.dialogue_tools.IMPLEMENTATIONS unless a test passes the real ones (C-17-6).
 """
 import contextlib
 import io

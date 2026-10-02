@@ -95,8 +95,8 @@ class HelperTests(unittest.TestCase):
                          [(1, "lookup_order", False), (2, "read_policy", True)])
         self.assertIn("ZeroDivisionError", dispatch.records[1]["error"])
         self.assertEqual(dialogue_tools.missing_implementations(self.scenario, {}), ["lookup_order", "read_policy"])
-        # No real tool until C-17-6.
-        self.assertEqual(dialogue_tools.IMPLEMENTATIONS, {})
+        # C-17-6 part 1: the local CS tools are real.
+        self.assertEqual(set(dialogue_tools.IMPLEMENTATIONS), {"lookup_order", "read_policy"})
 
     def test_prompt_text_states_facts_only(self):
         agent = self.scenario.agents[1]
@@ -243,7 +243,7 @@ class SafeguardTests(unittest.IsolatedAsyncioTestCase):
     async def test_contract_protocol_and_tools(self):
         await self.refused("output-contract-v3", output_contract="output-contract-v2")
         await self.refused("tool-capable-step-v10", runner_protocol="tool-capable-step-v9-reasoning-all-calls")
-        await self.refused("C-17-6: lookup_order, read_policy", implementations={})
+        await self.refused("Tools without an implementation: lookup_order, read_policy", implementations={})
         await self.refused("reasoning_effort", scenario_changes={"reasoning_effort": None})
 
     async def test_scenario_v1_refuses_the_dialogue_options(self):

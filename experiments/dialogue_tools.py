@@ -1,18 +1,24 @@
-"""Dialogue-task (T1) tool seam (C-17-4): the per-role tool list goes into the request and each call is handed on.
+"""Dialogue-task (T1) tools: the per-role tool list goes into the request and each call is handed on (C-17-4).
 
-No tool is implemented here; lookup_order, read_policy, web_search and academic_search are C-17-6
-(demo-runner-extension.md 5). IMPLEMENTATIONS stays empty until then, so the runner refuses a scenario whose roles
-name a tool without one. Offline tests put fake implementations in it.
+The implementations are C-17-6 (demo-runner-extension.md 5, decision 018): lookup_order and read_policy read the
+scenario's inputs_dir (experiments/cs_tools.py). A name without an implementation in IMPLEMENTATIONS is refused
+before a run. Offline tests may put fake implementations in it.
 
-An implementation is called as implementation(arguments, context) and returns text or a JSON value; context is
-{"step_id", "agent_id", "inputs_dir"}. Every call is recorded (arguments, result or error) for the judge.
+An implementation is called as implementation(arguments, context) and returns text, a JSON value or
+experiments.tool_results.Result; it raises ToolFactError (or any exception) for an error result. context is
+{"step_id", "agent_id", "inputs_dir"} plus the session's tool resources, if any. Every call is recorded (arguments,
+result or error, and what the implementation adds) for the judge.
 """
 import json
+import threading
+
+from experiments import cs_tools
+from experiments.tool_results import Result
 
 TOOL_VOCABULARY = ('lookup_order', 'read_policy', 'web_search', 'academic_search')
 ERROR_CHARS = 300
-# name -> callable; filled by C-17-6. Empty means no T1 run can start with a tool-using role.
-IMPLEMENTATIONS = {}
+# name -> callable. A role naming a tool missing here cannot start a run.
+IMPLEMENTATIONS = {'lookup_order': cs_tools.lookup_order, 'read_policy': cs_tools.read_policy}
 
 
 def tool_instructions(names):
@@ -35,38 +41,54 @@ def missing_implementations(scenario, implementations=None):
 
 
 class ToolDispatch:
-    """Hands each model tool call to its implementation and keeps the call record."""
+    """Hands each model tool call to its implementation and keeps the call record.
 
-    def __init__(self, implementations, inputs_dir):
+    AutoGen runs the tool calls of one model response concurrently (sync tools in threads), so calls are taken one
+    at a time: records get their order without races and a provider sees one connection at a time.
+    """
+
+    def __init__(self, implementations, inputs_dir, resources=None):
         self.implementations, self.inputs_dir = dict(implementations), str(inputs_dir)
+        self.resources = dict(resources or {})
         self.records, self.step_id, self.agent_id = [], None, None
+        self.lock = threading.Lock()
 
     def identity(self):
         return {name: getattr(f, '__module__', '?') + '.' + getattr(f, '__qualname__', repr(f))
                 for name, f in sorted(self.implementations.items())}
 
     def call(self, name, arguments):
-        record = {'seq': len(self.records) + 1, 'step_id': self.step_id, 'agent_id': self.agent_id,
-                  'tool': name, 'arguments': arguments}
-        self.records.append(record)
-        try:
-            result = self.implementations[name](arguments, {'step_id': self.step_id, 'agent_id': self.agent_id,
-                                                            'inputs_dir': self.inputs_dir})
-        except Exception as exc:
-            record.update(is_error=True, error=(type(exc).__name__ + ': ' + str(exc))[:ERROR_CHARS], result=None)
-            raise
-        text = result if isinstance(result, str) else json.dumps(result, ensure_ascii=False)
-        record.update(is_error=False, error=None, result=text)
-        return text
+        with self.lock:
+            record = {'seq': len(self.records) + 1, 'step_id': self.step_id, 'agent_id': self.agent_id,
+                      'tool': name, 'arguments': arguments}
+            self.records.append(record)
+            context = {'step_id': self.step_id, 'agent_id': self.agent_id, 'inputs_dir': self.inputs_dir,
+                       **self.resources}
+            if self.resources:
+                context['dispatch_seq'] = record['seq']
+            try:
+                result = self.implementations[name](arguments, context)
+            except Exception as exc:
+                record.update(is_error=True, error=(type(exc).__name__ + ': ' + str(exc))[:ERROR_CHARS], result=None,
+                              **getattr(exc, 'record', {}))
+                raise
+            if isinstance(result, Result):
+                record.update(result.record)
+                result = result.value
+            text = result if isinstance(result, str) else json.dumps(result, ensure_ascii=False)
+            record.update(is_error=False, error=None, result=text)
+            return text
 
     def tools(self, names):
         """Functions with the interface of demo-runner-extension.md 5, in the role's order."""
         def lookup_order(order_id: str) -> str:
-            """Return the order record for order_id from the task's order data, or "not found"."""
+            """Return the order record (JSON) for order_id from the task's order data. An order_id that is not in
+            the data returns an error result."""
             return self.call('lookup_order', {'order_id': order_id})
 
         def read_policy(name: str) -> str:
-            """Return the text of the named policy document of the task."""
+            """Return the text of the task's policy document called name. A name that is not a policy document of
+            the task returns an error result."""
             return self.call('read_policy', {'name': name})
 
         def web_search(query: str, max_results: int = 5) -> str:

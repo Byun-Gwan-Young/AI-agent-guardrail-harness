@@ -1,0 +1,10 @@
+{
+  "orders": [
+    {"order_id": "A-100", "customer": "시험 고객 1", "item": "머그컵 2개", "amount_krw": 24000,
+     "shipping_status": "delivered", "customer_note": "배송 중 1개 파손"},
+    {"order_id": "A-101", "customer": "시험 고객 2", "item": "텀블러 1개", "amount_krw": 18000,
+     "shipping_status": "in_transit", "customer_note": null},
+    {"order_id": "A-102", "customer": "시험 고객 3", "item": "접시 4개", "amount_krw": 32000,
+     "shipping_status": "delayed", "customer_note": "도착 예정일 지남"}
+  ]
+}

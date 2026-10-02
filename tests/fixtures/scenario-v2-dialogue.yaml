@@ -1,5 +1,6 @@
 # Synthetic scenario-v2 dialogue (T1) fixture for offline schema, contract and registration tests (C-17-3).
-# Not a demo scenario: DEMO-CS/MR/LR are written in C-18. Paths below are never read by these tests.
+# Not a demo scenario: DEMO-CS/MR/LR are written in C-18. inputs_dir holds synthetic CS inputs in the C-17-6
+# formats (decision 018) for the real lookup_order / read_policy; the judge is a test judge.
 schema_version: scenario-v2
 scenario_id: TEST-T1-v2
 title: 시험용 대화 과제 (스키마 검사 전용)

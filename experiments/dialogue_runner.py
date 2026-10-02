@@ -16,7 +16,7 @@ step mechanics, unchanged). What differs:
   judge; a failed claim is recorded and the run goes on), escalated (the one terminal status, DM-18, DM-46),
   max_steps, guardrail_stop (block mode), strict_output_failures or runner_error
 
-Tools are only handed on (experiments/dialogue_tools.py); their implementations are C-17-6.
+Tools are handed on through experiments/dialogue_tools.py; their implementations are C-17-6 (decision 018).
 The artifact path (scenario-v1 and its requests) is untouched: experiments/run_scenario.py dispatches here only for
 scenario-v2 dialogue tasks.
 """
@@ -223,7 +223,7 @@ def check_arguments(args, scenario):
         raise ValueError('Invalid run index or temperature')
     missing = dialogue_tools.missing_implementations(scenario)
     if missing:
-        raise ValueError('Tools not implemented until C-17-6: ' + ', '.join(missing))
+        raise ValueError('Tools without an implementation: ' + ', '.join(missing))
     return mode
 
 
