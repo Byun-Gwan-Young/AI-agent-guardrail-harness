@@ -1,0 +1,609 @@
+{
+  "scenario_id": "A-1-v4",
+  "model": "accounts/fireworks/models/gpt-oss-120b",
+  "role": "developer",
+  "config_file": "guardrail-deadlock-v0.2-kmu.yaml",
+  "endpoint": "https://factchat.mindlogic-kr-api.com/v1/gateway/chat/completions/",
+  "api_key_env": "KMU_API_KEY",
+  "user_agent": "python-httpx/0.28.1",
+  "runner_protocol": "tool-capable-step-v8-budget-and-writable-paths",
+  "output_contract_version": "output-contract-v2",
+  "allowed_issues_sha256": "434e1ebc382f48bd2788a669aa66afca1129bc987ab08ea4ca3e9241a9098a10",
+  "max_tokens": 16384,
+  "created_at": "2026-09-29T03:01:46.694263+00:00",
+  "dry_run": false,
+  "note": "One request per variant does not establish reliability. Compare the reasoning_tokens of the two tool variants to see whether reasoning_effort was applied.",
+  "results": [
+    {
+      "variant": "short-no-tools",
+      "model": "accounts/fireworks/models/gpt-oss-120b",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 36,
+        "prompt_tokens": 79,
+        "total_tokens": 115,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 25,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 25
+        }
+      },
+      "tool_calls": [],
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": true,
+      "credits": {
+        "value": 0.03345,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 4391.441690000001,
+        "used_after": 4391.4751400000005
+      }
+    },
+    {
+      "variant": "v8-tools-reasoning-high",
+      "model": "accounts/fireworks/models/gpt-oss-120b",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "tool_calls",
+      "usage": {
+        "completion_tokens": 42,
+        "prompt_tokens": 1533,
+        "total_tokens": 1575,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 17,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 0
+        },
+        "output_tokens_details": {
+          "reasoning_tokens": 17
+        }
+      },
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "argument_chars": 18
+        }
+      ],
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": true,
+      "credits": {
+        "value": 0.25515,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 4391.4751400000005,
+        "used_after": 4391.7302899999995
+      }
+    },
+    {
+      "variant": "short-no-tools",
+      "model": "claude-sonnet-5",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 4,
+        "prompt_tokens": 16,
+        "total_tokens": 20,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": null
+      },
+      "tool_calls": [],
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": false,
+      "credits": {
+        "value": 0.072,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 4391.7302899999995,
+        "used_after": 4391.80229
+      }
+    },
+    {
+      "variant": "v8-tools-reasoning-high",
+      "model": "claude-sonnet-5",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "tool_calls",
+      "usage": {
+        "completion_tokens": 168,
+        "prompt_tokens": 2999,
+        "total_tokens": 3167,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": null
+      },
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "argument_chars": 19
+        },
+        {
+          "name": "read_file",
+          "argument_chars": 29
+        },
+        {
+          "name": "read_file",
+          "argument_chars": 36
+        }
+      ],
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": false,
+      "credits": {
+        "value": 7.678,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 4391.80229,
+        "used_after": 4399.4802899999995
+      }
+    },
+    {
+      "variant": "short-no-tools",
+      "model": "claude-haiku-4-5-20251001",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 4,
+        "prompt_tokens": 14,
+        "total_tokens": 18,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": null
+      },
+      "tool_calls": [],
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": false,
+      "credits": {
+        "value": 0.034,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 4399.4802899999995,
+        "used_after": 4399.51429
+      }
+    },
+    {
+      "variant": "v8-tools-reasoning-high",
+      "model": "claude-haiku-4-5-20251001",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "tool_calls",
+      "usage": {
+        "completion_tokens": 166,
+        "prompt_tokens": 2701,
+        "total_tokens": 2867,
+        "completion_tokens_details": null,
+        "prompt_tokens_details": null
+      },
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "argument_chars": 19
+        },
+        {
+          "name": "read_file",
+          "argument_chars": 29
+        },
+        {
+          "name": "read_file",
+          "argument_chars": 36
+        }
+      ],
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": false,
+      "credits": {
+        "value": 3.531,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 4399.51429,
+        "used_after": 4403.04529
+      }
+    },
+    {
+      "variant": "short-no-tools",
+      "model": "gpt-5.5",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 17,
+        "prompt_tokens": 13,
+        "total_tokens": 30,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 7,
+          "rejected_prediction_tokens": 0
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        }
+      },
+      "tool_calls": [],
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": false,
+      "credits": {
+        "value": 0.575,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 4403.04529,
+        "used_after": 4403.62029
+      }
+    },
+    {
+      "variant": "v8-tools-reasoning-high",
+      "model": "gpt-5.5",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "tool_calls",
+      "usage": {
+        "completion_tokens": 69,
+        "prompt_tokens": 1536,
+        "total_tokens": 1605,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0
+        }
+      },
+      "tool_calls": [
+        {
+          "name": "read_file",
+          "argument_chars": 29
+        },
+        {
+          "name": "read_file",
+          "argument_chars": 36
+        },
+        {
+          "name": "read_file",
+          "argument_chars": 19
+        }
+      ],
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": false,
+      "credits": {
+        "value": 9.75,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 4403.62029,
+        "used_after": 4413.37029
+      }
+    },
+    {
+      "variant": "short-no-tools",
+      "model": "gpt-6-sol",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 4,
+        "prompt_tokens": 13,
+        "total_tokens": 17,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0,
+          "cache_write_tokens": 0
+        }
+      },
+      "tool_calls": [],
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": false,
+      "credits": {
+        "value": 0.066,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 4413.37029,
+        "used_after": 4413.43629
+      }
+    },
+    {
+      "variant": "v8-tools-reasoning-high",
+      "model": "gpt-6-sol",
+      "sent": true,
+      "http_status": 400,
+      "error_message": null,
+      "finish_reason": null,
+      "usage": null,
+      "tool_calls": null,
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": null,
+      "credits": {
+        "value": 0.0,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 4413.43629,
+        "used_after": 4413.43629
+      }
+    },
+    {
+      "variant": "short-no-tools",
+      "model": "gpt-6-luna",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 4,
+        "prompt_tokens": 13,
+        "total_tokens": 17,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": 0
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cached_tokens": 0,
+          "cache_write_tokens": 0
+        }
+      },
+      "tool_calls": [],
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": false,
+      "credits": {
+        "value": 0.0033,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 4413.43629,
+        "used_after": 4413.43959
+      }
+    },
+    {
+      "variant": "v8-tools-reasoning-high",
+      "model": "gpt-6-luna",
+      "sent": true,
+      "http_status": 400,
+      "error_message": null,
+      "finish_reason": null,
+      "usage": null,
+      "tool_calls": null,
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": null,
+      "credits": {
+        "value": 0.0,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 4413.43959,
+        "used_after": 4413.43959
+      }
+    }
+  ],
+  "reasoning_comparison": null,
+  "models": [
+    "accounts/fireworks/models/gpt-oss-120b",
+    "claude-sonnet-5",
+    "claude-haiku-4-5-20251001",
+    "gpt-5.5",
+    "gpt-6-sol",
+    "gpt-6-luna"
+  ],
+  "model_summary": {
+    "accounts/fireworks/models/gpt-oss-120b": {
+      "requests": [
+        {
+          "variant": "short-no-tools",
+          "http_status": 200,
+          "error_message": null,
+          "prompt_tokens": 79,
+          "completion_tokens": 36,
+          "reasoning_tokens": 25,
+          "tool_call_returned": false,
+          "credits": 0.03345
+        },
+        {
+          "variant": "v8-tools-reasoning-high",
+          "http_status": 200,
+          "error_message": null,
+          "prompt_tokens": 1533,
+          "completion_tokens": 42,
+          "reasoning_tokens": 17,
+          "tool_call_returned": true,
+          "credits": 0.25515
+        }
+      ],
+      "token_rates": {
+        "status": "solved_from_two_requests",
+        "requests_used": 2,
+        "credits_per_million_prompt_tokens": 150.0,
+        "credits_per_million_completion_tokens": 600.0,
+        "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+      }
+    },
+    "claude-sonnet-5": {
+      "requests": [
+        {
+          "variant": "short-no-tools",
+          "http_status": 200,
+          "error_message": null,
+          "prompt_tokens": 16,
+          "completion_tokens": 4,
+          "reasoning_tokens": null,
+          "tool_call_returned": false,
+          "credits": 0.072
+        },
+        {
+          "variant": "v8-tools-reasoning-high",
+          "http_status": 200,
+          "error_message": null,
+          "prompt_tokens": 2999,
+          "completion_tokens": 168,
+          "reasoning_tokens": null,
+          "tool_call_returned": true,
+          "credits": 7.678
+        }
+      ],
+      "token_rates": {
+        "status": "solved_from_two_requests",
+        "requests_used": 2,
+        "credits_per_million_prompt_tokens": 2000.0,
+        "credits_per_million_completion_tokens": 10000.0,
+        "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+      }
+    },
+    "claude-haiku-4-5-20251001": {
+      "requests": [
+        {
+          "variant": "short-no-tools",
+          "http_status": 200,
+          "error_message": null,
+          "prompt_tokens": 14,
+          "completion_tokens": 4,
+          "reasoning_tokens": null,
+          "tool_call_returned": false,
+          "credits": 0.034
+        },
+        {
+          "variant": "v8-tools-reasoning-high",
+          "http_status": 200,
+          "error_message": null,
+          "prompt_tokens": 2701,
+          "completion_tokens": 166,
+          "reasoning_tokens": null,
+          "tool_call_returned": true,
+          "credits": 3.531
+        }
+      ],
+      "token_rates": {
+        "status": "solved_from_two_requests",
+        "requests_used": 2,
+        "credits_per_million_prompt_tokens": 1000.0,
+        "credits_per_million_completion_tokens": 5000.0,
+        "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+      }
+    },
+    "gpt-5.5": {
+      "requests": [
+        {
+          "variant": "short-no-tools",
+          "http_status": 200,
+          "error_message": null,
+          "prompt_tokens": 13,
+          "completion_tokens": 17,
+          "reasoning_tokens": 7,
+          "tool_call_returned": false,
+          "credits": 0.575
+        },
+        {
+          "variant": "v8-tools-reasoning-high",
+          "http_status": 200,
+          "error_message": null,
+          "prompt_tokens": 1536,
+          "completion_tokens": 69,
+          "reasoning_tokens": 0,
+          "tool_call_returned": true,
+          "credits": 9.75
+        }
+      ],
+      "token_rates": {
+        "status": "solved_from_two_requests",
+        "requests_used": 2,
+        "credits_per_million_prompt_tokens": 5000.0,
+        "credits_per_million_completion_tokens": 30000.0,
+        "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+      }
+    },
+    "gpt-6-sol": {
+      "requests": [
+        {
+          "variant": "short-no-tools",
+          "http_status": 200,
+          "error_message": null,
+          "prompt_tokens": 13,
+          "completion_tokens": 4,
+          "reasoning_tokens": 0,
+          "tool_call_returned": false,
+          "credits": 0.066
+        },
+        {
+          "variant": "v8-tools-reasoning-high",
+          "http_status": 400,
+          "error_message": null,
+          "prompt_tokens": null,
+          "completion_tokens": null,
+          "reasoning_tokens": null,
+          "tool_call_returned": null,
+          "credits": 0.0
+        }
+      ],
+      "token_rates": {
+        "status": "unmeasured",
+        "reason": "fewer than two requests with usage and measured credits"
+      }
+    },
+    "gpt-6-luna": {
+      "requests": [
+        {
+          "variant": "short-no-tools",
+          "http_status": 200,
+          "error_message": null,
+          "prompt_tokens": 13,
+          "completion_tokens": 4,
+          "reasoning_tokens": 0,
+          "tool_call_returned": false,
+          "credits": 0.0033
+        },
+        {
+          "variant": "v8-tools-reasoning-high",
+          "http_status": 400,
+          "error_message": null,
+          "prompt_tokens": null,
+          "completion_tokens": null,
+          "reasoning_tokens": null,
+          "tool_call_returned": null,
+          "credits": 0.0
+        }
+      ],
+      "token_rates": {
+        "status": "unmeasured",
+        "reason": "fewer than two requests with usage and measured credits"
+      }
+    }
+  }
+}
