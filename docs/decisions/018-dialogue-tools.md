@@ -50,3 +50,121 @@
 
 테스트 `tests/test_cs_tools.py` : 한 건 반환·출처 기록, 없는 ID·빈 값, 읽기 전용, 이름 세 형태, 경로·없는 이름 거절(문서 이름 고지), 밖으로 풀리는 링크,
 입력 형식 검사, 실제 실행기 경로에서 오류 결과가 모델 요청의 도구 결과로 들어가고 step 은 `failed`·세션은 계속.
+
+## 파트 2 — 검색 도구 2 종 + 원문 저장 (`experiments/search_tools.py`, DM-13 · DM-21)
+
+**제공자** (DM-21) — 문서 확인 2026-10-02, 실제 호출 없음
+
+| 도구 | 제공자 | 요청 | 인증 | 근거 |
+|---|---|---|---|---|
+| `web_search` (MR) | Tavily | `POST https://api.tavily.com/search`, JSON 본문 | `Authorization: Bearer <TAVILY_API_KEY>` | Tavily Search API reference |
+| `academic_search` (LR) | arXiv API | `GET https://export.arxiv.org/api/query?search_query=…&start=0&max_results=…&sortBy=…&sortOrder=…`, Atom 응답 | 없음 | arXiv API User's Manual (문서의 기본 주소는 `http://`, 같은 호스트의 https 를 쓴다) |
+
+**arXiv 호출 간격 (확인 결과)** — 3 초가 맞다. 이용 약관(https://info.arxiv.org/help/api/tou.html) : "make no more than one request every three
+seconds, and limit requests to a single connection at a time". 사용 설명서도 연속 호출에 3 초 지연을 권한다.
+- 구현 : 앞 arXiv 요청이 **끝난** 시각부터 `min_interval_seconds` 가 지나야 다음 요청을 보낸다 (시작 기준보다 보수적). 기다린 시간은 기록 `waited_seconds`
+- 스키마가 `min_interval_seconds ≥ 3` 을 강제한다. "연결 하나" 는 호출 직렬화(파트 1)로 지킨다
+- **한계 (보고)** : 간격은 **실행기 프로세스 하나 안에서만** 지킨다. LR 세션 여러 개를 수동 병렬(DM-24, 창 3 개)로 돌리면 프로세스끼리는 간격을 모른다.
+  LR 세션은 한 번에 하나만 돌리는 것을 제안한다 (보고 6 절)
+
+**설정** — 시나리오 `tool_settings` 에서만 읽는다. 코드에 기본값이 없다. 역할이 쓰는 검색 도구마다 설정이 정확히 있어야 하고(없으면 스키마 오류),
+쓰지 않는 도구의 설정도 오류. 산출물 과제는 `tool_settings` 를 가질 수 없다. 설정과 그 해시는 `conditions.json` (`tool_settings`, `search`),
+검색 기록 한 줄마다, 매니페스트 v0.6 `task.tool_settings`·`task.search` 에 남는다.
+
+| 필드 | `web_search` (Tavily) | `academic_search` (arXiv) |
+|---|---|---|
+| `provider` | `tavily` | `arxiv` |
+| `max_results` | 1~20 (Tavily 범위) | 1~50 |
+| 검색 방식 | `search_depth` : `basic` / `advanced`, `topic` : `general` / `news` | `sort_by` : `relevance` / `lastUpdatedDate` / `submittedDate`, `sort_order` |
+| `max_result_chars` | 모델에게 넘기는 한 번의 결과 글자 수 상한 (≥ 200) | 같음 |
+| `max_calls_per_session` | 세션당 실제로 보낸 요청 수 상한 (≥ 1) | 같음 |
+| `timeout_seconds` | 0 초과 120 이하 | 같음 |
+| `min_interval_seconds` | — | ≥ 3 (위) |
+
+- **도구가 고정하는 Tavily 값** : `include_answer: false`, `include_raw_content: false`, `include_images: false`. 모델은 검색 결과만 받고 Tavily 가 생성한 답·
+  페이지 전문·이미지는 받지 않는다. 설정이 아니라 도구 정의라 코드 상수이고, 요청 기록과 `conditions.search.*.fixed_parameters` 에 남는다
+- **세션당 호출 상한의 기본값 제안** (정하지 않음, 보고 6 절) : **20**. 근거는 구조다 — MR·LR 은 고정 순서 3 역할이고 `max_steps` 30 이면 검색 담당 차례는 10 번,
+  차례마다 도구를 쓸 수 있는 호출은 3 − 1 = 2 번 (마지막 호출은 도구 없음, v8 사실 문장) → 10 × 2 = 20. 한 응답에 도구 호출을 여러 개 담으면 이보다 많아질 수 있고,
+  그때 상한이 비용을 막는다. 상한에 닿은 호출은 요청을 보내지 않고 사실 문장 오류 결과
+  (`web_search was not run: the limit of 20 web_search calls for this session is reached.`)
+
+**모델 인터페이스 (설계 5 절과 다름, 보고)**
+
+- `web_search(query)`, `academic_search(query)` — 설계 표의 `max_results: int = 5` 인자를 **뺐다**. 지시가 결과 수를 설정값(하드코딩 금지)으로 정했고,
+  인자로 두면 기본값 5 가 요청의 도구 스키마에 하드코딩되며, 같은 시나리오 세션끼리 결과 수(비용·결과)가 모델 선택에 따라 달라진다. 결과 수는 `max_results` 설정이다.
+  **PM 확인 필요** — 모델이 설정 이하에서 고르게 되돌릴지
+- `academic_search` 의 질의는 **그대로** arXiv `search_query` 로 보낸다 (도구 설명이 이 사실과 `all:`·`ti:`·`abs:`·`AND`/`OR`/`ANDNOT` 이 있다는 것을 알린다).
+  자유 문장을 `all:` 로 바꾸는 규칙을 만들지 않았다 — 어떤 규칙이든 결과를 바꾸는 하네스 선택이 되고, 그대로 보내면 기록된 질의가 곧 보낸 질의다.
+  자유 문장이 arXiv 에서 어떻게 해석되는지는 PM 검색 확인 도구(파트 3)와 C-18 시험 실행에서 본다
+- 도구 설명(docstring) 은 사실만 쓴다 (제공자, 돌려주는 필드, 결과 수는 과제가 정함)
+
+**원문 저장** — 세션 폴더 `runs/demo/<세션>/search/`
+
+- `search/responses/<sha256>.json|.xml` : 200 응답 본문을 **받은 바이트 그대로** 저장 (같은 내용은 파일 하나). 설계 5 절의 `search-cache.jsonl` 안
+  `response_raw` 대신 파일로 둔 이유 : JSON 한 줄에 다시 담으면 재직렬화라 "원문 그대로" 가 아니고, XML(arXiv)은 JSON 값이 아니다
+- `search/records.jsonl` : 검색 호출 1 건 = 1 줄 (상한·인자 오류로 보내지 않은 호출 포함)
+
+| 필드 | 뜻 |
+|---|---|
+| `seq`, `dispatch_seq`, `step_id`, `agent_id`, `tool`, `provider`, `query`, `requested_at` | 어느 호출인가 (`dispatch_seq` = `tool-dispatch.json` 의 호출 번호) |
+| `settings`, `settings_sha256` | 그 호출에 쓴 설정 |
+| `request` | 보낸 그대로의 method·URL·파라미터·본문·헤더. **키 없음** (`auth` 에 "값은 기록하지 않음" 문장만) |
+| `outcome` | `ok` / `invalid_arguments` / `limit_reached` / `missing_key` / `timeout` / `network_error` / `http_error` / `parse_error` / `provider_error` |
+| `http_status`, `elapsed_ms`, `waited_seconds` | 응답 상태, 걸린 시간, arXiv 간격 대기 |
+| `response` | 저장한 응답 `{sha256, bytes, path, content_type, redacted, received_sha256}` 또는 null |
+| `error` | 실패 기록 `{type, message}` (키 가림, 300 자) 또는 null |
+| `normalizer`, `results`, `total_results` | 원문에서 만든 정규화 결과 (`tavily-results-v1` : rank·title·url·excerpt / `arxiv-atom-v1` : rank·id·title·authors·year·excerpt, arXiv 전체 건수) |
+| `truncation` | 자르기 규칙·상한·원래 길이·보낸 길이·자른 길이·보낸 결과 수 |
+| `model_text`, `model_text_sha256` | 모델에게 넘긴 내용 그대로 (오류면 그 사실 문장) |
+
+- **로그에서는 해시로 참조** : 호출 기록(`tool-dispatch.json`)의 `search` = `{record_seq, provider, outcome, response_sha256, results, results_sent, total_results}`.
+  `results` 는 판정 함수 입력이다 (아래)
+- 요약 `summary.search` (매니페스트 v0.6 `search`) : 보낸 요청 수, 기록 수, 결과별 수, 저장 응답 수, `records.jsonl` 의 sha256
+
+**모델에게 넘기는 내용과 자르기** (`uniform-excerpt-cut-v1`)
+
+- JSON 텍스트 `{result_count, results, excerpts_cut_to_chars, results_left_out, (arXiv) total_results}`. 결과 항목은 Tavily `title·url·excerpt`,
+  arXiv `id·title·authors·year·excerpt`. 질의는 다시 싣지 않는다
+- 전체가 `max_result_chars` 보다 길면 모든 발췌(excerpt)를 **같은 길이**로 자른다 — 들어가는 가장 긴 길이(이분 탐색), 자른 발췌 끝에 "…".
+  발췌를 비워도 안 들어가면 뒤에서부터 결과를 뺀다. 결과는 항상 유효한 JSON 이고 같은 입력이면 같은 출력이다. 자른 길이·뺀 수는 텍스트 안에도 사실로 들어간다
+
+**실패 처리** — 자동 재시도 없음 (요청 1 번 = 기록 1 줄, 테스트)
+
+| 경우 | 모델이 받는 오류 결과 (사실 문장) | 저장 |
+|---|---|---|
+| 시간 초과 / 네트워크 오류 | `<tool> failed: no response from <제공자> (timed out \| network error). No results.` | 오류 기록 (원문 없음) |
+| HTTP 오류 (200 아님) | `<tool> failed: HTTP <상태> from <제공자>. [제공자 오류 문장] No results.` — 제공자 문장은 Tavily `detail.error`, arXiv 오류 피드 `summary`, 200 자 | 오류 기록 (본문 300 자 발췌, 원문 파일 없음) |
+| 200 인데 읽을 수 없음 | `<tool> failed: the <제공자> response could not be read. No results.` | 원문 저장 + 오류 기록 |
+| arXiv 200 오류 피드 | `academic_search failed: arXiv returned an error: <summary> No results.` | 원문 저장 + 오류 기록 |
+| 빈 질의 / 키 없음 / 상한 | 각각 사실 문장, 요청 안 보냄 | 기록만 |
+
+**키** (`TAVILY_API_KEY`, KMU 키와 같은 규칙)
+
+- 환경 변수에서 호출 때만 읽는다. 요청 기록·오류 기록·모델 텍스트에 넣지 않는다. 제공자가 응답이나 오류 본문에 키를 되돌려 보내면 저장 전에
+  `[REDACTED]` 로 바꾸고 `redacted: true`·받은 원문 해시를 남긴다 (테스트 : 세션 폴더 어느 파일에도 키 바이트 없음)
+- D-11 검사 (`tools/analyze_session.py secret_scan`) : 검색 도구 설정이 있는 세션만 `tvly-` 패턴과 `TAVILY_API_KEY` 값 자체를 더 찾는다.
+  검색 도구가 없는 세션은 검사 항목이 이전과 같아 기존 저장 분석(G0-8·A-1 계열)이 그대로 재현된다
+
+**replay — 다시 검색하지 않는다**
+
+- `search_tools.load_records(run_dir)` : 기록마다 저장 원문 파일의 sha256 을 확인하고, 원문에서 정규화를 다시 해 기록된 결과와 같은지, 자르기를 다시 해
+  모델 텍스트·자르기 기록이 같은지 확인한다. 다르면 `ReplayMismatch`
+- `search_tools.replay_tool_records(run_dir)` : `tool-dispatch.json` 의 검색 참조를 위 원문에서 다시 만든 값으로 바꿔 돌려준다 (판정 함수 입력)
+- `tools/rejudge_dialogue.py <run_dir>` : 판정 재계산. step 마다 그때까지의 최신 검증 보고와 그때까지의 도구 기록(위)으로 판정 함수를 다시 부르고,
+  완료 주장(DM-45)도 다시 판정해 기록과 비교한다. 판정 함수 파일 해시도 `conditions.judge` 와 비교. 검색·모델·프록시 호출 없음
+- 세션 재생 화면(C-19)도 같은 저장 원문을 읽으면 된다
+- 설계 5 절의 `--search-replay <cache>` (저장 결과로 **세션을 다시 실행**) 는 만들지 않았다. C-17-6 지시의 replay 는 재계산·재생·판정이고,
+  다시 실행하면 모델 호출이 생기는 새 세션이다
+
+**판정 함수 연결** — `judge(report, *, tool_records, inputs_dir)` 의 `tool_records` 가 위 호출 기록이다. 검색 호출이면 `search.results` 와
+`search.results_sent` (모델이 실제로 본 결과 수) 로 "보고의 출처 URL·논문 ID 가 그 세션의 저장된 검색 결과에 있었는가" 를 검사한다.
+시험용 판정 함수 `tests/fixtures/scenario_judges/TEST-MR-v2.py` (URL), `TEST-LR-v2.py` (arXiv ID 2 개).
+
+**기록 위치**
+
+- `conditions.json` : `tool_settings`, `search` (도구별 제공자·주소·키 환경 변수 이름·고정 파라미터·정규화기·자르기 규칙·설정과 해시·간격 범위·재시도 없음)
+- 매니페스트 **v0.6 자리에서 넓혔다** : `task.tool_settings`, `task.search`, 대화 과제의 `search` (요약). v0.6 을 만든 실제 세션이 아직 없다 (DM-51 원칙)
+
+테스트 `tests/test_search_tools.py` (가짜 HTTP 계층 `tests/search_fixtures.py`, 응답 fixture `tests/fixtures/search/` — 모양의 출처는 그 폴더 README) :
+Tavily 요청·원문 바이트 저장·정규화·모델 텍스트·호출 참조, 되돌아온 키 가림, arXiv 요청 파라미터·정규화(옛 형식 ID 포함)·간격, 상한, 실패 7 경우(재시도 없음),
+빈 질의·키 없음, 자르기(균일 자르기·결과 빼기·결정적), replay(원문만, 전송 없음, 판정 동일, 변조 거부), 설정 스키마, 도구 인자.

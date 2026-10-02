@@ -32,7 +32,7 @@ from importlib.metadata import version
 
 import httpx
 
-from experiments import dialogue_tools
+from experiments import dialogue_tools, search_tools
 from experiments import run_scenario as common
 from experiments.dialogue_contract import V3, VOCABULARY_VIOLATIONS_V3, for_dialogue_scenario
 from experiments.observation_collection import INDEPENDENT, collection_metadata, select_sources
@@ -257,7 +257,11 @@ async def run_dialogue(args, scenario, scenario_path):
     if args.seed_probe is not None and scenario.seed_support != 'unverified':
         raise ValueError('--seed-probe is only for unverified support')
     versions = {p: version(p) for p in ('autogen-agentchat', 'autogen-core', 'autogen-ext', 'openai')}
-    dispatch = dialogue_tools.ToolDispatch(dialogue_tools.IMPLEMENTATIONS, inputs_dir)
+    # C-17-6: search tools store every response in the run folder; their settings are the scenario's (decision 018).
+    tool_settings = scenario.tool_settings.model_dump(exclude_none=True) if scenario.tool_settings else {}
+    search = search_tools.SearchSession(tool_settings, out) if tool_settings else None
+    dispatch = dialogue_tools.ToolDispatch(dialogue_tools.IMPLEMENTATIONS, inputs_dir,
+                                           {'search': search} if search is not None else None)
     evidence = scenario.reasoning_effort_evidence
     effective = {
         'scenario': scenario.model_dump(), 'temperature': temperature, 'versions': versions, 'actual_outcome': None,
@@ -288,6 +292,8 @@ async def run_dialogue(args, scenario, scenario_path):
         'registration': registration, 'registration_sha256': canonical_sha256(registration),
         'judge': judge_record, 'inputs_dir': scenario.inputs_dir,
         'tools': {a.id: list(a.tools) for a in scenario.agents}, 'tool_implementations': dispatch.identity(),
+        'tool_settings': tool_settings or None,
+        'search': search_tools.conditions_record(tool_settings) if tool_settings else None,
         'dataset_run': dataset_run, 'phase': phase, **repository_state}
     conditions_path = out / 'conditions.json'
     common.save(conditions_path, effective)
@@ -527,7 +533,8 @@ async def run_dialogue(args, scenario, scenario_path):
                                                          'accepted', 'reasons')} for c in claims],
                 'recent_messages_rule': RECENT_MESSAGES_RULE,
                 'route_fallbacks': [{'step_id': s['step_id'], 'reason': s['route']['fallback_reason']}
-                                    for s in steps if (s.get('route') or {}).get('fallback_reason')]}
+                                    for s in steps if (s.get('route') or {}).get('fallback_reason')],
+                'search': search.summary() if search is not None else None}
             if guardrail_block is not None:
                 summary['guardrail_stop'] = guardrail_block
             common.save(out / 'summary.json', summary)

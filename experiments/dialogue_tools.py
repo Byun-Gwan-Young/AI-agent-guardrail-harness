@@ -1,8 +1,9 @@
 """Dialogue-task (T1) tools: the per-role tool list goes into the request and each call is handed on (C-17-4).
 
 The implementations are C-17-6 (demo-runner-extension.md 5, decision 018): lookup_order and read_policy read the
-scenario's inputs_dir (experiments/cs_tools.py). A name without an implementation in IMPLEMENTATIONS is refused
-before a run. Offline tests may put fake implementations in it.
+scenario's inputs_dir (experiments/cs_tools.py); web_search (Tavily) and academic_search (arXiv) store every response
+in the session folder (experiments/search_tools.py, resource "search"). A name without an implementation in
+IMPLEMENTATIONS is refused before a run. Offline tests may put fake implementations in it.
 
 An implementation is called as implementation(arguments, context) and returns text, a JSON value or
 experiments.tool_results.Result; it raises ToolFactError (or any exception) for an error result. context is
@@ -12,13 +13,14 @@ result or error, and what the implementation adds) for the judge.
 import json
 import threading
 
-from experiments import cs_tools
+from experiments import cs_tools, search_tools
 from experiments.tool_results import Result
 
 TOOL_VOCABULARY = ('lookup_order', 'read_policy', 'web_search', 'academic_search')
 ERROR_CHARS = 300
 # name -> callable. A role naming a tool missing here cannot start a run.
-IMPLEMENTATIONS = {'lookup_order': cs_tools.lookup_order, 'read_policy': cs_tools.read_policy}
+IMPLEMENTATIONS = {'lookup_order': cs_tools.lookup_order, 'read_policy': cs_tools.read_policy,
+                   'web_search': search_tools.web_search, 'academic_search': search_tools.academic_search}
 
 
 def tool_instructions(names):
@@ -91,13 +93,17 @@ class ToolDispatch:
             the task returns an error result."""
             return self.call('read_policy', {'name': name})
 
-        def web_search(query: str, max_results: int = 5) -> str:
-            """Return web search results (title, URL, excerpt) for query."""
-            return self.call('web_search', {'query': query, 'max_results': max_results})
+        # C-17-6: the number of results is the scenario's setting (tool_settings), not a model argument.
+        def web_search(query: str) -> str:
+            """Search the web (Tavily) for query. Returns JSON results with title, url and excerpt; the number of
+            results is set by the task."""
+            return self.call('web_search', {'query': query})
 
-        def academic_search(query: str, max_results: int = 5) -> str:
-            """Return academic search results (ID, title, authors, year, abstract excerpt) for query."""
-            return self.call('academic_search', {'query': query, 'max_results': max_results})
+        def academic_search(query: str) -> str:
+            """Search arXiv for query, sent unchanged as the arXiv API search_query (field prefixes such as all:,
+            ti:, abs: and AND, OR, ANDNOT may be used). Returns JSON results with id (arXiv ID), title, authors,
+            year and excerpt; the number of results is set by the task."""
+            return self.call('academic_search', {'query': query})
         available = {f.__name__: f for f in (lookup_order, read_policy, web_search, academic_search)}
         return [available[name] for name in names]
 

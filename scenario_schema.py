@@ -193,6 +193,38 @@ class WriteGate(Definition):
     spec_path: str = Field(min_length=1)
 
 
+class WebSearchSettings(Definition):
+    """web_search (DEMO-MR, DM-21: Tavily). Read by experiments/search_tools.py and recorded with the run (decision 018)."""
+    provider: Literal["tavily"]
+    max_results: int = Field(ge=1, le=20)  # Tavily max_results range
+    search_depth: Literal["basic", "advanced"]
+    topic: Literal["general", "news"]
+    max_result_chars: int = Field(ge=200)  # longest text handed to the model for one call
+    max_calls_per_session: int = Field(ge=1)
+    timeout_seconds: float = Field(gt=0, le=120)
+
+
+class AcademicSearchSettings(Definition):
+    """academic_search (DEMO-LR, DM-21: arXiv API, no key)."""
+    provider: Literal["arxiv"]
+    max_results: int = Field(ge=1, le=50)
+    sort_by: Literal["relevance", "lastUpdatedDate", "submittedDate"]
+    sort_order: Literal["descending", "ascending"]
+    max_result_chars: int = Field(ge=200)
+    max_calls_per_session: int = Field(ge=1)
+    timeout_seconds: float = Field(gt=0, le=120)
+    # arXiv API terms of use: no more than one request every three seconds.
+    min_interval_seconds: float = Field(ge=3)
+
+
+class ToolSettings(Definition):
+    web_search: WebSearchSettings | None = None
+    academic_search: AcademicSearchSettings | None = None
+
+
+SEARCH_TOOLS = ("web_search", "academic_search")
+
+
 def relative_path(value, name):
     path = PurePosixPath(value)
     if not value or path.is_absolute() or ".." in path.parts or "\\" in value:
@@ -241,6 +273,8 @@ class ScenarioV2(Definition):
     judge: str | None = None  # agents cannot read it: scenario_judges/, outside every inputs_dir
     inputs_dir: str | None = None
     required_adopted_items: int | None = Field(default=None, ge=1)  # E5 "{adopted}/{required}" (DM-29)
+    # C-17-6: settings of the search tools; given exactly for the search tools the roles use (decision 018).
+    tool_settings: ToolSettings | None = None
     token_estimate: TokenEstimate | None = None
 
     @model_validator(mode="after")
@@ -304,6 +338,13 @@ class ScenarioV2(Definition):
         json_subset.check_schema(self.deliverable_schema)
         if "adopted_items" in self.progress_metric.conversation and self.required_adopted_items is None:
             raise ValueError("adopted_items needs required_adopted_items (E5, DM-29)")
+        # No code default for a search setting (C-17-6): a used search tool has its settings, an unused one has none.
+        used = {t for a in self.agents for t in a.tools}
+        for tool in SEARCH_TOOLS:
+            given = self.tool_settings is not None and getattr(self.tool_settings, tool) is not None
+            if (tool in used) != given:
+                raise ValueError("tool_settings." + tool + (" required: a role uses " + tool if tool in used
+                                                            else " given but no role uses " + tool))
 
     def artifact_rules(self):
         if self.progress_source not in ("artifact", "both") or not self.fixture_dir:
@@ -324,8 +365,9 @@ class ScenarioV2(Definition):
             if agent.writable_paths and not set(agent.tools) & set(WRITE_TOOLS):
                 raise ValueError("writable_paths need a write tool")
         if (self.status_values is not None or self.terminal_statuses or self.deliverable_schema is not None
-                or self.judge is not None or self.inputs_dir is not None or self.required_adopted_items is not None):
-            raise ValueError("Status, deliverable, judge and inputs fields belong to dialogue tasks")
+                or self.judge is not None or self.inputs_dir is not None or self.required_adopted_items is not None
+                or self.tool_settings is not None):
+            raise ValueError("Status, deliverable, judge, inputs and tool settings fields belong to dialogue tasks")
 
 
     def write_gate_rules(self):

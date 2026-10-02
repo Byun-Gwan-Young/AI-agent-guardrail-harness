@@ -1,0 +1,30 @@
+{
+  "query": "AI coding assistant pricing",
+  "answer": null,
+  "images": [],
+  "results": [
+    {
+      "title": "Tool A pricing (synthetic fixture)",
+      "url": "https://example.com/tool-a/pricing",
+      "content": "Synthetic excerpt for offline tests. Tool A lists\n  an individual plan and a team plan.",
+      "score": 0.81,
+      "raw_content": null
+    },
+    {
+      "title": "Tool B plans (synthetic fixture)",
+      "url": "https://example.org/tool-b/plans",
+      "content": "Synthetic excerpt for offline tests. Tool B has a free tier and a paid tier.",
+      "score": 0.77,
+      "raw_content": null
+    },
+    {
+      "title": "Tool C features (synthetic fixture)",
+      "url": "https://example.net/tool-c/features",
+      "content": "Synthetic excerpt for offline tests. Tool C describes code completion and chat.",
+      "score": 0.64,
+      "raw_content": null
+    }
+  ],
+  "response_time": 1.67,
+  "request_id": "00000000-0000-4000-8000-000000000000"
+}

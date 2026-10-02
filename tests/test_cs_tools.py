@@ -143,9 +143,9 @@ class RunnerPathTests(unittest.IsolatedAsyncioTestCase):
         tool_messages = [m for body in run["requests"] for m in body["messages"] if m.get("role") == "tool"]
         self.assertEqual(tool_messages[0]["content"], 'No order with order_id "Z-9" in the order data.')
         self.assertEqual(tool_messages[-1]["content"], (INPUTS / "policies/refund.md").read_text(encoding="utf-8"))
-        self.assertEqual(run["conditions"]["tool_implementations"],
-                         {"lookup_order": "experiments.cs_tools.lookup_order",
-                          "read_policy": "experiments.cs_tools.read_policy"})
+        implementations = run["conditions"]["tool_implementations"]
+        self.assertEqual((implementations["lookup_order"], implementations["read_policy"]),
+                         ("experiments.cs_tools.lookup_order", "experiments.cs_tools.read_policy"))
 
 
 if __name__ == "__main__":

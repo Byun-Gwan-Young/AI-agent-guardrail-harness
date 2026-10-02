@@ -25,6 +25,10 @@ SECRET_PATTERNS = {'groq_key': re.compile(r'gsk_[A-Za-z0-9]{8,}'),
                    'bearer_value': re.compile(r'Bearer\s+[A-Za-z0-9._\-]{8,}'),
                    'openai_style_key': re.compile(r'\bsk-[A-Za-z0-9]{16,}'),
                    'authorization_field': re.compile(r'"authorization"\s*:\s*"[^"]+', re.I)}
+# C-17-6: a run with search tools is also checked for search keys (pattern and the environment value itself).
+# Runs without them keep the scan they had, so earlier saved analyses stay reproducible.
+SEARCH_SECRET_PATTERNS = {'tavily_key': re.compile(r'tvly-[A-Za-z0-9_\-]{8,}')}
+SEARCH_KEY_ENVS = ('TAVILY_API_KEY',)
 
 
 def load(path):
@@ -216,10 +220,10 @@ def shared_artifact_progress(rows):
     return counted
 
 
-def secret_scan(paths, env_names=()):
+def secret_scan(paths, env_names=(), extra_patterns=None):
     """Pattern hits plus the literal value of each named environment variable set right now (D-11)."""
     checked = {}
-    patterns = dict(SECRET_PATTERNS)
+    patterns = {**SECRET_PATTERNS, **(extra_patterns or {})}
     for name in sorted({n for n in env_names if n}):
         value = os.environ.get(name)
         checked[name] = 'set' if value else 'not set in this environment'
@@ -326,7 +330,9 @@ def analyse(session_id):
                                                   'framework_version', 'upstream')},
         'secret_scan': secret_scan([log_path, run],
                                    {(log['meta'].get('upstream') or {}).get('api_key_env'),
-                                    'GROQ_API_KEY', 'KMU_API_KEY'})}
+                                    'GROQ_API_KEY', 'KMU_API_KEY',
+                                    *(SEARCH_KEY_ENVS if conditions.get('tool_settings') else ())},
+                                   SEARCH_SECRET_PATTERNS if conditions.get('tool_settings') else None)}
 
 
 def base_manifest(a, phase, notes):
@@ -490,15 +496,16 @@ def v05_fields(result, conditions, log):
 
 def v06_fields(result, conditions, summary, log):
     """session-manifest-v0.6 = v0.5 + a scenario-v2 run: the session registration and its hash, the output contract
-    and vocabulary violations. A dialogue (T1, C-17-4) run adds routing and how it ended; an artifact (T2/T3, C-17-5)
-    run keeps the acceptance-test judgement of v0.3. Earlier sessions keep theirs."""
+    and vocabulary violations. A dialogue (T1, C-17-4) run adds routing and how it ended, and (C-17-6) its tool settings
+    and search calls; an artifact (T2/T3, C-17-5) run keeps the acceptance-test judgement of v0.3. Earlier sessions keep
+    theirs. v0.6 was widened in place while no session had one (DM-51 principle)."""
     registration = conditions.get('registration')
     observations = log['observations']
     result['manifest_version'] = 'session-manifest-v0.6'
     result['task'] = {k: conditions.get(k) for k in ('task_kind', 'turn_order', 'dialogue_flow', 'output_contract_version',
                                                      'contract_sha256', 'allowed_issues_sha256', 'closed_list_check',
                                                      'judge', 'inputs_dir', 'tools', 'tool_implementations',
-                                                     'recent_messages_rule')}
+                                                     'recent_messages_rule', 'tool_settings', 'search')}
     result['registration'] = {
         'value': registration, 'sha256': conditions.get('registration_sha256'),
         'sha256_recomputed': hashlib.sha256(json.dumps(registration, ensure_ascii=False, sort_keys=True,
@@ -517,6 +524,8 @@ def v06_fields(result, conditions, summary, log):
         return result
     # DM-46: escalated is the one terminal status, so the termination reason already names it; who escalated is kept.
     result['run'].update(final_status=summary.get('final_status'), escalated_by=summary.get('escalated_by'))
+    # C-17-6: search calls of the run (stored responses by hash, decision 018); null without search tools.
+    result['search'] = summary.get('search')
     result['judgement'] = {'before': None, 'after': {'gate': summary.get('completion_gate'),
                                                      'final_status': summary.get('final_status')},
                            'normal_session': summary.get('termination_reason') == 'success',
