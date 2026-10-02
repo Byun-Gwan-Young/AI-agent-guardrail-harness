@@ -9,7 +9,7 @@ TAVILY_200 = (SEARCH / "tavily-search-200.json").read_bytes()
 TAVILY_432 = (SEARCH / "tavily-error-432.json").read_bytes()
 ARXIV_200 = (SEARCH / "arxiv-query-200.xml").read_bytes()
 ARXIV_400 = (SEARCH / "arxiv-error-400.xml").read_bytes()
-KEY = "tvly-OFFLINE-TEST-KEY-0123456789"
+KEY = "offline-fake-search-key-0123456789"  # not a provider key format, on purpose
 WEB = {"provider": "tavily", "max_results": 3, "search_depth": "basic", "topic": "general",
        "max_result_chars": 4000, "max_calls_per_session": 5, "timeout_seconds": 20.0}
 ACADEMIC = {"provider": "arxiv", "max_results": 3, "sort_by": "relevance", "sort_order": "descending",
