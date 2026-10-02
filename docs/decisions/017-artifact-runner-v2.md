@@ -83,3 +83,22 @@ v0.2 프록시의 등록 거절, 차단 프록시.
 
 테스트 `tests/test_approval_gate.py` : 스키마 규칙, 고지 문장(모든 역할·한 문장·명령형 없음·같은 게이트면 같은 문장·게이트 없으면 없음),
 승인 전 거절·후 실행, 승인 역할만 셈·승인 유지, `replace_in_file` 거절, 최종 요청의 `is_error`, 다른 도구 오류와 구분, 매니페스트.
+
+## 파트 3 — 통합 오프라인 테스트 (가짜 업스트림)
+
+합성 fixture `TEST-T2-v2` + 하네스 `tests/t2_harness.py` (실제 실행기·파일 도구·메모리 프록시·가짜 업스트림. 인수 테스트만 작업 공간 파일의
+`# PASS=<n>` 표식으로 통과 수를 내는 함수로 바꿨다). 실제 CT·CL·CT-N 시나리오는 C-18 이다. 고정 순서 : 기획 1·4·…, 개발 2·5·…, 리뷰 3·6·…
+
+| 흐름 (`tests/test_artifact_flows.py`) | 결과 |
+|---|---|
+| 승인 정상 | SPEC 작성(1) → 리뷰 승인(3) → 개발 편집(5) → 16/16 → 리뷰 완료 선언(6) `success`, STOP 없음 |
+| 승인 정체 (관측) | 쓰기 4 번 모두 거절(2·5·8·11), 파일 원본 그대로, strict 연속 0, step 6 v0.3 STOP (E1 "최근 3 step 동안 기획·개발·리뷰 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 7/16."), `max_steps` 까지 계속, `runner_error` 아님 |
+| 승인 정체 (차단) | step 6 STOP → step 7 첫 요청 403 → `guardrail_stop`, 오류 본문 = STOP 기록 문장, 그 전 거절 2 번 |
+| T3 전역 되돌림 | 최고 9 (step 2) 뒤 편집 2 번, step 11 에 개발이 원본(세션 step 1 상태, 개발 자신은 본 적 없음)으로 되돌림 → `oscillating` (`global_revert`, 되돌아간 step 1). K = 6 초과 정체와 함께 step 11 STOP, E2 "src/task_query.py 파일이 step 1 의 내용으로 되돌아갔고, 통과 테스트는 9 step 동안 7/16 입니다." |
+| T3 역할 자신의 되돌림 | 개발이 자기 이전 내용으로 오가면 progress-v2 의 역할별 비교가 먼저 `oscillating` (진전 아님), step 10 STOP E7 |
+| T3 통과 수 정체 | 새 내용 편집이 계속돼도 최고 통과 수 갱신이 없으면 K = 6 안은 진전, 넘으면 `test_plateau` → step 11 STOP E3 |
+
+- DM-37 등가 조건 : `tests/test_artifact_v2.py` (파트 1). A-1 scenario-v1 경로 바이트 불변 (C-17-4 기준값) : `tests/test_dialogue_flows.py`
+  (그대로 통과). 파트 0 결정별 테스트 : `tests/test_c17_5_part0.py`
+- 관찰 (보고) : 역할 자신의 이전 상태로의 되돌림은 progress-v2 역할별 비교가 먼저 잡아 T3 (a) 표시(`applied: global_revert`)가 붙지 않고
+  E7 이 된다. E2 는 되돌린 역할이 본 적 없는 세션 이전 상태로 돌아갈 때 나온다. 판정 규칙·템플릿은 바꾸지 않았다
