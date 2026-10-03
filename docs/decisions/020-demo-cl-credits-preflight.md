@@ -48,3 +48,19 @@
 
 `reports/c17-7/evidence-keycheck.json` (PM 이 `KMU_API_KEY` 를 넣고 실행, `clean: true`, hits 없음) 을 커밋했다.
 `reports/c17-8/evidence-models-keycheck.json`·`evidence-search-keycheck.json` 도 작업 트리에 추적되지 않은 채 있다. 지시 범위 밖이라 커밋하지 않았다.
+
+## 파트 1 — `tools/scenario_preflight.py` v0.3 · scenario-v2 지원
+
+- **scenario-v1 (v0.1·v0.2)** : 기록은 이전과 바이트 같다. 시나리오 파일이 바뀌지 않은 저장 기록 3 개(`reports/p0-4/A-1-v2-preflight.json`, `reports/a-1-v3/preflight-kmu.json`, `reports/a-1-v4/preflight.json`)와 같은지 테스트한다. 출력·종료 코드도 같다
+- **scenario-v2** (데모, `deadlock-v0.3`)
+  - 판정 규칙 : 파라미터는 코드에 없으므로 데모 프록시 설정에서 읽어 고정한다 (`--config`, 기본 `guardrail-deadlock-v0.3-kmu.yaml`). 설정의 `criteria_version` 이 시나리오와 다르면 오류. 기록 : `criteria_sha256`, 파라미터 (N = `consecutive_steps`, K = `plateau_steps`, H = `handoff_record_threshold`, 기록만), 동결 기록 `docs/criteria/deadlock-v0.3.json` 과의 일치 (파라미터 해시·구현 파일 해시·설명 템플릿 해시), `freeze_sha256`
+  - 실행 조건 (DM-57) : `run_conditions` 가 `demo-conditions.yaml` 인지, 그 파일의 모델·추론 강도·해시, 프록시 설정이 같은 모델로 고정되는지
+  - 계약 조합 (DM-37, DM-16) : `v3 with write_gate (CT)` / `v2 without write_gate (CL, CT-N)` 는 통과, `v3 without write_gate` 는 실패 (v3 의 `spec_approved` 를 읽는 것은 write_gate 뿐). 스키마는 이 조합을 막지 않으므로 preflight 가 따로 본다
+  - 세션 등록 해시, 역할 표시 이름, 역할별 쓰기 경로·도구
+  - 산출물 과제 : 이전과 같은 인수 판정(새 사본), suite ID 일치, fixture 무변경 + 감시 파일이 fixture 에 있는지
+  - 대화 과제 : 쓰는 도구, 구현 없는 도구, 필요한 키 환경변수 **이름** (있음/없음은 기록하지 않는다. 실행 전 검사가 실행 때 본다), `inputs_dir`·판정 함수 파일 존재, 입력 문제, 검색 설정
+  - 종료 코드 : 위 검사가 하나라도 실패하면 1
+- **짝 비교 (`--pair`)** : 정상판·교착판을 파일 단위로 비교한다
+  - 시나리오 파일 : 파싱한 값의 차이 (점 경로), 텍스트 unified diff. 짝이 서로 다를 수밖에 없는 값 (`scenario_id`, `fixture_dir`, 그 결과인 `test_suite_id`) 밖의 차이는 `scenario_values_differing_beyond_identity` 에 모은다
+  - fixture 폴더 : 파일마다 같음 / 다름 (unified diff) / 한쪽에만 있음
+  - `one_fixture_file_and_identity_only` : 위 세 값 밖의 차이가 없고 fixture 파일 하나만 다르면 true. 그 차이가 설계 문서의 유도 장치인지는 PM 이 diff 를 보고 판단한다 (도구는 판단하지 않는다)
