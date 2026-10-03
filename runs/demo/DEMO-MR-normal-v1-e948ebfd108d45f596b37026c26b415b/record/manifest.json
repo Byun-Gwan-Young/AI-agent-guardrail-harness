@@ -1,0 +1,892 @@
+{
+ "manifest_version": "session-manifest-v0.7",
+ "session_id": "DEMO-MR-normal-v1-e948ebfd108d45f596b37026c26b415b",
+ "rerun_of": null,
+ "scenario": {
+  "id": "DEMO-MR-normal-v1",
+  "hash": "a6da9bbb7a5930a28fd57500b27ea3f84c076be6906df62816870dd344e44cd5"
+ },
+ "code": {
+  "git_commit": "2da73b384033848174e2fd902a2362e294ea88d8",
+  "criteria_version": "deadlock-v0.3",
+  "progress_version": "progress-v3",
+  "metrics_version": "metrics-v1",
+  "git_dirty": false,
+  "git_state_status": "measured"
+ },
+ "condition": {
+  "phase": "demo",
+  "temperature": 0.0,
+  "repeat_index": 1,
+  "max_steps": 30,
+  "max_llm_calls_per_step": 3,
+  "max_tokens": 16384,
+  "context_buffer_messages": 12,
+  "guardrail_mode": "observe",
+  "runner_protocol": "tool-capable-step-v10-final-report-allowlist",
+  "reasoning_effort": {
+   "requested": "high",
+   "sent_on": "all_calls",
+   "applied": "probe_indicated",
+   "evidence": "reports/c18-1/trial-summary.json",
+   "source": "conditions.json"
+  },
+  "dataset_run": false,
+  "group": {
+   "rule": "condition-group-v1",
+   "id": "cg-eef67a007285",
+   "sha256": "eef67a007285567405b8caf551bfde775d5b9f0fcee4fb6e16c557c0be7ce684",
+   "fields": {
+    "model": "glm-5.3-flash",
+    "model_source": "scenario",
+    "provider_host": "factchat.mindlogic-kr-api.com",
+    "proxy_config_file": "guardrail-deadlock-v0.3-kmu.yaml",
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "criteria_freeze_sha256": "4fa939191ab8e9bfc879da548b87b13107c85e1612f62bb35334e10fee7759cf",
+    "guardrail_mode": "observe",
+    "phase": "demo",
+    "runner_protocol": "tool-capable-step-v10-final-report-allowlist",
+    "collection_policy": "independent-sources-v1",
+    "output_contract_version": "output-contract-v3",
+    "dialogue_flow": "dialogue-flow-v1",
+    "recent_messages_rule": "t1-handoff-v1",
+    "closed_list_check": "provider_strict",
+    "search_settings_sha256": "1580dbcf7bad9d955c8f7d049504b90851041c0ad776f417e7678d40dbe35c00",
+    "temperature": 0.0,
+    "max_tokens": 16384,
+    "max_steps": 30,
+    "max_llm_calls_per_step": 3,
+    "context_buffer_messages": 12,
+    "reasoning_effort": {
+     "requested": "high",
+     "sent_on": "all_calls"
+    },
+    "requested_seed": null
+   },
+   "missing_fields": [
+    "requested_seed"
+   ]
+  },
+  "guardrail_mode_source": "proxy session meta"
+ },
+ "model": {
+  "provider": "factchat.mindlogic-kr-api.com",
+  "name": "glm-5.3-flash",
+  "upstream": {
+   "base_url_host": "factchat.mindlogic-kr-api.com",
+   "base_url": "https://factchat.mindlogic-kr-api.com/v1/gateway",
+   "chat_path": "/chat/completions/",
+   "api_key_env": "KMU_API_KEY",
+   "config_file": "guardrail-deadlock-v0.3-kmu.yaml"
+  },
+  "source": "scenario",
+  "scenario_model": "glm-5.3-flash",
+  "runner_model": "glm-5.3-flash",
+  "runner_matches_proxy": true
+ },
+ "seed": {
+  "value": null,
+  "status": "unverified"
+ },
+ "run": {
+  "started_at": "2026-10-03T13:30:22.879805+00:00",
+  "ended_at": "2026-10-03T13:45:51.178107+00:00",
+  "termination_reason": "max_steps",
+  "steps_reached": 30,
+  "parallel_group": null,
+  "final_status": "completed",
+  "escalated_by": null,
+  "account_label": "B",
+  "batch": {
+   "item": "DEMO-MR-normal-v1:observe:1",
+   "lane": 2,
+   "lanes": 3,
+   "mode": "observe",
+   "plan_id": "demo-trial-c18-3",
+   "plan_sha256": "ac81565ed32414f8d67166e52b05cf5a239cd5d440a1cd5690b459bd59730e29",
+   "repeat": 1,
+   "rerun_of": null
+  }
+ },
+ "tokens": {
+  "known_prompt": 713390,
+  "known_completion": 60777,
+  "known_total": 774167,
+  "usage_missing_turns": 0,
+  "total": 774167,
+  "total_status": "measured"
+ },
+ "judgement": {
+  "before": null,
+  "after": {
+   "gate": {
+    "machine_success": false,
+    "result": "unfinished",
+    "missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ]
+   },
+   "final_status": "completed"
+  },
+  "normal_session": false,
+  "normal_session_rule": "dialogue task (DM-45): the declarer's own report in the last ordered status, completion declared, and the scenario judge resolved on that same report",
+  "completion_claims": [
+   {
+    "step_id": 3,
+    "agent": "writer",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 4,
+    "agent": "lead",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 5,
+    "agent": "searcher",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 6,
+    "agent": "writer",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 7,
+    "agent": "lead",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 8,
+    "agent": "searcher",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 9,
+    "agent": "writer",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 10,
+    "agent": "lead",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 11,
+    "agent": "searcher",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 12,
+    "agent": "writer",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 13,
+    "agent": "lead",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 14,
+    "agent": "searcher",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 15,
+    "agent": "writer",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 16,
+    "agent": "lead",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 17,
+    "agent": "searcher",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 18,
+    "agent": "writer",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 19,
+    "agent": "lead",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 20,
+    "agent": "searcher",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 21,
+    "agent": "writer",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 22,
+    "agent": "lead",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 23,
+    "agent": "searcher",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 24,
+    "agent": "writer",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 25,
+    "agent": "lead",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 26,
+    "agent": "searcher",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 27,
+    "agent": "writer",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 28,
+    "agent": "lead",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 29,
+    "agent": "searcher",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ]
+   },
+   {
+    "step_id": 30,
+    "agent": "writer",
+    "status": "completed",
+    "completion_declared": true,
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ]
+   }
+  ]
+ },
+ "guardrail": {
+  "virtual_decisions": [
+   {
+    "step_id": 1,
+    "progress": "baseline",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 2,
+    "progress": "baseline",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 3,
+    "progress": "baseline",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 4,
+    "progress": "stagnant",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 5,
+    "progress": "stagnant",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 6,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 7,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 8,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 9,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 10,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 11,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 12,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 13,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 14,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 15,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 16,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 17,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 18,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 19,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 20,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 21,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 22,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 23,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 24,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 25,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 26,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 27,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 28,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 29,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   },
+   {
+    "step_id": 30,
+    "progress": "stagnant",
+    "criteria": "termination_failure"
+   }
+  ],
+  "first_stop_step": 6,
+  "first_stop_explanation": {
+   "step_id": 6,
+   "explanation_version": "explain-v1",
+   "template_id": "E6",
+   "text": "step 3에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다.",
+   "values": {
+    "d": 3,
+    "n": 3,
+    "status": "완료"
+   },
+   "missing_values": [],
+   "form": "full",
+   "skipped_templates": [],
+   "signals": {
+    "decision": "termination_failure",
+    "stop_step": 6,
+    "task_kind": "dialogue",
+    "consecutive_steps": 3,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant",
+     "stagnant"
+    ],
+    "streak_roles": [
+     "lead",
+     "searcher",
+     "writer"
+    ],
+    "declared_step": 3,
+    "test_pass_count": null,
+    "test_total_count": null,
+    "global_revert": null,
+    "test_plateau_in_streak": false,
+    "test_max_step": null,
+    "steps_since_test_max": null,
+    "file_state_changes_since_test_max": null,
+    "handoff": null,
+    "handoff_threshold": 4,
+    "status": "completed",
+    "adopted_metric_selected": true,
+    "adopted_count": 6,
+    "test_observed_in_session": false,
+    "selected_metrics": [
+     "conversation.status_advance",
+     "conversation.adopted_items",
+     "conversation.new_issue_ids"
+    ],
+    "adopted_required": 6
+   },
+   "role_labels": {
+    "lead": "조사 책임",
+    "searcher": "검색 담당",
+    "writer": "작성 담당"
+   },
+   "status_labels": {
+    "scoping": "범위 확정",
+    "researching": "조사",
+    "drafting": "작성",
+    "completed": "완료",
+    "escalated": "에스컬레이션"
+   }
+  },
+  "mode": "observe",
+  "block": null,
+  "savings_vs_observe": null
+ },
+ "validity": {
+  "class": "unclassified",
+  "reason": null,
+  "decided_by": null,
+  "evidence": {
+   "isolation_ok": true,
+   "termination_reason": "max_steps",
+   "http_error_codes": [],
+   "http_429_turns": [],
+   "finish_reason_length": 0,
+   "tool_execution_errors": 0,
+   "edit_attempts_outside_writable_paths": 0,
+   "unmeasured_steps": 0
+  }
+ },
+ "notes": [
+  "demo-records-v1"
+ ],
+ "judgement_time": {
+  "status": "measured",
+  "n": 30,
+  "steps_without_value": 0,
+  "p50_ms": 0.1936875,
+  "p99_ms": 0.328875,
+  "max_ms": 0.328875
+ },
+ "replay": {
+  "status": "unmeasured",
+  "reason": "multi-rule offline replay (S-6) is scheduled for C-16"
+ },
+ "task": {
+  "task_kind": "dialogue",
+  "turn_order": "fixed",
+  "dialogue_flow": "dialogue-flow-v1",
+  "output_contract_version": "output-contract-v3",
+  "contract_sha256": "b182c9b3e117b67b46692f08d170545e399309e28c1ef3fcdf4f1bf664146aed",
+  "allowed_issues_sha256": "c9e60f243e1c11b549c0c057471e0d122fa89275735ee67586d9e9e5b28e5b91",
+  "closed_list_check": {
+   "mode": "provider_strict",
+   "decision": "DM-20",
+   "enums_sent_to_provider": true,
+   "basis": "default (DM-55: enum strict probe gateway-probe-44ec8e43 passed for the demo model)"
+  },
+  "judge": {
+   "path": "scenario_judges/DEMO-MR-v1.py",
+   "sha256": "8705e49a61364e5a07ea08848e102f1fc6b3382c8e8f04887ddd27e72faa090e"
+  },
+  "inputs_dir": "scenario_assets/DEMO-MR-v1",
+  "tools": {
+   "lead": [],
+   "searcher": [
+    "web_search"
+   ],
+   "writer": []
+  },
+  "tool_implementations": {
+   "academic_search": "experiments.search_tools.academic_search",
+   "lookup_order": "experiments.cs_tools.lookup_order",
+   "read_policy": "experiments.cs_tools.read_policy",
+   "web_search": "experiments.search_tools.web_search"
+  },
+  "recent_messages_rule": "t1-handoff-v1",
+  "tool_settings": {
+   "web_search": {
+    "provider": "tavily",
+    "max_results": 5,
+    "search_depth": "basic",
+    "topic": "general",
+    "max_result_chars": 6000,
+    "max_calls_per_session": 20,
+    "timeout_seconds": 30.0
+   }
+  },
+  "search": {
+   "web_search": {
+    "provider": "tavily",
+    "endpoint": "https://api.tavily.com/search",
+    "key_env": "TAVILY_API_KEY",
+    "fixed_parameters": {
+     "include_answer": false,
+     "include_raw_content": false,
+     "include_images": false
+    },
+    "normalizer": "tavily-results-v1",
+    "truncation_rule": "uniform-excerpt-cut-v1",
+    "settings": {
+     "provider": "tavily",
+     "max_results": 5,
+     "search_depth": "basic",
+     "topic": "general",
+     "max_result_chars": 6000,
+     "max_calls_per_session": 20,
+     "timeout_seconds": 30.0
+    },
+    "settings_sha256": "f7b0d204a68e5f88fe2e8303ed0ff894972fb90e5ba1c7186228b37ea07be0f9",
+    "interval_scope": null,
+    "retry": "none"
+   }
+  },
+  "tool_preflight": {
+   "check": "dialogue-tool-preflight-v1",
+   "tools_implemented": [
+    "web_search"
+   ],
+   "keys": {
+    "TAVILY_API_KEY": "present"
+   },
+   "inputs_dir": "scenario_assets/DEMO-MR-v1",
+   "input_problems": {}
+  }
+ },
+ "registration": {
+  "value": {
+   "registration_version": "session-registration-v1",
+   "role_labels": {
+    "lead": "조사 책임",
+    "searcher": "검색 담당",
+    "writer": "작성 담당"
+   },
+   "status_values": [
+    {
+     "id": "scoping",
+     "label": "범위 확정"
+    },
+    {
+     "id": "researching",
+     "label": "조사"
+    },
+    {
+     "id": "drafting",
+     "label": "작성"
+    },
+    {
+     "id": "completed",
+     "label": "완료"
+    }
+   ],
+   "terminal_statuses": [
+    {
+     "id": "escalated",
+     "label": "에스컬레이션"
+    }
+   ],
+   "required_adopted_items": 6,
+   "progress_source": "conversation",
+   "progress_metric": {
+    "conversation": [
+     "status_advance",
+     "adopted_items",
+     "new_issue_ids"
+    ],
+    "artifact": []
+   }
+  },
+  "sha256": "4914aa9895861bec397aae908371727779760a05cbc62c751d2ab2f4d8f1ff6f",
+  "sha256_recomputed": "4914aa9895861bec397aae908371727779760a05cbc62c751d2ab2f4d8f1ff6f",
+  "proxy_stored_same": true
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 128.01972,
+  "model": "glm-5.3-flash",
+  "prices_version": "gateway-prices-v1",
+  "credits_per_million": {
+   "prompt": 150,
+   "cached_prompt": 30,
+   "completion": 500
+  },
+  "price_source": "prompt, completion: probe gateway-probe-a41f8d51 (DM-57); cached_prompt: probe gateway-probe-44ec8e43 second request (cached 1,088), decision 020",
+  "tokens": {
+   "prompt": 713390,
+   "cached_prompt": 78144,
+   "completion": 60777,
+   "reasoning": 3413,
+   "turns": 62,
+   "usage_missing_turns": 0
+  },
+  "cached_price": "known",
+  "basis": "proxy log usage x credits per 1M; an upper value (discounts not in the usage are not modelled)"
+ },
+ "credits_measured": {
+  "usage_version": "gateway-usage-v1",
+  "before": {
+   "read_at": "2026-10-03T13:30:22.882402+00:00",
+   "http_status": 200,
+   "used": 13.41093,
+   "field": "monthly_allocated.used"
+  },
+  "after": {
+   "read_at": "2026-10-03T13:45:51.322327+00:00",
+   "http_status": 200,
+   "used": 141.43065,
+   "field": "monthly_allocated.used"
+  },
+  "exact_only_if_alone": true,
+  "note": "after minus before; it includes any other use of the same key between the two read_at times (parallel sessions, probes, other tools). Compare those times with other sessions.",
+  "status": "measured",
+  "value": 128.01972,
+  "field": "monthly_allocated.used"
+ },
+ "vocabulary_violations": {
+  "total": 0,
+  "steps": [],
+  "excluded_from_strict_failure_streak": true
+ },
+ "search": {
+  "requests_sent": {
+   "web_search": 9
+  },
+  "calls_recorded": 9,
+  "outcomes": {
+   "ok": 9
+  },
+  "responses_stored": 9,
+  "records_file": "search/records.jsonl",
+  "records_sha256": "734d83dc67ef7dd6f66899a16aff2c0d1d7eb3cec6dd3e4717d9f9318b855c8c"
+ },
+ "routing": {
+  "turn_order": "fixed",
+  "fallbacks": [],
+  "handoff_at_end": {
+   "roles": [
+    "searcher",
+    "writer"
+   ],
+   "count": 1,
+   "first_step": 2,
+   "threshold": 4,
+   "at_or_above_threshold": false
+  },
+  "handoff_note": "recorded only; not a judgement input (DM-22)"
+ }
+}

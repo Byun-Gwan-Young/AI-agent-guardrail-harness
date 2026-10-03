@@ -1,0 +1,92 @@
+{
+ "session_id": "DEMO-LR-normal-v1-433f48c2145948259077ce99f0495111",
+ "scenario_id": "DEMO-LR-normal-v1",
+ "termination_reason": "success",
+ "steps": 6,
+ "error": null,
+ "tests_passed": {
+  "before": null,
+  "after": null,
+  "max": null
+ },
+ "first_stop": null,
+ "stop_steps": [],
+ "tokens": {
+  "prompt": 81598,
+  "cached_prompt": 15232,
+  "completion": 12470,
+  "reasoning": 1753,
+  "turns": 13,
+  "usage_missing_turns": 0
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 16.64686,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-03T13:30:58.415515+00:00",
+   "2026-10-03T13:34:56.567178+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 16.64686,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 11,
+  "2": 2
+ },
+ "tool_results": {
+  "executed": 4,
+  "refused_before_approval": 0,
+  "error_results": 0,
+  "error_results_by_tool": {},
+  "error_results_by_summary": {},
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 0,
+  "vocabulary_violations": 0,
+  "by_kind": {},
+  "failed_steps": []
+ },
+ "condition_group": "cg-880cb785600f",
+ "condition_group_missing_fields": [
+  "requested_seed"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": []
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "observe",
+ "session_times": {
+  "started_at": "2026-10-03T13:30:58.412963+00:00",
+  "ended_at": "2026-10-03T13:34:56.542633+00:00"
+ },
+ "account_label": "C",
+ "batch": {
+  "item": "DEMO-LR-normal-v1:observe:1",
+  "lane": 3,
+  "lanes": 3,
+  "mode": "observe",
+  "plan_id": "demo-trial-c18-3",
+  "plan_sha256": "ac81565ed32414f8d67166e52b05cf5a239cd5d440a1cd5690b459bd59730e29",
+  "repeat": 1,
+  "rerun_of": null
+ },
+ "key_scan": {
+  "files_scanned": 25,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

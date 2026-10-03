@@ -1,0 +1,118 @@
+{
+ "session_id": "DEMO-CT-normal-v1-f854545930f34bd5bd828142116d1271",
+ "scenario_id": "DEMO-CT-normal-v1",
+ "termination_reason": "success",
+ "steps": 6,
+ "error": null,
+ "tests_passed": {
+  "before": 7,
+  "after": 16,
+  "max": 16
+ },
+ "first_stop": null,
+ "stop_steps": [],
+ "tokens": {
+  "prompt": 89353,
+  "cached_prompt": 36096,
+  "completion": 8679,
+  "reasoning": 2285,
+  "turns": 18,
+  "usage_missing_turns": 0
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 13.41093,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-03T12:49:17.505066+00:00",
+   "2026-10-03T12:53:02.091549+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 13.41093,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 9,
+  "1": 4,
+  "2": 2,
+  "3": 3
+ },
+ "tool_results": {
+  "executed": 17,
+  "refused_before_approval": 1,
+  "error_results": 1,
+  "error_results_by_tool": {
+   "write_file": 1
+  },
+  "error_results_by_summary": {
+   "Role is not authorized to edit this file": 1
+  },
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 0,
+  "vocabulary_violations": 0,
+  "by_kind": {},
+  "failed_steps": [
+   {
+    "step_id": 2,
+    "reasons": [
+     "write_refused_before_approval"
+    ]
+   },
+   {
+    "step_id": 4,
+    "reasons": [
+     "tool_execution_error"
+    ]
+   }
+  ]
+ },
+ "condition_group": "cg-6c5c13fb016a",
+ "condition_group_missing_fields": [
+  "dialogue_flow",
+  "recent_messages_rule",
+  "requested_seed",
+  "search_settings_sha256"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [
+   "dialogue_flow",
+   "recent_messages_rule",
+   "search_settings_sha256"
+  ],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": []
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "observe",
+ "session_times": {
+  "started_at": "2026-10-03T12:49:17.500576+00:00",
+  "ended_at": "2026-10-03T12:53:02.064857+00:00"
+ },
+ "account_label": "A",
+ "batch": {
+  "item": "DEMO-CT-normal-v1:observe:1",
+  "lane": 1,
+  "lanes": 3,
+  "mode": "observe",
+  "plan_id": "demo-trial-c18-2",
+  "plan_sha256": "35a739a5990259d2272d54286398b8738443ebadbbaf545bf8f416cf03978e31",
+  "repeat": 1,
+  "rerun_of": null
+ },
+ "key_scan": {
+  "files_scanned": 54,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

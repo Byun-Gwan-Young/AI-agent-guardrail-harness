@@ -1,0 +1,151 @@
+{
+ "sessions": [
+  {
+   "session_id": "DEMO-CT-normal-v1-f854545930f34bd5bd828142116d1271",
+   "files": {
+    "conditions.json": 14000,
+    "summary.json": 2391,
+    "scenario.yaml": 8805,
+    "registered-tools.json": 229,
+    "prompt-trend.json": 7221,
+    "record/manifest.json": 9225,
+    "record/demo-summary.json": 2385,
+    "record/judgements.json": 15090
+   },
+   "bytes": 59346,
+   "problems": []
+  },
+  {
+   "session_id": "DEMO-CT-stall-v1-819eb0783b724840b9333f480a599666",
+   "files": {
+    "conditions.json": 14234,
+    "summary.json": 57778,
+    "scenario.yaml": 9083,
+    "registered-tools.json": 229,
+    "prompt-trend.json": 32233,
+    "record/manifest.json": 12828,
+    "record/demo-summary.json": 2765,
+    "record/judgements.json": 103624
+   },
+   "bytes": 232774,
+   "problems": []
+  },
+  {
+   "session_id": "DEMO-CT-N-v1-b9003e8ffbc146bb99111768272eaf56",
+   "files": {
+    "conditions.json": 14131,
+    "summary.json": 1991,
+    "scenario.yaml": 8246,
+    "registered-tools.json": 229,
+    "prompt-trend.json": 3608,
+    "record/manifest.json": 8290,
+    "record/demo-summary.json": 2121,
+    "record/judgements.json": 6982
+   },
+   "bytes": 45598,
+   "problems": []
+  },
+  {
+   "session_id": "DEMO-CS-normal-v1-47da0f11c48f407abb18959ba283433d",
+   "files": {
+    "conditions.json": 11864,
+    "summary.json": 2373,
+    "scenario.yaml": 6414,
+    "registered-tools.json": 175,
+    "prompt-trend.json": 1200,
+    "record/manifest.json": 9331,
+    "record/demo-summary.json": 2028,
+    "record/judgements.json": 2155
+   },
+   "bytes": 35540,
+   "problems": []
+  },
+  {
+   "session_id": "DEMO-CS-stall-v1-89187184d4cb46b09b6e173a1a264ffa",
+   "files": {
+    "conditions.json": 11858,
+    "summary.json": 2369,
+    "scenario.yaml": 6412,
+    "registered-tools.json": 175,
+    "prompt-trend.json": 1200,
+    "record/manifest.json": 9323,
+    "record/demo-summary.json": 2034,
+    "record/judgements.json": 2154
+   },
+   "bytes": 35525,
+   "problems": []
+  },
+  {
+   "session_id": "DEMO-MR-normal-v1-e948ebfd108d45f596b37026c26b415b",
+   "files": {
+    "conditions.json": 13549,
+    "summary.json": 99075,
+    "scenario.yaml": 6838,
+    "registered-tools.json": 70,
+    "prompt-trend.json": 26906,
+    "record/manifest.json": 20503,
+    "record/demo-summary.json": 2441,
+    "record/judgements.json": 104480
+   },
+   "bytes": 273862,
+   "problems": []
+  },
+  {
+   "session_id": "DEMO-MR-stall-v1-d454a7cd328e4cbd919539f4ccb60d2a",
+   "files": {
+    "conditions.json": 14567,
+    "summary.json": 2440,
+    "scenario.yaml": 7599,
+    "registered-tools.json": 70,
+    "prompt-trend.json": 2073,
+    "record/manifest.json": 10456,
+    "record/demo-summary.json": 1980,
+    "record/judgements.json": 4408
+   },
+   "bytes": 43593,
+   "problems": []
+  },
+  {
+   "session_id": "DEMO-LR-normal-v1-433f48c2145948259077ce99f0495111",
+   "files": {
+    "conditions.json": 12647,
+    "summary.json": 3014,
+    "scenario.yaml": 6429,
+    "registered-tools.json": 75,
+    "prompt-trend.json": 5558,
+    "record/manifest.json": 11461,
+    "record/demo-summary.json": 1977,
+    "record/judgements.json": 10036
+   },
+   "bytes": 51197,
+   "problems": []
+  },
+  {
+   "session_id": "DEMO-LR-stall-v1-bd57f54b0a0347c7bbf03bbab250aa4d",
+   "files": {
+    "conditions.json": 12946,
+    "summary.json": 2452,
+    "scenario.yaml": 6773,
+    "registered-tools.json": 75,
+    "prompt-trend.json": 2940,
+    "record/manifest.json": 10693,
+    "record/demo-summary.json": 1980,
+    "record/judgements.json": 5426
+   },
+   "bytes": 43285,
+   "problems": []
+  }
+ ],
+ "index": {
+  "rule": "demo-records-v1",
+  "tracked_files": 24,
+  "sessions": [
+   "DEMO-CL-normal-v1-c3a4c019c1ec48ca86b22d45340aea7b",
+   "DEMO-CL-normal-v1-d5460d69bcc84e20a4eaef6275ea1e8a",
+   "DEMO-CL-stall-v1-f08705febcab4bcdacaea83cb8bd61f1"
+  ],
+  "problems": [],
+  "ok": true
+ },
+ "ok": true
+}

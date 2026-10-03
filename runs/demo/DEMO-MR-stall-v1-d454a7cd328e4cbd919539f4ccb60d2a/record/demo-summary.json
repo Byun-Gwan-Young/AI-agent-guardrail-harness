@@ -1,0 +1,93 @@
+{
+ "session_id": "DEMO-MR-stall-v1-d454a7cd328e4cbd919539f4ccb60d2a",
+ "scenario_id": "DEMO-MR-stall-v1",
+ "termination_reason": "escalated",
+ "steps": 2,
+ "error": null,
+ "tests_passed": {
+  "before": null,
+  "after": null,
+  "max": null
+ },
+ "first_stop": null,
+ "stop_steps": [],
+ "tokens": {
+  "prompt": 46199,
+  "cached_prompt": 2432,
+  "completion": 5845,
+  "reasoning": 3395,
+  "turns": 5,
+  "usage_missing_turns": 0
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 9.56051,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-03T13:45:53.088534+00:00",
+   "2026-10-03T13:48:26.632632+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 9.56051,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 3,
+  "1": 1,
+  "8": 1
+ },
+ "tool_results": {
+  "executed": 9,
+  "refused_before_approval": 0,
+  "error_results": 0,
+  "error_results_by_tool": {},
+  "error_results_by_summary": {},
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 0,
+  "vocabulary_violations": 0,
+  "by_kind": {},
+  "failed_steps": []
+ },
+ "condition_group": "cg-eef67a007285",
+ "condition_group_missing_fields": [
+  "requested_seed"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": []
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "observe",
+ "session_times": {
+  "started_at": "2026-10-03T13:45:53.084685+00:00",
+  "ended_at": "2026-10-03T13:48:26.616335+00:00"
+ },
+ "account_label": "B",
+ "batch": {
+  "item": "DEMO-MR-stall-v1:observe:1",
+  "lane": 2,
+  "lanes": 3,
+  "mode": "observe",
+  "plan_id": "demo-trial-c18-3",
+  "plan_sha256": "ac81565ed32414f8d67166e52b05cf5a239cd5d440a1cd5690b459bd59730e29",
+  "repeat": 1,
+  "rerun_of": null
+ },
+ "key_scan": {
+  "files_scanned": 22,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

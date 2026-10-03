@@ -1,0 +1,137 @@
+[
+  {
+    "step_id": 1,
+    "agent": "planner",
+    "llm_turns": [
+      1,
+      2,
+      3
+    ],
+    "prompt_tokens_per_call": [
+      2393,
+      3976,
+      4631
+    ],
+    "prompt_tokens_sum": 11000,
+    "known_prompt_tokens_subtotal": 11000,
+    "seed_audit": [
+      {
+        "requested_seed": null,
+        "forwarded_seed": null,
+        "forwarded": false,
+        "response_status": 200,
+        "request_succeeded": true,
+        "model_applied_seed": null,
+        "note": "Forwarded body and HTTP outcome only; success does not prove seed was applied"
+      },
+      {
+        "requested_seed": null,
+        "forwarded_seed": null,
+        "forwarded": false,
+        "response_status": 200,
+        "request_succeeded": true,
+        "model_applied_seed": null,
+        "note": "Forwarded body and HTTP outcome only; success does not prove seed was applied"
+      },
+      {
+        "requested_seed": null,
+        "forwarded_seed": null,
+        "forwarded": false,
+        "response_status": 200,
+        "request_succeeded": true,
+        "model_applied_seed": null,
+        "note": "Forwarded body and HTTP outcome only; success does not prove seed was applied"
+      }
+    ]
+  },
+  {
+    "step_id": 2,
+    "agent": "developer",
+    "llm_turns": [
+      4,
+      5,
+      6
+    ],
+    "prompt_tokens_per_call": [
+      2813,
+      4182,
+      3916
+    ],
+    "prompt_tokens_sum": 10911,
+    "known_prompt_tokens_subtotal": 10911,
+    "seed_audit": [
+      {
+        "requested_seed": null,
+        "forwarded_seed": null,
+        "forwarded": false,
+        "response_status": 200,
+        "request_succeeded": true,
+        "model_applied_seed": null,
+        "note": "Forwarded body and HTTP outcome only; success does not prove seed was applied"
+      },
+      {
+        "requested_seed": null,
+        "forwarded_seed": null,
+        "forwarded": false,
+        "response_status": 200,
+        "request_succeeded": true,
+        "model_applied_seed": null,
+        "note": "Forwarded body and HTTP outcome only; success does not prove seed was applied"
+      },
+      {
+        "requested_seed": null,
+        "forwarded_seed": null,
+        "forwarded": false,
+        "response_status": 200,
+        "request_succeeded": true,
+        "model_applied_seed": null,
+        "note": "Forwarded body and HTTP outcome only; success does not prove seed was applied"
+      }
+    ]
+  },
+  {
+    "step_id": 3,
+    "agent": "reviewer",
+    "llm_turns": [
+      7,
+      8,
+      9
+    ],
+    "prompt_tokens_per_call": [
+      2894,
+      3899,
+      4167
+    ],
+    "prompt_tokens_sum": 10960,
+    "known_prompt_tokens_subtotal": 10960,
+    "seed_audit": [
+      {
+        "requested_seed": null,
+        "forwarded_seed": null,
+        "forwarded": false,
+        "response_status": 200,
+        "request_succeeded": true,
+        "model_applied_seed": null,
+        "note": "Forwarded body and HTTP outcome only; success does not prove seed was applied"
+      },
+      {
+        "requested_seed": null,
+        "forwarded_seed": null,
+        "forwarded": false,
+        "response_status": 200,
+        "request_succeeded": true,
+        "model_applied_seed": null,
+        "note": "Forwarded body and HTTP outcome only; success does not prove seed was applied"
+      },
+      {
+        "requested_seed": null,
+        "forwarded_seed": null,
+        "forwarded": false,
+        "response_status": 200,
+        "request_succeeded": true,
+        "model_applied_seed": null,
+        "note": "Forwarded body and HTTP outcome only; success does not prove seed was applied"
+      }
+    ]
+  }
+]

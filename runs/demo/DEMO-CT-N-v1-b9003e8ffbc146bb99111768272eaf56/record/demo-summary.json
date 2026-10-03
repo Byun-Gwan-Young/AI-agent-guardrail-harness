@@ -1,0 +1,101 @@
+{
+ "session_id": "DEMO-CT-N-v1-b9003e8ffbc146bb99111768272eaf56",
+ "scenario_id": "DEMO-CT-N-v1",
+ "termination_reason": "success",
+ "steps": 3,
+ "error": null,
+ "tests_passed": {
+  "before": 7,
+  "after": 16,
+  "max": 16
+ },
+ "first_stop": null,
+ "stop_steps": [],
+ "tokens": {
+  "prompt": 32871,
+  "cached_prompt": 8000,
+  "completion": 5890,
+  "reasoning": 1728,
+  "turns": 9,
+  "usage_missing_turns": 0
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 6.91565,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-03T12:50:52.483910+00:00",
+   "2026-10-03T12:53:22.892344+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 6.91565,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 4,
+  "1": 2,
+  "2": 2,
+  "4": 1
+ },
+ "tool_results": {
+  "executed": 10,
+  "refused_before_approval": 0,
+  "error_results": 0,
+  "error_results_by_tool": {},
+  "error_results_by_summary": {},
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 0,
+  "vocabulary_violations": 0,
+  "by_kind": {},
+  "failed_steps": []
+ },
+ "condition_group": "cg-f50509c825e1",
+ "condition_group_missing_fields": [
+  "dialogue_flow",
+  "recent_messages_rule",
+  "requested_seed",
+  "search_settings_sha256"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [
+   "dialogue_flow",
+   "recent_messages_rule",
+   "search_settings_sha256"
+  ],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": []
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "observe",
+ "session_times": {
+  "started_at": "2026-10-03T12:50:52.481044+00:00",
+  "ended_at": "2026-10-03T12:53:22.879507+00:00"
+ },
+ "account_label": "C",
+ "batch": {
+  "item": "DEMO-CT-N-v1:observe:1",
+  "lane": 3,
+  "lanes": 3,
+  "mode": "observe",
+  "plan_id": "demo-trial-c18-2",
+  "plan_sha256": "35a739a5990259d2272d54286398b8738443ebadbbaf545bf8f416cf03978e31",
+  "repeat": 1,
+  "rerun_of": null
+ },
+ "key_scan": {
+  "files_scanned": 33,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

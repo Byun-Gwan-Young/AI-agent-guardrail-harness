@@ -1,0 +1,77 @@
+{
+  "session_id": "DEMO-LR-stall-v1-bd57f54b0a0347c7bbf03bbab250aa4d",
+  "steps": 3,
+  "termination_reason": "escalated",
+  "total_tokens": 31303,
+  "known_tokens_subtotal": 31303,
+  "criteria_latest": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "progress, baseline or declaration step",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "declared_step": null
+  },
+  "criteria_alerts": [],
+  "missing_observation_steps": [],
+  "missing_observation_count": 0,
+  "error": null,
+  "cleanup_errors": [],
+  "actual_outcome": null,
+  "context_buffer_messages": 12,
+  "task_kind": "dialogue",
+  "turn_order": "fixed",
+  "output_contract_version": "output-contract-v3",
+  "registration_sha256": "f18f26f3d08de371ad6b42b775f4619b257204f648366295d83f1437f4979322",
+  "vocabulary_violation_steps": [],
+  "vocabulary_violations_total": 0,
+  "failed_steps": [],
+  "final_status": "escalated",
+  "escalated_by": "writer",
+  "completion_gate": {
+    "machine_success": false,
+    "result": "escalated",
+    "missing": []
+  },
+  "completion_claims": [],
+  "recent_messages_rule": "t1-handoff-v1",
+  "route_fallbacks": [],
+  "search": {
+    "requests_sent": {
+      "academic_search": 3
+    },
+    "calls_recorded": 3,
+    "outcomes": {
+      "ok": 3
+    },
+    "responses_stored": 3,
+    "records_file": "search/records.jsonl",
+    "records_sha256": "809516ac25347b0203c0a7eb5992348cb8826d1025b6dde8c6ea2b89cf89b447"
+  },
+  "gateway_usage": {
+    "usage_version": "gateway-usage-v1",
+    "before": {
+      "read_at": "2026-10-03T13:34:58.075838+00:00",
+      "http_status": 200,
+      "used": 173.29980000000003,
+      "field": "monthly_allocated.used"
+    },
+    "after": {
+      "read_at": "2026-10-03T13:36:53.831394+00:00",
+      "http_status": 200,
+      "used": 179.44047000000006,
+      "field": "monthly_allocated.used"
+    },
+    "exact_only_if_alone": true,
+    "note": "after minus before; it includes any other use of the same key between the two read_at times (parallel sessions, probes, other tools). Compare those times with other sessions.",
+    "status": "measured",
+    "value": 6.14067,
+    "field": "monthly_allocated.used"
+  }
+}

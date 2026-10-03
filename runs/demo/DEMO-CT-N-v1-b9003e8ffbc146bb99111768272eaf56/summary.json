@@ -1,0 +1,59 @@
+{
+  "session_id": "DEMO-CT-N-v1-b9003e8ffbc146bb99111768272eaf56",
+  "steps": 3,
+  "termination_reason": "success",
+  "total_tokens": 38761,
+  "known_tokens_subtotal": 38761,
+  "criteria_latest": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "progress, baseline or declaration step",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "declared_step": 3
+  },
+  "criteria_alerts": [],
+  "tests_passed_before": 7,
+  "tests_passed_after": 16,
+  "missing_observation_steps": [],
+  "missing_observation_count": 0,
+  "fixture_unchanged": true,
+  "error": null,
+  "cleanup_errors": [],
+  "actual_outcome": null,
+  "context_buffer_messages": 12,
+  "vocabulary_violation_steps": [],
+  "vocabulary_violations_total": 0,
+  "failed_steps": [],
+  "task_kind": "artifact",
+  "turn_order": "fixed",
+  "output_contract_version": "output-contract-v2",
+  "registration_sha256": "98276d795684696230fcd56aab4b08b774bc2b90fe4b947128d846d9e00578de",
+  "approval": null,
+  "gateway_usage": {
+    "usage_version": "gateway-usage-v1",
+    "before": {
+      "read_at": "2026-10-03T12:50:52.483910+00:00",
+      "http_status": 200,
+      "used": 149.73729000000003,
+      "field": "monthly_allocated.used"
+    },
+    "after": {
+      "read_at": "2026-10-03T12:53:22.892344+00:00",
+      "http_status": 200,
+      "used": 156.65294000000003,
+      "field": "monthly_allocated.used"
+    },
+    "exact_only_if_alone": true,
+    "note": "after minus before; it includes any other use of the same key between the two read_at times (parallel sessions, probes, other tools). Compare those times with other sessions.",
+    "status": "measured",
+    "value": 6.91565,
+    "field": "monthly_allocated.used"
+  }
+}
