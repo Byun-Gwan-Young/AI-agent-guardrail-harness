@@ -1,0 +1,46 @@
+{
+ "script": "tools/c18_2_evidence.py trial",
+ "status": "estimated",
+ "plan_id": "demo-trial-c18-2",
+ "plan_sha256": "35a739a5990259d2272d54286398b8738443ebadbbaf545bf8f416cf03978e31",
+ "references": {
+  "short_success": {
+   "session_id": "DEMO-CL-normal-v1-d5460d69bcc84e20a4eaef6275ea1e8a",
+   "credits_measured": 16.35269,
+   "steps": 6
+  },
+  "thirty_steps": {
+   "session_id": "DEMO-CL-stall-v1-f08705febcab4bcdacaea83cb8bd61f1",
+   "credits_measured": 126.5433,
+   "steps": 30
+  }
+ },
+ "sessions": [
+  {
+   "item": "DEMO-CT-normal-v1:observe:1",
+   "kind": "between a short success and 30 steps",
+   "low": 16.35269,
+   "high": 126.5433
+  },
+  {
+   "item": "DEMO-CT-stall-v1:observe:1",
+   "kind": "30-step (cannot succeed)",
+   "low": 126.5433,
+   "high": 126.5433
+  },
+  {
+   "item": "DEMO-CT-N-v1:observe:1",
+   "kind": "between a short success and 30 steps",
+   "low": 16.35269,
+   "high": 126.5433
+  }
+ ],
+ "total": {
+  "low": 159.24868,
+  "high": 379.6299
+ },
+ "limits": [
+  "one measured session per reference (CL, T3); CT and CT-N have another task and SPEC/approval turns, so their length and tokens differ",
+  "a session that stops early on runner_error costs less than the low value"
+ ]
+}

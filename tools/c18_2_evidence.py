@@ -5,6 +5,9 @@ tokens that back demo-conditions.yaml reasoning_effort: high (DM-60), the 400 th
 tool result with its role, tool, target path and that role's writable paths (the step 4 errors). Only tool names,
 paths and the runner's error summaries are printed: no model text, no reasoning content, no tool arguments other
 than the path.
+
+`c18_2_evidence.py trial` (part 3) writes reports/c18-2/estimate-trial.json: the credits the C-18-2 trial plan is
+expected to use, from those measured credits (an estimate).
 """
 import argparse
 import json
@@ -85,10 +88,50 @@ def evidence(runs_root=ROOT / 'runs/demo', sessions=TRIAL_SESSIONS):
         'summaries': summaries}
 
 
+# C-18-2 part 3: the C-18-1 trial sessions whose measured credits stand for a short normal run and a 30-step run.
+NORMAL_REFERENCE = 'DEMO-CL-normal-v1-d5460d69bcc84e20a4eaef6275ea1e8a'
+FULL_REFERENCE = 'DEMO-CL-stall-v1-f08705febcab4bcdacaea83cb8bd61f1'
+# Scenarios that cannot end in success (no implementation passes their acceptance tests), so they run to max_steps.
+CANNOT_SUCCEED = ('DEMO-CT-stall-v1', 'DEMO-CL-stall-v1')
+TRIAL_PLAN = ROOT / 'batch_plans/demo-trial-c18-2.yaml'
+DEFAULT_ESTIMATE = ROOT / 'reports/c18-2/estimate-trial.json'
+
+
+def trial_estimate(summary_path=DEFAULT_OUTPUT, plan_path=TRIAL_PLAN):
+    """Credits expected for the C-18-2 trial plan (an estimate): per session, from the measured credits of the C-18-1
+    trial (glm-5.3-flash, high). A session that can succeed lies between the short normal run and the 30-step run;
+    one that cannot succeed (and has no escalation on the artifact path) is taken as the 30-step run."""
+    from tools import run_batch
+    summaries = json.loads(Path(summary_path).read_text(encoding='utf-8'))['summaries']
+    low = summaries[NORMAL_REFERENCE]['credits_measured']['value']
+    full = summaries[FULL_REFERENCE]['credits_measured']['value']
+    plan = run_batch.load_plan(plan_path)
+    rows = [{'item': i.key, 'kind': '30-step (cannot succeed)' if i.scenario_id in CANNOT_SUCCEED else
+             'between a short success and 30 steps',
+             'low': full if i.scenario_id in CANNOT_SUCCEED else low, 'high': full} for i in plan['items']]
+    return {'script': 'tools/c18_2_evidence.py trial', 'status': 'estimated', 'plan_id': plan['plan_id'],
+            'plan_sha256': plan['plan_sha256'],
+            'references': {'short_success': {'session_id': NORMAL_REFERENCE, 'credits_measured': low, 'steps': 6},
+                           'thirty_steps': {'session_id': FULL_REFERENCE, 'credits_measured': full, 'steps': 30}},
+            'sessions': rows, 'total': {'low': round(sum(r['low'] for r in rows), 5),
+                                        'high': round(sum(r['high'] for r in rows), 5)},
+            'limits': ['one measured session per reference (CL, T3); CT and CT-N have another task and SPEC/approval '
+                       'turns, so their length and tokens differ',
+                       'a session that stops early on runner_error costs less than the low value']}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument('action', nargs='?', choices=('evidence', 'trial'), default='evidence')
+    parser.add_argument('--output', type=Path, default=None)
     args = parser.parse_args()
+    if args.action == 'trial':
+        result = trial_estimate()
+        output = args.output or DEFAULT_ESTIMATE
+        output.write_text(json.dumps(result, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
+        print(json.dumps(result, ensure_ascii=False, indent=1))
+        return 0
+    args.output = args.output or DEFAULT_OUTPUT
     result = evidence()
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
