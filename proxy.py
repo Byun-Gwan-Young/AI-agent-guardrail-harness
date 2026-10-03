@@ -10,8 +10,8 @@ import time
 import uuid
 from session_store import JsonSessionRepository, SessionStore, utc_now
 from health import install_health
-from experiment_config import (PHASE_HEADER, config_file, load_config, conditions, guardrail_mode, tool_call_count,
-                               truncate_text, upstream)
+from experiment_config import (PHASE_HEADER, config_file, load_config, conditions, guardrail_mode, pinned_model,
+                               tool_call_count, truncate_text, upstream)
 from conversation_extract import extract_conversation
 from observation_api import install_observations
 from deadlock_policy import VERSION as CRITERIA_VERSION
@@ -19,6 +19,7 @@ from deadlock_policy_v03 import VERSION as BLOCK_CRITERIA_VERSION
 from progress_schema import SessionRegistration
 from pydantic import ValidationError
 from explain_v1 import STOP_DECISIONS
+from criteria_freeze import freeze
 
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -85,6 +86,16 @@ def demo_only(phase):
                         status_code=409, headers={"x-should-retry": "false"})
 
 
+def other_model(pin, requested):
+    """S-12: a pinned proxy forwards one model only. Another model is refused before anything goes upstream or a
+    session starts, like DM-32: running it here would put a session of another condition group in this proxy's logs."""
+    return JSONResponse({"error": {"type": "guardrail_model_not_pinned", "code": "model_differs_from_pinned_model",
+                                   "message": "이 프록시는 모델 " + pin["name"] + " 전용입니다 (S-12, 프록시 1 개 = 조건군 1 개). "
+                                              "요청 모델 : " + str(requested),
+                                   "pinned_model": pin["name"], "requested_model": requested}},
+                        status_code=409, headers={"x-should-retry": "false"})
+
+
 def blocking_stop(session, params):
     """DM-7, DM-23: the first STOP record of a block-mode session, for a request that declares the demo phase.
 
@@ -119,6 +130,7 @@ def create_app(log_dir=None, transport=None, sleep=asyncio.sleep, repository=Non
         # Block is a demo device (DM-7); the dataset criteria versions never run with it.
         raise ValueError("guardrail_mode block requires criteria_version " + BLOCK_CRITERIA_VERSION)
     settings = upstream(config)
+    pin = pinned_model(config)
     endpoint = settings["base_url"] + settings["chat_path"]
     # Identifiers only: the key itself is never read here, only forwarded from the caller.
     identity = {"base_url_host": urlsplit(settings["base_url"]).netloc,
@@ -130,9 +142,11 @@ def create_app(log_dir=None, transport=None, sleep=asyncio.sleep, repository=Non
         log_dir = log_dir_for(demo_condition(config), os.environ.get("GUARDRAIL_LOG_DIR"))
     store = SessionStore(repository if repository is not None else JsonSessionRepository(log_dir),
         criteria_version=config.get("criteria_version", CRITERIA_VERSION), upstream=identity,
-        criteria_parameters=config.get("criteria_parameters"), guardrail_mode=mode)
+        criteria_parameters=config.get("criteria_parameters"), guardrail_mode=mode, pinned_model=pin,
+        criteria_freeze=freeze(config.get("criteria_version", CRITERIA_VERSION)))
     app.state.store = store
     app.state.upstream = identity
+    app.state.pinned_model = pin
     install_health(app, store, clock, config.get("policy_version"))
     install_observations(app, store, session_key, judgement_clock_ns)
 
@@ -190,6 +204,8 @@ def create_app(log_dir=None, transport=None, sleep=asyncio.sleep, repository=Non
         session_mode = existing.meta.get("guardrail_mode") if existing is not None else mode
         if session_mode == "block" and params["phase"] != DEMO_PHASE:
             return demo_only(params["phase"])
+        if pin is not None and body.get("model") != pin["name"]:
+            return other_model(pin, body.get("model"))
         session = store.get_or_start(key)
         async with session.lock:
             if session.status == "ended":

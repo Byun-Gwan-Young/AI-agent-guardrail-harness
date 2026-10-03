@@ -86,7 +86,8 @@ class DialogueManifestTests(unittest.IsolatedAsyncioTestCase):
         a, b = first["condition"]["group"], second["condition"]["group"]
         self.assertEqual((a["rule"], b["rule"]), ("condition-group-v1", "condition-group-v1"))
         self.assertNotEqual(a["id"], b["id"])
-        self.assertEqual({k for k in a["fields"] if a["fields"][k] != b["fields"][k]}, {"model"})
+        # C-17-8 added the model's source to the group: a stated run model differs in both.
+        self.assertEqual({k for k in a["fields"] if a["fields"][k] != b["fields"][k]}, {"model", "model_source"})
         self.assertEqual((a["fields"]["phase"], a["fields"]["guardrail_mode"], a["fields"]["closed_list_check"],
                           a["fields"]["runner_protocol"]),
                          ("demo", "observe", "after_receipt", "tool-capable-step-v10-final-report-allowlist"))

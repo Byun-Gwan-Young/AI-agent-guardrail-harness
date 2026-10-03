@@ -19,8 +19,10 @@ from test_criteria_v03 import CONFIG as OBSERVE_CONFIG, artifact_obs
 import test_harness_facts as facts
 import test_tool_recovery as recovery
 from tools import analyze_session
+from pinned_configs import demo_model, for_model
 
 ROOT = Path(__file__).resolve().parents[1]
+DEMO_MODEL = demo_model()  # C-17-8: the demo proxies forward their pinned model only (S-12)
 BLOCK_CONFIG = ROOT / "guardrail-deadlock-v0.3-kmu-block.yaml"
 A1V4 = ROOT / "scenarios/A-1-v4-ambiguous-task-query.yaml"
 DEMO = {"X-Guardrail-Phase": "demo"}
@@ -47,7 +49,7 @@ class ProxyBlockTests(unittest.IsolatedAsyncioTestCase):
         client = httpx.AsyncClient(transport=httpx.ASGITransport(app=self.app(config)), base_url="http://test")
         self.addAsyncCleanup(client.aclose)
         for step in range(1, steps + 1):
-            await client.post("/v1/chat/completions", json={"messages": []}, headers=headers)
+            await client.post("/v1/chat/completions", json={"messages": [], "model": DEMO_MODEL}, headers=headers)
             response = await client.post("/sessions/observations", headers=headers,
                                          json=artifact_obs(step, {"code.py": "same"}))
         return client, response.json()["observation"]
@@ -56,7 +58,7 @@ class ProxyBlockTests(unittest.IsolatedAsyncioTestCase):
         headers = {"X-Guardrail-Session": "blocked", **DEMO}
         client, stop = await self.stop_session(BLOCK_CONFIG, headers)
         self.assertEqual(stop["criteria"]["decision"], "deadlock")
-        response = await client.post("/v1/chat/completions", json={"messages": [{"content": "next"}]}, headers=headers)
+        response = await client.post("/v1/chat/completions", json={"messages": [{"content": "next"}], "model": DEMO_MODEL}, headers=headers)
         self.assertEqual(response.status_code, 403)
         self.assertEqual((response.headers["x-should-retry"], response.headers["X-Guardrail-Turn"]), ("false", "7"))
         error = response.json()["error"]
@@ -68,7 +70,7 @@ class ProxyBlockTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(error["message"], stop["criteria"]["explanation"]["text"])
         self.assertEqual(error["criteria_sha256"], stop["criteria"]["criteria_sha256"])
         self.assertEqual(len(self.upstream), 6)
-        again = await client.post("/v1/chat/completions", json={"messages": []}, headers=headers)
+        again = await client.post("/v1/chat/completions", json={"messages": [], "model": DEMO_MODEL}, headers=headers)
         self.assertEqual((again.status_code, len(self.upstream)), (403, 6))
         log = (await client.get("/log", headers=headers)).json()
         refused = log["turns"][6:]
@@ -95,7 +97,7 @@ class ProxyBlockTests(unittest.IsolatedAsyncioTestCase):
         for phase in (None, "measure"):
             with self.subTest(phase=phase):
                 headers = {"X-Guardrail-Session": f"plain-{phase}", **({"X-Guardrail-Phase": phase} if phase else {})}
-                for path, body in (("/sessions", None), ("/v1/chat/completions", {"messages": []})):
+                for path, body in (("/sessions", None), ("/v1/chat/completions", {"messages": [], "model": DEMO_MODEL})):
                     response = await client.post(path, json=body, headers=headers)
                     self.assertEqual(response.status_code, 409)
                     self.assertEqual(response.headers["x-should-retry"], "false")
@@ -109,7 +111,7 @@ class ProxyBlockTests(unittest.IsolatedAsyncioTestCase):
     async def test_a_demo_session_on_the_block_proxy_refuses_a_later_request_without_the_phase(self):
         headers = {"X-Guardrail-Session": "mixed", **DEMO}
         client, _ = await self.stop_session(BLOCK_CONFIG, headers, steps=2)
-        response = await client.post("/v1/chat/completions", json={"messages": []},
+        response = await client.post("/v1/chat/completions", json={"messages": [], "model": DEMO_MODEL},
                                      headers={"X-Guardrail-Session": "mixed"})
         self.assertEqual((response.status_code, len(self.upstream)), (409, 2))
         self.assertEqual(len((await client.get("/log", headers=headers)).json()["turns"]), 2)
@@ -120,7 +122,7 @@ class ProxyBlockTests(unittest.IsolatedAsyncioTestCase):
         headers = {"X-Guardrail-Session": "observe", **DEMO}
         client, stop = await self.stop_session(OBSERVE_CONFIG, headers)
         self.assertEqual(stop["criteria"]["decision"], "deadlock")
-        response = await client.post("/v1/chat/completions", json={"messages": []}, headers=headers)
+        response = await client.post("/v1/chat/completions", json={"messages": [], "model": DEMO_MODEL}, headers=headers)
         self.assertEqual((response.status_code, len(self.upstream)), (200, 7))
         self.assertEqual((await client.get("/log", headers=headers)).json()["meta"]["guardrail_mode"], "observe")
 
@@ -129,13 +131,13 @@ class ProxyBlockTests(unittest.IsolatedAsyncioTestCase):
         with mock.patch.object(deadlock_policy_v03, "explain", side_effect=RuntimeError("boom")):
             client, stop = await self.stop_session(BLOCK_CONFIG, headers)
         self.assertEqual(stop["criteria"]["explanation"]["status"], "failed")
-        error = (await client.post("/v1/chat/completions", json={"messages": []}, headers=headers)).json()["error"]
+        error = (await client.post("/v1/chat/completions", json={"messages": [], "model": DEMO_MODEL}, headers=headers)).json()["error"]
         self.assertEqual((error["message"], error["template_id"], error["stop_step"]), ("guardrail_stop", None, 6))
 
     async def test_invalid_phase_header_is_rejected(self):
         app = self.app(BLOCK_CONFIG)
         async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
-            response = await client.post("/v1/chat/completions", json={"messages": []},
+            response = await client.post("/v1/chat/completions", json={"messages": [], "model": DEMO_MODEL},
                                          headers={"X-Guardrail-Session": "bad", "X-Guardrail-Phase": "Demo Run"})
         self.assertEqual((response.status_code, self.upstream), (400, []))
 
@@ -239,7 +241,8 @@ class BlockRunTests(unittest.IsolatedAsyncioTestCase):
             upstream_requests.append(json.loads(request.content))
             return responses.pop(0)
         root = Path(self.enterContext(tempfile.TemporaryDirectory()))
-        app = create_app(root / "logs", transport=httpx.MockTransport(upstream_handler), config_path=config)
+        app = create_app(root / "logs", transport=httpx.MockTransport(upstream_handler),
+                         config_path=for_model(config, scenario.model))
         real_client = httpx.AsyncClient
 
         class OfflineClient(real_client):

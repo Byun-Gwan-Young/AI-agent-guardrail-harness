@@ -14,8 +14,10 @@ from progress_signal import calculate_progress
 from progress_signal_v3 import calculate_progress as calculate_v3
 from proxy import create_app
 from tools import write_criteria_snapshot as snapshot_tool
+from pinned_configs import demo_model
 
 ROOT = Path(__file__).resolve().parents[1]
+DEMO_MODEL = demo_model()  # C-17-8: the demo proxies forward their pinned model only (S-12)
 CONFIG = ROOT / "guardrail-deadlock-v0.3-kmu.yaml"
 V02_KMU = ROOT / "guardrail-deadlock-v0.2-kmu.yaml"
 ROLES = ["planner", "developer", "reviewer"]
@@ -108,6 +110,10 @@ class PinTests(unittest.TestCase):
         self.assertEqual((v03.pop("criteria_version"), v02.pop("criteria_version")), ("deadlock-v0.3", "deadlock-v0.2"))
         v03.pop("criteria_parameters")
         self.assertNotIn("criteria_parameters", v02)
+        # C-17-8 (S-12): the demo proxy is pinned to one model; the protected v0.2 configuration stays byte-identical
+        # and unpinned.
+        self.assertEqual((v03.pop("pinned_model"), v02.get("pinned_model")),
+                         ("accounts/fireworks/models/gpt-oss-120b", None))
         self.assertEqual(v03, v02)
 
     def test_parameters_have_no_code_default(self):
@@ -378,7 +384,7 @@ class V03IntegrationTests(unittest.IsolatedAsyncioTestCase):
             headers = {"X-Guardrail-Session": "v03"}
             async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as c:
                 for step in (1, 2, 3):
-                    await c.post("/v1/chat/completions", json={"messages": []}, headers=headers)
+                    await c.post("/v1/chat/completions", json={"messages": [], "model": DEMO_MODEL}, headers=headers)
                     response = await c.post("/sessions/observations", headers=headers,
                                             json=artifact_obs(step, {"code.py": "same"}))
                     self.assertEqual(response.status_code, 200)
@@ -392,7 +398,7 @@ class V03IntegrationTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual({k: meta[k] for k in configured()}, configured())
             self.assertEqual(progress_version_for(meta), "progress-v3")
             async with httpx.AsyncClient(transport=httpx.ASGITransport(app=restarted), base_url="http://test") as c:
-                await c.post("/v1/chat/completions", json={"messages": []}, headers=headers)
+                await c.post("/v1/chat/completions", json={"messages": [], "model": DEMO_MODEL}, headers=headers)
                 response = await c.post("/sessions/observations", headers=headers,
                                         json=artifact_obs(4, {"code.py": "same"}))
                 record = response.json()["observation"]

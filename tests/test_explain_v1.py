@@ -14,8 +14,10 @@ from explain_v1 import SELECTION_ORDER, TEMPLATES, E6_DIALOGUE, UNMEASURED, expl
 from proxy import create_app
 from test_criteria_v03 import CONFIG, CONTEXT, REG, artifact_obs, configured, dialogue, replay, t1_registration
 from tools import analyze_session as tool
+from pinned_configs import demo_model
 
 ROOT = Path(__file__).resolve().parents[1]
+DEMO_MODEL = demo_model()  # C-17-8: the demo proxies forward their pinned model only (S-12)
 V4 = "A-1-v4-e174aafe805b4f59bb62d7c95716b8b7"
 LABELS = {"planner": "기획", "developer": "개발", "reviewer": "리뷰"}
 CS_LABELS = {"planner": "접수", "developer": "환불 담당", "reviewer": "배송 담당"}
@@ -348,7 +350,7 @@ class ExplanationApiTests(unittest.IsolatedAsyncioTestCase):
             headers = {"X-Guardrail-Session": "explain"}
             async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as c:
                 for step in range(1, 7):
-                    await c.post("/v1/chat/completions", json={"messages": []}, headers=headers)
+                    await c.post("/v1/chat/completions", json={"messages": [], "model": DEMO_MODEL}, headers=headers)
                     response = await c.post("/sessions/observations", headers=headers,
                                             json=artifact_obs(step, {"code.py": "same"}))
             criteria = response.json()["observation"]["criteria"]

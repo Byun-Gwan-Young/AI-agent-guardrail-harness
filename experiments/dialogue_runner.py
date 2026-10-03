@@ -381,8 +381,9 @@ async def run_dialogue(args, scenario, scenario_path):
             if meta.get('registration') != registration:
                 raise ValueError('The proxy stored a different registration')
             common.ensure_key_env(meta.get('upstream'), key_env)
+            pin = common.enforce_proxy_model(meta, model_name, dataset_run, phase)
             effective.update(api_key_env=key_env, upstream=meta.get('upstream'),
-                             guardrail_mode=meta.get('guardrail_mode'))
+                             guardrail_mode=meta.get('guardrail_mode'), proxy_pinned_model=pin)
             common.save(conditions_path, effective)
             common.enforce_observe_proxy(dataset_run, meta.get('guardrail_mode'))
             for step in range(1, scenario.termination.max_steps + 1):

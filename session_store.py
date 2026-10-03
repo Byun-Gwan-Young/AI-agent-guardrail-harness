@@ -102,8 +102,12 @@ class JsonSessionRepository:
 
 class SessionStore:
     def __init__(self, repository: SessionRepository, criteria_version=CRITERIA_VERSION, upstream=None,
-                 criteria_parameters=None, guardrail_mode="observe"):
+                 criteria_parameters=None, guardrail_mode="observe", pinned_model=None, criteria_freeze=None):
         self.repository = repository
+        # S-12: the proxy's one model; kept in the meta of each session only when the proxy is pinned.
+        self.pinned_model = pinned_model
+        # C-17-8: deadlock-v0.3 code and template hashes (criteria_freeze.py); a refreeze keeps criteria_sha256.
+        self.criteria_freeze = criteria_freeze
         self.guardrail_mode = guardrail_mode
         self.criteria_parameters = criteria_parameters
         self.criteria_pin = pin_criteria(criteria_version, criteria_parameters)
@@ -119,6 +123,10 @@ class SessionStore:
         # Fixed per session: a later restart with another configuration does not change how it is treated.
         session.meta["guardrail_mode"] = self.guardrail_mode
         session.meta.update(pin_criteria(self.criteria_pin["criteria_version"], self.criteria_parameters))
+        if self.pinned_model is not None:
+            session.meta["pinned_model"] = self.pinned_model
+        if self.criteria_freeze is not None:
+            session.meta["criteria_freeze"] = self.criteria_freeze
         if registration is not None:
             # DM-35: registered once at session start and never changed; absent for unregistered sessions.
             session.meta["registration"] = registration

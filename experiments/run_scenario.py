@@ -1,7 +1,9 @@
 """Explicit single-run CLI. Importing this module never starts an experiment."""
 import argparse
 import asyncio
+import functools
 import hashlib
+import inspect
 import json
 import os
 from pathlib import Path
@@ -113,6 +115,20 @@ def enforce_observe_proxy(dataset_run, mode):
     # The proxy's mode is known only from the session it starts; this runs before any model call.
     if dataset_run and mode == 'block':
         raise ValueError('--dataset-run is refused by a block-mode proxy (demo only, DM-7)')
+
+
+def enforce_proxy_model(meta, model_name, dataset_run, phase):
+    """S-12 (one proxy = one condition group), from the session the proxy started, before any model call: a pinned
+    proxy must be pinned to the model this run sends, and a dataset or demo run needs a pinned proxy."""
+    pin = meta.get('pinned_model')
+    if pin is None:
+        if dataset_run or phase == DEMO_PHASE:
+            raise ValueError('A --dataset-run or --phase demo run needs a proxy pinned to one model (S-12): '
+                             'pinned_model or run_conditions in its configuration')
+        return None
+    if pin.get('name') != model_name:
+        raise ValueError(f"The proxy is pinned to {pin.get('name')}; this run would send {model_name} (S-12)")
+    return pin
 
 
 def safe_path(root, relative):
@@ -244,6 +260,10 @@ def run_model(scenario, args):
     requested = getattr(args, 'model', None)
     if requested is not None and (not isinstance(requested, str) or not requested.strip() or requested != requested.strip()):
         raise ValueError('--model must name a model ID without surrounding spaces')
+    if requested is not None and getattr(args, 'dataset_run', False) and requested != scenario.model:
+        # DM-54 ②: dataset conditions are the versioned scenario's; another model is another scenario version.
+        raise ValueError('--dataset-run sends the scenario model ' + str(scenario.model) + '; --model ' + requested
+                         + ' differs from it (DM-54)')
     name = requested if requested is not None else scenario.model
     return name, {'rule': MODEL_RULE, 'name': name, 'source': 'run_condition' if requested is not None else 'scenario',
                   'scenario_model': scenario.model}
@@ -272,6 +292,24 @@ class Workspace:
         self.scenario, self.root, self.counter = scenario, root, 0
         # CT approval rule (DM-16, experiments/approval_gate.py); None keeps every write tool as it was.
         self.gate = gate
+        # DM-54 ④: the tool calls of one model response run one at a time, in the response's order. autogen starts
+        # them together (asyncio.gather, one task per call in that order); asyncio.Lock wakes waiters first come,
+        # first served, so the calls take the lock in the order their tasks start. parallel_tool_calls is not sent.
+        self.order = asyncio.Lock()
+
+    def in_order(self, function):
+        """The tool as handed to the agent: same name, parameters and docstring (functools.wraps), so the tool schema
+        in every request is unchanged; it waits for the calls before it in the response, then runs."""
+        @functools.wraps(function)
+        async def ordered(*args, **kwargs):
+            async with self.order:
+                if inspect.iscoroutinefunction(function):
+                    return await function(*args, **kwargs)
+                return await asyncio.to_thread(function, *args, **kwargs)
+        return ordered
+
+    def ordered_tools(self, agent):
+        return [self.in_order(tool) for tool in self.tools(agent)]
 
     def acceptance(self):
         self.counter += 1
@@ -518,7 +556,7 @@ async def run(args):
         options['seed'] = args.seed_probe
     model = make_client(options, budget)
     schema_text = schema_instructions(contract)
-    role_tools = [work.tools(a) for a in scenario.agents]
+    role_tools = [work.ordered_tools(a) for a in scenario.agents]
     role_names = [[t.__name__ for t in ts] for ts in role_tools]
     save(out / 'registered-tools.json', dict(zip([a.id for a in scenario.agents], role_names)))
     agents = [AssistantAgent(a.id, model_client=model, tools=role_tools[i],
@@ -553,8 +591,11 @@ async def run(args):
             if artifact_v2 and meta.get('registration') != registration:
                 raise ValueError('The proxy stored a different registration')
             ensure_key_env(meta.get('upstream'), key_env)
+            pin = enforce_proxy_model(meta, model_name, dataset_run, phase)
             effective.update(api_key_env=key_env, upstream=meta.get('upstream'),
                              guardrail_mode=meta.get('guardrail_mode'))
+            if pin is not None:
+                effective.update(proxy_pinned_model=pin)
             save(conditions_path, effective)
             enforce_observe_proxy(dataset_run, meta.get('guardrail_mode'))
             baseline = await asyncio.to_thread(work.acceptance)
@@ -797,7 +838,8 @@ def main():
                              'Not allowed with --dataset-run')
     parser.add_argument('--temperature', type=float, default=None)
     parser.add_argument('--model', default=None,
-                        help="model ID sent for this run (C-17-7); default the scenario's model. Recorded in "
+                        help="model ID sent for this run (C-17-7); default the scenario's model. Refused with "
+                             '--dataset-run when it differs from the scenario model (DM-54). Recorded in '
                              'conditions.json and the manifest condition group')
     context_options = parser.add_mutually_exclusive_group()
     context_options.add_argument('--context-buffer-messages', type=int, default=None)

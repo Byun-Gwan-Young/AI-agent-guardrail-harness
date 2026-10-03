@@ -17,6 +17,7 @@
 
 **하지 않은 것** : `--model` 필수화(D-25 처럼), `--dataset-run` 에서 시나리오와 다른 모델 거절, 모델별 단가(`analyze_session.PRICE_PER_M`) 추가.
 셋 다 PM 결정 사항으로 보고한다. 단가가 없는 모델의 세션 크레딧은 지금처럼 `unmeasured` 로 나온다.
+(DM-54 : `--model` 선택 유지, `--dataset-run` 의 다른 모델 거절은 C-17-8 에서 구현. 단가 추가는 아직 결정 없음)
 
 ## 파트 1 — 매니페스트 조건군 (`condition-group-v1`)
 
@@ -101,3 +102,60 @@ PM 이 키 값 검사를 다시 돌리는 명령은 보고서에 있다. 걸리�
 - **대화 과제 도구**는 `ToolDispatch` 잠금으로 한 번에 하나씩 돈다. 기록 순번(`seq`)은 잠금을 잡은 순서라 응답의 호출 순서와 다를 수 있다.
   검색 호출 상한·arXiv 간격은 호출마다 적용된다
 - gpt-oss 세션에서는 일어난 적이 없으므로 지금 고치지 않는다. D-32 전에 정할 선택지는 보고서 6 절
+
+## C-17-8 파트 1 — C-17-7 결정 반영 (DM-54) · 프록시 모델 고정 (S-12) · 조건군 값
+
+**DM-54 ② `--dataset-run` 의 다른 모델 거절** (`run_model`) — `--dataset-run` 과 시나리오 모델이 아닌 `--model` 을 함께 주면 실행 전 오류
+(`--dataset-run sends the scenario model …; --model … differs from it (DM-54)`). 실행 폴더·요청 없음 (테스트). 시나리오 모델을 `--model` 로 다시 적는 것은 허용한다
+(출처가 `run_condition` 으로 남는다). scenario-v2 는 원래 `--dataset-run` 을 거절한다 (DM-41).
+
+**DM-54 ④ 한 응답의 파일 도구를 응답 순서대로 하나씩** (`Workspace.ordered_tools`, 산출물 경로)
+
+- autogen 은 한 응답의 호출마다 작업을 만들어 응답 순서대로 `asyncio.gather` 로 함께 시작한다. 실행기가 넘기는 도구는 이제 작업 공간마다 하나인
+  `asyncio.Lock` 을 잡은 뒤 실행한다. `asyncio.Lock` 은 기다린 순서대로 깨우므로 호출은 작업이 시작된 순서 = 응답의 호출 순서대로 하나씩 돈다.
+  동기 도구(`read_file`·`write_file`·`replace_in_file`)는 잠금 안에서 스레드로, `run_tests` 는 잠금 안에서 그대로 돈다
+- 도구 본체(`Workspace.tools`)는 그대로다 (기준선 테스트가 동기 함수로 직접 부른다). 넘기는 함수는 `functools.wraps` 라 이름·인자·설명이 같고,
+  **도구 스키마가 같다** (테스트 : `FunctionTool` 스키마 비교). 도구 호출이 하나인 응답의 동작과 업스트림 요청은 바뀌지 않는다
+  (C-17-4 scenario-v1 요청 12 건 바이트 비교, C-17-5 등가 조건 테스트 통과)
+- 테스트 (`tests/test_c17_8_part1.py`) : 첫 쓰기를 0.2 초 늦춘 상태에서 한 응답에 `write(SPEC.md, first)`, `read`, `write(SPEC.md, second)`, `read` →
+  읽기 결과 `first`·`second`, 다음 요청의 도구 결과도 그 순서. 같은 늦춤으로 잠금 없이 동시에 돌리면 읽기가 원래 내용을 읽고 파일에 `first` 가 남는 것도
+  함께 보여 잠금이 순서를 만든다는 것을 확인한다. C-17-7 의 특성 기록("같은 파일 두 번 쓰기면 결과 불확정")은 이제 "나중 것이 남음" 이다
+- `parallel_tool_calls` 는 보내지 않는다 (요청이 바뀐다. D-32 때 정한다). 대화 과제 도구는 원래 `ToolDispatch` 잠금으로 하나씩 돈다 (C-17-6)
+
+**프록시 모델 고정 (S-12 : 프록시 1 개 = 조건군 1 개)** (`experiment_config.pinned_model`, `proxy.py`)
+
+- 프록시가 시작할 때 설정 파일에서 모델 하나를 정한다 (`pinned_model: <ID>`). 코드에는 모델 기본값이 없다. 그 밖의 모델 요청은 업스트림에 보내지 않고,
+  세션도 만들지 않고 **409** 로 거절한다 (DM-32 와 같은 방식) : `{"error": {"type": "guardrail_model_not_pinned", "code": "model_differs_from_pinned_model",
+  "message": "이 프록시는 모델 … 전용입니다 (S-12, 프록시 1 개 = 조건군 1 개). 요청 모델 : …", "pinned_model", "requested_model"}}`, `x-should-retry: false`
+- 고정된 프록시의 세션 meta 에 `pinned_model` (`{name, source}`) 을 남긴다. 고정하지 않은 설정은 지금처럼 모든 모델을 보내고 meta 도 그대로다
+- **`deadlock-v0.3` (데모) 설정은 고정이 필수**다 (없으면 프록시 시작 전 오류). 데모 관측·차단 설정 두 개가 같은 모델로 고정된다 (파트 2 에서 `demo-conditions.yaml` 로 옮김)
+- 실행기 (`enforce_proxy_model`, 산출물·대화 경로 공통) : 세션 시작 뒤 첫 모델 호출 전에 프록시 meta 를 읽어 **고정 모델이 자기가 보낼 모델과 다르면 실행 전 오류**.
+  `--dataset-run` 이나 `--phase demo` 실행은 **고정된 프록시가 필요**하다. 고정 값은 `conditions.json` `proxy_pinned_model` 에 남는다
+- **데이터셋 프록시 (보고, PM 결정 필요)** : `guardrail-deadlock-v0.2-kmu.yaml` 은 C-17-1 보호 파일(바이트 고정, `tests/fixtures/c17-1-protected-files.json`)이라
+  고정 모델을 넣지 않았다. 데이터셋 모델도 아직 없다 (DM-57 : 파일럿 전에 정함, gpt-oss 는 게이트웨이에서 제거). 그래서 지금은 **`--dataset-run` 이 이 프록시에서
+  실행 전 오류**가 난다 (고정 없음). C-20 에서 데이터셋 모델을 정할 때 고정 모델이 있는 데이터셋 설정을 만든다 — 새 설정 파일로 할지, 보호 해시를 갱신할지는 PM 결정.
+  Groq 시대 설정 `guardrail.yaml`·`guardrail-deadlock-v0.2.yaml` 도 고정하지 않았다 (G0-8 재현용, 데이터셋·데모 실행에 쓰지 않음)
+
+**조건군 값 확인 (`condition-group-v1`, 제자리 추가 — 실제 세션 0 개, DM-54 ③)**
+
+| 지시 목록 | 조건군 필드 | 출처 | C-17-8 |
+|---|---|---|---|
+| 모델 | `model` | 프록시 세션 meta (실제로 보낸 모델) | 있었음 |
+| 모델 출처 | `model_source` (`scenario` / `run_condition`) | `conditions.json` `model.source` | **추가** |
+| 추론 강도 | `reasoning_effort` (`requested`, `sent_on`) | `conditions.json` | 있었음 |
+| 판정 규칙 버전 | `criteria_version` | 프록시 meta | 있었음 |
+| 판정 파라미터 해시 | `criteria_sha256` | 프록시 meta | 있었음 |
+| 동결 해시 (코드·템플릿) | `criteria_freeze_sha256` | 프록시 meta `criteria_freeze.sha256` (v0.3 만, 아니면 null) | **추가** — 재동결은 `criteria_sha256` 을 바꾸지 않으므로(DM-33) 따로 둔다 |
+| 프로토콜 | `runner_protocol` | `conditions.json` | 있었음 |
+| 출력 계약 | `output_contract_version` | `conditions.json` | 있었음 |
+| strict 방식 | `closed_list_check` | `conditions.json` (대화 과제만) | 있었음 |
+| 차례 전달 규칙 | `recent_messages_rule` (`t1-handoff-v1`), `dialogue_flow` | `conditions.json` (대화 과제만) | `recent_messages_rule` **추가** |
+| phase | `phase` | `conditions.json` | 있었음 |
+| 모드 | `guardrail_mode` | 프록시 meta | 있었음 |
+| 검색 설정 | `search_settings_sha256` (`tool_settings` 정규 JSON 의 SHA-256, 없으면 null) | `conditions.json` | **추가** |
+| (그 밖) | `provider_host`, `proxy_config_file`, `collection_policy`, `temperature`, `max_tokens`, `max_steps`, `max_llm_calls_per_step`, `context_buffer_messages`, `requested_seed` | | 있었음 |
+
+- 동결 기록 : 프록시가 시작할 때 `criteria_freeze.freeze` 로 v0.3 판정 파일 3 개의 SHA-256 과 템플릿 해시를 계산해 세션 meta `criteria_freeze` 에 남긴다.
+  `tools/write_criteria_snapshot.py` 가 같은 함수를 쓴다 (동결 파일 출력 바이트 동일 확인). 테스트 : meta 값 = `docs/criteria/deadlock-v0.3.json` 의 값
+- 테스트 : 목록의 각 값이 조건군에 있음, 새 값 넷이 바뀌면 조건군 ID 가 바뀜, 대화 과제 매니페스트의 실제 값
+

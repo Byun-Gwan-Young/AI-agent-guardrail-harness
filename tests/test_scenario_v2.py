@@ -16,8 +16,10 @@ from progress_schema import Metrics, Observation
 from proxy import create_app
 from scenario_schema import Scenario, ScenarioV2, load_scenario
 from test_criteria_v03 import CONFIG as V03_CONFIG, CONTEXT, artifact_obs
+from pinned_configs import demo_model
 
 ROOT = Path(__file__).resolve().parents[1]
+DEMO_MODEL = demo_model()  # C-17-8: the demo proxies forward their pinned model only (S-12)
 DIALOGUE = ROOT / "tests/fixtures/scenario-v2-dialogue.yaml"
 V02_CONFIG = ROOT / "guardrail-deadlock-v0.2-kmu.yaml"
 TOOLS = {"read_files": ["read_file"], "write_files": ["write_file", "replace_in_file"], "run_tests": ["run_tests"]}
@@ -199,7 +201,7 @@ class ObservationT1Tests(unittest.IsolatedAsyncioTestCase):
                 lambda r: httpx.Response(200, json={"choices": [{"message": {"content": "ok"}}]})), config_path=config)
             headers = {"X-Guardrail-Session": "t1"}
             async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
-                await client.post("/v1/chat/completions", json={"messages": []}, headers=headers)
+                await client.post("/v1/chat/completions", json={"messages": [], "model": DEMO_MODEL}, headers=headers)
                 return await client.post("/sessions/observations", headers=headers, json=observation)
 
     async def test_only_a_progress_v3_session_takes_t1_input(self):

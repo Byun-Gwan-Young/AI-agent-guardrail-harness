@@ -438,15 +438,25 @@ def condition_group(result, conditions, meta):
     reasoning = conditions.get('reasoning_effort') or {}
     upstream = meta.get('upstream') or {}
     closed_list = conditions.get('closed_list_check')
-    fields = {'model': meta.get('model'), 'provider_host': upstream.get('base_url_host'),
+    model = conditions.get('model') or {}
+    tool_settings = conditions.get('tool_settings')
+    # C-17-8 additions (in place, DM-54 ③): model source, the deadlock-v0.3 code/template freeze (a refreeze keeps
+    # criteria_sha256, DM-33), the dialogue hand-on rule (DM-47) and the search settings (DM-52).
+    fields = {'model': meta.get('model'), 'model_source': model.get('source'),
+              'provider_host': upstream.get('base_url_host'),
               'proxy_config_file': upstream.get('config_file'),
               'criteria_version': meta.get('criteria_version'), 'criteria_sha256': meta.get('criteria_sha256'),
+              'criteria_freeze_sha256': (meta.get('criteria_freeze') or {}).get('sha256'),
               'guardrail_mode': meta.get('guardrail_mode'), 'phase': conditions.get('phase'),
               'runner_protocol': conditions.get('runner_protocol'),
               'collection_policy': conditions.get('collection_policy'),
               'output_contract_version': conditions.get('output_contract_version'),
               'dialogue_flow': conditions.get('dialogue_flow'),
+              'recent_messages_rule': conditions.get('recent_messages_rule'),
               'closed_list_check': closed_list.get('mode') if isinstance(closed_list, dict) else None,
+              'search_settings_sha256': (hashlib.sha256(json.dumps(tool_settings, ensure_ascii=False, sort_keys=True,
+                                                                   separators=(',', ':')).encode('utf-8')).hexdigest()
+                                         if tool_settings else None),
               'temperature': conditions.get('temperature'), 'max_tokens': meta.get('max_tokens'),
               'max_steps': result['condition']['max_steps'],
               'max_llm_calls_per_step': result['condition']['max_llm_calls_per_step'],

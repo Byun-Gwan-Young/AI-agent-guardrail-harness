@@ -14,43 +14,23 @@ import json
 from pathlib import Path
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+import criteria_freeze
 from criteria_policy import pin_criteria
 from experiment_config import load_config
-import explain_v1
 
 ROOT = Path(__file__).resolve().parents[1]
-V03 = "deadlock-v0.3"
-# progress_signal.py and progress_signal_v1.py, which progress-v3 calls, are byte-fixed separately
-# (tests/fixtures/c17-1-protected-files.json).
-V03_IMPLEMENTATION = ("deadlock_policy_v03.py", "explain_v1.py", "progress_signal_v3.py")
-EXPLANATION_RECORD = "docs/criteria/explain-v1.json"
-
-
-def canonical_sha256(value):
-    return hashlib.sha256(json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
-
-
-def explanation_record():
-    """Templates, the E6 dialogue form, the selection order, the DM-31 signal phrases, the DM-36 particle pairs,
-    the DM-49 digit rule and the DM-50 required values, reduced sentences and fallback exactly as explain_v1 uses
-    them."""
-    frozen = {"explanation_version": explain_v1.VERSION, "unmeasured": explain_v1.UNMEASURED,
-              "templates": explain_v1.TEMPLATES, "variants": {"E6": {"dialogue": explain_v1.E6_DIALOGUE}},
-              "selection_order": [list(pair) for pair in explain_v1.SELECTION_ORDER],
-              "signal_phrases": [list(pair) for pair in explain_v1.SIGNAL_PHRASES],
-              "unrecorded_selection_phrases": explain_v1.UNRECORDED_SELECTION,
-              "particles": list(explain_v1.PARTICLES),
-              "digits_with_final_consonant": explain_v1.DIGITS_WITH_FINAL_CONSONANT,
-              "required_values": {k: list(v) for k, v in explain_v1.REQUIRED_VALUES.items()},
-              "reduced_templates": explain_v1.REDUCED, "fallback": explain_v1.FALLBACK}
-    return {**frozen, "templates_sha256": canonical_sha256(frozen)}
+V03 = criteria_freeze.V03
+V03_IMPLEMENTATION = criteria_freeze.V03_IMPLEMENTATION
+EXPLANATION_RECORD = criteria_freeze.EXPLANATION_RECORD
+canonical_sha256 = criteria_freeze.canonical_sha256
+# C-17-8: moved to criteria_freeze.py so the proxy records the same freeze with each deadlock-v0.3 session.
+explanation_record = criteria_freeze.explanation_record
 
 
 def snapshot(pin, root=ROOT):
     if pin["criteria_version"] != V03:
         return pin
-    return {**pin, "implementation_sha256": {name: hashlib.sha256((root / name).read_bytes()).hexdigest()
-                                             for name in V03_IMPLEMENTATION},
+    return {**pin, "implementation_sha256": criteria_freeze.implementation_sha256(root),
             "explanation_record": EXPLANATION_RECORD,
             "explanation_templates_sha256": explanation_record()["templates_sha256"]}
 

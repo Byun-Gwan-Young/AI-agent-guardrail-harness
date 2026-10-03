@@ -41,6 +41,23 @@ def guardrail_mode(config):
     return mode
 
 
+def model_id(value, name):
+    if not isinstance(value, str) or not value.strip() or value != value.strip():
+        raise ValueError(name + " must name a model ID without surrounding spaces")
+    return value
+
+
+def pinned_model(config):
+    """S-12 (one proxy = one condition group): the one model this proxy forwards, set when it starts, never in code.
+    None for an unpinned configuration (the Groq-era ones and the byte-protected v0.2 gateway one); a deadlock-v0.3
+    (demo) configuration must be pinned."""
+    if "pinned_model" in config:
+        return {"name": model_id(config["pinned_model"], "pinned_model"), "source": "pinned_model"}
+    if config.get("criteria_version") == "deadlock-v0.3":
+        raise ValueError("A deadlock-v0.3 (demo) proxy needs pinned_model (S-12)")
+    return None
+
+
 def load_config(path=None):
     path = config_file(path)
     data = yaml.safe_load(path.read_text(encoding="utf-8")) if path.exists() else {}
@@ -50,6 +67,7 @@ def load_config(path=None):
         raise ValueError("log.truncate must be null or a non-negative integer")
     upstream(data)
     guardrail_mode(data)
+    pinned_model(data)
     for model in data.get("models", {}).values():
         if model.get("seed_supported") is not None and type(model["seed_supported"]) is not bool:
             raise ValueError("models.*.seed_supported must be true, false or null")

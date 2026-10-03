@@ -11,8 +11,10 @@ from progress_schema import SessionRegistration
 from proxy import create_app
 from scenario_schema import load_scenario, registration_for
 from test_criteria_v03 import CONFIG as V03_CONFIG, CONTEXT
+from pinned_configs import demo_model
 
 ROOT = Path(__file__).resolve().parents[1]
+DEMO_MODEL = demo_model()  # C-17-8: the demo proxies forward their pinned model only (S-12)
 DIALOGUE = ROOT / "tests/fixtures/scenario-v2-dialogue.yaml"
 V02_CONFIG = ROOT / "guardrail-deadlock-v0.2-kmu.yaml"
 AGENTS = ["intake", "refund", "shipping"]
@@ -75,7 +77,7 @@ class RegistrationApiTests(unittest.IsolatedAsyncioTestCase):
         started = await client.post("/sessions", headers=headers, json={"registration": registration(metrics)})
         self.assertEqual(started.json(), {"session_id": "t1", "registered": True})
         for raw in inputs:
-            await client.post("/v1/chat/completions", json={"messages": []}, headers=headers)
+            await client.post("/v1/chat/completions", json={"messages": [], "model": DEMO_MODEL}, headers=headers)
             response = await client.post("/sessions/observations", headers=headers, json=raw)
             self.assertEqual(response.status_code, 200, response.text)
         return (await client.get("/log", headers=headers)).json()
@@ -102,7 +104,7 @@ class RegistrationApiTests(unittest.IsolatedAsyncioTestCase):
         client = self.client(V03_CONFIG)
         headers = {"X-Guardrail-Session": "m"}
         await client.post("/sessions", headers=headers, json={"registration": registration(["adopted_items"])})
-        await client.post("/v1/chat/completions", json={"messages": []}, headers=headers)
+        await client.post("/v1/chat/completions", json={"messages": [], "model": DEMO_MODEL}, headers=headers)
         other = await client.post("/sessions/observations", headers=headers,
                                   json=observation(1, ["adopted_items", "new_issue_ids"]))
         self.assertEqual(other.status_code, 422)
@@ -148,7 +150,7 @@ class RegistrationApiTests(unittest.IsolatedAsyncioTestCase):
         headers = {"X-Guardrail-Session": "plain"}
         metrics = ["adopted_items", "new_issue_ids"]
         for step in range(1, 7):
-            await client.post("/v1/chat/completions", json={"messages": []}, headers=headers)
+            await client.post("/v1/chat/completions", json={"messages": [], "model": DEMO_MODEL}, headers=headers)
             response = await client.post("/sessions/observations", headers=headers, json=observation(step, metrics))
         explanation = response.json()["observation"]["criteria"]["explanation"]
         # DM-50: without a registration there is no required count, so E5 is not chosen (it used to write

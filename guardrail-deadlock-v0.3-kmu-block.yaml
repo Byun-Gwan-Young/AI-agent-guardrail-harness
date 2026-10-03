@@ -45,3 +45,7 @@ upstream:
   base_url: https://factchat.mindlogic-kr-api.com/v1/gateway
   chat_path: /chat/completions/
   api_key_env: KMU_API_KEY
+
+# S-12 (프록시 1 개 = 조건군 1 개) : 이 프록시가 보내는 모델은 하나다. 다른 모델 요청은 업스트림에 보내지 않고 409 로 거절한다.
+# 실행기는 시작 전에 이 값과 자기 모델이 같은지 확인한다. 값은 코드가 아니라 이 설정에만 있다.
+pinned_model: accounts/fireworks/models/gpt-oss-120b

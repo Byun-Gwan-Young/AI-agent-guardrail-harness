@@ -62,7 +62,9 @@ async def offline_run(path, config, steps, phase=None, model=None):
         return responses.pop(0)
     with tempfile.TemporaryDirectory() as directory:
         root = Path(directory)
-        app = create_app(root / "logs", transport=httpx.MockTransport(upstream), config_path=config)
+        from pinned_configs import for_model
+        app = create_app(root / "logs", transport=httpx.MockTransport(upstream),
+                         config_path=for_model(config, model if model is not None else scenario.model))
         real_client = httpx.AsyncClient
 
         class OfflineClient(real_client):

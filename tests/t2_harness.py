@@ -105,7 +105,10 @@ async def run_t2(reports, *, tools=None, config=OBSERVE_CONFIG, contract=V3, gat
     upstream = Upstream(reports, tools)
     root = Path(tests.enterContext(tempfile.TemporaryDirectory()) if tests else tempfile.mkdtemp())
     path = scenario_file(root, contract, gate, max_steps, **(scenario_changes or {}))
-    app = create_app(root / "logs" / "demo", transport=httpx.MockTransport(upstream), config_path=config)
+    from pinned_configs import for_model
+    sent_model = yaml.safe_load(path.read_text(encoding="utf-8"))["model"]
+    app = create_app(root / "logs" / "demo", transport=httpx.MockTransport(upstream),
+                     config_path=for_model(config, sent_model))
     real_client = httpx.AsyncClient
 
     class OfflineClient(real_client):
