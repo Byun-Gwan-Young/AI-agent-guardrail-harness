@@ -90,14 +90,15 @@ class DialogueManifestTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual({k for k in a["fields"] if a["fields"][k] != b["fields"][k]}, {"model", "model_source"})
         self.assertEqual((a["fields"]["phase"], a["fields"]["guardrail_mode"], a["fields"]["closed_list_check"],
                           a["fields"]["runner_protocol"]),
-                         ("demo", "observe", "after_receipt", "tool-capable-step-v10-final-report-allowlist"))
+                         ("demo", "observe", "provider_strict", "tool-capable-step-v10-final-report-allowlist"))
         self.assertTrue(a["id"].startswith("cg-") and a["id"][3:] == a["sha256"][:12])
 
     async def test_same_conditions_share_a_group_and_a_closed_list_change_splits_it(self):
         first = await run_t1(self.reports(), tools=LOOKUP, scenario_changes=FIXED, max_steps=2, tests=self)
         second = await run_t1(self.reports(), tools=LOOKUP, scenario_changes=FIXED, max_steps=2, tests=self)
+        # The default is provider_strict since DM-55; after_receipt (DM-40) is the other group.
         strict = await run_t1(self.reports(), tools=LOOKUP, scenario_changes=FIXED, max_steps=2, tests=self,
-                              closed_list_check="provider_strict")
+                              closed_list_check="after_receipt")
         groups = [(await self.manifest(r))["condition"]["group"] for r in (first, second, strict)]
         self.assertEqual(groups[0]["id"], groups[1]["id"])
         self.assertNotEqual(groups[0]["id"], groups[2]["id"])

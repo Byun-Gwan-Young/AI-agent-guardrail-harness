@@ -110,10 +110,10 @@ class PinTests(unittest.TestCase):
         self.assertEqual((v03.pop("criteria_version"), v02.pop("criteria_version")), ("deadlock-v0.3", "deadlock-v0.2"))
         v03.pop("criteria_parameters")
         self.assertNotIn("criteria_parameters", v02)
-        # C-17-8 (S-12): the demo proxy is pinned to one model; the protected v0.2 configuration stays byte-identical
-        # and unpinned.
-        self.assertEqual((v03.pop("pinned_model"), v02.get("pinned_model")),
-                         ("accounts/fireworks/models/gpt-oss-120b", None))
+        # C-17-8 (S-12, DM-57): the demo proxy is pinned to the model of demo-conditions.yaml; the protected v0.2
+        # configuration stays byte-identical and unpinned.
+        self.assertEqual((v03.pop("run_conditions"), v02.get("run_conditions"), v02.get("pinned_model")),
+                         ("demo-conditions.yaml", None, None))
         self.assertEqual(v03, v02)
 
     def test_parameters_have_no_code_default(self):

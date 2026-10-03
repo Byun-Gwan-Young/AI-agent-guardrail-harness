@@ -19,7 +19,7 @@ import httpx
 from pydantic import BaseModel, ConfigDict
 from progress_schema import Conversation
 from artifact_hook import capture_artifact, make_observation, submit_observation
-from scenario_schema import load_scenario, registration_for
+from scenario_schema import load_scenario, registration_for, resolve_run_conditions
 from scenario_checks import check_acceptance
 from suite_identity import compute_test_suite_id
 from experiments.step_execution import (FINAL_REASONING_EFFORT, NO_OUTPUT_PLACEHOLDER, PROTOCOL_V7, PROTOCOL_V8,
@@ -392,13 +392,14 @@ async def run(args):
     if collection_policy not in PROTOCOLS:
         raise ValueError("Unsupported collection policy")
     scenario_path = args.scenario.resolve()
-    scenario = load_scenario(scenario_path)
+    # DM-57: a demo scenario takes its model and reasoning effort from its run-conditions file.
+    scenario, run_conditions = resolve_run_conditions(load_scenario(scenario_path), ROOT)
     # scenario-v2 artifact tasks (CT, CL, CT-N; C-17-5, DM-37) run on this artifact path, unchanged for scenario-v1.
     artifact_v2 = scenario.schema_version != 'scenario-v1'
     if artifact_v2 and scenario.task_kind == 'dialogue':
         # T1 dialogue tasks (C-17-4) have their own flow.
         from experiments.dialogue_runner import run_dialogue
-        return await run_dialogue(args, scenario, scenario_path)
+        return await run_dialogue(args, scenario, scenario_path, run_conditions)
     if artifact_v2:
         # The scenario picks the contract (DM-37); the command line states the same one (D-25: nothing implicit).
         contract = for_artifact_scenario(scenario)
@@ -529,7 +530,9 @@ async def run(args):
                          contract_sha256=getattr(contract, 'contract_sha256', None),
                          registration=registration, registration_sha256=canonical_sha256(registration),
                          tools={a.id: list(a.tools) for a in scenario.agents},
-                         write_gate=gate.conditions() if gate is not None else None)
+                         write_gate=gate.conditions() if gate is not None else None,
+                         # DM-57: the run-conditions file the model and reasoning effort came from, or None.
+                         run_conditions=run_conditions)
     save(conditions_path, effective)
     print('session_id:', session_id, 'run_directory:', out, flush=True)
     shutil.copy2(scenario_path, out / 'scenario.yaml')
@@ -823,8 +826,8 @@ def main():
                              'v9 needs a scenario with reasoning_effort; dialogue tasks run v10')
     parser.add_argument('--closed-list-check', choices=('after_receipt', 'provider_strict'), default=None,
                         help='dialogue tasks (DM-20): send status/handoff_to/deliverable enums in the strict schema '
-                             '(provider_strict) or check them after receipt (after_receipt, the default until a '
-                             'gateway strict probe)')
+                             '(provider_strict, the default since DM-55) or leave them out of it (after_receipt, '
+                             'DM-40); values are checked after receipt either way')
     parser.add_argument('--api-key-env', default='GROQ_API_KEY',
                         help='environment variable holding the provider key; must match the proxy config')
     parser.add_argument('--proxy-url', default=os.environ.get('GUARDRAIL_PROXY_URL', 'http://127.0.0.1:8000'))
@@ -838,9 +841,9 @@ def main():
                              'Not allowed with --dataset-run')
     parser.add_argument('--temperature', type=float, default=None)
     parser.add_argument('--model', default=None,
-                        help="model ID sent for this run (C-17-7); default the scenario's model. Refused with "
-                             '--dataset-run when it differs from the scenario model (DM-54). Recorded in '
-                             'conditions.json and the manifest condition group')
+                        help="model ID sent for this run (C-17-7); default the scenario's model (or its run "
+                             'conditions file, DM-57). Refused with --dataset-run when it differs from the scenario '
+                             'model (DM-54). Recorded in conditions.json and the manifest condition group')
     context_options = parser.add_mutually_exclusive_group()
     context_options.add_argument('--context-buffer-messages', type=int, default=None)
     context_options.add_argument('--no-context-buffer', action='store_true')

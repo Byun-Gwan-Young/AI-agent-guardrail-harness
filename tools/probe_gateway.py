@@ -38,7 +38,7 @@ from experiments.dialogue_runner import SentContract
 from experiments.issue_contract import V2, for_scenario
 from experiments.run_scenario import Workspace, role_system_message, safe_path, schema_instructions
 from experiments.step_execution import PROTOCOL_V8, PROTOCOL_V10, call_budget, final_instruction, harness_facts
-from scenario_schema import load_scenario
+from scenario_schema import load_scenario as load_scenario_file, resolve_run_conditions
 from tools.probe_gateway_support import EXCERPT_CHARS, default_user_agent, redact
 
 DEFAULT_SCENARIO = ROOT / 'scenarios/A-1-v3-ambiguous-task-query.yaml'
@@ -59,6 +59,12 @@ V3_STRICT = {V3_STRICT_NO_ENUMS: 'after_receipt', V3_STRICT_ENUMS: 'provider_str
 STRICT_VARIANTS = (FINAL, *V3_STRICT)
 REASONING_QUESTION = ('How many integers n with 1 <= n <= 1000 are divisible by 3 or 5 but not by 7? '
                       'Work it out, then reply with the integer only. Do not call any tool.')
+
+
+def load_scenario(path):
+    """The scenario as the runner sends it: a demo scenario's model and reasoning effort come from its run-conditions
+    file (DM-57, C-17-8), so a probe of a demo scenario uses the same values as its runs."""
+    return resolve_run_conditions(load_scenario_file(path), ROOT)[0]
 
 
 def role_tools(scenario, agent, workspace):

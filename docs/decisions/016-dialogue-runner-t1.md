@@ -21,7 +21,8 @@
   `registered: true` 가 아니거나 프록시가 저장한 등록이 보낸 것과 다르면 모델 호출 전 `runner_error`. 등록과 정규 JSON 해시를
   `conditions.json` 에 남긴다. 등록 없는 v2 세션은 없다 (v0.2 프록시는 422 로 거절 → 테스트)
 - **출력 계약** : 각 차례의 최종 보고는 output-contract-v3. **DM-20 은 실행 조건 `--closed-list-check`** :
-  - `after_receipt` (기본, probe 전) : 제공자에게 v3 strict 스키마에서 `enum` 만 뺀 모양을 보내고(상태·`handoff_to`·산출물 스키마의 닫힌 목록),
+  - **C-17-8 (DM-55) 부터 기본은 `provider_strict`** 다 (데모 모델 glm 의 enum 포함 strict probe 통과, 결정 문서 019). 아래 `after_receipt` 는 실행 조건으로 줄 때만
+  - `after_receipt` (C-17-8 전 기본, DM-40) : 제공자에게 v3 strict 스키마에서 `enum` 만 뺀 모양을 보내고(상태·`handoff_to`·산출물 스키마의 닫힌 목록),
     받은 뒤 계약이 전부 검사한다. D-13 이 쟁점 ID enum 을 보내지 않은 것과 같은 방식
   - `provider_strict` : v3 strict 스키마(enum 포함) 그대로
   - 응답 형식 자체를 빼지 않은 이유 : 최종 보고 검증(`validate_final_response`)이 strict json_schema 요청만 유효 보고로 인정한다.

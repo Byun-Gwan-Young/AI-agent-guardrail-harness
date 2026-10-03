@@ -1,0 +1,120 @@
+{
+ "script": "docs/design/demo_budget.py",
+ "status": "ESTIMATE",
+ "rate_check": {
+  "A-1-v3": {
+   "turns": 23,
+   "usage_missing_turns": 0,
+   "prompt": 80115,
+   "completion": 7355,
+   "measured_credits": 16.43025,
+   "rate_credits": 15.69475
+  },
+  "A-1-v4": {
+   "turns": 74,
+   "usage_missing_turns": 0,
+   "prompt": 444636,
+   "completion": 106866,
+   "measured_credits": 130.815,
+   "rate_credits": 120.1284
+  }
+ },
+ "blocked_session_reference": {
+  "session": "A-1-v4-e174aafe805b4f59bb62d7c95716b8b7",
+  "first_stop_step": 9,
+  "turns": 25,
+  "usage_missing_turns": 0,
+  "prompt": 111206,
+  "completion": 39698,
+  "credits": 36.5299,
+  "note": "A-1-v4 consumption through its first STOP step, as if the next request were blocked"
+ },
+ "session_counts": {
+  "observe_normal": 25,
+  "observe_stall": 25,
+  "observe_natural": 5,
+  "block_stall": 15,
+  "total": 70
+ },
+ "c18_trial_sessions": 11,
+ "per_session_reference_credits": {
+  "normal_like_A-1-v3": 15.69475,
+  "stall_like_A-1-v4": 120.1284,
+  "blocked_like_A-1-v4_to_stop": 36.5299
+ },
+ "estimate": {
+  "mixed": 4544.17,
+  "envelope_all_like_A-1-v3": 1098.63,
+  "envelope_all_like_A-1-v4": 8408.99,
+  "c18_trial_envelope": [
+   172.64,
+   1321.41
+  ]
+ },
+ "wall_time": {
+  "measured_seconds": {
+   "A-1-v3": 87.433252,
+   "A-1-v4": 574.348379
+  },
+  "source": "reports/a-1-v4/c14-evidence.json",
+  "sequential_hours_envelope": [
+   1.7,
+   11.17
+  ],
+  "parallel_3_hours_envelope": [
+   0.57,
+   3.72
+  ]
+ },
+ "limits": [
+  "A-1-v3 ran on protocol v8 (reasoning high not on every call); a v10 normal session is likely larger, unmeasured",
+  "T1 tasks (CS/MR/LR) have no measured session; search results enlarge prompts, unmeasured",
+  "mixed assumes every normal-variant session looks like A-1-v3 and every stall/natural like A-1-v4",
+  "two sessions are points, not a population range",
+  "priced at glm-5.3-flash rates from gpt-oss token counts: output length per model differs (DM-57), reasoning effort medium is not reflected, cached-token discounts are not subtracted"
+ ],
+ "rates": {
+  "model": "glm-5.3-flash",
+  "credits_per_1m_prompt": 150.0,
+  "credits_per_1m_completion": 500.0,
+  "measured_rates": false
+ },
+ "allocation_check": {
+  "monthly_allocation": 5000,
+  "used_this_month_given": 6.8413,
+  "mixed_plus_c18_trials": [
+   4716.81,
+   5865.58
+  ],
+  "exceeds_allocation": [
+   false,
+   true
+  ],
+  "observe_runs_options": {
+   "5": {
+    "sessions": 70,
+    "mixed": 4544.17,
+    "mixed_plus_c18_trials": [
+     4716.81,
+     5865.58
+    ]
+   },
+   "4": {
+    "sessions": 59,
+    "mixed": 3744.93,
+    "mixed_plus_c18_trials": [
+     3917.57,
+     5066.34
+    ]
+   },
+   "3": {
+    "sessions": 48,
+    "mixed": 2945.68,
+    "mixed_plus_c18_trials": [
+     3118.32,
+     4267.09
+    ]
+   }
+  }
+ }
+}

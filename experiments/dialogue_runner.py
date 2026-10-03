@@ -4,7 +4,8 @@ One step is one role's turn with at most max_llm_calls_per_step model calls, as 
 step mechanics, unchanged). What differs:
 - the session starts with the scenario's registration (DM-26, DM-29, DM-35); no registration, no run
 - every turn's final report is output-contract-v3; the closed lists (status, handoff_to, deliverable enums) are sent
-  to the provider only with --closed-list-check provider_strict, else checked after receipt (DM-20)
+  to the provider in the strict schema (provider_strict, the default since DM-55) or, with --closed-list-check
+  after_receipt, left out of it (DM-40); either way they are checked after receipt (DM-20)
 - the observation is built from the verified report's structured fields only (no narrative extraction, no reasoning)
 - a value outside a closed list is a vocabulary violation (D-17): the step fails, the value is not observed and the
   violation stays out of the consecutive strict-failure stop; a shape error still counts there
@@ -50,8 +51,11 @@ HANDOFF_TO_SELF = 'handoff_to_self'
 # The judge and inputs_dir are repository paths; offline tests point this at their fixtures.
 SCENARIO_ROOT = common.ROOT
 CLOSED_LIST_CHECKS = ('after_receipt', 'provider_strict')
-# DM-20: gateway strict-schema support with enums is not probed yet, so values are checked after receipt.
-DEFAULT_CLOSED_LIST_CHECK = 'after_receipt'
+# DM-55 (C-17-8): the demo model (DM-57) returned 200 and a valid report for the strict schema with its enums
+# (PM probe gateway-probe-44ec8e43…), so the enums are sent; values are still checked after receipt (DM-40 kept).
+# Before C-17-8 the default was after_receipt (DM-40); the mode is in the condition group.
+DEFAULT_CLOSED_LIST_CHECK = 'provider_strict'
+CLOSED_LIST_DEFAULT_BASIS = 'default (DM-55: enum strict probe gateway-probe-44ec8e43 passed for the demo model)'
 JUDGE_RESULTS = ('resolved', 'escalated', 'unfinished')
 # The verified report's state fields the next roles see with its narrative (recent_messages, kept by v10).
 SHARED_FIELDS = ('status', 'handoff_to', 'adopted_items', 'deliverable')
@@ -253,7 +257,7 @@ def tool_preflight(scenario, root, environ):
     return record
 
 
-async def run_dialogue(args, scenario, scenario_path):
+async def run_dialogue(args, scenario, scenario_path, run_conditions=None):
     from autogen_agentchat.agents import AssistantAgent
 
     mode = check_arguments(args, scenario)
@@ -303,7 +307,7 @@ async def run_dialogue(args, scenario, scenario_path):
         'output_contract_version': V3, 'allowed_issues_sha256': contract.sha256,
         'contract_sha256': contract.contract_sha256,
         'closed_list_check': {'mode': mode, 'decision': 'DM-20', 'enums_sent_to_provider': mode == 'provider_strict',
-                              'basis': ('default until a gateway strict probe (DM-20)' if mode == DEFAULT_CLOSED_LIST_CHECK
+                              'basis': (CLOSED_LIST_DEFAULT_BASIS if getattr(args, 'closed_list_check', None) is None
                                         else 'run condition')},
         'strict_support': 'unverified', 'strict_probe': None,
         'strict_failure_policy': 'fail step; abort after two consecutive strict-failed steps; vocabulary violations '
@@ -325,7 +329,8 @@ async def run_dialogue(args, scenario, scenario_path):
         'tools': {a.id: list(a.tools) for a in scenario.agents}, 'tool_implementations': dispatch.identity(),
         'tool_settings': tool_settings or None, 'tool_preflight': preflight,
         'search': search_tools.conditions_record(tool_settings) if tool_settings else None,
-        'dataset_run': dataset_run, 'phase': phase, **repository_state}
+        # DM-57: the run-conditions file the model and reasoning effort came from, or None.
+        'run_conditions': run_conditions, 'dataset_run': dataset_run, 'phase': phase, **repository_state}
     conditions_path = out / 'conditions.json'
     common.save(conditions_path, effective)
     print('session_id:', session_id, 'run_directory:', out, flush=True)

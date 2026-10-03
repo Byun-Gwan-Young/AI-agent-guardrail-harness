@@ -1,4 +1,4 @@
-"""C-17-8 (S-12): the demo proxy configurations are pinned to the demo model. The C-17
+"""C-17-8 (S-12, DM-57): the demo proxy configurations are pinned to the model of demo-conditions.yaml. The C-17
 offline fixtures keep the model they were written with (TEST-T1-v2, TEST-T2-v2, the DM-37 copy of A-1-v4 and the
 C-17-4 baseline requests), so tests run them through a copy of the same configuration pinned to that model.
 The copy keeps the file name (the proxy records it) and differs only in the pin (tests/test_c17_8_part1.py)."""

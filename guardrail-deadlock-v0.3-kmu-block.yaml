@@ -1,4 +1,4 @@
-# deadlock-v0.3 / progress-v3 + 계명대 API Gateway (Fireworks gpt-oss-120b) 데모 차단 전용 설정 (DM-7, DM-23).
+# deadlock-v0.3 / progress-v3 + 계명대 API Gateway 데모 차단 전용 설정 (DM-7, DM-23). 모델은 demo-conditions.yaml (DM-57).
 # guardrail-deadlock-v0.3-kmu.yaml 과 guardrail_mode 한 줄만 다르다 (테스트로 확인). 프록시 시작 시 명시적으로 지정한다:
 #   GUARDRAIL_CONFIG=guardrail-deadlock-v0.3-kmu-block.yaml
 # 차단은 데모에서만 쓴다. 판정이 STOP 을 낸 세션의 다음 LLM 요청을 업스트림으로 보내지 않고 403 으로 돌려준다.
@@ -46,6 +46,6 @@ upstream:
   chat_path: /chat/completions/
   api_key_env: KMU_API_KEY
 
-# S-12 (프록시 1 개 = 조건군 1 개) : 이 프록시가 보내는 모델은 하나다. 다른 모델 요청은 업스트림에 보내지 않고 409 로 거절한다.
-# 실행기는 시작 전에 이 값과 자기 모델이 같은지 확인한다. 값은 코드가 아니라 이 설정에만 있다.
-pinned_model: accounts/fireworks/models/gpt-oss-120b
+# S-12 (프록시 1 개 = 조건군 1 개) : 이 프록시가 보내는 모델은 하나다. 값은 demo-conditions.yaml 의 model 이고 (DM-57, 한 곳),
+# 다른 모델 요청은 업스트림에 보내지 않고 409 로 거절한다. 실행기는 시작 전에 이 값과 자기 모델이 같은지 확인한다.
+run_conditions: demo-conditions.yaml

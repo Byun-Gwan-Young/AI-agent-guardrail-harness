@@ -159,3 +159,79 @@ PM 이 키 값 검사를 다시 돌리는 명령은 보고서에 있다. 걸리�
   `tools/write_criteria_snapshot.py` 가 같은 함수를 쓴다 (동결 파일 출력 바이트 동일 확인). 테스트 : meta 값 = `docs/criteria/deadlock-v0.3.json` 의 값
 - 테스트 : 목록의 각 값이 조건군에 있음, 새 값 넷이 바뀌면 조건군 ID 가 바뀜, 대화 과제 매니페스트의 실제 값
 
+## C-17-8 파트 2 — 모델 교체 (DM-57) · DM-20 확정 (DM-55)
+
+**근거 probe 다시 읽기** (`tools/c17_8_evidence.py models` → `reports/c17-8/evidence-models.json`, 파일만 읽음) — **DM-57 의 값과 모두 같다** (`all_same_as_dm57: true`)
+
+| 확인 | probe 값 | DM-57 |
+|---|---|---|
+| ① 도구 + 추론 high (`a41f8d51`, A-1-v4) | 셋 다 200, `tool_calls` 반환 (glm 3, qwen 4, nano 3 개) | 통과, 3~4 개 |
+| ① v3 strict `enum` 없음 (`44ec8e43`, TEST-T1-v2) | 셋 다 200, 계약 유효 | 통과 |
+| v3 strict `enum` 포함 | 셋 다 200, 계약 유효 | 통과 (DM-55 (가)) |
+| 단가 (크레딧 per 1M, 입력/출력) | glm 150/500, qwen 150/470, nano 200/1,250 (`a41f8d51` 두 요청으로 푼 값. nano 단독 `e38debde` 도 200/1,250) | 같음 |
+| A-1-v4 30 step 환산 (입력 444,636 · 출력 106,866) | glm 120.13, qwen 116.92, nano 222.51 | 약 120 / 117 / 222 (1 크레딧 이내) |
+| strict 최종 보고 1 회 출력 (`enum` 없음) | qwen 5,239, glm 204, nano 376 | 같음 |
+| strict 두 번째 요청 cached | glm 1,088, qwen 1,024, nano 0 | 1,024~1,088 (nano 는 캐시 없음, DM-57 에 따로 적혀 있지 않음) |
+| gpt-oss (`8f022e0a` strict 2 건, `2992b509` 일반 2 건) | 4 건 모두 404 `Model 'accounts/fireworks/models/gpt-oss-120b' not found` | 같음 |
+
+- strict probe(`44ec8e43`)의 `model_summary.token_rates` (glm 210/178, qwen 3/500) 는 **단가가 아니다**. 두 번째 요청에 캐시된 입력이 있어 두 식을 푼 값이 틀어진다.
+  단가는 캐시가 없는 도구 probe 의 값이다
+- 모델 목록에서 빠진 것(`accounts/fireworks/models/gpt-oss-120b`, `meta-llama/Llama-4-Maverick…`)은 probe 파일에 없다 (PM 이 `/models/` 로 확인). DM-57 기록으로만 남긴다
+- 선정 근거 (DM-57) : 세 후보 모두 ① 통과. 30 step 환산은 qwen 이 3 % 싸지만 같은 strict 요청의 출력이 glm 의 약 26 배(5,239 대 204)라 실제 비용·시간이 커질 것이므로 glm.
+  환산은 모델별 출력 길이 차이를 반영하지 못한다
+- 이번 달 사용량 : 마지막 probe 요청 뒤 `monthly_allocated.used` 6.8413 (probe 파일 값)
+- D-11 : 다섯 폴더(파일 41 개)를 `secret_scan` 으로 검사, 걸린 것 없음. 이 환경에 `KMU_API_KEY` 가 없어 **키 값 자체 검사는 하지 못했다** (PM 명령은 C-17-8 보고서). 커밋 `966a9b3`
+
+**`gpt-oss-120b` 가 기본값·고정값으로 들어 있던 곳** (C-17-8 기준 커밋 `4d425e5`, `git grep`, 스크립트 분류)
+
+| 분류 | 위치 | 처리 |
+|---|---|---|
+| **교체 대상 (데모 실행에 쓰임)** | `guardrail-deadlock-v0.3-kmu.yaml`:1, `guardrail-deadlock-v0.3-kmu-block.yaml`:1 (머리 주석. 모델 키는 없었다) | 주석을 고치고 `run_conditions: demo-conditions.yaml` 로 고정 (아래) |
+| | `docs/design/demo-scenarios.md`:20 (C-18 이 따르는 공통 조건 줄) | 모델·추론 강도에 줄을 긋고 `run_conditions` 안내를 붙였다 |
+| **데이터셋 시나리오 (새 버전 필요, C-20)** | `scenarios/A-1-ambiguous-task-query.yaml`:8, `A-1-v2`:13, `A-1-v3`:7·12, `A-1-v4`:12 | 그대로. 데이터셋 모델은 파일럿 전에 정하고 새 시나리오 버전을 만든다 (DM-54 ②) |
+| | `guardrail-deadlock-v0.2-kmu.yaml`:1 (머리 주석) | 그대로. C-17-1 보호 파일 (파트 1 "데이터셋 프록시") |
+| **기록이라 그대로** | `logs/` 9 파일, `runs/` 35 파일, `reports/` 12 파일 (기존 세션·probe·분석), `docs/decisions/011`·`019`, `docs/design/demo-model-probe.md`, `docs/findings/error-evidence.json`, `docs/A1-*.md` | 그대로 |
+| | `tests/fixtures/scenario-v2-dialogue.yaml`:8 (TEST-T1-v2), `tests/fixtures/scenario-v2-artifact.yaml`:9 (DM-37 의 A-1-v4 사본), 테스트 상수 (`test_harness_facts`·`test_model_run_condition`·`test_multi_tool_calls`·`test_probe_models`·`test_probe_v3_strict`) | 그대로 (C-17-4 기준값·C-17-5 등가 조건). 테스트는 fixture 모델로 고정한 설정 사본으로 돈다 (`tests/pinned_configs.py`) |
+| | `tools/analyze_session.py`:387 (`PRICE_PER_M`, 기록된 세션의 단가) | 그대로. glm 단가 추가는 PM 결정 (C-17-7 보고) |
+| | `experiments/probe_strict_output.py`:14, `test.py`:5, `deadlock_test.py`:10 (Groq 시대) | 그대로. 데모 트랙 뒤 Groq 잔재 정리 |
+
+C-17-8 뒤 데모 실행 경로(코드·데모 설정)에는 `gpt-oss` 가 없다 (`evidence-models.json` `now_tracked.demo` 는 `demo-scenarios.md` 의 줄 그은 기록뿐).
+
+**데모 모델을 한 곳에서 (`demo-conditions.yaml`, `demo-run-conditions-v1`)**
+
+```yaml
+conditions_version: demo-run-conditions-v1
+model: glm-5.3-flash
+reasoning_effort: medium
+reasoning_effort_evidence: null
+```
+
+- 이 파일만 데모 모델·추론 강도를 정한다. 코드·설정 YAML 에는 모델 ID 가 없다 (테스트 : 루트·`experiments/` 의 Python 과 `guardrail*.yaml` 에 `glm-5.3-flash` 없음)
+- **실행기** : scenario-v2 에 `run_conditions: demo-conditions.yaml` 을 두면 그 시나리오는 `model`·`reasoning_effort`·`reasoning_effort_evidence` 를 쓰지 않고
+  (둘 다 쓰거나 둘 다 없으면 스키마 오류) 실행할 때 파일 값으로 채운다 (`scenario_schema.resolve_run_conditions`). C-18 데모 시나리오 11 개가 이 방식을 쓴다.
+  `conditions.json` `run_conditions` 에 파일 경로·SHA-256·값을 남긴다. 모델 출처는 `scenario` (시나리오가 가리킨 파일), `--model` 을 주면 `run_condition`
+- **데모 프록시** : 관측·차단 설정 둘 다 `run_conditions: demo-conditions.yaml` 로 그 파일의 모델에 고정된다 (meta `pinned_model.source: run_conditions`, 파일 해시 포함)
+- **probe** : `tools/probe_gateway.py --scenario <데모 시나리오>` 도 같은 값을 쓴다 (테스트 : dry run 요청이 glm·medium)
+- 추론 강도 `medium` 의 실제 적용 여부는 probe 로 확인하지 않았다 → `reasoning_effort.applied: unverified`. C-18 시험 실행의 `reasoning_tokens` 로 본다
+- `run_conditions` 가 없는 scenario-v2(C-17 fixture)와 scenario-v1(A-1 계열)은 지금처럼 시나리오의 모델을 보낸다. **scenario-v1 기본 실행의 업스트림 요청은 바이트 그대로**다
+  (C-17-4 요청 12 건 비교 통과). 데모 경로의 요청은 지시의 예외대로 바뀐다 : 모델 `glm-5.3-flash`, `reasoning_effort: medium`, 최종 보고 strict 스키마에 `enum` 포함
+
+**DM-55 — 대화 과제의 기본 strict 방식 = `enum` 포함 (`provider_strict`)**
+
+- `dialogue_runner.DEFAULT_CLOSED_LIST_CHECK = 'provider_strict'`. `--closed-list-check after_receipt` 를 주면 DM-40 방식(enum 없이 보내기). 받은 뒤 검사(어휘 위반 기록)는 두 방식 모두 그대로
+- `conditions.closed_list_check` : `{mode, decision: DM-20, enums_sent_to_provider, basis}`. 기본이면 `basis` 가 `default (DM-55: enum strict probe gateway-probe-44ec8e43 passed for the demo model)`,
+  명시하면 `run condition`. 조건군 필드 `closed_list_check` 에 방식이 들어간다 (테스트 : `after_receipt` 로 바꾸면 조건군 ID 가 바뀐다)
+- probe 근거는 glm 이다. 다른 모델로 데모를 돌리면(`--model`) 그 모델의 strict probe 를 다시 보고 정한다 (DM-55 규칙). C-19 본 실행은 한 방식으로 고정 (DM-40)
+
+**한 응답의 다중 도구 호출** — 후보 셋 모두 3~4 개. 테스트가 있다 : 산출물 경로 응답 순서 실행 `tests/test_c17_8_part1.py` (`InOrderRunTests`, 4 호출),
+도구 호출 수와 무관하게 모델 호출 1 회 `tests/test_multi_tool_calls.py`, 대화 경로 직렬 실행·검색 상한 `tests/test_dialogue_tool_flows.py`·`tests/test_c17_8_part0.py`.
+검색 상한 20 에 일찍 닿는지는 C-18 시험 실행에서 본다
+
+**비용 재추정 (추정)** (`docs/design/demo_budget.py --prompt-rate 150 --completion-rate 500 --model-label glm-5.3-flash --used-this-month 6.8413` → `reports/c17-8/demo-budget-glm.json`)
+
+- 스크립트가 단가를 인자로 받게 고쳤다 (`--prompt-rate`, `--completion-rate`, `--output`, `--model-label`, `--used-this-month`). 기본값(150/600)으로 돌리면 C-16 출력과 기존 키가 모두 같다
+- 세션 기준값 (gpt-oss 세션의 토큰을 glm 단가로) : 정상(A-1-v3 같은) 15.69, 교착(A-1-v4 같은) 120.13, 차단(A-1-v4 첫 STOP 까지) 36.53
+- 데모 70 세션 혼합 추정 **4,544.17**. C-18 시험 11 세션 범위 172.64~1,321.41 을 더하면 **4,716.81~5,865.58** → 위쪽이 월 할당 5,000 을 넘는다
+- 관측 반복 수(DM-6)별 (차단 3 회·시험 11 세션 유지) : 5 회 70 세션 4,544 (+시험 4,717~5,866) / 4 회 59 세션 3,745 (3,918~5,066) / 3 회 48 세션 2,946 (3,118~4,267)
+- 한계 : 토큰 수는 gpt-oss(추론 high) 세션이다. glm 의 출력 길이·`medium` 효과·캐시 할인은 반영하지 않았다 (위쪽 추정). 실측은 C-18 시험 실행으로 갱신
+

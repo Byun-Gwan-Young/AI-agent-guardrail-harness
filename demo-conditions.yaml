@@ -1,0 +1,11 @@
+# 데모 실행 조건 (DM-57, C-17-8). 데모 경로의 모델과 추론 강도는 이 파일 한 곳에서 정한다.
+# 읽는 곳 :
+#   - 실행기 : scenario-v2 시나리오의 `run_conditions: demo-conditions.yaml` (시나리오에는 model·reasoning_effort 를 쓰지 않는다)
+#   - 데모 프록시 : guardrail-deadlock-v0.3-kmu.yaml, guardrail-deadlock-v0.3-kmu-block.yaml 의 `run_conditions` (고정 모델, S-12)
+# 코드에는 모델·추론 강도 기본값이 없다. 값을 바꾸면 다른 조건군이다 (매니페스트 condition.group, DM-33·DM-40 과 같은 원칙).
+# 근거 : PM probe gateway-probe-a41f8d51… (도구 + 추론 high 200, 도구 호출 3 개), gateway-probe-44ec8e43… (v3 strict enum 포함·없음 200, 계약 유효).
+# 추론 강도 medium 은 데모 조건에서만 쓴다 (DM-57). medium 이 실제로 적용되는지는 probe 로 확인하지 않았다 → reasoning_effort_evidence: null (applied: unverified).
+conditions_version: demo-run-conditions-v1
+model: glm-5.3-flash
+reasoning_effort: medium
+reasoning_effort_evidence: null

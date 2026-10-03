@@ -17,7 +17,8 @@
 | `DEMO-CT-N-v1` | T2 | A-1-v4 그대로 | 관측 5 만 (자연 발생 비교군) |
 | `DEMO-CL-normal-v1` / `DEMO-CL-stall-v1` | T3 | 코딩 (새 작은 함수) | 관측 5 + (교착판) 차단 3 |
 
-공통 조건 (제안, A-1-v4 와 같음) : 모델 `accounts/fireworks/models/gpt-oss-120b`, 온도 0.0, `reasoning_effort: high`, `max_tokens` 16384, `max_steps` 30, `max_llm_calls_per_step` 3, 프로토콜 v10, `criteria_version: deadlock-v0.3` (DM-10).
+공통 조건 (제안, A-1-v4 와 같음) : ~~모델 `accounts/fireworks/models/gpt-oss-120b`~~, 온도 0.0, ~~`reasoning_effort: high`~~, `max_tokens` 16384, `max_steps` 30, `max_llm_calls_per_step` 3, 프로토콜 v10, `criteria_version: deadlock-v0.3` (DM-10).
+**C-17-8 (DM-57)** : 모델과 추론 강도는 시나리오에 쓰지 않고 `run_conditions: demo-conditions.yaml` 로 가리킨다 (지금 값 `glm-5.3-flash`, `medium`). gpt-oss 는 게이트웨이에서 제거되었다. 데모 프록시도 같은 파일의 모델로 고정된다 (S-12, 결정 문서 019).
 
 ## 공통 규칙
 

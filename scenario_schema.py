@@ -242,7 +242,11 @@ class ScenarioV2(Definition):
     scenario_id: str = Field(min_length=1)
     title: str
     task_kind: Literal["artifact", "dialogue"]
-    model: str
+    # DM-57: a demo scenario names the run-conditions file (demo-conditions.yaml) that sets its model and reasoning
+    # effort in one place for every demo scenario and the demo proxies; it then gives neither itself. Without it the
+    # scenario gives its model (the C-17 offline fixtures, the DM-37 copy of A-1-v4).
+    model: str | None = None
+    run_conditions: str | None = None
     agents: list[AgentV2] = Field(min_length=1)
     turn_order: Literal["fixed", "router"]
     task: str = Field(min_length=1)
@@ -297,6 +301,12 @@ class ScenarioV2(Definition):
             raise ValueError("Agent tools must not repeat")
         if self.reasoning_effort_evidence is not None and self.reasoning_effort is None:
             raise ValueError("reasoning_effort_evidence requires reasoning_effort")
+        if (self.model is None) == (self.run_conditions is None):
+            raise ValueError("Give model or run_conditions, not both and not neither")
+        if self.run_conditions is not None:
+            relative_path(self.run_conditions, "run_conditions")
+            if self.reasoning_effort is not None or self.reasoning_effort_evidence is not None:
+                raise ValueError("With run_conditions the reasoning effort comes from that file (DM-57)")
         if self.seed_support != "supported" and self.seed is not None:
             raise ValueError("Do not claim a fixed seed unless support is confirmed")
         if self.progress_source in ("conversation", "both") and not self.progress_metric.conversation:
@@ -395,6 +405,19 @@ def load_scenario(path):
     if isinstance(data, dict) and data.get("schema_version") == "scenario-v2":
         return ScenarioV2.model_validate(data)
     return Scenario.model_validate(data)
+
+
+def resolve_run_conditions(scenario, root):
+    """(scenario to run, run-conditions record or None). A scenario-v2 with run_conditions gets the file's model,
+    reasoning effort and its evidence (DM-57); everything else is returned as it is."""
+    if getattr(scenario, "run_conditions", None) is None:
+        return scenario, None
+    from experiment_config import load_run_conditions
+    conditions = load_run_conditions(scenario.run_conditions, root)
+    resolved = scenario.model_copy(update={"model": conditions["model"],
+                                           "reasoning_effort": conditions["reasoning_effort"],
+                                           "reasoning_effort_evidence": conditions["reasoning_effort_evidence"]})
+    return resolved, conditions
 
 
 def token_estimate(scenario):

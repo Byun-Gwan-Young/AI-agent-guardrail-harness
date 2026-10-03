@@ -138,7 +138,7 @@ class FixedFlowTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(conditions["registration_sha256"], dialogue.canonical_sha256(expected))
         self.assertEqual((conditions["output_contract_version"], conditions["runner_protocol"],
                           conditions["closed_list_check"]["mode"], conditions["task_kind"], conditions["turn_order"]),
-                         (V3, PROTOCOL_V10, "after_receipt", "dialogue", "fixed"))
+                         (V3, PROTOCOL_V10, "provider_strict", "dialogue", "fixed"))
         # T1 observations: the verified report's structured fields only; handoff_to recorded in the fixed order too.
         self.assertEqual([(c["status"], c.get("handoff_to"), c["adopted_items"]) for c in conversations(run)],
                          [("triage", "shipping", ["ticket"]), ("assigned", "shipping", ["ticket", "owner"]),
@@ -159,7 +159,9 @@ class FixedFlowTests(unittest.IsolatedAsyncioTestCase):
     async def test_requests_carry_the_contract_and_the_shared_state(self):
         reports = [report("triage", handoff="refund", adopted=["ticket"]),
                    report("resolved", deliverable=DELIVERABLE, issues=())]
-        run = await run_t1(reports, tools=LOOKUP, scenario_changes=FIXED, max_steps=2, tests=self)
+        # after_receipt (DM-40) stated: the strict shape without its enums. The default is provider_strict (DM-55).
+        run = await run_t1(reports, tools=LOOKUP, scenario_changes=FIXED, max_steps=2, tests=self,
+                           closed_list_check="after_receipt")
         requests = run["requests"]
         finals = [r for r in requests if "response_format" in r]
         others = [r for r in requests if "response_format" not in r]
@@ -185,13 +187,20 @@ class FixedFlowTests(unittest.IsolatedAsyncioTestCase):
                          ("max_steps", True))
 
     async def test_provider_strict_sends_the_closed_lists(self):
-        run = await run_t1([report("triage")], max_steps=1, closed_list_check="provider_strict",
-                           scenario_changes=FIXED, tests=self)
-        final = next(r for r in run["requests"] if "response_format" in r)
-        properties = final["response_format"]["json_schema"]["schema"]["properties"]
-        self.assertEqual(properties["status"]["enum"], ["received", "triage", "assigned", "resolved", "escalated"])
-        self.assertEqual(properties["handoff_to"]["anyOf"][0]["enum"], ["intake", "refund", "shipping"])
-        self.assertTrue(run["conditions"]["closed_list_check"]["enums_sent_to_provider"])
+        # DM-55 (C-17-8): the default, and the same request when it is stated; only the recorded basis differs.
+        default = await run_t1([report("triage")], max_steps=1, scenario_changes=FIXED, tests=self)
+        stated = await run_t1([report("triage")], max_steps=1, closed_list_check="provider_strict",
+                              scenario_changes=FIXED, tests=self)
+        for run in (default, stated):
+            final = next(r for r in run["requests"] if "response_format" in r)
+            properties = final["response_format"]["json_schema"]["schema"]["properties"]
+            self.assertEqual(properties["status"]["enum"], ["received", "triage", "assigned", "resolved", "escalated"])
+            self.assertEqual(properties["handoff_to"]["anyOf"][0]["enum"], ["intake", "refund", "shipping"])
+            self.assertTrue(run["conditions"]["closed_list_check"]["enums_sent_to_provider"])
+        self.assertEqual(default["requests"], stated["requests"])
+        self.assertEqual((default["conditions"]["closed_list_check"]["basis"],
+                          stated["conditions"]["closed_list_check"]["basis"]),
+                         (dialogue.CLOSED_LIST_DEFAULT_BASIS, "run condition"))
 
     async def test_resolved_without_the_declaration_or_the_judge_does_not_end(self):
         reports = [report("resolved", deliverable=DELIVERABLE, issues=()),  # nothing looked up yet
@@ -292,7 +301,7 @@ class ManifestTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(registration["sha256"], registration["sha256_recomputed"])
         self.assertTrue(registration["proxy_stored_same"])
         self.assertEqual((manifest["task"]["output_contract_version"], manifest["task"]["turn_order"],
-                          manifest["task"]["closed_list_check"]["mode"]), (V3, "fixed", "after_receipt"))
+                          manifest["task"]["closed_list_check"]["mode"]), (V3, "fixed", "provider_strict"))
         self.assertEqual((manifest["vocabulary_violations"]["total"], manifest["vocabulary_violations"]["steps"]),
                          (1, [2]))
         # Shipping (step 3) is not the declarer, so the run reaches max_steps.

@@ -1,4 +1,5 @@
 """Explicit experiment conditions, never inferred from provider defaults."""
+import hashlib
 import os
 from pathlib import Path
 import re
@@ -41,20 +42,59 @@ def guardrail_mode(config):
     return mode
 
 
+RUN_CONDITIONS_VERSION = "demo-run-conditions-v1"
+RUN_CONDITION_FIELDS = {"conditions_version", "model", "reasoning_effort", "reasoning_effort_evidence"}
+REASONING_EFFORTS = ("low", "medium", "high")
+ROOT = Path(__file__).resolve().parent
+
+
 def model_id(value, name):
     if not isinstance(value, str) or not value.strip() or value != value.strip():
         raise ValueError(name + " must name a model ID without surrounding spaces")
     return value
 
 
-def pinned_model(config):
+def run_conditions_path(value, root=ROOT):
+    """A repository-relative POSIX path to a run-conditions file (DM-57)."""
+    if not isinstance(value, str) or not value or value.startswith("/") or "\\" in value or ".." in value.split("/"):
+        raise ValueError("run_conditions must be a relative path inside the repository")
+    return root / value
+
+
+def load_run_conditions(value, root=ROOT):
+    """DM-57: the one place that sets the demo model and reasoning effort, read by the runner (scenario-v2
+    run_conditions) and by the demo proxies (their pinned model). Returns the values with the file's path and sha256."""
+    path = run_conditions_path(value, root)
+    raw = path.read_bytes()
+    data = yaml.safe_load(raw.decode("utf-8"))
+    if not isinstance(data, dict) or set(data) != RUN_CONDITION_FIELDS:
+        raise ValueError("run conditions need exactly " + ", ".join(sorted(RUN_CONDITION_FIELDS)))
+    if data["conditions_version"] != RUN_CONDITIONS_VERSION:
+        raise ValueError("Unsupported run conditions version")
+    model_id(data["model"], "run conditions model")
+    if data["reasoning_effort"] not in REASONING_EFFORTS:
+        raise ValueError("run conditions reasoning_effort must be one of " + ", ".join(REASONING_EFFORTS))
+    evidence = data["reasoning_effort_evidence"]
+    if evidence is not None and not isinstance(evidence, str):
+        raise ValueError("reasoning_effort_evidence must be a path or null")
+    return {"file": value, "sha256": hashlib.sha256(raw).hexdigest(), **data}
+
+
+def pinned_model(config, root=ROOT):
     """S-12 (one proxy = one condition group): the one model this proxy forwards, set when it starts, never in code.
-    None for an unpinned configuration (the Groq-era ones and the byte-protected v0.2 gateway one); a deadlock-v0.3
-    (demo) configuration must be pinned."""
+    pinned_model names it; run_conditions takes it from a run-conditions file (the demo proxies, DM-57). None for an
+    unpinned configuration (the Groq-era ones and the byte-protected v0.2 gateway one); a deadlock-v0.3 (demo)
+    configuration must be pinned."""
+    if "pinned_model" in config and "run_conditions" in config:
+        raise ValueError("Give pinned_model or run_conditions, not both")
     if "pinned_model" in config:
         return {"name": model_id(config["pinned_model"], "pinned_model"), "source": "pinned_model"}
+    if "run_conditions" in config:
+        conditions = load_run_conditions(config["run_conditions"], root)
+        return {"name": conditions["model"], "source": "run_conditions", "run_conditions": conditions["file"],
+                "run_conditions_sha256": conditions["sha256"]}
     if config.get("criteria_version") == "deadlock-v0.3":
-        raise ValueError("A deadlock-v0.3 (demo) proxy needs pinned_model (S-12)")
+        raise ValueError("A deadlock-v0.3 (demo) proxy needs pinned_model or run_conditions (S-12)")
     return None
 
 

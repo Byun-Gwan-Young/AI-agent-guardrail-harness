@@ -104,9 +104,10 @@ async def run_t1(reports, *, tools=None, config=OBSERVE_CONFIG, phase="demo", da
     root = Path(tests.enterContext(tempfile.TemporaryDirectory()) if tests else tempfile.mkdtemp())
     path = scenario_file(root, max_steps=max_steps, **(scenario_changes or {}))
     from pinned_configs import for_model
-    sent_model = model if model is not None else yaml.safe_load(path.read_text(encoding="utf-8"))["model"]
+    # A scenario with run_conditions (DM-57) and no --model runs through the real demo configuration.
+    sent_model = model if model is not None else yaml.safe_load(path.read_text(encoding="utf-8")).get("model")
     app = create_app(root / "logs" / "demo", transport=httpx.MockTransport(upstream),
-                     config_path=for_model(config, sent_model))
+                     config_path=for_model(config, sent_model) if sent_model else config)
     real_client = httpx.AsyncClient
 
     class OfflineClient(real_client):
