@@ -1,0 +1,114 @@
+{
+  "scenario_id": "DEMO-LR-stall-v1",
+  "schema_version": "scenario-v2",
+  "task_kind": "dialogue",
+  "scenario_path": "scenarios/DEMO-LR-stall-v1.yaml",
+  "scenario_sha256": "5fb09038d6b1a0fd1a29344a4faca0ce41d71de7128f6f3b0629e9d968a332b4",
+  "criteria_version": "deadlock-v0.3",
+  "progress_version": "progress-v3",
+  "criteria": {
+    "config_file": "guardrail-deadlock-v0.3-kmu.yaml",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "parameters": {
+      "consecutive_steps": 3,
+      "grace_steps": 2,
+      "missing_review_steps": 3,
+      "plateau_steps": 6,
+      "t3_global_revert": true,
+      "t1_metrics": [
+        "status_advance",
+        "adopted_items",
+        "new_issue_ids"
+      ],
+      "handoff_record_threshold": 4
+    },
+    "parameter_names": {
+      "K": "plateau_steps",
+      "H": "handoff_record_threshold (recorded only, DM-22)",
+      "N": "consecutive_steps"
+    },
+    "frozen_record": "docs/criteria/deadlock-v0.3.json",
+    "frozen_criteria_sha256_matches": true,
+    "frozen_implementation_matches": true,
+    "frozen_templates_match": true,
+    "freeze_sha256": "4fa939191ab8e9bfc879da548b87b13107c85e1612f62bb35334e10fee7759cf"
+  },
+  "run_conditions": {
+    "run_conditions": "demo-conditions.yaml",
+    "points_to_demo_conditions": true,
+    "run_conditions_sha256": "96472b969d906af1afd4972602be932c21c6913e96468ae77b745ee294a1e0c0",
+    "model": "glm-5.3-flash",
+    "reasoning_effort": "high",
+    "proxy_pinned_model": {
+      "name": "glm-5.3-flash",
+      "source": "run_conditions",
+      "run_conditions": "demo-conditions.yaml",
+      "run_conditions_sha256": "96472b969d906af1afd4972602be932c21c6913e96468ae77b745ee294a1e0c0"
+    },
+    "proxy_pins_the_same_model": true
+  },
+  "output_contract_version": "output-contract-v3",
+  "contract": {
+    "output_contract": "output-contract-v3",
+    "write_gate": null,
+    "combination_ok": true,
+    "rule": "a dialogue task reports output-contract-v3 and has no write_gate"
+  },
+  "allowed_issues_sha256": "05f6d18aebc2838a576401c3bce88d7659586833935a119ceadaa0a71b204d52",
+  "allowed_issue_ids": [
+    "requirements",
+    "acceptance-review",
+    "paper-selection",
+    "summaries",
+    "benchmark-condition"
+  ],
+  "initial_issue_ids": [
+    "requirements",
+    "paper-selection",
+    "summaries",
+    "benchmark-condition",
+    "acceptance-review"
+  ],
+  "registration_sha256": "f18f26f3d08de371ad6b42b775f4619b257204f648366295d83f1437f4979322",
+  "role_labels": {
+    "lead": "조사 책임",
+    "searcher": "검색 담당",
+    "writer": "작성 담당"
+  },
+  "writable_paths": {
+    "lead": [],
+    "searcher": [],
+    "writer": []
+  },
+  "tools": {
+    "lead": [],
+    "searcher": [
+      "academic_search"
+    ],
+    "writer": []
+  },
+  "dialogue": {
+    "tools_used": [
+      "academic_search"
+    ],
+    "tools_without_implementation": [],
+    "key_environment_variables": [],
+    "inputs_dir": "scenario_assets/DEMO-LR-v1",
+    "inputs_dir_exists": true,
+    "input_problems": {},
+    "judge": "scenario_judges/DEMO-LR-stall-v1.py",
+    "judge_exists": true,
+    "tool_settings": {
+      "academic_search": {
+        "provider": "arxiv",
+        "max_results": 10,
+        "sort_by": "relevance",
+        "sort_order": "descending",
+        "max_result_chars": 12000,
+        "max_calls_per_session": 20,
+        "timeout_seconds": 30.0,
+        "min_interval_seconds": 3.0
+      }
+    }
+  }
+}

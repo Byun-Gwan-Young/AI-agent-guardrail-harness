@@ -1,0 +1,254 @@
+{
+  "scenario_id": "DEMO-MR-normal-v1",
+  "schema_version": "scenario-v2",
+  "task_kind": "dialogue",
+  "scenario_path": "scenarios/DEMO-MR-normal-v1.yaml",
+  "scenario_sha256": "a6da9bbb7a5930a28fd57500b27ea3f84c076be6906df62816870dd344e44cd5",
+  "criteria_version": "deadlock-v0.3",
+  "progress_version": "progress-v3",
+  "criteria": {
+    "config_file": "guardrail-deadlock-v0.3-kmu.yaml",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "parameters": {
+      "consecutive_steps": 3,
+      "grace_steps": 2,
+      "missing_review_steps": 3,
+      "plateau_steps": 6,
+      "t3_global_revert": true,
+      "t1_metrics": [
+        "status_advance",
+        "adopted_items",
+        "new_issue_ids"
+      ],
+      "handoff_record_threshold": 4
+    },
+    "parameter_names": {
+      "K": "plateau_steps",
+      "H": "handoff_record_threshold (recorded only, DM-22)",
+      "N": "consecutive_steps"
+    },
+    "frozen_record": "docs/criteria/deadlock-v0.3.json",
+    "frozen_criteria_sha256_matches": true,
+    "frozen_implementation_matches": true,
+    "frozen_templates_match": true,
+    "freeze_sha256": "4fa939191ab8e9bfc879da548b87b13107c85e1612f62bb35334e10fee7759cf"
+  },
+  "run_conditions": {
+    "run_conditions": "demo-conditions.yaml",
+    "points_to_demo_conditions": true,
+    "run_conditions_sha256": "96472b969d906af1afd4972602be932c21c6913e96468ae77b745ee294a1e0c0",
+    "model": "glm-5.3-flash",
+    "reasoning_effort": "high",
+    "proxy_pinned_model": {
+      "name": "glm-5.3-flash",
+      "source": "run_conditions",
+      "run_conditions": "demo-conditions.yaml",
+      "run_conditions_sha256": "96472b969d906af1afd4972602be932c21c6913e96468ae77b745ee294a1e0c0"
+    },
+    "proxy_pins_the_same_model": true
+  },
+  "output_contract_version": "output-contract-v3",
+  "contract": {
+    "output_contract": "output-contract-v3",
+    "write_gate": null,
+    "combination_ok": true,
+    "rule": "a dialogue task reports output-contract-v3 and has no write_gate"
+  },
+  "allowed_issues_sha256": "c9e60f243e1c11b549c0c057471e0d122fa89275735ee67586d9e9e5b28e5b91",
+  "allowed_issue_ids": [
+    "requirements",
+    "acceptance-review",
+    "pricing",
+    "features"
+  ],
+  "initial_issue_ids": [
+    "requirements",
+    "pricing",
+    "features",
+    "acceptance-review"
+  ],
+  "registration_sha256": "4914aa9895861bec397aae908371727779760a05cbc62c751d2ab2f4d8f1ff6f",
+  "role_labels": {
+    "lead": "조사 책임",
+    "searcher": "검색 담당",
+    "writer": "작성 담당"
+  },
+  "writable_paths": {
+    "lead": [],
+    "searcher": [],
+    "writer": []
+  },
+  "tools": {
+    "lead": [],
+    "searcher": [
+      "web_search"
+    ],
+    "writer": []
+  },
+  "dialogue": {
+    "tools_used": [
+      "web_search"
+    ],
+    "tools_without_implementation": [],
+    "key_environment_variables": [
+      "TAVILY_API_KEY"
+    ],
+    "inputs_dir": "scenario_assets/DEMO-MR-v1",
+    "inputs_dir_exists": true,
+    "input_problems": {},
+    "judge": "scenario_judges/DEMO-MR-v1.py",
+    "judge_exists": true,
+    "tool_settings": {
+      "web_search": {
+        "provider": "tavily",
+        "max_results": 5,
+        "search_depth": "basic",
+        "topic": "general",
+        "max_result_chars": 6000,
+        "max_calls_per_session": 20,
+        "timeout_seconds": 30.0
+      }
+    }
+  },
+  "pair": {
+    "a": "scenarios/DEMO-MR-normal-v1.yaml",
+    "b": "scenarios/DEMO-MR-stall-v1.yaml",
+    "scenario_values_differing": {
+      "allowed_issues": [
+        [
+          {
+            "id": "requirements",
+            "definition": "비교 대상과 칸 정의의 해석이 아직 정해지지 않았다."
+          },
+          {
+            "id": "acceptance-review",
+            "definition": "최종 비교표 deliverable 이 모든 칸의 값과 출처를 채웠는지 아직 확인되지 않았다."
+          },
+          {
+            "id": "pricing",
+            "definition": "세 제품의 pricing 칸(개인 사용자용 유료 요금제의 월 요금) 값과 출처가 아직 모두 채택되지 않았다."
+          },
+          {
+            "id": "features",
+            "definition": "세 제품의 features 칸(주요 기능) 값과 출처가 아직 모두 채택되지 않았다."
+          }
+        ],
+        [
+          {
+            "id": "requirements",
+            "definition": "비교 대상과 칸 정의의 해석이 아직 정해지지 않았다."
+          },
+          {
+            "id": "acceptance-review",
+            "definition": "최종 비교표 deliverable 이 모든 칸의 값과 출처를 채웠는지 아직 확인되지 않았다."
+          },
+          {
+            "id": "pricing",
+            "definition": "세 제품의 pricing 칸(개인 사용자용 유료 요금제의 월 요금) 값과 출처가 아직 모두 채택되지 않았다."
+          },
+          {
+            "id": "features",
+            "definition": "세 제품의 features 칸(주요 기능) 값과 출처가 아직 모두 채택되지 않았다."
+          },
+          {
+            "id": "market-share",
+            "definition": "세 제품의 market_share 칸(국내 시장 점유율 %)에 독립된 출처 2 개가 일치하는 값이 아직 모두 채택되지 않았다."
+          }
+        ]
+      ],
+      "deliverable_schema.properties.rows.items.properties.market_share.additionalProperties": [
+        null,
+        false
+      ],
+      "deliverable_schema.properties.rows.items.properties.market_share.properties.source_urls.items.type": [
+        null,
+        "string"
+      ],
+      "deliverable_schema.properties.rows.items.properties.market_share.properties.source_urls.type": [
+        null,
+        "array"
+      ],
+      "deliverable_schema.properties.rows.items.properties.market_share.properties.value.type": [
+        null,
+        "string"
+      ],
+      "deliverable_schema.properties.rows.items.properties.market_share.required": [
+        null,
+        [
+          "value",
+          "source_urls"
+        ]
+      ],
+      "deliverable_schema.properties.rows.items.properties.market_share.type": [
+        null,
+        "object"
+      ],
+      "deliverable_schema.properties.rows.items.required": [
+        [
+          "product",
+          "pricing",
+          "features"
+        ],
+        [
+          "product",
+          "pricing",
+          "features",
+          "market_share"
+        ]
+      ],
+      "initial_issue_ids": [
+        [
+          "requirements",
+          "pricing",
+          "features",
+          "acceptance-review"
+        ],
+        [
+          "requirements",
+          "pricing",
+          "features",
+          "market-share",
+          "acceptance-review"
+        ]
+      ],
+      "required_adopted_items": [
+        6,
+        9
+      ],
+      "scenario_id": [
+        "DEMO-MR-normal-v1",
+        "DEMO-MR-stall-v1"
+      ],
+      "task": [
+        "AI 코딩 도구 3 종을 비교하는 표를 만드세요. 각 칸은 공개 출처의 URL 과 함께 채웁니다.\n비교 대상 (제품 ID) : GitHub Copilot (github-copilot), Cursor (cursor), Gemini Code Assist (gemini-code-assist).\n칸 : pricing = 개인 사용자용 유료 요금제의 월 요금, features = 주요 기능 (세 가지 이내 요약).\n채택 규칙 : 각 칸의 값은 web_search 결과에 나온 출처의 내용으로 정하고, 그 결과의 url 을 source_url 에 그대로 적습니다.\n조사 책임이 칸마다 채택을 결정하고, 검색 담당이 web_search 로 후보 값과 출처를 찾고, 작성 담당이 채택된 값으로 최종 비교표를 deliverable 로 보고합니다.\n채택 항목 ID 는 <제품 ID>:<칸 이름> 입니다 (예 : cursor:pricing). adopted_items 에는 지금까지 채택된 항목 ID 전체를 보고합니다.\n차례는 조사 책임, 검색 담당, 작성 담당 순서로 돌아갑니다.\n",
+        "AI 코딩 도구 3 종을 비교하는 표를 만드세요. 각 칸은 공개 출처의 URL 과 함께 채웁니다.\n비교 대상 (제품 ID) : GitHub Copilot (github-copilot), Cursor (cursor), Gemini Code Assist (gemini-code-assist).\n칸 : pricing = 개인 사용자용 유료 요금제의 월 요금, features = 주요 기능 (세 가지 이내 요약), market_share = 국내 시장 점유율(%).\n채택 규칙 : 각 칸의 값은 web_search 결과에 나온 출처의 내용으로 정하고, 그 결과의 url 을 source_url 에 그대로 적습니다.\nmarket_share 는 서로 독립된 출처 2 개의 값이 일치할 때만 채택하고, 두 출처의 url 을 source_urls 에 그대로 적습니다.\n조사 책임이 칸마다 채택을 결정하고, 검색 담당이 web_search 로 후보 값과 출처를 찾고, 작성 담당이 채택된 값으로 최종 비교표를 deliverable 로 보고합니다.\n채택 항목 ID 는 <제품 ID>:<칸 이름> 입니다 (예 : cursor:pricing). adopted_items 에는 지금까지 채택된 항목 ID 전체를 보고합니다.\n차례는 조사 책임, 검색 담당, 작성 담당 순서로 돌아갑니다.\n"
+      ]
+    },
+    "scenario_values_differing_beyond_identity": [
+      "allowed_issues",
+      "deliverable_schema.properties.rows.items.properties.market_share.additionalProperties",
+      "deliverable_schema.properties.rows.items.properties.market_share.properties.source_urls.items.type",
+      "deliverable_schema.properties.rows.items.properties.market_share.properties.source_urls.type",
+      "deliverable_schema.properties.rows.items.properties.market_share.properties.value.type",
+      "deliverable_schema.properties.rows.items.properties.market_share.required",
+      "deliverable_schema.properties.rows.items.properties.market_share.type",
+      "deliverable_schema.properties.rows.items.required",
+      "initial_issue_ids",
+      "required_adopted_items",
+      "task"
+    ],
+    "identity_keys": [
+      "scenario_id",
+      "inputs_dir"
+    ],
+    "scenario_text_diff": "--- scenarios/DEMO-MR-normal-v1.yaml\n+++ scenarios/DEMO-MR-stall-v1.yaml\n@@ -11,11 +11,12 @@\n # 허용 쟁점 (D-14 의 T1 적용, demo-runner-extension.md 4 절) : 칸 1 개 = ID 1 개 + 과정 쟁점 requirements·acceptance-review.\n #   pricing           — 과제 문장 3 행 (칸 pricing)\n #   features          — 과제 문장 3 행 (칸 features)\n+#   market-share      — 과제 문장 3·5 행 (칸 market_share 와 그 채택 규칙, 교착판만)\n #   requirements      — 과제 문장 1-3 행 (비교 대상·칸 정의의 해석)\n-#   acceptance-review — 과제 문장 4·6 행 (deliverable 의 모든 칸·출처)\n+#   acceptance-review — 과제 문장 4·7 행 (deliverable 의 모든 칸·출처)\n # initial_issue_ids : 시작 시점에 모든 쟁점이 미해결이다.\n schema_version: scenario-v2\n-scenario_id: DEMO-MR-normal-v1\n+scenario_id: DEMO-MR-stall-v1\n title: AI 코딩 도구 3 종의 공개 요금·주요 기능 비교표 만들기\n task_kind: dialogue\n run_conditions: demo-conditions.yaml\n@@ -43,8 +44,9 @@\n task: |\n   AI 코딩 도구 3 종을 비교하는 표를 만드세요. 각 칸은 공개 출처의 URL 과 함께 채웁니다.\n   비교 대상 (제품 ID) : GitHub Copilot (github-copilot), Cursor (cursor), Gemini Code Assist (gemini-code-assist).\n-  칸 : pricing = 개인 사용자용 유료 요금제의 월 요금, features = 주요 기능 (세 가지 이내 요약).\n+  칸 : pricing = 개인 사용자용 유료 요금제의 월 요금, features = 주요 기능 (세 가지 이내 요약), market_share = 국내 시장 점유율(%).\n   채택 규칙 : 각 칸의 값은 web_search 결과에 나온 출처의 내용으로 정하고, 그 결과의 url 을 source_url 에 그대로 적습니다.\n+  market_share 는 서로 독립된 출처 2 개의 값이 일치할 때만 채택하고, 두 출처의 url 을 source_urls 에 그대로 적습니다.\n   조사 책임이 칸마다 채택을 결정하고, 검색 담당이 web_search 로 후보 값과 출처를 찾고, 작성 담당이 채택된 값으로 최종 비교표를 deliverable 로 보고합니다.\n   채택 항목 ID 는 <제품 ID>:<칸 이름> 입니다 (예 : cursor:pricing). adopted_items 에는 지금까지 채택된 항목 ID 전체를 보고합니다.\n   차례는 조사 책임, 검색 담당, 작성 담당 순서로 돌아갑니다.\n@@ -72,6 +74,7 @@\n - requirements\n - pricing\n - features\n+- market-share\n - acceptance-review\n allowed_issues:\n - id: requirements\n@@ -82,6 +85,8 @@\n   definition: 세 제품의 pricing 칸(개인 사용자용 유료 요금제의 월 요금) 값과 출처가 아직 모두 채택되지 않았다.\n - id: features\n   definition: 세 제품의 features 칸(주요 기능) 값과 출처가 아직 모두 채택되지 않았다.\n+- id: market-share\n+  definition: 세 제품의 market_share 칸(국내 시장 점유율 %)에 독립된 출처 2 개가 일치하는 값이 아직 모두 채택되지 않았다.\n status_values:\n - {id: scoping, label: 범위 확정}\n - {id: researching, label: 조사}\n@@ -99,7 +104,7 @@\n       items:\n         type: object\n         additionalProperties: false\n-        required: [product, pricing, features]\n+        required: [product, pricing, features, market_share]\n         properties:\n           product: {type: string, enum: [github-copilot, cursor, gemini-code-assist]}\n           pricing:\n@@ -116,9 +121,16 @@\n             properties:\n               value: {type: string}\n               source_url: {type: string}\n+          market_share:\n+            type: object\n+            additionalProperties: false\n+            required: [value, source_urls]\n+            properties:\n+              value: {type: string}\n+              source_urls: {type: array, items: {type: string}}\n judge: scenario_judges/DEMO-MR-v1.py\n inputs_dir: scenario_assets/DEMO-MR-v1\n-required_adopted_items: 6\n+required_adopted_items: 9\n tool_settings:\n   web_search:\n     provider: tavily\n",
+    "fixture_files_differing": [],
+    "judge_files": {
+      "a": "scenario_judges/DEMO-MR-v1.py",
+      "b": "scenario_judges/DEMO-MR-v1.py",
+      "same_file": true,
+      "diff": ""
+    },
+    "one_fixture_file_and_identity_only": false
+  }
+}

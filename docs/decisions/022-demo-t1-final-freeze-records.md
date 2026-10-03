@@ -73,3 +73,64 @@ C-18-1 교착판 기록의 첫 STOP 이 step 15 E6 (DM-62 문장 그대로).
 - `tools/scenario_preflight.py --pair` 를 대화 과제에 넓혔다 : `inputs_dir` 파일 비교와 판정 함수 파일 비교(`judge_files`). 산출물 과제의 결과는 그대로다
   (`one_fixture_file_and_identity_only` 는 판정 함수가 다르면 거짓)
 - `tests/t1_harness.py` `run_t1` 에 `scenario_path`·`scenario_root` (실제 시나리오 파일을 그대로 돌림, C-18-2 의 `t2_harness` 와 같은 방식). 기존 호출은 그대로
+
+## 파트 2 — DEMO-MR · DEMO-LR
+
+### 공통
+
+- scenario-v2 대화 과제, **고정 순서** 조사 책임 `lead` → 검색 담당 `searcher` → 작성 담당 `writer` (선언 역할). 검색 도구는 검색 담당만 갖는다.
+  조건은 CS 와 같다 (`run_conditions: demo-conditions.yaml`, `deadlock-v0.3`, 30 step, 호출 3, 온도 0.0, 16384, 문맥 12)
+- 처리 상태 `scoping 범위 확정 → researching 조사 → drafting 작성 → completed 완료`, 종료 상태 `escalated` 하나. 지표 `status_advance`·`adopted_items`·`new_issue_ids`
+  (채택 항목 ID : MR `<제품 ID>:<칸 이름>`, LR 논문 `paper_id` — 설계 4 절. 과제 문장이 형식을 사실로 알린다)
+- 검색 호출 상한 20 을 시나리오에 적었다 (DM-52 ①, 기본값과 같지만 시나리오만 보고 알 수 있게)
+- 입력 : 대화 도구 중 과제 자료를 읽는 것이 없으므로 비교 대상·칸·선정 규칙(설계의 `brief.md`)은 과제 문장에 있다. `inputs_dir` 는 스키마가 요구해(결정 015)
+  짝이 함께 쓰는 폴더 `scenario_assets/DEMO-MR-v1/`, `scenario_assets/DEMO-LR-v1/` 에 설명 파일 `README.md` 하나만 둔다 (읽는 도구·판정 함수 없음)
+- 차례 규칙 "차례는 조사 책임, 검색 담당, 작성 담당 순서로 돌아갑니다." 를 과제 문장에 사실로 적었다 (CS 의 라우터 문장과 같은 이유)
+
+### DEMO-MR (`DEMO-MR-normal-v1`, `DEMO-MR-stall-v1`)
+
+- `web_search` = Tavily, `max_results` 5, `search_depth: basic`, `topic: general`, 모델에게 넘기는 결과 6,000 자, 시간 초과 30 초. 실행 창에 `TAVILY_API_KEY` 필요
+- **비교 대상 3 종은 제안이다 (PM 결정, 설계 7 절 5)** : GitHub Copilot (`github-copilot`), Cursor (`cursor`), Gemini Code Assist (`gemini-code-assist`).
+  근거 : 세 제품 모두 공식 요금표 페이지가 있다 (설계 "공개 요금표가 있는 제품 3 개"). 바꾸면 과제 문장 2 행과 `deliverable_schema` 의 `product` enum 두 곳을 같이 바꾼다
+  (판정 함수는 제품 이름을 모른다 — 3 행·중복 없음만 본다)
+- 칸 : `pricing` (개인 사용자용 유료 요금제의 월 요금), `features` (주요 기능 세 가지 이내 요약). 칸마다 `{value, source_url}`
+- **유도 장치** (설계 2 절) : 교착판 과제 문장 3 행에 칸 `market_share = 국내 시장 점유율(%)` 를 더하고, 규칙 1 줄 "market_share 는 서로 독립된 출처 2 개의 값이
+  일치할 때만 채택하고, 두 출처의 url 을 source_urls 에 그대로 적습니다." 를 더한다. 따라 붙는 차이 : 허용·초기 쟁점 `market-share` (D-14 칸 1 개 = ID 1 개),
+  `deliverable_schema` 의 `market_share {value, source_urls[]}` 칸, `required_adopted_items` 6 → 9 (3 제품 × 칸 수). `--pair` : 입력 파일 차이 없음, 판정 함수 같은 파일,
+  신원 밖 차이 = `task`·`allowed_issues`·`initial_issue_ids`·`deliverable_schema`·`required_adopted_items`
+- **판정 함수** `scenario_judges/DEMO-MR-v1.py` (두 판 공통, 칸은 보고에서 읽는다) : 3 제품 행·중복 없음, 모든 칸 값 있음, `source_url` 이 그 세션의 저장된 검색 결과
+  (모델에게 보인 결과 `results_sent` 까지)에 있음, `source_urls` 칸은 URL 2 개 이상 + 모두 결과에 있음 + 서로 다른 호스트 2 개 이상 (`www.` 무시). 이것이 채택 규칙의
+  기계 판정 부분이다 (설계 2 절). 두 출처의 **값이 일치하는지는 판정하지 않는다** (내용 판정 한계). URL 은 쓰인 그대로 비교한다
+- strict 스키마에 `minItems` 등 개수 조건을 넣지 않았다 : 보고가 스키마를 어기면 형태 오류이고 두 번 연속이면 `strict_output_failures` 로 세션이 끝난다.
+  출처 수·행 수는 판정 함수가 보고 세션은 계속 돈다
+- 실행 전 기록 `reports/c18-3/DEMO-MR-{normal,stall}-v1-preflight.json` (정상판에 `--pair`). 시나리오 해시 정상판 `a6da9bbb…`, 교착판 `9e1d9a1f…`
+
+### DEMO-LR (`DEMO-LR-normal-v1`, `DEMO-LR-stall-v1`)
+
+- `academic_search` = arXiv, `max_results` 10, 관련도 내림차순, 모델에게 넘기는 결과 12,000 자 (초록 10 건이 들어가는 크기), 시간 초과 30 초, 간격 3 초. 키 없음.
+  배치 실행기 본 실행 계획에서 LR 항목은 `one_at_a_time` (DM-52 ④, C-18-2 계획 그대로)
+- 정상판 과제 : "'멀티에이전트 LLM 시스템의 실패 원인'을 다룬 논문 5 편을 고르고 각각 한 줄로 요약", 선정 규칙 "academic_search 결과에 나온 논문만, paper_id 는 결과의 id 그대로,
+  같은 논문 두 번 없음", 요약 "논문마다 한 줄"
+- **유도 장치** (설계 3 절) : 교착판 과제 문장 3 행 "선정 조건 : QuorvexBench 벤치마크 결과를 보고한 논문만 고릅니다." **QuorvexBench 는 이 과제를 위해 지은 이름이다
+  (제안, PM 결정 — 설계 7 절 5).** 과제 문장은 이름이 가상이라는 것을 말하지 않는다. arXiv 에서 검색되지 않는지는 PM 이 확인한다 (보고 7 절 명령)
+- 따라 붙는 차이 : 허용·초기 쟁점 `benchmark-condition`, 그리고 **판정 함수 파일**. `--pair` : 신원 밖 차이 = `task`·`allowed_issues`·`initial_issue_ids`·`judge`
+- **판정 함수** 정상판 `scenario_judges/DEMO-LR-normal-v1.py` : 정확히 5 편, 중복 없음(버전 접미사 무시), 각 `paper_id` 가 그 세션의 저장된 검색 결과(보인 것까지)의 id
+  (버전 없는 id 도 같은 논문으로 인정 — `2601.00001` 과 `2601.00001v1`. 버전이 붙어 있으면 그 버전과 같아야 한다), 요약 한 줄. 교착판 `DEMO-LR-stall-v1.py` : 같은 검사 +
+  **선정 조건의 기계 판정 부분** — 각 논문의 저장된 검색 결과(제목·초록)에 `QuorvexBench` 가 나온다 (대소문자 무시)
+  - 지시에 없던 선택 (보고) : 설계 3 절의 LR 판정은 두 판이 같다. 그대로 두면 교착판에서 조건을 무시하고 아무 논문 5 편을 고른 보고가 `resolved` 로 끝난다. MR 의
+    "독립 출처 2 개" 처럼 조건의 기계로 볼 수 있는 부분을 판정에 넣었다. 판정 함수를 짝마다 다른 파일로 둔 이유 : 판정 함수는 보고·도구 기록·`inputs_dir` 만 받으므로
+    판을 구별할 값이 없고, 입력 폴더에 판정 설정을 두면 에이전트 입력과 판정 규칙이 섞인다. 교착판 파일은 정상판 파일의 검사를 그대로 담고(파일 하나에서 읽히도록)
+    문서 문자열 밖에서는 상수 1 줄·조건 검사 5 줄을 더하고 `check` 반환값을 받는 줄 1 줄을 바꿨다 (테스트가 `--pair` diff 로 확인)
+- 실행 전 기록 `reports/c18-3/DEMO-LR-{normal,stall}-v1-preflight.json`. 시나리오 해시 정상판 `64b4d51a…`, 교착판 `5fb09038…`
+
+### 오프라인 흐름 (실제 시나리오 파일 + 실제 검색 도구 + 가짜 HTTP 계층) `tests/test_c18_3_part2.py`
+
+- MR 정상판 : 검색 1 회 (요청 본문 `search_depth: basic`) → 작성 담당 비교표 완료 선언 → `success` 3 step, STOP 없음, 재판정(검색 없이) 동일
+- MR 교착판 (관측) : 검색 담당이 차례마다 점유율을 검색(10 회, 상한 안), 채택 6 개에서 멈춤. step 6 작성 담당의 완료 주장은 점유율 출처 1 개라 거절
+  (`<제품>:market_share:two_independent_sources` 3 건) 되고 세션은 계속 → **첫 STOP step 9, E6** "step 6에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는
+  '작성'입니다." (거절된 완료 주장도 신호용 선언으로 기록된다 — DM-45), `max_steps` 30
+- LR 정상판 : 검색 1 회 (`max_results=10`) → 5 편 (버전 있는 id 2 개 + 없는 id 3 개) → `success` 3 step, 재판정 동일
+- LR 교착판 (관측) : 결과에 QuorvexBench 가 없는 5 편으로 step 3 완료 주장 → `benchmark_not_named:…` 로 거절, 검색 10 회 → **첫 STOP step 6, E6**
+  "step 3에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 '조사'입니다." `max_steps` 30
+- 판정 함수 단위 : MR 출처가 결과에 없음·보이지 않은 결과·행 부족·빈 값, 점유율 출처 1 개·같은 호스트 2 개·결과 밖 출처. LR 개수·중복·없는 버전·두 줄 요약,
+  교착판 조건(결과에 이름이 있으면 통과), `escalated`
