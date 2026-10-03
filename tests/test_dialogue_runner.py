@@ -295,7 +295,8 @@ class ManifestTests(unittest.IsolatedAsyncioTestCase):
                    report("resolved", deliverable=DELIVERABLE, declared=True, issues=())]
         run = await run_t1(reports, tools=LOOKUP, scenario_changes=FIXED, max_steps=3, tests=self)
         analysis, manifest = await self.manifest(run)
-        self.assertEqual(manifest["manifest_version"], "session-manifest-v0.6")
+        # C-18-2: the runner records the account label and batch item (None here), so the manifest is v0.7 (v0.6 + run.account_label, run.batch).
+        self.assertEqual(manifest["manifest_version"], "session-manifest-v0.7")
         registration = manifest["registration"]
         self.assertEqual(registration["value"], run["conditions"]["registration"])
         self.assertEqual(registration["sha256"], registration["sha256_recomputed"])

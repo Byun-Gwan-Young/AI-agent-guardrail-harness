@@ -603,6 +603,15 @@ def v06_fields(result, conditions, summary, log):
     return result
 
 
+def v07_fields(result, conditions):
+    """session-manifest-v0.7 = v0.6 + the account label the PM gave the window's key (never the key) and the batch
+    plan item the run was made for (tools/run_batch.py), both None for a run started by hand. Sessions with a v0.6
+    manifest exist (the C-18-1 trial), so this is a new version."""
+    result['manifest_version'] = 'session-manifest-v0.7'
+    result['run'].update(account_label=conditions.get('account_label'), batch=conditions.get('batch'))
+    return result
+
+
 def manifest(a, phase, notes):
     result = base_manifest(a, phase, notes)
     conditions = load(run_dir(a['session_id']) / 'conditions.json')
@@ -621,7 +630,11 @@ def manifest(a, phase, notes):
         # v0.6 for scenario-v2 runs: dialogue (C-17-4 onward) and artifact (C-17-5 onward) tasks.
         if conditions.get('task_kind') not in ('dialogue', 'artifact'):
             return result
-        return v06_fields(result, conditions, load(run_dir(a['session_id']) / 'summary.json'), log)
+        result = v06_fields(result, conditions, load(run_dir(a['session_id']) / 'summary.json'), log)
+        if 'account_label' not in conditions:
+            return result
+        # v0.7 (C-18-2, DM-63) for runs whose runner records the account label and batch item.
+        return v07_fields(result, conditions)
     if a['conditions']['runner_protocol'] in (PROTOCOL_V8, PROTOCOL_V9, PROTOCOL_V10):
         # v0.2 adds condition.runner_protocol and condition.reasoning_effort; v7 sessions keep v0.1 unchanged.
         result['manifest_version'] = 'session-manifest-v0.2'

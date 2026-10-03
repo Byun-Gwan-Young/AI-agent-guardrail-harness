@@ -330,7 +330,9 @@ async def run_dialogue(args, scenario, scenario_path, run_conditions=None):
         'tool_settings': tool_settings or None, 'tool_preflight': preflight,
         'search': search_tools.conditions_record(tool_settings) if tool_settings else None,
         # DM-57: the run-conditions file the model and reasoning effort came from, or None.
-        'run_conditions': run_conditions, 'dataset_run': dataset_run, 'phase': phase, **repository_state}
+        'run_conditions': run_conditions, 'dataset_run': dataset_run, 'phase': phase, **repository_state,
+        # C-18-2 (DM-63): the PM's account label and the batch plan item, or None.
+        **common.run_labels(args, True)}
     conditions_path = out / 'conditions.json'
     common.save(conditions_path, effective)
     print('session_id:', session_id, 'run_directory:', out, flush=True)

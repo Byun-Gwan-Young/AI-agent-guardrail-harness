@@ -124,7 +124,8 @@ class RunTests(unittest.IsolatedAsyncioTestCase):
         with mock.patch.object(analyze_session, "ROOT", run["root"]):
             analysis = analyze_session.analyse(run["session_id"])
             manifest = analyze_session.manifest(analysis, "measure", [])
-        self.assertEqual(manifest["manifest_version"], "session-manifest-v0.6")
+        # C-18-2: the runner records the account label and batch item (None here), so the manifest is v0.7 (v0.6 + run.account_label, run.batch).
+        self.assertEqual(manifest["manifest_version"], "session-manifest-v0.7")
         self.assertEqual((manifest["task"]["task_kind"], manifest["task"]["output_contract_version"],
                           manifest["task"]["turn_order"]), ("artifact", V2, "fixed"))
         self.assertTrue(manifest["registration"]["proxy_stored_same"])

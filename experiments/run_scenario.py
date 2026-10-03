@@ -86,6 +86,33 @@ ARTIFACT_CLOSED_LIST_CHECK = {'mode': 'after_receipt', 'decision': 'D-13', 'enum
                                        'carries no enum (output-contract-v2, v3 adds spec_approved only)'}
 
 
+# C-18-2 (DM-63): a demo run may carry the PM's account label (never a key) and the batch plan item it ran for.
+ACCOUNT_LABEL_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-'
+BATCH_ITEM_KEYS = ('plan_id', 'plan_sha256', 'item', 'mode', 'repeat', 'lane', 'lanes', 'rerun_of')
+
+
+def run_labels(args, demo_run):
+    """{account_label, batch} recorded in conditions.json of a scenario-v2 (demo) run; None for scenario-v1 runs,
+    which refuse both options. The batch item arrives as JSON from tools/run_batch.py."""
+    label, batch = getattr(args, 'account_label', None), getattr(args, 'batch_item', None)
+    if not demo_run:
+        if label is not None or batch is not None:
+            raise ValueError('--account-label and --batch-item are for scenario-v2 (demo) runs')
+        return None
+    if label is not None and not (0 < len(label) <= 32 and set(label) <= set(ACCOUNT_LABEL_CHARS)):
+        raise ValueError('--account-label takes 1-32 letters, digits, _ or -')
+    if batch is not None:
+        try:
+            batch = json.loads(batch)
+        except ValueError:
+            raise ValueError('--batch-item must be a JSON object') from None
+        if not isinstance(batch, dict) or set(batch) != set(BATCH_ITEM_KEYS):
+            raise ValueError('--batch-item needs exactly ' + ', '.join(BATCH_ITEM_KEYS))
+        if batch['mode'] not in ('observe', 'block') or batch['repeat'] != getattr(args, 'run_index', None):
+            raise ValueError('--batch-item mode must be observe or block and its repeat the --run-index')
+    return {'account_label': label, 'batch': batch}
+
+
 def enforce_demo_separation(dataset_run, phase):
     # DM-7, DM-23: block mode acts only on the demo phase, so a dataset session can never carry it.
     if phase not in (None, DEMO_PHASE):
@@ -402,6 +429,7 @@ async def run(args):
     scenario, run_conditions = resolve_run_conditions(load_scenario(scenario_path), ROOT)
     # scenario-v2 artifact tasks (CT, CL, CT-N; C-17-5, DM-37) run on this artifact path, unchanged for scenario-v1.
     artifact_v2 = scenario.schema_version != 'scenario-v1'
+    labels = run_labels(args, artifact_v2)
     if artifact_v2 and scenario.task_kind == 'dialogue':
         # T1 dialogue tasks (C-17-4) have their own flow.
         from experiments.dialogue_runner import run_dialogue
@@ -541,7 +569,7 @@ async def run(args):
                          run_conditions=run_conditions,
                          # C-18-2: the condition group's closed-list value for an artifact task. Its closed list
                          # (issue IDs) is checked after receipt and no enum is sent (output-contract-v2/v3, D-13).
-                         closed_list_check=ARTIFACT_CLOSED_LIST_CHECK)
+                         closed_list_check=ARTIFACT_CLOSED_LIST_CHECK, **labels)
     save(conditions_path, effective)
     print('session_id:', session_id, 'run_directory:', out, flush=True)
     shutil.copy2(scenario_path, out / 'scenario.yaml')
@@ -865,6 +893,11 @@ def main():
     context_options.add_argument('--no-context-buffer', action='store_true')
     parser.add_argument('--seed-probe', type=int, default=None,
                         help='Explicit unverified seed probe; does not change support status')
+    parser.add_argument('--account-label', default=None,
+                        help='demo runs (DM-63): a label the PM gives the account whose key this window holds, '
+                             'recorded in conditions.json and the manifest; never the key')
+    parser.add_argument('--batch-item', default=None,
+                        help='set by tools/run_batch.py: the batch plan item of this demo run (JSON)')
     args = parser.parse_args()
     if args.output_contract in (V2, V3) and args.runner_protocol is None:
         parser.error('--runner-protocol is required for --output-contract ' + args.output_contract)

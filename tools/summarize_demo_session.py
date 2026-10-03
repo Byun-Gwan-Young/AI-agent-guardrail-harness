@@ -142,6 +142,8 @@ def summarize(folder):
         'model': meta.get('model'), 'reasoning_effort': (conditions.get('reasoning_effort') or {}).get('requested'),
         'phase': conditions.get('phase'), 'guardrail_mode': meta.get('guardrail_mode'),
         'session_times': {'started_at': meta.get('started_at'), 'ended_at': meta.get('ended_at')},
+        # C-18-2 (DM-63): the PM's account label and the batch plan item, None for a run started by hand.
+        'account_label': conditions.get('account_label'), 'batch': conditions.get('batch'),
         'key_scan': key_scan(folder)}
 
 

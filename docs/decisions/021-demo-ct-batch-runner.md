@@ -44,3 +44,45 @@
   - step 1 에 열린 쟁점 수가 8 → 1 로 바뀌어 진전이고(가짜 보고), 그 뒤로 변화가 없다
 - CT 교착판 (차단) : step 6 STOP 다음 요청(step 7)이 403 → 종료 `guardrail_stop`, 7 step
 - CT-N : 위 요청 비교 (A-1-v4 와 같은 경로)
+
+## 파트 2 — 배치 실행기 (DM-63) `tools/run_batch.py`
+
+**실행 계획 파일** (`batch_plans/*.yaml`, `demo-batch-plan-v1`) : 항목마다 `scenario` (`scenarios/<ID>.yaml`), `mode` (`observe` / `block`), `repeats` (반복 번호 목록), 선택 `one_at_a_time`. 세션 하나 = (시나리오 ID, 모드, 반복 번호), 키 `<ID>:<mode>:<repeat>`. 같은 키 두 번, 0 이하 반복, 다른 모드, `scenarios/` 밖 경로는 읽을 때 거절한다
+
+| 계획 | 파일 | 세션 |
+|---|---|---|
+| 본 실행 | `batch_plans/demo-main-v1.yaml` (`demo-main-v1`) | 관측 11 × 5 = 55 + 차단 교착판 5 × 3 = 15 (CT-N 차단 없음) = 70. CS·MR·LR 파일은 C-18-3 에서 생긴다 (그 전에는 그 항목이 든 레인이 실행 전에 멈춘다) |
+| C-18-2 시험 | `batch_plans/demo-trial-c18-2.yaml` (`demo-trial-c18-2`) | CT 정상판·교착판·CT-N 관측 각 1 회 = 3 |
+
+**레인** (`run --lane k --lanes n`) : 창 하나가 레인 하나, 레인 안에서는 계획 순서대로 한 세션씩.
+- `one_at_a_time: true` 항목(LR, `academic_search`)은 레인이 2 개 이상이면 **마지막 레인에 모두** 들어가고 그 레인은 LR 만 돈다 (DM-52 ④). 나머지 항목은 남은 레인에 계획 순서대로 돌아가며 나눈다. 레인이 1 개면 그 레인이 전부 돈다
+- 본 실행 레인 4 개 : 19 · 19 · 19 · 13 (LR 13 = 관측 10 + 차단 3). 레인 5 개 : 15 · 14 · 14 · 14 · 13
+- 레인을 시작할 때 그 레인의 시나리오 파일이 모두 있는지, ID 가 파일 이름과 같은지, `one_at_a_time` 이 `academic_search` 유무와 정확히 맞는지 본다. 어긋나면 레인이 멈춘다
+
+**키** : 그 창의 `KMU_API_KEY` (그 레인에 `web_search` 시나리오가 있으면 `TAVILY_API_KEY` 도) 가 있는지만 본다. 없으면 변수 이름만 알리고 멈춘다. 키 값은 출력·기록하지 않는다 (DM-53). `--account-label A` 는 실행기 `--account-label` 로 넘어가 `conditions.json` 과 매니페스트에 남는다
+
+**모드 확인** : 세션마다 시작 전에 대상 프록시의 `GET /conditions` (이번에 추가, 업스트림 호출 없음, 키 없음 — 판정 규칙 버전·파라미터 해시·v0.3 동결 해시·모드·고정 모델·설정 파일 이름·업스트림 호스트) 를 읽어 다음이 모두 맞아야 실행한다. 하나라도 다르면 **그 레인을 멈춘다**
+- 프록시 모드 = 항목 모드 (관측 `--observe-proxy`, 기본 `:8000` / 차단 `--block-proxy`, 기본 `:8001` — 두 프록시를 포트를 나눠 동시에 띄운다)
+- 판정 규칙 버전 = 시나리오의 `criteria_version`
+- 프록시의 `deadlock-v0.3` 동결 해시 = 이 체크아웃의 동결 해시 (재동결 뒤 프록시를 다시 띄우지 않은 경우를 잡는다)
+- 고정 모델 = `demo-conditions.yaml` 의 모델, 그리고 프록시가 읽은 그 파일의 해시 = 지금 파일의 해시
+- 프록시에 닿지 않으면 멈춘다
+
+**이어 하기** : 끝난 항목은 `runs/demo/*/conditions.json` 의 `batch` (`plan_id`, `item`) 로 찾는다 (레인 기록이 아니라 세션 폴더가 기준이라 레인 수를 바꿔도 다시 돌지 않는다).
+- `done` = 그 항목의 세션 중 `runner_error` 가 아닌 사유로 끝난 것이 있음 → 건너뜀
+- `failed` = 마지막 세션이 `runner_error` / `interrupted` = 마지막 세션에 `summary.json` 이 없음 (창을 닫은 경우 등) → **자동으로 다시 돌리지 않고 건너뛴다**. PM 이 `--rerun-failed` 를 주면 그 레인의 실패 항목만 다시 돌고 새 세션의 `batch.rerun_of` 에 이전 세션 ID 를 남긴다 (9 장 재실행 규칙)
+- `pending` = 세션 없음
+
+**멈춤** : 한 레인에서 `runner_error` 가 **2 번 연속**이면 그 레인을 멈추고 이유와 마지막 항목·세션을 출력한다 (사이에 다른 결과가 있으면 다시 0). 실행기 출력이 세션 ID 를 내지 못했거나 `summary.json` 이 없으면 `runner_error` 로 센다. 키 검사에서 키가 나오면 멈춘다
+
+**세션 기록** : 세션마다 끝나면 이 창에서 `tools/summarize_demo_session.py` 를 돌려 (이 창의 키 값으로 키 검사) `runs/demo-batches/<plan_id>/lane-<k>-of-<n>.jsonl` 에 한 줄 (항목, 세션 ID, 종료 사유, step, 테스트, 첫 STOP step·템플릿, 실측·추정 크레딧, 조건군, 모델, 계정 표시, 키 검사). 실행기 출력은 같은 폴더 `.log` 로
+
+**진행 확인** : `run_batch.py status --plan … --lanes n` → 레인별 계획·`done`·`failed`·`interrupted`·`pending` 수, 종료 사유별 세션 수, 실패·중단·남은 항목 목록, 계획에 없는 항목으로 기록된 세션
+
+**실행기 쪽 변경**
+- `experiments/run_scenario.py` `--account-label` (영문·숫자·`_`·`-` 1~32 자), `--batch-item` (배치 실행기가 넣는 JSON, 키 `plan_id`·`plan_sha256`·`item`·`mode`·`repeat`·`lane`·`lanes`·`rerun_of`, `repeat` = `--run-index`). **scenario-v2 (데모) 실행만** 받고 `conditions.json` 에 `account_label`·`batch` 로 남긴다 (값이 없으면 null). scenario-v1 은 두 옵션을 거절하고 `conditions.json` 도 그대로다
+- 매니페스트 **`session-manifest-v0.7`** = v0.6 + `run.account_label`, `run.batch`. `conditions.json` 에 `account_label` 키가 있는 세션만 (C-18-1 시험 세션은 v0.6 그대로). v0.6 매니페스트를 가질 실제 세션이 생겼으므로(C-18-1) 제자리 변경이 아니라 버전을 올렸다. v0.6 을 기대하던 테스트 4 개를 v0.7 로 바꿨다
+- 프록시 `GET /conditions` (위)
+
+**오프라인 테스트** (`tests/test_c18_2_part2.py`) : 계획 읽기·거절, 레인 나누기·LR 레인, `one_at_a_time` 불일치 멈춤, 이어 하기 (레인 수를 바꿔도), 멈춘 레인 다시 켜기, 실패 항목 건너뛰기와 `--rerun-failed`, 연속 오류 멈춤과 초기화, 모드·규칙·동결·모델·조건 파일 불일치 멈춤, 프록시 없음, 키 없음, 키 검사 걸림, 명령 내용 (계약·프록시·반복·계정, 키 값 없음), 실행기 옵션 검사, 프록시 `GET /conditions`, 그리고 **실제 실행기 + 실제 관측·차단 프록시 + 가짜 업스트림으로 레인 하나** (CT 정상판 관측 `success` 6 step, CT 교착판 차단 `guardrail_stop` 7 step, 매니페스트 v0.7, 두 번째 실행은 아무것도 돌리지 않음)
+

@@ -1,0 +1,15 @@
+# C-18-2 시험 계획 (DM-59 : 시나리오당 1 회, 과제가 의도대로 동작하는지만 본다). 관측만, 차단 없음.
+# 실행 : tools/run_batch.py run --plan batch_plans/demo-trial-c18-2.yaml --lane <k> --lanes <n>
+plan_version: demo-batch-plan-v1
+plan_id: demo-trial-c18-2
+description: DEMO-CT 정상판·교착판, DEMO-CT-N 시험 실행 각 1 회 (observe)
+items:
+- scenario: scenarios/DEMO-CT-normal-v1.yaml
+  mode: observe
+  repeats: [1]
+- scenario: scenarios/DEMO-CT-stall-v1.yaml
+  mode: observe
+  repeats: [1]
+- scenario: scenarios/DEMO-CT-N-v1.yaml
+  mode: observe
+  repeats: [1]

@@ -339,6 +339,16 @@ def create_app(log_dir=None, transport=None, sleep=asyncio.sleep, repository=Non
                             headers={"X-Guardrail-Session": session.session_id,
                                      "X-Guardrail-Turn": str(len(session.turns))})
 
+    @app.get("/conditions")
+    async def get_conditions():
+        # C-18-2 (DM-63): what this proxy judges and forwards, read by the batch runner before each session. Local
+        # values only; never calls the upstream and holds no key.
+        return {"criteria_version": store.criteria_pin["criteria_version"],
+                "criteria_sha256": store.criteria_pin.get("criteria_sha256"),
+                "criteria_freeze_sha256": (store.criteria_freeze or {}).get("sha256"),
+                "guardrail_mode": mode, "pinned_model": pin, "config_file": identity["config_file"],
+                "upstream_host": identity["base_url_host"]}
+
     @app.get("/log")
     async def get_log(request: Request):
         if not request.headers.get("X-Guardrail-Session"):

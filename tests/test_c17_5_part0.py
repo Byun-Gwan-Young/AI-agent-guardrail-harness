@@ -203,7 +203,8 @@ class ManifestTests(unittest.IsolatedAsyncioTestCase):
                          ("t1-handoff-v1", "t1-handoff-v1"))
         with mock.patch.object(analyze_session, "ROOT", run["root"]):
             manifest = analyze_session.manifest(analyze_session.analyse(run["session_id"]), "measure", [])
-        self.assertEqual(manifest["manifest_version"], "session-manifest-v0.6")
+        # C-18-2: the runner records the account label and batch item (None here), so the manifest is v0.7 (v0.6 + run.account_label, run.batch).
+        self.assertEqual(manifest["manifest_version"], "session-manifest-v0.7")
         self.assertEqual(manifest["task"]["recent_messages_rule"], "t1-handoff-v1")
         self.assertEqual((manifest["run"]["termination_reason"], manifest["run"]["escalated_by"]), ("escalated", "refund"))
         self.assertNotIn("terminal_status", manifest["run"])

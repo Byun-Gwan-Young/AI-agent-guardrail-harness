@@ -181,7 +181,8 @@ class FlowTests(unittest.IsolatedAsyncioTestCase):
         with mock.patch.object(analyze_session, "ROOT", run["root"]):
             manifest = analyze_session.manifest(analyze_session.analyse(run["session_id"]), "measure", [])
             scan = analyze_session.analyse(run["session_id"])["secret_scan"]
-        self.assertEqual(manifest["manifest_version"], "session-manifest-v0.6")
+        # C-18-2: the runner records the account label and batch item (None here), so the manifest is v0.7 (v0.6 + run.account_label, run.batch).
+        self.assertEqual(manifest["manifest_version"], "session-manifest-v0.7")
         self.assertEqual(manifest["task"]["tool_settings"], {"academic_search": LR["tool_settings"]["academic_search"]})
         self.assertEqual(manifest["task"]["search"]["academic_search"]["provider"], "arxiv")
         self.assertEqual(manifest["search"]["requests_sent"], {"academic_search": 2})
