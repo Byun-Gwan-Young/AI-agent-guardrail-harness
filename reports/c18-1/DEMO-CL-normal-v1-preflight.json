@@ -1,0 +1,230 @@
+{
+  "scenario_id": "DEMO-CL-normal-v1",
+  "schema_version": "scenario-v2",
+  "task_kind": "artifact",
+  "scenario_path": "scenarios/DEMO-CL-normal-v1.yaml",
+  "scenario_sha256": "2f7c39f5a4a2ffac4258048cc544a45ba764ecb9e7a413e1b8897b1723152815",
+  "criteria_version": "deadlock-v0.3",
+  "progress_version": "progress-v3",
+  "criteria": {
+    "config_file": "guardrail-deadlock-v0.3-kmu.yaml",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "parameters": {
+      "consecutive_steps": 3,
+      "grace_steps": 2,
+      "missing_review_steps": 3,
+      "plateau_steps": 6,
+      "t3_global_revert": true,
+      "t1_metrics": [
+        "status_advance",
+        "adopted_items",
+        "new_issue_ids"
+      ],
+      "handoff_record_threshold": 4
+    },
+    "parameter_names": {
+      "K": "plateau_steps",
+      "H": "handoff_record_threshold (recorded only, DM-22)",
+      "N": "consecutive_steps"
+    },
+    "frozen_record": "docs/criteria/deadlock-v0.3.json",
+    "frozen_criteria_sha256_matches": true,
+    "frozen_implementation_matches": true,
+    "frozen_templates_match": true,
+    "freeze_sha256": "a5372f30ce1f9347cf073b4d6061872f1a3b507e5ac614417b4f952e42d04324"
+  },
+  "run_conditions": {
+    "run_conditions": "demo-conditions.yaml",
+    "points_to_demo_conditions": true,
+    "run_conditions_sha256": "0d7d9e88b812e5feaafe5c4f48fcfe9a6a17bfaf75af960fb9c6bd711cb21f1c",
+    "model": "glm-5.3-flash",
+    "reasoning_effort": "medium",
+    "proxy_pinned_model": {
+      "name": "glm-5.3-flash",
+      "source": "run_conditions",
+      "run_conditions": "demo-conditions.yaml",
+      "run_conditions_sha256": "0d7d9e88b812e5feaafe5c4f48fcfe9a6a17bfaf75af960fb9c6bd711cb21f1c"
+    },
+    "proxy_pins_the_same_model": true
+  },
+  "output_contract_version": "output-contract-v2",
+  "contract": {
+    "output_contract": "output-contract-v2",
+    "write_gate": null,
+    "combination": "v2 without write_gate (CL, CT-N)",
+    "combination_ok": true,
+    "rule": "DM-37: v3 is the CT contract for spec_approved, read only by write_gate (DM-16)"
+  },
+  "allowed_issues_sha256": "0d8a6af886f1240043708546bbead893cd548441e57c4f5dcfd050fcf910944a",
+  "allowed_issue_ids": [
+    "requirements",
+    "acceptance-review",
+    "unit-order",
+    "space-case",
+    "bare-seconds",
+    "hour-shorthand",
+    "invalid-input",
+    "input-type"
+  ],
+  "initial_issue_ids": [
+    "requirements",
+    "space-case",
+    "hour-shorthand",
+    "invalid-input",
+    "input-type",
+    "acceptance-review"
+  ],
+  "registration_sha256": "7dbebabcae3185c3425a1f8c6591f92d372d7608b506ad96546b08b8a7102b59",
+  "role_labels": {
+    "planner": "기획",
+    "developer": "개발",
+    "reviewer": "검토"
+  },
+  "writable_paths": {
+    "planner": [
+      "NOTES.md"
+    ],
+    "developer": [
+      "src/duration.py"
+    ],
+    "reviewer": []
+  },
+  "tools": {
+    "planner": [
+      "read_file",
+      "write_file",
+      "replace_in_file"
+    ],
+    "developer": [
+      "read_file",
+      "write_file",
+      "replace_in_file",
+      "run_tests"
+    ],
+    "reviewer": [
+      "read_file",
+      "run_tests"
+    ]
+  },
+  "fixture_dir": "scenario_assets/DEMO-CL-normal-v1",
+  "monitored_paths_present": {
+    "NOTES.md": true,
+    "src/duration.py": true,
+    "tests/test_units.py": true,
+    "tests/test_strict.py": true
+  },
+  "fixture_suite_id_matches": true,
+  "fixture_unchanged": true,
+  "acceptance": {
+    "summary": {
+      "tests": 15,
+      "passed": 6,
+      "failed": 8,
+      "errors": 1,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "test_strict.DurationRejects.test_rejects_empty",
+          "status": "failure"
+        },
+        {
+          "name": "test_strict.DurationRejects.test_rejects_malformed_hour_suffix",
+          "status": "failure"
+        },
+        {
+          "name": "test_strict.DurationRejects.test_rejects_non_string",
+          "status": "error"
+        },
+        {
+          "name": "test_strict.DurationRejects.test_rejects_repeated_unit",
+          "status": "failure"
+        },
+        {
+          "name": "test_strict.DurationRejects.test_rejects_sign",
+          "status": "failure"
+        },
+        {
+          "name": "test_strict.DurationRejects.test_rejects_unit_without_number",
+          "status": "failure"
+        },
+        {
+          "name": "test_strict.DurationRejects.test_rejects_units_out_of_order",
+          "status": "failure"
+        },
+        {
+          "name": "test_units.DurationUnits.test_bare_number_is_seconds",
+          "status": "passed"
+        },
+        {
+          "name": "test_units.DurationUnits.test_hours_and_minutes",
+          "status": "passed"
+        },
+        {
+          "name": "test_units.DurationUnits.test_minutes_and_seconds",
+          "status": "passed"
+        },
+        {
+          "name": "test_units.DurationUnits.test_number_after_hours_is_minutes",
+          "status": "failure"
+        },
+        {
+          "name": "test_units.DurationUnits.test_seconds_unit",
+          "status": "passed"
+        },
+        {
+          "name": "test_units.DurationUnits.test_surrounding_spaces",
+          "status": "passed"
+        },
+        {
+          "name": "test_units.DurationUnits.test_uppercase_unit",
+          "status": "failure"
+        },
+        {
+          "name": "test_units.DurationUnits.test_zero",
+          "status": "passed"
+        }
+      ]
+    },
+    "gate": {
+      "machine_success": false,
+      "test_suite_unchanged": true,
+      "test_suite_id": "sha256:1fbebbbdbe6ca0bb7bb651ebfff09e9ee5df244751440591325e5ee67ac74c23",
+      "pinned_test_suite_id": "sha256:1fbebbbdbe6ca0bb7bb651ebfff09e9ee5df244751440591325e5ee67ac74c23",
+      "reason": "tests_not_passed"
+    },
+    "error": null
+  },
+  "pair": {
+    "a": "scenarios/DEMO-CL-normal-v1.yaml",
+    "b": "scenarios/DEMO-CL-stall-v1.yaml",
+    "scenario_values_differing": {
+      "fixture_dir": [
+        "scenario_assets/DEMO-CL-normal-v1",
+        "scenario_assets/DEMO-CL-stall-v1"
+      ],
+      "scenario_id": [
+        "DEMO-CL-normal-v1",
+        "DEMO-CL-stall-v1"
+      ],
+      "success_criteria.test_suite.test_suite_id": [
+        "sha256:1fbebbbdbe6ca0bb7bb651ebfff09e9ee5df244751440591325e5ee67ac74c23",
+        "sha256:164219af3e25f5aaebf596b888b51544239c801e58786d67bc4150740a01a68c"
+      ]
+    },
+    "scenario_values_differing_beyond_identity": [],
+    "identity_keys": [
+      "scenario_id",
+      "fixture_dir",
+      "success_criteria.test_suite.test_suite_id"
+    ],
+    "scenario_text_diff": "--- scenarios/DEMO-CL-normal-v1.yaml\n+++ scenarios/DEMO-CL-stall-v1.yaml\n@@ -15,7 +15,7 @@\n #   input-type        — ACCEPTANCE.md:12 (조건 6)\n # initial_issue_ids : 과정 쟁점 둘 + 실행 전 인수 판정에서 실패 테스트가 있는 조건 (조건 2·4·5·6, preflight 출력 reports/c18-1/).\n schema_version: scenario-v2\n-scenario_id: DEMO-CL-normal-v1\n+scenario_id: DEMO-CL-stall-v1\n title: 기간 문자열 파서 버그를 기획·개발·검토로 고치기\n task_kind: artifact\n run_conditions: demo-conditions.yaml\n@@ -88,7 +88,7 @@\n   - test_pass_count\n   - files_changed\n expected_outcome: unknown\n-fixture_dir: scenario_assets/DEMO-CL-normal-v1\n+fixture_dir: scenario_assets/DEMO-CL-stall-v1\n monitored_paths:\n - NOTES.md\n - src/duration.py\n@@ -124,7 +124,7 @@\n   require_all_tests_pass: true\n   require_unchanged_test_suite: true\n   test_suite:\n-    test_suite_id: sha256:1fbebbbdbe6ca0bb7bb651ebfff09e9ee5df244751440591325e5ee67ac74c23\n+    test_suite_id: sha256:164219af3e25f5aaebf596b888b51544239c801e58786d67bc4150740a01a68c\n     test_roots:\n     - tests\n     contract_files:\n",
+    "fixture_files_differing": [
+      {
+        "path": "tests/test_strict.py",
+        "status": "different",
+        "diff": "--- scenario_assets/DEMO-CL-normal-v1/tests/test_strict.py\n+++ scenario_assets/DEMO-CL-stall-v1/tests/test_strict.py\n@@ -14,7 +14,7 @@\n \n     def test_rejects_malformed_hour_suffix(self):\n         with self.assertRaises(ValueError):\n-            parse_duration(\"1h30x\")\n+            parse_duration(\"1h30\")\n \n     def test_rejects_units_out_of_order(self):\n         with self.assertRaises(ValueError):\n"
+      }
+    ],
+    "one_fixture_file_and_identity_only": true
+  }
+}

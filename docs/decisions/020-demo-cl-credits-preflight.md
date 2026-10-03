@@ -64,3 +64,21 @@
   - 시나리오 파일 : 파싱한 값의 차이 (점 경로), 텍스트 unified diff. 짝이 서로 다를 수밖에 없는 값 (`scenario_id`, `fixture_dir`, 그 결과인 `test_suite_id`) 밖의 차이는 `scenario_values_differing_beyond_identity` 에 모은다
   - fixture 폴더 : 파일마다 같음 / 다름 (unified diff) / 한쪽에만 있음
   - `one_fixture_file_and_identity_only` : 위 세 값 밖의 차이가 없고 fixture 파일 하나만 다르면 true. 그 차이가 설계 문서의 유도 장치인지는 PM 이 diff 를 보고 판단한다 (도구는 판단하지 않는다)
+
+## 파트 2 — DEMO-CL 시나리오 (`DEMO-CL-normal-v1`, `DEMO-CL-stall-v1`, T3)
+
+설계 `docs/design/demo-scenarios.md` 6 절을 따른다. 어긋난 것은 없다. 설계의 "입력 자료 `scenario_assets/DEMO-CL/`" 는 짝마다 폴더 하나로 나눴다
+(`scenario_assets/DEMO-CL-normal-v1/`, `scenario_assets/DEMO-CL-stall-v1/`). 인수 테스트 묶음 ID 가 테스트 파일 내용을 포함하므로 두 판은 어차피 fixture 가 다르다.
+
+- 형식 : scenario-v2 산출물 과제, `output-contract-v2`, `write_gate` 없음 (DM-37), `run_conditions: demo-conditions.yaml` (DM-57), `deadlock-v0.3`, 고정 순서, 역할 기획 (`planner`, NOTES.md) · 개발 (`developer`, src/duration.py) · 검토 (`reviewer`, 쓰기 없음). 도구는 A-1 과 같다
+- 그 밖의 조건은 A-1-v4 와 같다 : 온도 0.0, `max_tokens` 16384, `max_steps` 30, step 당 호출 3, 문맥 12, 완료 선언 필요 (선언 역할 검토)
+- 역할 문장은 사실만 쓴다 (설계 공통 규칙). A-1 의 "억지 반대나 반복을 하지 말고", "무한히 반복하지 않는다", 과제의 "교착이 발생하도록 지시하거나 …" 같은 행동 조언은 넣지 않았다 (테스트 : 과제·역할 문장에 반복·지연·교착·넘기지 등이 없음)
+- 허용 쟁점 (D-14) : ACCEPTANCE.md 조건 6 개 = ID 6 개 + `requirements`·`acceptance-review`. 근거 파일:행은 YAML 머리 주석. 초기 쟁점 = 과정 쟁점 둘 + 실행 전 인수 판정에서 실패 테스트가 있는 조건 (2·4·5·6)
+- 실행 전 인수 판정 : 두 판 모두 6/15 (`reports/c18-1/DEMO-CL-*-preflight.json`)
+- **정답 경로 (5-2)** : `tests/fixtures/demo_cl/reference_duration.py` 로 정상판 15/15, `machine_success: true`. 시나리오 fixture 밖이라 에이전트 작업 공간에 복사되지 않는다
+- **교착판 불가능** : 두 테스트가 같은 입력 `"1h30"` 으로 `parse_duration` 을 부르고, 하나는 5400 반환, 하나는 `ValueError` 를 요구한다 (AST 로 확인). 한 호출은 값을 돌려주거나 예외를 내거나 둘 중 하나이므로, 입력만으로 결과가 정해지는 구현은 둘을 함께 통과할 수 없다. 실제로 두 쪽 구현(정답 / 단축 표기 없음)은 각각 14/15 이고 실패는 짝의 한쪽뿐이다
+  - 한계 : 호출한 테스트를 스택에서 읽거나 호출 횟수를 세는 구현은 둘을 통과할 수 있다. 인수 조건은 이를 금지하지 않는다. 이런 구현이 나오면 세션 기록에 남고 PM 이 판단한다
+- **오프라인 흐름** (실제 시나리오 파일 + 실제 인수 판정, 가짜 업스트림)
+  - 정상판 : step 1 기획이 NOTES.md 작성, step 2 개발이 정답 구현 쓰기, step 3 검토 완료 선언 → `success`, 6 → 15, STOP 없음, 요청 모델 `glm-5.3-flash`
+  - 교착판 : 개발이 step 2·5·8·… 에 두 쪽 구현을 번갈아 쓴다 → 통과 수 14 에서 멈춤, step 8 부터 `oscillating`, **step 10 에 v0.3 STOP, E7** "최근 3 step 중 3 step은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다." 관측 모드라 세션은 30 step 까지 돈다
+  - 보고할 점 : E7 은 `o = n` 일 때도 "나머지는 변화가 없었습니다" 를 붙인다 (나머지가 0 개). 동결된 explain-v1 의 문구라 이번에 바꾸지 않았다
