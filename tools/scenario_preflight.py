@@ -7,7 +7,8 @@ configuration (--config, default guardrail-deadlock-v0.3-kmu.yaml) and compared 
 (docs/criteria/deadlock-v0.3.json); the record adds the run-conditions file and the proxy's pinned model (DM-57), the
 output contract and write_gate combination (DM-37), the session registration, and for a dialogue task the tool
 settings, implementations and inputs (C-17-6). --pair compares a normal/stall pair file by file (DM-5: the two differ
-only in the inducing device; the differences are listed for the PM, not judged here).
+only in the inducing device; the differences are listed for the PM, not judged here): the scenario values, the artifact
+fixtures, and for a dialogue pair (C-18-3) the inputs_dir files and the judge files.
 """
 import argparse
 import difflib
@@ -36,6 +37,8 @@ DEMO_RUN_CONDITIONS = 'demo-conditions.yaml'
 FROZEN_V03 = 'docs/criteria/deadlock-v0.3.json'
 # What a normal/stall pair may differ in besides the inducing device: their own names and what follows from them.
 PAIR_IDENTITY_KEYS = ('scenario_id', 'fixture_dir', 'success_criteria.test_suite.test_suite_id')
+# A dialogue pair (C-18-3) names its own inputs folder as well.
+DIALOGUE_IDENTITY_KEYS = ('scenario_id', 'inputs_dir')
 
 
 def acceptance_record(scenario):
@@ -218,9 +221,12 @@ def pair_diff(a_path, b_path):
     keys = sorted(k for k in set(a_leaves) | set(b_leaves) if a_leaves.get(k) != b_leaves.get(k))
     a_scenario, b_scenario = load_scenario(a_path), load_scenario(b_path)
     files = []
-    if getattr(a_scenario, 'fixture_dir', None) and getattr(b_scenario, 'fixture_dir', None):
-        a_root, b_root = safe_path(ROOT, a_scenario.fixture_dir), safe_path(ROOT, b_scenario.fixture_dir)
-        a_files, b_files = fixture_files(a_root), fixture_files(b_root)
+    # The artifact fixtures, or the inputs of a dialogue pair (C-18-3); a shared folder has no difference.
+    for field in ('fixture_dir', 'inputs_dir'):
+        a_dir, b_dir = getattr(a_scenario, field, None), getattr(b_scenario, field, None)
+        if not a_dir or not b_dir:
+            continue
+        a_files, b_files = fixture_files(safe_path(ROOT, a_dir)), fixture_files(safe_path(ROOT, b_dir))
         for name in sorted(set(a_files) | set(b_files)):
             if name not in b_files or name not in a_files:
                 files.append({'path': name, 'status': 'only_in_' + ('a' if name in a_files else 'b')})
@@ -228,17 +234,26 @@ def pair_diff(a_path, b_path):
                 files.append({'path': name, 'status': 'different',
                               'diff': unified(a_files[name].read_text(encoding='utf-8'),
                                               b_files[name].read_text(encoding='utf-8'),
-                                              a_scenario.fixture_dir + '/' + name, b_scenario.fixture_dir + '/' + name)})
-    beyond = [k for k in keys if k not in PAIR_IDENTITY_KEYS]
+                                              a_dir + '/' + name, b_dir + '/' + name)})
+    judges = None
+    if getattr(a_scenario, 'judge', None) and getattr(b_scenario, 'judge', None):
+        a_judge, b_judge = (safe_path(ROOT, s.judge).read_text(encoding='utf-8') for s in (a_scenario, b_scenario))
+        judges = {'a': a_scenario.judge, 'b': b_scenario.judge, 'same_file': a_scenario.judge == b_scenario.judge,
+                  'diff': unified(a_judge, b_judge, a_scenario.judge, b_scenario.judge)}
+    identity = DIALOGUE_IDENTITY_KEYS if a_scenario.schema_version == 'scenario-v2' and \
+        a_scenario.task_kind == 'dialogue' else PAIR_IDENTITY_KEYS
+    beyond = [k for k in keys if k not in identity]
     rel = lambda p: p.relative_to(ROOT).as_posix()
     return {'a': rel(a_path), 'b': rel(b_path),
             'scenario_values_differing': {k: [a_leaves.get(k), b_leaves.get(k)] for k in keys},
             'scenario_values_differing_beyond_identity': beyond,
-            'identity_keys': list(PAIR_IDENTITY_KEYS),
+            'identity_keys': list(identity),
             'scenario_text_diff': unified(a_path.read_text(encoding='utf-8'), b_path.read_text(encoding='utf-8'),
                                           rel(a_path), rel(b_path)),
             'fixture_files_differing': files,
-            'one_fixture_file_and_identity_only': not beyond and len(files) == 1 and files[0]['status'] == 'different'}
+            'judge_files': judges,
+            'one_fixture_file_and_identity_only': not beyond and len(files) == 1 and files[0]['status'] == 'different'
+                                                  and (judges is None or judges['same_file'])}
 
 
 def main():
@@ -262,6 +277,8 @@ def main():
         shown['pair'] = {k: report['pair'][k] for k in ('scenario_values_differing_beyond_identity',
                                                         'one_fixture_file_and_identity_only')}
         shown['pair']['fixture_files_differing'] = [f['path'] for f in report['pair']['fixture_files_differing']]
+        if report['pair']['judge_files'] is not None:
+            shown['pair']['judge_files'] = {k: report['pair']['judge_files'][k] for k in ('a', 'b', 'same_file')}
     print(json.dumps(shown, ensure_ascii=False, indent=2))
     return 0 if checks_passed(report) else 1
 

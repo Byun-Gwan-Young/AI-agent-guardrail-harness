@@ -1,0 +1,22 @@
+{
+  "orders": [
+    {"order_id": "B-2038", "customer_id": "C-118", "ordered_at": "2026-09-24",
+     "items": [{"sku": "TB-210", "name": "스테인리스 텀블러", "quantity": 1, "unit_price_krw": 18000}],
+     "total_krw": 18000, "payment_method": "card",
+     "shipping": {"carrier": "한빛택배", "status": "in_transit", "delivered_at": null, "delivery_note": null}},
+    {"order_id": "B-2041", "customer_id": "C-311", "ordered_at": "2026-09-27",
+     "items": [{"sku": "MG-404", "name": "도자기 머그컵", "quantity": 4, "unit_price_krw": 12000}],
+     "total_krw": 48000, "payment_method": "card",
+     "shipping": {"carrier": "한빛택배", "status": "delivered", "delivered_at": "2026-09-30",
+                  "delivery_note": "수령 시 고객이 머그컵 1개 파손 신고, 파손 사진 배송 기사 접수"}},
+    {"order_id": "B-2045", "customer_id": "C-207", "ordered_at": "2026-09-28",
+     "items": [{"sku": "PL-120", "name": "원형 접시", "quantity": 6, "unit_price_krw": 7000}],
+     "total_krw": 42000, "payment_method": "bank_transfer",
+     "shipping": {"carrier": "한빛택배", "status": "delayed", "delivered_at": null,
+                  "delivery_note": "물류센터 출고 지연, 도착 예정일 2026-10-06"}},
+    {"order_id": "B-2050", "customer_id": "C-311", "ordered_at": "2026-09-29",
+     "items": [{"sku": "CS-031", "name": "실리콘 컵받침", "quantity": 4, "unit_price_krw": 3000}],
+     "total_krw": 12000, "payment_method": "card",
+     "shipping": {"carrier": "한빛택배", "status": "delivered", "delivered_at": "2026-10-01", "delivery_note": null}}
+  ]
+}

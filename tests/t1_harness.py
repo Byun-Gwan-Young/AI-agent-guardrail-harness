@@ -94,15 +94,20 @@ def scenario_file(directory, **changes):
 
 async def run_t1(reports, *, tools=None, config=OBSERVE_CONFIG, phase="demo", dataset_run=False,
                  closed_list_check=None, output_contract=V3, runner_protocol=PROTOCOL_V10, implementations=None,
-                 output_root=None, scenario_changes=None, max_steps=8, tests=None, model=None):
-    """Returns the run folder files, the proxy log and every upstream request."""
+                 output_root=None, scenario_changes=None, max_steps=8, tests=None, model=None, scenario_path=None,
+                 scenario_root=FIXTURES):
+    """Returns the run folder files, the proxy log and every upstream request.
+
+    scenario_path runs that scenario file as it is (C-18-3: the DEMO-CS/MR/LR files) instead of a changed copy of
+    FIXTURE; scenario_root is where its judge and inputs_dir resolve (the repository for the demo files)."""
     import experiments.run_scenario as runner
     import experiments.dialogue_runner as dialogue
     import experiments.dialogue_tools as dialogue_tools
     from proxy import create_app
     upstream = Upstream(reports, tools)
     root = Path(tests.enterContext(tempfile.TemporaryDirectory()) if tests else tempfile.mkdtemp())
-    path = scenario_file(root, max_steps=max_steps, **(scenario_changes or {}))
+    path = (Path(scenario_path) if scenario_path is not None
+            else scenario_file(root, max_steps=max_steps, **(scenario_changes or {})))
     from pinned_configs import for_model
     # A scenario with run_conditions (DM-57) and no --model runs through the real demo configuration.
     sent_model = model if model is not None else yaml.safe_load(path.read_text(encoding="utf-8")).get("model")
@@ -125,7 +130,7 @@ async def run_t1(reports, *, tools=None, config=OBSERVE_CONFIG, phase="demo", da
     stdout = io.StringIO()
     with mock.patch.object(runner, "DEMO_OUTPUT_ROOT", demo_root), \
             mock.patch.object(runner, "git_state", return_value=clean), \
-            mock.patch.object(dialogue, "SCENARIO_ROOT", FIXTURES), \
+            mock.patch.object(dialogue, "SCENARIO_ROOT", scenario_root), \
             mock.patch.dict(dialogue_tools.IMPLEMENTATIONS, FAKE_TOOLS if implementations is None else implementations,
                             clear=True), \
             mock.patch("httpx.AsyncClient", OfflineClient), mock.patch.dict("os.environ", {"KMU_API_KEY": "fake"}), \

@@ -38,3 +38,38 @@
 허용 목록에 원본 없음, 임시 git 저장소에서 `stage` 가 무시된 폴더의 커밋 파일만 더함, 기록 없는 세션 거절, `check --index` 가 원본·프록시 로그를 짚음,
 백업 내용·해시·프록시 로그 없음 표시, 저장소 안·덮어쓰기 거절, 원본에 키가 있으면 백업 안 씀, 이 체크아웃의 인덱스가 규칙을 지키고 원본이 무시되며
 C-18-1 교착판 기록의 첫 STOP 이 step 15 E6 (DM-62 문장 그대로).
+
+## 파트 1 — DEMO-CS (`DEMO-CS-normal-v1`, `DEMO-CS-stall-v1`)
+
+- scenario-v2 대화 과제, `turn_order: router` (DM-19), `run_conditions: demo-conditions.yaml`, `deadlock-v0.3`, `max_steps` 30, step 당 호출 3,
+  온도 0.0, `max_tokens` 16384, 문맥 12. 계약 output-contract-v3 (`provider_strict`, DM-55)
+- 역할 (DM-26 등록 이름) : 접수 `intake` (선언 역할), 환불 담당 `refund`, 배송 담당 `shipping`. 세 역할 모두 `lookup_order`·`read_policy`
+- 처리 상태 `received 접수 → triage 분류 → assigned 배정 → resolved 해결`, 종료 상태 `escalated` 하나 (DM-46, DM-51). 완료 = 접수 자신의 보고가
+  `resolved` + `completion_declared: true` + 판정 통과 (DM-45)
+- 지표 `status_advance`, `new_issue_ids`. 설계 4 절대로 CS 의 채택 항목은 빈 목록이라 `adopted_items` 는 고르지 않았다 (DM-31 : 고르지 않은 신호는 문장에 나오지 않는다).
+  과제 문장이 "adopted_items 는 [] 로 보고" 를 사실로 알린다
+- **입력** (`scenario_assets/DEMO-CS-{normal,stall}-v1/`, 결정 018 형식) : `orders.json` (주문 4 건, 문의 주문 B-2041 = 도자기 머그컵 4 개 × 12,000 원,
+  배송 메모 "수령 시 고객이 머그컵 1개 파손 신고…"), `policies/handling_codes.md` (코드 5 개 `PARTIAL_REFUND`·`FULL_REFUND`·`RESHIP`·`DELAY_NOTICE`·`INFO_ONLY`
+  와 담당 ID), `policies/refund.md`, `policies/shipping.md`. 티켓은 과제 문장에 있다 (대화 도구에 티켓을 읽는 도구가 없다)
+- **유도 장치 (DM-15 안 B)** : `policies/refund.md` 한 문장. 정상판 "배송 사고로 인한 금전 보상은 환불 담당이 처리한다." / 교착판 "배송 사고는 배송 담당 소관이다."
+  배송 정책 "금전 보상은 환불 담당 소관이다." 는 두 판 공통. `--pair` : 시나리오 값 차이는 신원(`scenario_id`, `inputs_dir`)뿐, 입력 파일 차이는 `policies/refund.md`
+  한 줄, 판정 함수 같은 파일 → `one_fixture_file_and_identity_only: true`
+- **판정 함수** `scenario_judges/DEMO-CS-v1.py` (두 판 공통) : `order_id` ∈ `orders.json`, `handling_code` ∈ `handling_codes.md` 의 코드 목록 (줄 형식 "- `CODE` —"),
+  `owner` ∈ {refund, shipping}, `customer_reply` 공백 아님. 상태가 `escalated` 면 `escalated`. 처리가 티켓에 맞는지(내용 정확성)는 보지 않는다 (한계).
+  주문을 실제로 조회했는지는 보지 않는다 (설계 정의는 "orders.json 에 존재". 합성 fixture 판정 함수의 `order_id_not_looked_up` 은 쓰지 않았다)
+- **과제 문장의 사실 고지 두 줄** (지시에 없던 것, 보고) : ① 라우터 규칙 "다음 차례는 각 보고의 handoff_to 가 가리키는 역할입니다. … null 이거나 쓸 수 없는 값이면
+  역할 목록 순서(접수, 환불 담당, 배송 담당)의 다음 역할입니다." — 실행기의 차례 규칙(결정 016 파트 2)이고, 모르면 `handoff_to` 가 차례를 정한다는 사실이 숨겨진다
+  (결함 7 과 같은 종류) ② 읽을 수 있는 정책 문서 이름 (`read_policy` 오류 문장도 알리는 사실)
+- 허용 쟁점 (D-14 T1 적용, 설계 4 절) : `ownership`, `handling-code`, `customer-reply` + 과정 `requirements` (티켓 요청 해석), `acceptance-review`
+  (deliverable 판정 필드 확인). 근거 파일:행은 YAML 머리 주석. 초기 쟁점 = 다섯 개 모두 (시작 시점에 모두 미해결)
+- 역할·과제 문장은 사실만 쓴다 (DM-5) : 테스트가 "반복·교착·넘기지·상충·미루·거절하" 가 없음을 확인한다. "지연" 은 배송 정책의 업무 낱말(배송 지연 안내)이라 검사에서 뺐다
+- 실행 전 기록 `reports/c18-3/DEMO-CS-{normal,stall}-v1-preflight.json` (정상판에 `--pair`). 시나리오 해시 정상판 `0415ff79…`, 교착판 `4dae513a…`
+- **오프라인 흐름** (실제 시나리오 파일 + 실제 CS 도구 + 실제 판정 함수, 가짜 업스트림) `tests/test_c18_3_part1.py`
+  - 정상판 : 접수 `lookup_order(B-2041)` → 환불 담당 `read_policy(refund)` (정상판 문장을 받음) → 접수 완료 선언 → `success` 3 step, STOP 없음, 재판정 동일
+  - 교착판 관측 : 접수 → 환불 담당 ↔ 배송 담당 왕복, 상태 `assigned`·쟁점 불변 → step 1~3 은 역할마다 첫 관측(기준)이라 정체가 step 4 부터이고
+    **첫 STOP step 6, E4** "환불 담당과 배송 담당이 문의를 서로 5 번 넘겼고 처리 상태는 '배정'에서 바뀌지 않았습니다." 세션은 `max_steps` 30 까지
+  - 교착판 차단 : step 6 STOP 다음 요청이 403 → `guardrail_stop` 7 step
+  - `escalated` : 환불 담당의 `escalated` 보고로 끝남, `escalated_by: refund`
+- `tools/scenario_preflight.py --pair` 를 대화 과제에 넓혔다 : `inputs_dir` 파일 비교와 판정 함수 파일 비교(`judge_files`). 산출물 과제의 결과는 그대로다
+  (`one_fixture_file_and_identity_only` 는 판정 함수가 다르면 거짓)
+- `tests/t1_harness.py` `run_t1` 에 `scenario_path`·`scenario_root` (실제 시나리오 파일을 그대로 돌림, C-18-2 의 `t2_harness` 와 같은 방식). 기존 호출은 그대로
