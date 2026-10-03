@@ -1,0 +1,67 @@
+{
+ "script": "tools/c18_3_evidence.py trial",
+ "status": "estimated",
+ "plan_id": "demo-trial-c18-3",
+ "plan_sha256": "ac81565ed32414f8d67166e52b05cf5a239cd5d440a1cd5690b459bd59730e29",
+ "references": {
+  "thirty_steps": {
+   "session_id": "DEMO-CL-stall-v1-f08705febcab4bcdacaea83cb8bd61f1",
+   "credits_measured": 126.5433,
+   "steps": 30,
+   "used_as": "upper value of each T1 session"
+  },
+  "short_success": {
+   "session_id": "DEMO-CL-normal-v1-d5460d69bcc84e20a4eaef6275ea1e8a",
+   "credits_measured": 16.35269,
+   "steps": 6,
+   "used_as": "reference only (not a lower value)"
+  }
+ },
+ "sessions": [
+  {
+   "item": "DEMO-CS-normal-v1:observe:1",
+   "kind": "T1 dialogue, not measured",
+   "low": null,
+   "high": 126.5433
+  },
+  {
+   "item": "DEMO-MR-normal-v1:observe:1",
+   "kind": "T1 dialogue, not measured",
+   "low": null,
+   "high": 126.5433
+  },
+  {
+   "item": "DEMO-CS-stall-v1:observe:1",
+   "kind": "T1 dialogue, not measured",
+   "low": null,
+   "high": 126.5433
+  },
+  {
+   "item": "DEMO-MR-stall-v1:observe:1",
+   "kind": "T1 dialogue, not measured",
+   "low": null,
+   "high": 126.5433
+  },
+  {
+   "item": "DEMO-LR-normal-v1:observe:1",
+   "kind": "T1 dialogue, not measured",
+   "low": null,
+   "high": 126.5433
+  },
+  {
+   "item": "DEMO-LR-stall-v1:observe:1",
+   "kind": "T1 dialogue, not measured",
+   "low": null,
+   "high": 126.5433
+  }
+ ],
+ "total": {
+  "low": null,
+  "high": 759.2598
+ },
+ "limits": [
+  "no T1 session is measured; the references are CL (T3) artifact sessions",
+  "a T1 step can carry search results (MR up to 6,000 and LR up to 12,000 characters per call) that a CL step does not, so a 30-step T1 session may cost more than the upper value",
+  "a session that ends early (success, escalated, runner_error) costs less"
+ ]
+}

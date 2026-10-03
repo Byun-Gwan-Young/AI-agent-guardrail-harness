@@ -1,0 +1,13 @@
+# C-18-3 시험 계획 (DM-59 : 시나리오당 1 회, 과제가 의도대로 동작하는지만 본다). 관측만, 차단 없음. 최종 동결 전이라 requires_final_freeze 없음.
+# 레인 3 개면 : 레인 1 = CS 2 개, 레인 2 = MR 2 개 (TAVILY_API_KEY 도 필요), 레인 3 = LR 2 개 (one_at_a_time, DM-52 ④). 항목 순서가 이 나눔을 정한다.
+# 실행 : tools/run_batch.py run --plan batch_plans/demo-trial-c18-3.yaml --lane <k> --lanes 3
+plan_version: demo-batch-plan-v1
+plan_id: demo-trial-c18-3
+description: DEMO-CS·MR·LR 정상판·교착판 시험 실행 각 1 회 (observe)
+items:
+- {scenario: scenarios/DEMO-CS-normal-v1.yaml, mode: observe, repeats: [1]}
+- {scenario: scenarios/DEMO-MR-normal-v1.yaml, mode: observe, repeats: [1]}
+- {scenario: scenarios/DEMO-CS-stall-v1.yaml, mode: observe, repeats: [1]}
+- {scenario: scenarios/DEMO-MR-stall-v1.yaml, mode: observe, repeats: [1]}
+- {scenario: scenarios/DEMO-LR-normal-v1.yaml, mode: observe, repeats: [1], one_at_a_time: true}
+- {scenario: scenarios/DEMO-LR-stall-v1.yaml, mode: observe, repeats: [1], one_at_a_time: true}
