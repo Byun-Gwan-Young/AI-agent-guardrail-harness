@@ -1,0 +1,161 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/nesv2r0iuoReWj3FGZZe0AUEV+0</id>
+  <title>arXiv Query: search_query=all:"multi-agent" AND all:failure&amp;id_list=&amp;start=0&amp;max_results=5</title>
+  <updated>2026-10-02T12:26:01Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22multi-agent%22+AND+all:failure&amp;start=0&amp;max_results=5&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>5</opensearch:itemsPerPage>
+  <opensearch:totalResults>1056</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2403.14783v1</id>
+    <title>Multi-Agent VQA: Exploring Multi-Agent Foundation Models in Zero-Shot Visual Question Answering</title>
+    <updated>2024-03-21T18:57:25Z</updated>
+    <link href="https://arxiv.org/abs/2403.14783v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2403.14783v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>This work explores the zero-shot capabilities of foundation models in Visual Question Answering (VQA) tasks. We propose an adaptive multi-agent system, named Multi-Agent VQA, to overcome the limitations of foundation models in object detection and counting by using specialized agents as tools. Unlike existing approaches, our study focuses on the system's performance without fine-tuning it on specific VQA datasets, making it more practical and robust in the open world. We present preliminary experimental results under zero-shot scenarios and highlight some failure cases, offering new directions for future research.</summary>
+    <category term="cs.CV" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-03-21T18:57:25Z</published>
+    <arxiv:comment>A full version of the paper will be released soon. The codes are available at https://github.com/bowen-upenn/Multi-Agent-VQA</arxiv:comment>
+    <arxiv:primary_category term="cs.CV"/>
+    <author>
+      <name>Bowen Jiang</name>
+    </author>
+    <author>
+      <name>Zhijun Zhuang</name>
+    </author>
+    <author>
+      <name>Shreyas S. Shivakumar</name>
+    </author>
+    <author>
+      <name>Dan Roth</name>
+    </author>
+    <author>
+      <name>Camillo J. Taylor</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2602.04418v3</id>
+    <title>SPEAR: An Engineering Case Study of Multi-Agent Coordination for Smart Contract Auditing</title>
+    <updated>2026-04-10T04:50:24Z</updated>
+    <link href="https://arxiv.org/abs/2602.04418v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2602.04418v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present SPEAR, a multi-agent coordination framework for smart contract auditing that applies established MAS patterns in a realistic security analysis workflow. SPEAR models auditing as a coordinated mission carried out by specialized agents: a Planning Agent prioritizes contracts using risk-aware heuristics, an Execution Agent allocates tasks via the Contract Net protocol, and a Repair Agent autonomously recovers from brittle generated artifacts using a programmatic-first repair policy. Agents maintain local beliefs updated through AGM-compliant revision, coordinate via negotiation and auction protocols, and revise plans as new information becomes available. An empirical study compares the multi-agent design with centralized and pipeline-based alternatives under controlled failure scenarios, focusing on coordination, recovery behavior, and resource use.</summary>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.DC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.ET" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-02-04T10:51:19Z</published>
+    <arxiv:comment>Accepted at 14th International Workshop on Engineering Multi-Agent Systems(EMAS @ AAMAS)</arxiv:comment>
+    <arxiv:primary_category term="cs.MA"/>
+    <author>
+      <name>Indraveni Chebolu</name>
+    </author>
+    <author>
+      <name>Arnab Mallick</name>
+    </author>
+    <author>
+      <name>Harmesh Rana</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2604.09703v1</id>
+    <title>Cayley Graph Optimization for Scalable Multi-Agent Communication Topologies</title>
+    <updated>2026-04-07T13:43:09Z</updated>
+    <link href="https://arxiv.org/abs/2604.09703v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2604.09703v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large-scale multi-agent communication has long faced a scalability bottleneck: fully connected networks require quadratic complexity, yet existing sparse topologies rely on hand-crafted rules. This paper treats the communication graph itself as a design variable and proposes CayleyTopo, a family of circulant Cayley graphs whose generator sets are optimized to minimize diameter, directly targeting worst-case information propagation speed. To navigate the enormous search space of possible generator sets, we develop a lightweight reinforcement learning framework that injects a number-theoretic prior to favor structurally rich generators, alongside a message-propagation score that provides dense connectivity feedback during construction. The resulting CayleyTopo consistently outperforms existing hand-crafted topologies, achieving faster information dissemination, greater resilience to link failures, and lower communication load, all while approaching the theoretical Moore bound. Our study opens the door to scalable, robust, and efficient communication foundations for future multi-agent systems, where the graph itself becomes optimizable rather than a fixed constraint.</summary>
+    <category term="cs.NI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.IT" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-04-07T13:43:09Z</published>
+    <arxiv:comment>Keywords: Multi-agent communication, scalable topology, Cayley graph, diameter minimization</arxiv:comment>
+    <arxiv:primary_category term="cs.NI"/>
+    <author>
+      <name>Jingkai Luo</name>
+    </author>
+    <author>
+      <name>Yulin Shao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/cs/0511011v1</id>
+    <title>The Impact of Social Networks on Multi-Agent Recommender Systems</title>
+    <updated>2005-11-02T23:44:34Z</updated>
+    <link href="https://arxiv.org/abs/cs/0511011v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/cs/0511011v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>  Awerbuch et al.'s approach to distributed recommender systems (DRSs) is to have agents sample products at random while randomly querying one another for the best item they have found; we improve upon this by adding a communication network. Agents can only communicate with their immediate neighbors in the network, but neighboring agents may or may not represent users with common interests. We define two network structures: in the ``mailing-list model,'' agents representing similar users form cliques, while in the ``word-of-mouth model'' the agents are distributed randomly in a scale-free network (SFN). In both models, agents tell their neighbors about satisfactory products as they are found. In the word-of-mouth model, knowledge of items propagates only through interested agents, and the SFN parameters affect the system's performance. We include a summary of our new results on the character and parameters of random subgraphs of SFNs, in particular SFNs with power-law degree distributions down to minimum degree 1. These networks are not as resilient as Cohen et al. originally suggested. In the case of the widely-cited ``Internet resilience'' result, high failure rates actually lead to the orphaning of half of the surviving nodes after 60% of the network has failed and the complete disintegration of the network at 90%. We show that given an appropriate network, the communication network reduces the number of sampled items, the number of messages sent, and the amount of ``spam.'' We conclude that in many cases DRSs will be useful for sharing information in a multi-agent learning system.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CC" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2005-11-02T23:44:34Z</published>
+    <arxiv:comment>12 pages, 4 figures. Published in the Proceedings of the Workshop on Cooperative Multi-Agent Learning (ECML/PKDD '05). Resubmitted to fix citations and metadata</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <author>
+      <name>Hamilton Link</name>
+    </author>
+    <author>
+      <name>Jared Saia</name>
+    </author>
+    <author>
+      <name>Terran Lane</name>
+    </author>
+    <author>
+      <name>Randall A. LaViolette</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2603.21522v1</id>
+    <title>Efficient Failure Management for Multi-Agent Systems with Reasoning Trace Representation</title>
+    <updated>2026-03-23T03:31:41Z</updated>
+    <link href="https://arxiv.org/abs/2603.21522v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2603.21522v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large Language Models (LLM)-based Multi-Agent Systems (MASs) have emerged as a new paradigm in software system design, increasingly demonstrating strong reasoning and collaboration capabilities. As these systems become more complex and autonomous, effective failure management is essential to ensure reliability and availability. However, existing approaches often rely on per-trace reasoning, which leads to low efficiency, and neglect historical failure patterns, limiting diagnostic accuracy. In this paper, we conduct a preliminary empirical study to demonstrate the necessity, potential, and challenges of leveraging historical failure patterns to enhance failure management in MASs. Building on this insight, we propose \textbf{EAGER}, an efficient failure management framework for multi-agent systems based on reasoning trace representation. EAGER employs unsupervised reasoning-scoped contrastive learning to encode both intra-agent reasoning and inter-agent coordination, enabling real-time step-wise failure detection, diagnosis, and reflexive mitigation guided by historical failure knowledge. Preliminary evaluations on three open-source MASs demonstrate the effectiveness of EAGER and highlight promising directions for future research in reliable multi-agent system operations.</summary>
+    <category term="cs.SE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-03-23T03:31:41Z</published>
+    <arxiv:comment>Accepted by FSE'26-IVR</arxiv:comment>
+    <arxiv:primary_category term="cs.SE"/>
+    <author>
+      <name>Lingzhe Zhang</name>
+    </author>
+    <author>
+      <name>Tong Jia</name>
+    </author>
+    <author>
+      <name>Mingyu Wang</name>
+    </author>
+    <author>
+      <name>Weijie Hong</name>
+    </author>
+    <author>
+      <name>Chiming Duan</name>
+    </author>
+    <author>
+      <name>Minghua He</name>
+    </author>
+    <author>
+      <name>Rongqian Wang</name>
+    </author>
+    <author>
+      <name>Xi Peng</name>
+    </author>
+    <author>
+      <name>Meiling Wang</name>
+    </author>
+    <author>
+      <name>Gong Zhang</name>
+    </author>
+    <author>
+      <name>Renhai Chen</name>
+    </author>
+    <author>
+      <name>Ying Li</name>
+    </author>
+  </entry>
+</feed>

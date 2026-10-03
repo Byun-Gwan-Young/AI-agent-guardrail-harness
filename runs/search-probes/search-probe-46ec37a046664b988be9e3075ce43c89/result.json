@@ -1,0 +1,163 @@
+{
+ "probe_version": "search-probe-v1",
+ "probe_id": "search-probe-46ec37a046664b988be9e3075ce43c89",
+ "llm_calls": 0,
+ "requests_sent": 2,
+ "key_env": "TAVILY_API_KEY",
+ "providers": {
+  "tavily": {
+   "tool": "web_search",
+   "query": "multi-agent LLM system failure causes",
+   "settings": {
+    "provider": "tavily",
+    "max_results": 5,
+    "search_depth": "basic",
+    "topic": "general",
+    "max_result_chars": 4000,
+    "max_calls_per_session": 1,
+    "timeout_seconds": 30.0
+   },
+   "request": {
+    "method": "POST",
+    "url": "https://api.tavily.com/search",
+    "params": null,
+    "body": {
+     "query": "multi-agent LLM system failure causes",
+     "search_depth": "basic",
+     "topic": "general",
+     "max_results": 5,
+     "include_answer": false,
+     "include_raw_content": false,
+     "include_images": false
+    },
+    "headers": {
+     "Content-Type": "application/json",
+     "User-Agent": "agent-guardrail-harness-demo-search/1"
+    },
+    "auth": "Authorization: Bearer <TAVILY_API_KEY> (value not recorded)"
+   },
+   "requested_at": "2026-10-02T12:25:57.351785+00:00",
+   "fixture": {
+    "path": "tests/fixtures/search/tavily-search-200.json",
+    "sha256": "e3811a903c41fff956ad82362469842e600a6144226f9628cecb4dc65c80eed7"
+   },
+   "http_status": 200,
+   "content_type": "application/json",
+   "response": {
+    "file": "tavily-response.json",
+    "sha256": "b0f3db28f6905c6d3b78c2964bb6e5071c909a0ccb9692cfbb4e925372a78589",
+    "bytes": 6684,
+    "redacted": false
+   },
+   "normalized": {
+    "ok": true,
+    "results": 5,
+    "total_results": null,
+    "first": {
+     "rank": 1,
+     "title": "Why Multi-Agent LLM Systems Fail: Key Issues Explained",
+     "url": "https://orq.ai/blog/why-do-multi-agent-llm-systems-fail",
+     "excerpt": "Discover a collaborative platform where teams work side-by-side to deliver LLM apps safely. Book a briefing Get started ## Key Takeaways Multi-agent LLM systems often fail due to coordination breakdowns, weak specifications, and misaligned agent roles. The MAST framework helps categorize failure modes and guide systematic improvements in agentic system design. Reliable multi-agent performance requires both scalable evaluation tools and governance-driven development practices. [...] Through the MAST (Multi-Agent System Failure Taxonomy), it has been determined that these challenges are not isolated glitches; they’re deeply systemic. Many breakdowns stem from upstream specification flaws, weak role definitions, and inadequate oversight mechanisms, all of which become amplified in multi-agent contexts. Others are the result of overlooked inter-agent misalignment, insufficient error detection, and coordination overload as systems scale. [...] To understand why multi-agent LLM systems (MAS) break down in practice, academics have introduced the MAST Framework, an acronym for Misalignment, Ambiguity, Specification errors, and Termination gaps. Credits: LLM Watch This framework distills over a dozen recurring failure modes reported across real-world applications, lab benchmarks like ProgramDev, and community experiments in environments such as AppWorld. ### Specification & System Design Flaws"
+    }
+   },
+   "shape": {
+    "readable": true,
+    "missing_in_response": [],
+    "optional_absent": [],
+    "extra_in_response": [
+     "follow_up_questions",
+     "results[].id"
+    ],
+    "type_differences": {},
+    "tool_fields_present": true,
+    "same_shape": true
+   },
+   "outcome": "ok"
+  },
+  "arxiv": {
+   "tool": "academic_search",
+   "query": "all:\"multi-agent\" AND all:failure",
+   "settings": {
+    "provider": "arxiv",
+    "max_results": 5,
+    "sort_by": "relevance",
+    "sort_order": "descending",
+    "max_result_chars": 6000,
+    "max_calls_per_session": 1,
+    "timeout_seconds": 30.0,
+    "min_interval_seconds": 3.0
+   },
+   "request": {
+    "method": "GET",
+    "url": "https://export.arxiv.org/api/query?search_query=all%3A%22multi-agent%22+AND+all%3Afailure&start=0&max_results=5&sortBy=relevance&sortOrder=descending",
+    "params": {
+     "search_query": "all:\"multi-agent\" AND all:failure",
+     "start": 0,
+     "max_results": 5,
+     "sortBy": "relevance",
+     "sortOrder": "descending"
+    },
+    "body": null,
+    "headers": {
+     "User-Agent": "agent-guardrail-harness-demo-search/1"
+    },
+    "auth": null
+   },
+   "requested_at": "2026-10-02T12:26:00.430624+00:00",
+   "fixture": {
+    "path": "tests/fixtures/search/arxiv-query-200.xml",
+    "sha256": "c1b31743d027840f1200165be723d0d8510d6471082a5a2311530e290072b783"
+   },
+   "http_status": 200,
+   "content_type": "application/atom+xml; charset=utf-8",
+   "response": {
+    "file": "arxiv-response.xml",
+    "sha256": "e8dda74c7bf4615b8ee0ee6a0af1ac057b847ff5f5ea14f293fcb382404272f6",
+    "bytes": 12337,
+    "redacted": false
+   },
+   "normalized": {
+    "ok": true,
+    "results": 5,
+    "total_results": 1056,
+    "first": {
+     "rank": 1,
+     "id": "2403.14783v1",
+     "title": "Multi-Agent VQA: Exploring Multi-Agent Foundation Models in Zero-Shot Visual Question Answering",
+     "authors": [
+      "Bowen Jiang",
+      "Zhijun Zhuang",
+      "Shreyas S. Shivakumar",
+      "Dan Roth",
+      "Camillo J. Taylor"
+     ],
+     "year": 2024,
+     "excerpt": "This work explores the zero-shot capabilities of foundation models in Visual Question Answering (VQA) tasks. We propose an adaptive multi-agent system, named Multi-Agent VQA, to overcome the limitations of foundation models in object detection and counting by using specialized agents as tools. Unlike existing approaches, our study focuses on the system's performance without fine-tuning it on specific VQA datasets, making it more practical and robust in the open world. We present preliminary experimental results under zero-shot scenarios and highlight some failure cases, offering new directions for future research."
+    }
+   },
+   "shape": {
+    "readable": true,
+    "missing_in_response": [
+     "feed/entry/arxiv:primary_category@scheme",
+     "feed/link@rel",
+     "feed/title@type"
+    ],
+    "optional_absent": [
+     "feed/entry/arxiv:doi",
+     "feed/entry/arxiv:journal_ref",
+     "feed/entry/author/arxiv:affiliation"
+    ],
+    "extra_in_response": [],
+    "type_differences": {},
+    "tool_fields_present": true,
+    "same_shape": false
+   },
+   "outcome": "ok"
+  }
+ },
+ "all_ok": false,
+ "secret_scan": {
+  "key_value_found_in": [],
+  "clean": true
+ }
+}
