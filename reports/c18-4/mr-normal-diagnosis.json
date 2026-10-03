@@ -1,0 +1,1030 @@
+{
+ "script": "tools/c18_4_evidence.py mr",
+ "session_id": "DEMO-MR-normal-v1-e948ebfd108d45f596b37026c26b415b",
+ "termination_reason": "max_steps",
+ "steps": 30,
+ "search": {
+  "calls": 9,
+  "errors": 0,
+  "cap": 20,
+  "cap_reached": false,
+  "calls_by_step": {
+   "2": 7,
+   "5": 2
+  },
+  "result_urls_shown": 41
+ },
+ "claims": {
+  "count": 28,
+  "recorded_missing_kinds": [
+   "source_not_in_search_results"
+  ],
+  "accepted_after_normalisation": 0,
+  "recomputed_missing_kinds": {
+   "source_not_in_search_results": 112
+  },
+  "rows": [
+   {
+    "step_id": 3,
+    "agent": "writer",
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 4,
+    "agent": "lead",
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 5,
+    "agent": "searcher",
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 6,
+    "agent": "writer",
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 7,
+    "agent": "lead",
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 8,
+    "agent": "searcher",
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 9,
+    "agent": "writer",
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 10,
+    "agent": "lead",
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 11,
+    "agent": "searcher",
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 12,
+    "agent": "writer",
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 13,
+    "agent": "lead",
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 14,
+    "agent": "searcher",
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 15,
+    "agent": "writer",
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 16,
+    "agent": "lead",
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 17,
+    "agent": "searcher",
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 18,
+    "agent": "writer",
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 19,
+    "agent": "lead",
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 20,
+    "agent": "searcher",
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 21,
+    "agent": "writer",
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 22,
+    "agent": "lead",
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 23,
+    "agent": "searcher",
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 24,
+    "agent": "writer",
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 25,
+    "agent": "lead",
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 26,
+    "agent": "searcher",
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 27,
+    "agent": "writer",
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 28,
+    "agent": "lead",
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 29,
+    "agent": "searcher",
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   },
+   {
+    "step_id": 30,
+    "agent": "writer",
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "recorded_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results",
+     "gemini-code-assist:pricing:source_not_in_search_results",
+     "gemini-code-assist:features:source_not_in_search_results"
+    ],
+    "recomputed_missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ],
+    "recomputed_result": "unfinished"
+   }
+  ]
+ },
+ "deliverables_distinct": 1,
+ "cells": [
+  {
+   "cell": "github-copilot:pricing",
+   "source_url": "https://docs.github.com/en/copilot/get-started/plans-for-github-copilot",
+   "match": "absent",
+   "matching_result_url": null,
+   "first_step": 3,
+   "last_step": 30,
+   "steps": 28
+  },
+  {
+   "cell": "github-copilot:features",
+   "source_url": "https://github.blog/news-insights/product-news/github-copilot-the-agent-awakens/",
+   "match": "absent",
+   "matching_result_url": null,
+   "first_step": 3,
+   "last_step": 30,
+   "steps": 28
+  },
+  {
+   "cell": "cursor:pricing",
+   "source_url": "https://cursor.com/pricing",
+   "match": "absent",
+   "matching_result_url": null,
+   "first_step": 3,
+   "last_step": 30,
+   "steps": 28
+  },
+  {
+   "cell": "cursor:features",
+   "source_url": "https://docs.cursor.com/",
+   "match": "absent",
+   "matching_result_url": null,
+   "first_step": 3,
+   "last_step": 30,
+   "steps": 28
+  },
+  {
+   "cell": "gemini-code-assist:pricing",
+   "source_url": "https://codeassist.google/",
+   "match": "normalised",
+   "matching_result_url": "https://codeassist.google",
+   "first_step": 3,
+   "last_step": 30,
+   "steps": 28
+  },
+  {
+   "cell": "gemini-code-assist:features",
+   "source_url": "https://codeassist.google/",
+   "match": "normalised",
+   "matching_result_url": "https://codeassist.google",
+   "first_step": 3,
+   "last_step": 30,
+   "steps": 28
+  }
+ ],
+ "handoff_reach": [
+  {
+   "step_id": 1,
+   "agent": "lead",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 2,
+   "agent": "searcher",
+   "result_urls_in_requests": [
+    0,
+    28,
+    31
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 3,
+   "agent": "writer",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 4,
+   "agent": "lead",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 5,
+   "agent": "searcher",
+   "result_urls_in_requests": [
+    31,
+    36,
+    15
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 6,
+   "agent": "writer",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 7,
+   "agent": "lead",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 8,
+   "agent": "searcher",
+   "result_urls_in_requests": [
+    10,
+    10
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 9,
+   "agent": "writer",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 10,
+   "agent": "lead",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 11,
+   "agent": "searcher",
+   "result_urls_in_requests": [
+    10,
+    5
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 12,
+   "agent": "writer",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 13,
+   "agent": "lead",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 14,
+   "agent": "searcher",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 15,
+   "agent": "writer",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 16,
+   "agent": "lead",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 17,
+   "agent": "searcher",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 18,
+   "agent": "writer",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 19,
+   "agent": "lead",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 20,
+   "agent": "searcher",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 21,
+   "agent": "writer",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 22,
+   "agent": "lead",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 23,
+   "agent": "searcher",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 24,
+   "agent": "writer",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 25,
+   "agent": "lead",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 26,
+   "agent": "searcher",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 27,
+   "agent": "writer",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 28,
+   "agent": "lead",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 29,
+   "agent": "searcher",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  },
+  {
+   "step_id": 30,
+   "agent": "writer",
+   "result_urls_in_requests": [
+    0,
+    0
+   ],
+   "result_urls_in_handed_off_fields": 0,
+   "result_urls_in_info_items": 0
+  }
+ ],
+ "judge": {
+  "path": "scenario_judges/DEMO-MR-v1.py",
+  "sha256_recorded": "8705e49a61364e5a07ea08848e102f1fc6b3382c8e8f04887ddd27e72faa090e",
+  "sha256_now": "28965aff068ce6056318b288cc8bbd4dd1db9fc30451c25c51a3d6fd19b2a007",
+  "same_file": false
+ }
+}

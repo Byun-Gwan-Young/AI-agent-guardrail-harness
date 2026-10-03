@@ -171,7 +171,8 @@ class MrJudge(unittest.TestCase):
 
     def test_a_source_not_shown_or_a_missing_row_is_named(self):
         bad = table()
-        bad["rows"][1]["pricing"]["source_url"] = "https://cursor.com/pricing/"
+        # C-18-4 (DM-67 ②): a trailing "/" now matches (url_key); another path still does not.
+        bad["rows"][1]["pricing"]["source_url"] = "https://cursor.com/pricing/teams"
         bad["rows"][2]["features"]["value"] = " "
         self.assertEqual(self.judged(bad)["missing"], ["cursor:pricing:source_not_in_search_results",
                                                        "gemini-code-assist:features:value"])
