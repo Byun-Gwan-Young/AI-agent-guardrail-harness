@@ -6,6 +6,10 @@ prices: the gateway prices of tools/gateway_prices.py read again from the PM pro
         gateway-probe-44ec8e43… (1,088 of 1,094 prompt tokens cached), with the input and output prices above:
             cached_rate = (credits - (prompt - cached) x prompt_rate - completion x completion_rate) / cached
         and the first request of the same probe (no cached tokens) is used as a check of the two prices.
+trial:  the credits expected before the PM trial runs of DEMO-CL (normal once, stall once) at glm-5.3-flash prices, from
+        the measured token counts of the two reference sessions the C-17-8 budget uses (reports/c17-8/demo-budget-glm.json
+        rate_check): A-1-v3 (9 steps, success) for a normal run that ends early, A-1-v4 (30 steps) for a run that reaches
+        the 30-step limit. The stall run cannot succeed, so it is priced at 30 steps. An estimate, not a measurement.
 """
 import argparse
 import json
@@ -70,12 +74,34 @@ def prices():
                    'the cached price is solved from one request; the gateway documentation was not checked']}
 
 
+BUDGET = ROOT / 'reports/c17-8/demo-budget-glm.json'
+
+
+def trial():
+    references = json.loads(BUDGET.read_text(encoding='utf-8'))['rate_check']
+    price = gateway_prices.CREDITS_PER_MILLION[GLM]
+    per_session = {name: round((r['prompt'] * price['prompt'] + r['completion'] * price['completion']) / 1e6, 2)
+                   for name, r in references.items()}
+    normal_low, thirty = per_session['A-1-v3'], per_session['A-1-v4']
+    return {'status': 'ESTIMATE', 'model': GLM, 'credits_per_million': {k: price[k] for k in ('prompt', 'completion')},
+            'reference_tokens': {name: {k: r[k] for k in ('prompt', 'completion', 'turns')}
+                                 for name, r in references.items()},
+            'per_session': {'normal_if_like_A-1-v3': normal_low, 'any_run_to_30_steps_like_A-1-v4': thirty},
+            'trial': {'normal': [normal_low, thirty], 'stall': thirty,
+                      'both': [round(normal_low + thirty, 2), round(2 * thirty, 2)]},
+            'limits': ['token counts are gpt-oss-120b sessions with reasoning high; glm writes different lengths '
+                       '(DM-57) and the demo runs reasoning medium',
+                       'cached input is priced at the full input price here (no cached counts in the references); '
+                       'the gateway discount makes the real value lower',
+                       'two reference sessions are points, not a range of possible runs']}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('part', choices=('prices',))
+    parser.add_argument('part', choices=('prices', 'trial'))
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
-    result = prices()
+    result = prices() if args.part == 'prices' else trial()
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(result, ensure_ascii=False, indent=2))

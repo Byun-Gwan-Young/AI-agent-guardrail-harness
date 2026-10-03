@@ -1,0 +1,40 @@
+{
+  "status": "ESTIMATE",
+  "model": "glm-5.3-flash",
+  "credits_per_million": {
+    "prompt": 150,
+    "completion": 500
+  },
+  "reference_tokens": {
+    "A-1-v3": {
+      "prompt": 80115,
+      "completion": 7355,
+      "turns": 23
+    },
+    "A-1-v4": {
+      "prompt": 444636,
+      "completion": 106866,
+      "turns": 74
+    }
+  },
+  "per_session": {
+    "normal_if_like_A-1-v3": 15.69,
+    "any_run_to_30_steps_like_A-1-v4": 120.13
+  },
+  "trial": {
+    "normal": [
+      15.69,
+      120.13
+    ],
+    "stall": 120.13,
+    "both": [
+      135.82,
+      240.26
+    ]
+  },
+  "limits": [
+    "token counts are gpt-oss-120b sessions with reasoning high; glm writes different lengths (DM-57) and the demo runs reasoning medium",
+    "cached input is priced at the full input price here (no cached counts in the references); the gateway discount makes the real value lower",
+    "two reference sessions are points, not a range of possible runs"
+  ]
+}
