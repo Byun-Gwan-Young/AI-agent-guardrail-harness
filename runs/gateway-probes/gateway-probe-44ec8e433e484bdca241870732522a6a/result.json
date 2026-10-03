@@ -1,0 +1,400 @@
+{
+  "scenario_id": "TEST-T1-v2",
+  "model": "accounts/fireworks/models/gpt-oss-120b",
+  "role": null,
+  "config_file": "guardrail-deadlock-v0.2-kmu.yaml",
+  "endpoint": "https://factchat.mindlogic-kr-api.com/v1/gateway/chat/completions/",
+  "api_key_env": "KMU_API_KEY",
+  "user_agent": "python-httpx/0.28.1",
+  "runner_protocol": "tool-capable-step-v10-final-report-allowlist",
+  "output_contract_version": "output-contract-v3",
+  "allowed_issues_sha256": "022dc8f9759aa50efa01a539dc5394bfd3e8b1a1251bccbcf8f9017afb56fa3a",
+  "max_tokens": 16384,
+  "created_at": "2026-10-03T03:54:20.847534+00:00",
+  "dry_run": false,
+  "note": "One request per variant does not establish reliability. Compare the reasoning_tokens of the two tool variants to see whether reasoning_effort was applied.",
+  "results": [
+    {
+      "variant": "v3-final-strict-no-enums",
+      "model": "glm-5.3-flash",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 204,
+        "prompt_tokens": 1094,
+        "total_tokens": 1298,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 0,
+          "rejected_prediction_tokens": null,
+          "text_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 0,
+          "image_tokens": null,
+          "text_tokens": null
+        }
+      },
+      "tool_calls": [],
+      "contract_valid": true,
+      "contract_violation": null,
+      "reasoning_content_present": false,
+      "credits": {
+        "value": 0.2661,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 1.54315,
+        "used_after": 1.80925
+      }
+    },
+    {
+      "variant": "v3-final-strict-enums",
+      "model": "glm-5.3-flash",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 610,
+        "prompt_tokens": 1094,
+        "total_tokens": 1704,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 410,
+          "rejected_prediction_tokens": null,
+          "text_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 1088,
+          "image_tokens": null,
+          "text_tokens": null
+        }
+      },
+      "tool_calls": [],
+      "contract_valid": true,
+      "contract_violation": null,
+      "reasoning_content_present": true,
+      "credits": {
+        "value": 0.33854,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 1.80925,
+        "used_after": 2.14779
+      }
+    },
+    {
+      "variant": "v3-final-strict-no-enums",
+      "model": "qwen3.8-flash",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 5239,
+        "prompt_tokens": 1091,
+        "total_tokens": 6330,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 5031,
+          "rejected_prediction_tokens": null,
+          "text_tokens": 5239
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 0,
+          "image_tokens": null,
+          "text_tokens": 1091
+        }
+      },
+      "tool_calls": [],
+      "contract_valid": true,
+      "contract_violation": null,
+      "reasoning_content_present": true,
+      "credits": {
+        "value": 2.62598,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 2.14779,
+        "used_after": 4.773770000000001
+      }
+    },
+    {
+      "variant": "v3-final-strict-enums",
+      "model": "qwen3.8-flash",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 1223,
+        "prompt_tokens": 1091,
+        "total_tokens": 2314,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 1103,
+          "rejected_prediction_tokens": null,
+          "text_tokens": 1223
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 1024,
+          "image_tokens": null,
+          "text_tokens": 1091
+        }
+      },
+      "tool_calls": [],
+      "contract_valid": true,
+      "contract_violation": null,
+      "reasoning_content_present": true,
+      "credits": {
+        "value": 0.61558,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 4.773770000000001,
+        "used_after": 5.38935
+      }
+    },
+    {
+      "variant": "v3-final-strict-no-enums",
+      "model": "gpt-5.4-nano",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 376,
+        "prompt_tokens": 1342,
+        "total_tokens": 1718,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 199,
+          "rejected_prediction_tokens": 0,
+          "text_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cache_write_tokens": null,
+          "cached_tokens": 0,
+          "image_tokens": null,
+          "text_tokens": null
+        }
+      },
+      "tool_calls": [],
+      "contract_valid": true,
+      "contract_violation": null,
+      "reasoning_content_present": false,
+      "credits": {
+        "value": 0.7384,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 5.38935,
+        "used_after": 6.127749999999999
+      }
+    },
+    {
+      "variant": "v3-final-strict-enums",
+      "model": "gpt-5.4-nano",
+      "sent": true,
+      "http_status": 200,
+      "error_message": null,
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 351,
+        "prompt_tokens": 1374,
+        "total_tokens": 1725,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": 0,
+          "audio_tokens": 0,
+          "reasoning_tokens": 205,
+          "rejected_prediction_tokens": 0,
+          "text_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": 0,
+          "cache_write_tokens": null,
+          "cached_tokens": 0,
+          "image_tokens": null,
+          "text_tokens": null
+        }
+      },
+      "tool_calls": [],
+      "contract_valid": true,
+      "contract_violation": null,
+      "reasoning_content_present": false,
+      "credits": {
+        "value": 0.71355,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 6.127749999999999,
+        "used_after": 6.841299999999999
+      }
+    }
+  ],
+  "reasoning_comparison": null,
+  "closed_list_comparison": {
+    "by_model": {
+      "glm-5.3-flash": {
+        "after_receipt": {
+          "http_status": 200,
+          "error_message": null,
+          "finish_reason": "stop",
+          "contract_valid": true,
+          "contract_violation": null
+        },
+        "provider_strict": {
+          "http_status": 200,
+          "error_message": null,
+          "finish_reason": "stop",
+          "contract_valid": true,
+          "contract_violation": null
+        }
+      },
+      "qwen3.8-flash": {
+        "after_receipt": {
+          "http_status": 200,
+          "error_message": null,
+          "finish_reason": "stop",
+          "contract_valid": true,
+          "contract_violation": null
+        },
+        "provider_strict": {
+          "http_status": 200,
+          "error_message": null,
+          "finish_reason": "stop",
+          "contract_valid": true,
+          "contract_violation": null
+        }
+      },
+      "gpt-5.4-nano": {
+        "after_receipt": {
+          "http_status": 200,
+          "error_message": null,
+          "finish_reason": "stop",
+          "contract_valid": true,
+          "contract_violation": null
+        },
+        "provider_strict": {
+          "http_status": 200,
+          "error_message": null,
+          "finish_reason": "stop",
+          "contract_valid": true,
+          "contract_violation": null
+        }
+      }
+    },
+    "note": "One request per mode. provider_strict sends the closed lists as enums; after_receipt sends the same schema without them and checks after receipt. DM-20 is decided by the PM (DM-40)."
+  },
+  "models": [
+    "glm-5.3-flash",
+    "qwen3.8-flash",
+    "gpt-5.4-nano"
+  ],
+  "model_summary": {
+    "glm-5.3-flash": {
+      "requests": [
+        {
+          "variant": "v3-final-strict-no-enums",
+          "http_status": 200,
+          "error_message": null,
+          "prompt_tokens": 1094,
+          "completion_tokens": 204,
+          "reasoning_tokens": 0,
+          "tool_call_returned": false,
+          "credits": 0.2661
+        },
+        {
+          "variant": "v3-final-strict-enums",
+          "http_status": 200,
+          "error_message": null,
+          "prompt_tokens": 1094,
+          "completion_tokens": 610,
+          "reasoning_tokens": 410,
+          "tool_call_returned": false,
+          "credits": 0.33854
+        }
+      ],
+      "token_rates": {
+        "status": "solved_from_two_requests",
+        "requests_used": 2,
+        "credits_per_million_prompt_tokens": 209.964878,
+        "credits_per_million_completion_tokens": 178.423645,
+        "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+      }
+    },
+    "qwen3.8-flash": {
+      "requests": [
+        {
+          "variant": "v3-final-strict-no-enums",
+          "http_status": 200,
+          "error_message": null,
+          "prompt_tokens": 1091,
+          "completion_tokens": 5239,
+          "reasoning_tokens": 5031,
+          "tool_call_returned": false,
+          "credits": 2.62598
+        },
+        {
+          "variant": "v3-final-strict-enums",
+          "http_status": 200,
+          "error_message": null,
+          "prompt_tokens": 1091,
+          "completion_tokens": 1223,
+          "reasoning_tokens": 1103,
+          "tool_call_returned": false,
+          "credits": 0.61558
+        }
+      ],
+      "token_rates": {
+        "status": "solved_from_two_requests",
+        "requests_used": 2,
+        "credits_per_million_prompt_tokens": 3.069774,
+        "credits_per_million_completion_tokens": 500.59761,
+        "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+      }
+    },
+    "gpt-5.4-nano": {
+      "requests": [
+        {
+          "variant": "v3-final-strict-no-enums",
+          "http_status": 200,
+          "error_message": null,
+          "prompt_tokens": 1342,
+          "completion_tokens": 376,
+          "reasoning_tokens": 199,
+          "tool_call_returned": false,
+          "credits": 0.7384
+        },
+        {
+          "variant": "v3-final-strict-enums",
+          "http_status": 200,
+          "error_message": null,
+          "prompt_tokens": 1374,
+          "completion_tokens": 351,
+          "reasoning_tokens": 205,
+          "tool_call_returned": false,
+          "credits": 0.71355
+        }
+      ],
+      "token_rates": {
+        "status": "solved_from_two_requests",
+        "requests_used": 2,
+        "credits_per_million_prompt_tokens": 200.0,
+        "credits_per_million_completion_tokens": 1250.0,
+        "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+      }
+    }
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "scenario_id": "TEST-T1-v2",
+  "model": "accounts/fireworks/models/gpt-oss-120b",
+  "role": null,
+  "config_file": "guardrail-deadlock-v0.2-kmu.yaml",
+  "endpoint": "https://factchat.mindlogic-kr-api.com/v1/gateway/chat/completions/",
+  "api_key_env": "KMU_API_KEY",
+  "user_agent": "python-httpx/0.28.1",
+  "runner_protocol": "tool-capable-step-v10-final-report-allowlist",
+  "output_contract_version": "output-contract-v3",
+  "allowed_issues_sha256": "022dc8f9759aa50efa01a539dc5394bfd3e8b1a1251bccbcf8f9017afb56fa3a",
+  "max_tokens": 16384,
+  "created_at": "2026-10-02T14:20:28.394628+00:00",
+  "dry_run": false,
+  "note": "One request per variant does not establish reliability. Compare the reasoning_tokens of the two tool variants to see whether reasoning_effort was applied.",
+  "results": [
+    {
+      "variant": "v3-final-strict-no-enums",
+      "sent": true,
+      "http_status": 404,
+      "error_message": "invalid_request_error - Model 'accounts/fireworks/models/gpt-oss-120b' not found",
+      "finish_reason": null,
+      "usage": null,
+      "tool_calls": null,
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": null,
+      "credits": {
+        "value": 0,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 0,
+        "used_after": 0
+      }
+    },
+    {
+      "variant": "v3-final-strict-enums",
+      "sent": true,
+      "http_status": 404,
+      "error_message": "invalid_request_error - Model 'accounts/fireworks/models/gpt-oss-120b' not found",
+      "finish_reason": null,
+      "usage": null,
+      "tool_calls": null,
+      "contract_valid": null,
+      "contract_violation": null,
+      "reasoning_content_present": null,
+      "credits": {
+        "value": 0,
+        "status": "measured",
+        "field": "monthly_allocated.used",
+        "used_before": 0,
+        "used_after": 0
+      }
+    }
+  ],
+  "reasoning_comparison": null,
+  "closed_list_comparison": {
+    "by_model": {
+      "after_receipt": {
+        "http_status": 404,
+        "error_message": "invalid_request_error - Model 'accounts/fireworks/models/gpt-oss-120b' not found",
+        "finish_reason": null,
+        "contract_valid": null,
+        "contract_violation": null
+      },
+      "provider_strict": {
+        "http_status": 404,
+        "error_message": "invalid_request_error - Model 'accounts/fireworks/models/gpt-oss-120b' not found",
+        "finish_reason": null,
+        "contract_valid": null,
+        "contract_violation": null
+      }
+    },
+    "note": "One request per mode. provider_strict sends the closed lists as enums; after_receipt sends the same schema without them and checks after receipt. DM-20 is decided by the PM (DM-40)."
+  }
+}
