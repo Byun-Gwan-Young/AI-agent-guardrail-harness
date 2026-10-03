@@ -4,8 +4,10 @@
 #   - 데모 프록시 : guardrail-deadlock-v0.3-kmu.yaml, guardrail-deadlock-v0.3-kmu-block.yaml 의 `run_conditions` (고정 모델, S-12)
 # 코드에는 모델·추론 강도 기본값이 없다. 값을 바꾸면 다른 조건군이다 (매니페스트 condition.group, DM-33·DM-40 과 같은 원칙).
 # 근거 : PM probe gateway-probe-a41f8d51… (도구 + 추론 high 200, 도구 호출 3 개), gateway-probe-44ec8e43… (v3 strict enum 포함·없음 200, 계약 유효).
-# 추론 강도 medium 은 데모 조건에서만 쓴다 (DM-57). medium 이 실제로 적용되는지는 probe 로 확인하지 않았다 → reasoning_effort_evidence: null (applied: unverified).
+# 추론 강도 high (DM-60, 10/3). DM-57 의 medium 은 glm-5.3-flash 가 400 으로 거절했다 ("항상 추론하며 끌 수 없음, low·high·max 만 가능",
+#   시험 세션 DEMO-CL-normal-v1-c3a4c019… step 1). high 로 돈 시험 세션 두 개에 reasoning 토큰이 있다 :
+#   DEMO-CL-normal-v1-d5460d69… 9,800 / DEMO-CL-stall-v1-f08705fe… 25,527 (tools/c18_2_evidence.py → 아래 근거 파일).
 conditions_version: demo-run-conditions-v1
 model: glm-5.3-flash
-reasoning_effort: medium
-reasoning_effort_evidence: null
+reasoning_effort: high
+reasoning_effort_evidence: reports/c18-1/trial-summary.json

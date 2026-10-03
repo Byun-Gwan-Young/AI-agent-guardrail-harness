@@ -50,7 +50,7 @@ class Summary(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((result["tool_results"]["executed"], result["tool_results"]["error_results"]), (2, 0))
         self.assertEqual(result["strict_output"]["format_failures"], 0)
         self.assertEqual((result["model"], result["reasoning_effort"], result["phase"], result["guardrail_mode"]),
-                         ("glm-5.3-flash", "medium", "demo", "observe"))
+                         ("glm-5.3-flash", "high", "demo", "observe"))
         self.assertTrue(result["condition_group"].startswith("cg-"))
         self.assertEqual(result["key_scan"]["key_values_checked"], ["KMU_API_KEY"])
         self.assertTrue(result["key_scan"]["clean"])

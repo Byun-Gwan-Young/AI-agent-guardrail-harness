@@ -22,6 +22,11 @@ from tools import gateway_prices  # noqa: E402
 from tools.analyze_session import SECRET_PATTERNS, SEARCH_SECRET_PATTERNS, condition_group  # noqa: E402
 
 STOP_DECISIONS = ('deadlock', 'termination_failure')
+# Condition-group fields that only a dialogue (T1) run has, and the search tools that give search settings.
+DIALOGUE_ONLY = ('dialogue_flow', 'recent_messages_rule')
+SEARCH_TOOLS = ('web_search', 'academic_search')
+# Group field -> conditions.json key, where they differ.
+CONDITIONS_KEY = {'search_settings_sha256': 'tool_settings'}
 KEY_ENVS = ('KMU_API_KEY', 'TAVILY_API_KEY')
 
 
@@ -56,7 +61,9 @@ def tool_results(steps):
     refused = [e for e in executions if e.get('approval_refused')]
     failed = [e for e in executions if e.get('is_error') and not e.get('approval_refused')]
     return {'executed': len(executions), 'refused_before_approval': len(refused), 'error_results': len(failed),
-            'error_results_by_tool': dict(Counter(e.get('name') for e in failed)),
+            # The runner records the tool as 'tool' (C-18-2: 'name' gave null).
+            'error_results_by_tool': dict(Counter(e.get('tool') for e in failed)),
+            'error_results_by_summary': dict(Counter(e.get('error_summary') for e in failed)),
             'invalid_tool_calls': sum(len(s.get('tool_errors') or []) for s in steps)}
 
 
@@ -67,6 +74,24 @@ def strict_failures(steps):
             'by_kind': dict(Counter(kinds)),
             'failed_steps': [{'step_id': s['step_id'], 'reasons': s.get('failure_reasons')} for s in steps
                              if s.get('step_status') == 'failed']}
+
+
+def missing_field_classes(missing, conditions):
+    """C-18-2: the condition group's empty fields split into those that do not apply to this task and those that
+    are really missing. A key recorded with null in conditions.json (no seed asked for) is a value, not a gap."""
+    kind = conditions.get('task_kind')
+    search = any(t in SEARCH_TOOLS for tools in (conditions.get('tools') or {}).values() for t in tools)
+    def applies(name):
+        if name in DIALOGUE_ONLY:
+            return kind == 'dialogue'
+        if name == 'search_settings_sha256':
+            return search
+        return True
+    def recorded(name):
+        return CONDITIONS_KEY.get(name, name) in conditions
+    return {'not_applicable': [m for m in missing if not applies(m)],
+            'recorded_null': [m for m in missing if applies(m) and recorded(m)],
+            'missing': [m for m in missing if applies(m) and not recorded(m)]}
 
 
 def key_scan(folder):
@@ -113,6 +138,7 @@ def summarize(folder):
         'tool_results': tool_results(steps),
         'strict_output': strict_failures(steps),
         'condition_group': group['id'], 'condition_group_missing_fields': group['missing_fields'],
+        'condition_group_missing_by_class': missing_field_classes(group['missing_fields'], conditions),
         'model': meta.get('model'), 'reasoning_effort': (conditions.get('reasoning_effort') or {}).get('requested'),
         'phase': conditions.get('phase'), 'guardrail_mode': meta.get('guardrail_mode'),
         'session_times': {'started_at': meta.get('started_at'), 'ended_at': meta.get('ended_at')},

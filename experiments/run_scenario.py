@@ -79,6 +79,11 @@ DEMO_PHASE = 'demo'
 # DM-2, DM-34: demo runs live under runs/demo/ and nothing else does.
 DEFAULT_OUTPUT_ROOT = ROOT / 'runs'
 DEMO_OUTPUT_ROOT = ROOT / 'runs' / 'demo'
+# C-18-2: what a scenario-v2 artifact task records as its closed-list check (condition group, DM-40). The dialogue
+# path records its own mode (DM-55); here the issue-ID list is never sent as an enum.
+ARTIFACT_CLOSED_LIST_CHECK = {'mode': 'after_receipt', 'decision': 'D-13', 'enums_sent_to_provider': False,
+                              'basis': 'artifact task: issue IDs are checked after receipt; the strict schema '
+                                       'carries no enum (output-contract-v2, v3 adds spec_approved only)'}
 
 
 def enforce_demo_separation(dataset_run, phase):
@@ -533,7 +538,10 @@ async def run(args):
                          tools={a.id: list(a.tools) for a in scenario.agents},
                          write_gate=gate.conditions() if gate is not None else None,
                          # DM-57: the run-conditions file the model and reasoning effort came from, or None.
-                         run_conditions=run_conditions)
+                         run_conditions=run_conditions,
+                         # C-18-2: the condition group's closed-list value for an artifact task. Its closed list
+                         # (issue IDs) is checked after receipt and no enum is sent (output-contract-v2/v3, D-13).
+                         closed_list_check=ARTIFACT_CLOSED_LIST_CHECK)
     save(conditions_path, effective)
     print('session_id:', session_id, 'run_directory:', out, flush=True)
     shutil.copy2(scenario_path, out / 'scenario.yaml')

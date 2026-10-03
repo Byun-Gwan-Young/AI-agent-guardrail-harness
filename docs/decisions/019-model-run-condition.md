@@ -202,8 +202,8 @@ C-17-8 뒤 데모 실행 경로(코드·데모 설정)에는 `gpt-oss` 가 없�
 ```yaml
 conditions_version: demo-run-conditions-v1
 model: glm-5.3-flash
-reasoning_effort: medium
-reasoning_effort_evidence: null
+reasoning_effort: high                                    # C-18-2 (DM-60). C-17-8 에서는 medium
+reasoning_effort_evidence: reports/c18-1/trial-summary.json  # C-18-2. C-17-8 에서는 null
 ```
 
 - 이 파일만 데모 모델·추론 강도를 정한다. 코드·설정 YAML 에는 모델 ID 가 없다 (테스트 : 루트·`experiments/` 의 Python 과 `guardrail*.yaml` 에 `glm-5.3-flash` 없음)
@@ -211,10 +211,10 @@ reasoning_effort_evidence: null
   (둘 다 쓰거나 둘 다 없으면 스키마 오류) 실행할 때 파일 값으로 채운다 (`scenario_schema.resolve_run_conditions`). C-18 데모 시나리오 11 개가 이 방식을 쓴다.
   `conditions.json` `run_conditions` 에 파일 경로·SHA-256·값을 남긴다. 모델 출처는 `scenario` (시나리오가 가리킨 파일), `--model` 을 주면 `run_condition`
 - **데모 프록시** : 관측·차단 설정 둘 다 `run_conditions: demo-conditions.yaml` 로 그 파일의 모델에 고정된다 (meta `pinned_model.source: run_conditions`, 파일 해시 포함)
-- **probe** : `tools/probe_gateway.py --scenario <데모 시나리오>` 도 같은 값을 쓴다 (테스트 : dry run 요청이 glm·medium)
-- 추론 강도 `medium` 의 실제 적용 여부는 probe 로 확인하지 않았다 → `reasoning_effort.applied: unverified`. C-18 시험 실행의 `reasoning_tokens` 로 본다
+- **probe** : `tools/probe_gateway.py --scenario <데모 시나리오>` 도 같은 값을 쓴다 (테스트 : dry run 요청이 glm·high. C-17-8 에서는 medium)
+- ~~추론 강도 `medium` 의 실제 적용 여부는 probe 로 확인하지 않았다 → `reasoning_effort.applied: unverified`~~ → **C-18-2 (DM-60)** : `medium` 은 glm 이 400 으로 거절했다 (시험 세션 `c3a4c019…`). `high` 로 바꾸고 시험 세션 두 개의 reasoning 토큰을 근거 파일로 둔다 → `applied: probe_indicated`, `evidence: reports/c18-1/trial-summary.json` (아래 C-18-2 절)
 - `run_conditions` 가 없는 scenario-v2(C-17 fixture)와 scenario-v1(A-1 계열)은 지금처럼 시나리오의 모델을 보낸다. **scenario-v1 기본 실행의 업스트림 요청은 바이트 그대로**다
-  (C-17-4 요청 12 건 비교 통과). 데모 경로의 요청은 지시의 예외대로 바뀐다 : 모델 `glm-5.3-flash`, `reasoning_effort: medium`, 최종 보고 strict 스키마에 `enum` 포함
+  (C-17-4 요청 12 건 비교 통과). 데모 경로의 요청은 지시의 예외대로 바뀐다 : 모델 `glm-5.3-flash`, `reasoning_effort: medium` (C-18-2 부터 `high`), 최종 보고 strict 스키마에 `enum` 포함
 
 **DM-55 — 대화 과제의 기본 strict 방식 = `enum` 포함 (`provider_strict`)**
 
@@ -235,3 +235,28 @@ reasoning_effort_evidence: null
 - 관측 반복 수(DM-6)별 (차단 3 회·시험 11 세션 유지) : 5 회 70 세션 4,544 (+시험 4,717~5,866) / 4 회 59 세션 3,745 (3,918~5,066) / 3 회 48 세션 2,946 (3,118~4,267)
 - 한계 : 토큰 수는 gpt-oss(추론 high) 세션이다. glm 의 출력 길이·`medium` 효과·캐시 할인은 반영하지 않았다 (위쪽 추정). 실측은 C-18 시험 실행으로 갱신
 
+
+## C-18-2 파트 0 — 추론 강도 high (DM-60) · 산출물 과제의 조건군 값
+
+**DM-60** : `demo-conditions.yaml` 을 `reasoning_effort: high` 로 커밋한다 (PM 이 C-18-1 시험 실행 중 바꾼 값).
+
+- 원인 : 첫 시험 세션 `DEMO-CL-normal-v1-c3a4c019…` 이 step 1 에서 400 (`code 1210` "This model always engages in thinking and cannot be disabled; please use low, high, or max"). 0 크레딧
+- 근거 파일 `reports/c18-1/trial-summary.json` (`tools/c18_2_evidence.py`, 세션 폴더만 읽음) 의 `reasoning_effort_evidence` :
+  `DEMO-CL-normal-v1-d5460d69…` high · 18 턴 · reasoning 9,800 / `DEMO-CL-stall-v1-f08705fe…` high · 76 턴 · reasoning 25,527 / `c3a4c019…` medium · 400
+- `reasoning_effort_evidence` 는 경로만 받는다 (`experiment_config.load_run_conditions`, 실행기는 파일이 없으면 실행 전 오류). 세션 ID 와 토큰 수는 YAML 머리 주석과 근거 파일에 적었다
+- 그 결과 `conditions.reasoning_effort.applied` 가 `unverified` → `probe_indicated` 가 된다. 이름은 v9 부터 쓰던 값 그대로이고(데이터셋 경로 코드 불변), 여기서는 "근거 파일이 적용을 보여 준다" 는 뜻이다 (근거는 probe 가 아니라 시험 세션의 reasoning 토큰). `low`·`max` 는 시험하지 않았다
+- 조건군 필드는 `requested`·`sent_on` 만 쓰므로 근거 파일 변경은 조건군 ID 를 바꾸지 않는다. `medium` → `high` 는 조건군을 바꾼다 (실제로 `c3a4c019…` `cg-1cf34b825a1d`, 나머지 두 세션 `cg-9bfd9889d4f8`)
+- `medium` 을 가정한 곳 : 테스트 (`tests/test_c17_8_part2.py` 6 곳, `tests/test_c18_1_part3.py` 1 곳) 를 `high` 로, preflight 는 `reports/c18-2/DEMO-CL-*-preflight.json` 로 새로 만들었다 (C-18-1 기록은 그 시점 값 medium 으로 남긴다. 차이는 `run_conditions_sha256`·`reasoning_effort`·`freeze_sha256` 뿐이고 시나리오 해시·짝 차이·실행 전 판정 6/15 는 같다)
+- 그대로 둔 기록 : `reports/c17-8/demo-budget-glm.json`, `reports/c18-1/estimate-trial.json` 의 "reasoning medium 미반영" 메모 (그 시점 추정의 한계 문장. 실측 DM-62 가 대체), `docs/design/demo-scenarios.md` 21 행의 C-17-8 기록
+
+**조건군 빈 필드 (C-18-2 요약 도구 보완)** : 시험 세션 셋의 `condition_group_missing_fields` 5 개를 나눴다 (`tools/summarize_demo_session.py` `condition_group_missing_by_class`)
+
+| 필드 | 분류 | 처리 |
+|---|---|---|
+| `dialogue_flow`, `recent_messages_rule` | 산출물 과제에 해당 없음 (대화 과제 전달 규칙, DM-47) | 그대로 |
+| `search_settings_sha256` | 검색 도구가 없는 과제에 해당 없음 | 그대로 |
+| `requested_seed` | 기록된 null (seed 를 요청하지 않음. `conditions.json` 에 키가 있다) | 그대로 |
+| `closed_list_check` | **정말 빠짐** — 산출물 과제가 닫힌 목록(쟁점 ID) 검사 방식을 남기지 않았다 | **채움** |
+
+- 채운 값 (`experiments/run_scenario.ARTIFACT_CLOSED_LIST_CHECK`, scenario-v2 산출물 과제만) : `{mode: after_receipt, decision: D-13, enums_sent_to_provider: false, basis: …}`. 산출물 과제의 strict 스키마는 v2·v3 모두 `enum` 을 보내지 않는다 (`issue_contract.response_format`). 요청 바이트는 바뀌지 않는다
+- 영향 : 산출물 과제 세션의 조건군 ID 가 C-18-1 시험 세션(`cg-9bfd9889d4f8`)과 달라진다. 시험 세션끼리만 해당하고 본 실행은 최종 동결 뒤 한 조건군이다. scenario-v1(데이터셋) 경로의 `conditions.json` 은 바뀌지 않는다

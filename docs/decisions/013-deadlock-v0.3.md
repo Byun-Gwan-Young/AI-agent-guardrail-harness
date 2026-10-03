@@ -372,3 +372,28 @@ STOP 기록 전체(G0-8 8 건, A-1-v4 22 건)의 문장도 이전 보고와 같�
 첫 STOP 6 / 없음 / 9, A-1-v3 새 STOP 없음, v0.2 바이트 동일, 이전 대비 상태·판정 변화 0, 첫 STOP 문장 동일.
 STOP 기록 전체(G0-8 8 건, A-1-v4 22 건)의 문장도 C-17-6 보고와 같다 — 모두 E1 이고 E1 에는 단위 낱말 뒤 조사 자리가 없다 (E7 은 세 세션에서 골라지지 않는다)
 
+
+## C-18-2 파트 0 재동결 (DM-61 ① E7 문구)
+
+- **DM-61 ①** : 연속 구간의 모든 step 이 이전 상태로 되돌아간 경우(`o = n`) E7 은 **"최근 {n} step 모두 이전 상태로 되돌아갔습니다."** 로 끝낸다. "나머지는 변화가 없었습니다" 는 `o < n` 일 때만 붙인다
+  - 구현 : `explain_v1.E7_ALL` (E6 대화형처럼 변형 문장). 필수 값(`n`, `o`)·선택 순서·축약형은 그대로다. 문장을 만든 값(`values`)은 같으므로 기록에서 다시 만들면 같은 문장이 나온다
+  - 동결 기록 : `docs/criteria/explain-v1.json` `variants.E7.all_reverted` 에 넣었다 (`criteria_freeze.explanation_record`)
+  - 테스트 (`tests/test_c18_2_part0.py`) : `o = n` 3/3, `o < n` 2/3, 기록에서 다시 만들기, 동결 기록. C-18-1 교착판 흐름 테스트의 기대 문장을 "최근 3 step 모두 이전 상태로 되돌아갔습니다." 로 고쳤다
+- 판정·파라미터는 바뀌지 않았다. C-18-1 시험 세션 `DEMO-CL-stall-v1-f08705fe…` 의 STOP 16 건은 모두 E6 이라 새 규칙으로 다시 만들어도 문장이 같다
+
+**이전 해시 (C-17-8 파트 0, `2d7dcca`) → 새 해시 (C-18-2 파트 0)**
+
+| 대상 | 이전 | 새 |
+|---|---|---|
+| `docs/criteria/deadlock-v0.3.json` 파일 | `2522b94ab5640d2e9ed54e44a6be01323a7b9e2ebade259110b0849eb8275be3` | `3f801f766890bbacaaab17e1190159f67faae1d982c9110da862747d707da9fd` |
+| `criteria_sha256` (파라미터) | `a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50` | 같음 |
+| `deadlock_policy_v03.py` | `794f65e26211b7bcebbe4deadfa3e30f30dbaecc6fe361681854db23e2cef3b0` | 같음 |
+| `explain_v1.py` | `764e649db00a70dba8d5a4c326bc3ab67298552972ff665d9929acd68dfd5f12` | `1d01fc8428f368fb0eb3bd56c916e58337b582462259d7fbd1493d65ed7c09df` |
+| `progress_signal_v3.py` | `dc727697e0832a305569839d3fc347f36c093a09811e93183cc4fc478a8d6c94` | 같음 |
+| `docs/criteria/explain-v1.json` 파일 | `a53e6408169accd3398cab9d3e21856b9cf05a2935420a188aff62183f4703e7` | `87cdff03ca5c6e1b56468cab5321a54e5662b159a4a1f5fe0aee6243e01e177c` |
+| `explanation_templates_sha256` | `1236f4b7170e5d9417255ce93c244869fc3bbfb13a5099ed1b288d2e78124a9f` | `66c60d7d38d037428e3774a2127f6dd42d77ea3eb56ac7586fd313a854f3bcf1` |
+| 프록시가 세션에 남기는 `criteria_freeze.sha256` | `a5372f30ce1f9347cf073b4d6061872f1a3b507e5ac614417b4f952e42d04324` (C-18-1 시험 세션 셋) | `4fa939191ab8e9bfc879da548b87b13107c85e1612f62bb35334e10fee7759cf` |
+
+**기존 세션 재계산** (`--previous reports/c17-8/v03-recompute.json --output reports/c18-2/v03-recompute.json`) :
+첫 STOP 6 / 없음 / 9, A-1-v3 새 STOP 없음, v0.2 바이트 동일, 이전 대비 상태·판정 변화 0, 첫 STOP 문장 동일.
+STOP 기록 전체(G0-8 8 건, A-1-v4 22 건)의 문장도 C-17-8 보고와 같다 (모두 E1, E7 은 세 세션에서 골라지지 않는다)

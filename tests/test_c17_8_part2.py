@@ -22,6 +22,8 @@ import v1_request_capture as capture
 ROOT = Path(__file__).resolve().parents[1]
 DEMO = ROOT / "demo-conditions.yaml"
 V03_CONFIGS = ("guardrail-deadlock-v0.3-kmu.yaml", "guardrail-deadlock-v0.3-kmu-block.yaml")
+# DM-60 (C-18-2): reasoning effort high, backed by the C-18-1 trial sessions' reasoning tokens.
+EVIDENCE = "reports/c18-1/trial-summary.json"
 # A demo scenario: no model or reasoning effort of its own (DM-57).
 RUN_CONDITIONS = {"model": None, "reasoning_effort": None, "reasoning_effort_evidence": None,
                   "run_conditions": "demo-conditions.yaml"}
@@ -34,7 +36,7 @@ class DemoConditionsFileTests(unittest.TestCase):
         conditions = load_run_conditions("demo-conditions.yaml")
         self.assertEqual((conditions["conditions_version"], conditions["model"], conditions["reasoning_effort"],
                           conditions["reasoning_effort_evidence"]),
-                         (RUN_CONDITIONS_VERSION, "glm-5.3-flash", "medium", None))
+                         (RUN_CONDITIONS_VERSION, "glm-5.3-flash", "high", EVIDENCE))
         self.assertEqual(len(conditions["sha256"]), 64)
 
     def test_both_demo_proxies_take_their_pin_from_it(self):
@@ -96,7 +98,7 @@ class ScenarioRunConditionsTests(unittest.TestCase):
         scenario = ScenarioV2.model_validate(self.data(**RUN_CONDITIONS))
         resolved, record = resolve_run_conditions(scenario, ROOT)
         self.assertEqual((resolved.model, resolved.reasoning_effort, resolved.reasoning_effort_evidence),
-                         ("glm-5.3-flash", "medium", None))
+                         ("glm-5.3-flash", "high", EVIDENCE))
         self.assertEqual(record, load_run_conditions("demo-conditions.yaml"))
         for path in (FIXTURE, capture.A1V4, capture.A1V4_V2):
             original = load_scenario(path)
@@ -112,15 +114,16 @@ class DemoRunTests(unittest.IsolatedAsyncioTestCase):
                            tests=self)
         requests = run["requests"]
         self.assertEqual(run["summary"]["termination_reason"], "max_steps")
-        self.assertEqual({(r["model"], r["reasoning_effort"]) for r in requests}, {("glm-5.3-flash", "medium")})
+        self.assertEqual({(r["model"], r["reasoning_effort"]) for r in requests}, {("glm-5.3-flash", "high")})
         finals = [r for r in requests if "response_format" in r]
         self.assertTrue(finals and all('"enum"' in json.dumps(r["response_format"]) for r in finals))
         conditions = run["conditions"]
         self.assertEqual(conditions["run_conditions"], load_run_conditions("demo-conditions.yaml"))
         self.assertEqual((conditions["model"]["source"], conditions["model"]["name"],
                           conditions["model"]["scenario_model"]), ("scenario", "glm-5.3-flash", "glm-5.3-flash"))
-        self.assertEqual(conditions["reasoning_effort"]["requested"], "medium")
-        self.assertEqual(conditions["reasoning_effort"]["applied"], "unverified")
+        self.assertEqual(conditions["reasoning_effort"]["requested"], "high")
+        self.assertEqual((conditions["reasoning_effort"]["applied"], conditions["reasoning_effort"]["evidence"]),
+                         ("probe_indicated", EVIDENCE))
         self.assertEqual(conditions["proxy_pinned_model"]["source"], "run_conditions")
         self.assertEqual((conditions["closed_list_check"]["mode"], conditions["closed_list_check"]["basis"]),
                          ("provider_strict", dialogue_runner.CLOSED_LIST_DEFAULT_BASIS))
@@ -128,13 +131,13 @@ class DemoRunTests(unittest.IsolatedAsyncioTestCase):
             manifest = analyze_session.manifest(analyze_session.analyse(run["session_id"]), "measure", [])
         fields = manifest["condition"]["group"]["fields"]
         self.assertEqual((fields["model"], fields["reasoning_effort"]["requested"], fields["closed_list_check"]),
-                         ("glm-5.3-flash", "medium", "provider_strict"))
+                         ("glm-5.3-flash", "high", "provider_strict"))
 
     async def test_artifact_run_takes_the_same_conditions(self):
         run = await t2_harness.run_t2([t2_harness.report(contract=t2_harness.V2)], contract=t2_harness.V2, max_steps=1,
                                       scenario_changes=RUN_CONDITIONS, tests=self)
         self.assertEqual({(r["model"], r["reasoning_effort"]) for r in run["requests"]},
-                         {("glm-5.3-flash", "medium")})
+                         {("glm-5.3-flash", "high")})
         self.assertEqual(run["conditions"]["run_conditions"]["model"], "glm-5.3-flash")
 
     async def test_another_run_model_is_refused_by_the_demo_proxy_before_any_call(self):
@@ -163,7 +166,7 @@ class ProbeDryRunTests(unittest.TestCase):
                                                      "developer", None)
             body = json.loads((folder / (probe_gateway.V3_STRICT_NO_ENUMS + ".request.json")).read_text(encoding="utf-8"))
         self.assertEqual((result["model"], body["model"], body["reasoning_effort"], result["dry_run"]),
-                         ("glm-5.3-flash", "glm-5.3-flash", "medium", True))
+                         ("glm-5.3-flash", "glm-5.3-flash", "high", True))
 
 
 class ProbeEvidenceTests(unittest.TestCase):

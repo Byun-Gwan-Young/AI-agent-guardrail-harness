@@ -14,6 +14,9 @@
   "variants": {
     "E6": {
       "dialogue": "step {d}에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 처리 상태는 '{status}'입니다."
+    },
+    "E7": {
+      "all_reverted": "최근 {n} step 모두 이전 상태로 되돌아갔습니다."
     }
   },
   "selection_order": [
@@ -151,5 +154,5 @@
     "E6": "step {d}에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다."
   },
   "fallback": "E1",
-  "templates_sha256": "1236f4b7170e5d9417255ce93c244869fc3bbfb13a5099ed1b288d2e78124a9f"
+  "templates_sha256": "66c60d7d38d037428e3774a2127f6dd42d77ea3eb56ac7586fd313a854f3bcf1"
 }

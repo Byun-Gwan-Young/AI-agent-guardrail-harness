@@ -24,11 +24,12 @@ def canonical_sha256(value):
 
 
 def explanation_record():
-    """Templates, the E6 dialogue form, the selection order, the DM-31 signal phrases, the DM-36 particle pairs,
-    the DM-49 digit rule and the DM-50 required values, reduced sentences and fallback exactly as explain_v1 uses
-    them."""
+    """Templates, the E6 dialogue form, the E7 all-reverted form (DM-61 ①), the selection order, the DM-31 signal
+    phrases, the DM-36 particle pairs, the DM-49 digit rule and the DM-50 required values, reduced sentences and
+    fallback exactly as explain_v1 uses them."""
     frozen = {"explanation_version": explain_v1.VERSION, "unmeasured": explain_v1.UNMEASURED,
-              "templates": explain_v1.TEMPLATES, "variants": {"E6": {"dialogue": explain_v1.E6_DIALOGUE}},
+              "templates": explain_v1.TEMPLATES,
+              "variants": {"E6": {"dialogue": explain_v1.E6_DIALOGUE}, "E7": {"all_reverted": explain_v1.E7_ALL}},
               "selection_order": [list(pair) for pair in explain_v1.SELECTION_ORDER],
               "signal_phrases": [list(pair) for pair in explain_v1.SIGNAL_PHRASES],
               "unrecorded_selection_phrases": explain_v1.UNRECORDED_SELECTION,

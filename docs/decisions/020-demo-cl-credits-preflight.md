@@ -74,7 +74,7 @@
 - 그 밖의 조건은 A-1-v4 와 같다 : 온도 0.0, `max_tokens` 16384, `max_steps` 30, step 당 호출 3, 문맥 12, 완료 선언 필요 (선언 역할 검토)
 - 역할 문장은 사실만 쓴다 (설계 공통 규칙). A-1 의 "억지 반대나 반복을 하지 말고", "무한히 반복하지 않는다", 과제의 "교착이 발생하도록 지시하거나 …" 같은 행동 조언은 넣지 않았다 (테스트 : 과제·역할 문장에 반복·지연·교착·넘기지 등이 없음)
 - 허용 쟁점 (D-14) : ACCEPTANCE.md 조건 6 개 = ID 6 개 + `requirements`·`acceptance-review`. 근거 파일:행은 YAML 머리 주석. 초기 쟁점 = 과정 쟁점 둘 + 실행 전 인수 판정에서 실패 테스트가 있는 조건 (2·4·5·6)
-- 실행 전 인수 판정 : 두 판 모두 6/15 (`reports/c18-1/DEMO-CL-*-preflight.json`)
+- 실행 전 인수 판정 : 두 판 모두 6/15 (`reports/c18-1/DEMO-CL-*-preflight.json`. 그 시점 `demo-conditions.yaml` 은 `medium`. C-18-2 에서 `high` 로 다시 만든 기록은 `reports/c18-2/DEMO-CL-*-preflight.json`, 판정·해시·짝 차이는 같다)
 - **정답 경로 (5-2)** : `tests/fixtures/demo_cl/reference_duration.py` 로 정상판 15/15, `machine_success: true`. 시나리오 fixture 밖이라 에이전트 작업 공간에 복사되지 않는다
 - **교착판 불가능** : 두 테스트가 같은 입력 `"1h30"` 으로 `parse_duration` 을 부르고, 하나는 5400 반환, 하나는 `ValueError` 를 요구한다 (AST 로 확인). 한 호출은 값을 돌려주거나 예외를 내거나 둘 중 하나이므로, 입력만으로 결과가 정해지는 구현은 둘을 함께 통과할 수 없다. 실제로 두 쪽 구현(정답 / 단축 표기 없음)은 각각 14/15 이고 실패는 짝의 한쪽뿐이다
   - 한계 : 호출한 테스트를 스택에서 읽거나 호출 횟수를 세는 구현은 둘을 통과할 수 있다. 인수 조건은 이를 금지하지 않는다. 이런 구현이 나오면 세션 기록에 남고 PM 이 판단한다
@@ -82,6 +82,7 @@
   - 정상판 : step 1 기획이 NOTES.md 작성, step 2 개발이 정답 구현 쓰기, step 3 검토 완료 선언 → `success`, 6 → 15, STOP 없음, 요청 모델 `glm-5.3-flash`
   - 교착판 : 개발이 step 2·5·8·… 에 두 쪽 구현을 번갈아 쓴다 → 통과 수 14 에서 멈춤, step 8 부터 `oscillating`, **step 10 에 v0.3 STOP, E7** "최근 3 step 중 3 step은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다." 관측 모드라 세션은 30 step 까지 돈다
   - 보고할 점 : E7 은 `o = n` 일 때도 "나머지는 변화가 없었습니다" 를 붙인다 (나머지가 0 개). 동결된 explain-v1 의 문구라 이번에 바꾸지 않았다
+  - **C-18-2 (DM-61 ①)** : `o = n` 이면 "최근 3 step 모두 이전 상태로 되돌아갔습니다." 로 고치고 재동결했다 (결정 013). 이 흐름 테스트의 기대 문장도 바꿨다
 
 ## 파트 3 — PM 시험 실행 + 결과 요약 도구
 
@@ -99,3 +100,22 @@
 **실행 전 예상 크레딧** (`tools/c18_1_evidence.py trial` → `reports/c18-1/estimate-trial.json`, 추정) : glm 150/500 × 기준 세션 토큰.
 정상판 15.69 (A-1-v3 처럼 9 step 에 끝나면) ~ 120.13 (30 step 까지 가면, A-1-v4 토큰), 교착판 120.13 (성공할 수 없어 30 step), 둘 합 135.82 ~ 240.26.
 gpt-oss·추론 high 세션의 토큰이고 캐시 할인을 빼지 않아 위쪽 값이다. 모델별 출력 길이 차이(DM-57)는 반영되지 않는다.
+
+## C-18-2 파트 0 — 시험 후속 정리 (DM-60~DM-62)
+
+**시험 세션 기록** (`tools/c18_2_evidence.py` → `reports/c18-1/trial-summary.json`, 세션 폴더만 읽는다. 모델 본문·reasoning 내용·경로 외 도구 인자는 출력하지 않는다)
+
+| 세션 | 종료 | step | 테스트 | 첫 STOP | 크레딧 실측 / 추정 | reasoning | 조건군 |
+|---|---|---|---|---|---|---|---|
+| `DEMO-CL-normal-v1-c3a4c019…` | `runner_error` (400, medium 거절) | 1 | 6→6 | 없음 | 0.0 / 0.0 (`incomplete`, usage 없는 턴 1) | — | `cg-1cf34b825a1d` |
+| `DEMO-CL-normal-v1-d5460d69…` | `success` | 6 | 6→15 | 없음 | 16.35269 / 16.35269 | 9,800 | `cg-9bfd9889d4f8` |
+| `DEMO-CL-stall-v1-f08705fe…` | `max_steps` | 30 | 6→14 (최고 14) | 15, E6 | 126.5433 / 126.5433 | 25,527 | `cg-9bfd9889d4f8` |
+
+- 세 세션 모두 `git_commit 3908f5c`, `git_dirty: true` (DM-60 : PM 이 `demo-conditions.yaml` 을 바꾼 채 실행), `criteria_freeze.sha256 a5372f30…`
+- D-11 키 검사 : 요약 도구의 패턴 검사 셋 다 clean (이 검사를 한 창에 키 값이 없어 값 검사는 하지 않았다). 기존 규칙(`b755960` A-1-v4 와 같음)대로 `runs/demo/<세션>`·`logs/demo/<세션>.json` 을 `git add -f` 로 커밋한다
+
+**요약 도구 보완 (`tools/summarize_demo_session.py`)**
+
+- `error_results_by_tool` 이 `null` 이던 원인 : 실행기는 도구 이름을 `tool` 키에 남기는데 도구가 `name` 을 읽었다. `tool` 로 고치고 오류 요약별 수(`error_results_by_summary`)를 더했다
+- **step 4 의 `tool_execution_error` 2 건 (두 세션 모두)** : 기획(`planner`) 차례에 `src/duration.py` 를 고치려 했다 (정상판 `replace_in_file` 2 건, 교착판 `replace_in_file` 1 건 + `write_file` 1 건). 기획의 쓰기 경로는 `NOTES.md` 하나이고 실행기가 "Role is not authorized to edit this file" 로 거절했다. 쓰기 경로는 v8 사실 문장으로 고지된다. **역할 쓰기 범위 밖 쓰기의 정상 거절**이라 실행기는 고치지 않는다 (G0-6 기록대로 step `failed`, 사유 `tool_execution_error`)
+- 조건군 빈 필드는 결정 019 C-18-2 절의 표대로 나눠 보인다 (`condition_group_missing_by_class`). 정말 빠진 `closed_list_check` 는 실행기가 채운다

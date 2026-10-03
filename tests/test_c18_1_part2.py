@@ -156,7 +156,8 @@ class Flows(unittest.IsolatedAsyncioTestCase):
         self.assertIn(explanation["template_id"], ("E2", "E7"))
         self.stop = (stop["step_id"], explanation["template_id"], explanation["text"])
         # Step 8 writes step 2's file again (a revert); steps 9 and 10 change nothing. Reported in decision 020.
-        self.assertEqual(self.stop, (10, "E7", "최근 3 step 중 3 step은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다."))
+        # DM-61 ① (C-18-2): every step of the streak went back (o = n), so no "나머지" clause.
+        self.assertEqual(self.stop, (10, "E7", "최근 3 step 모두 이전 상태로 되돌아갔습니다."))
         # Observe mode: the session ran to max_steps after the STOP.
         self.assertEqual(summary["steps"], steps)
 

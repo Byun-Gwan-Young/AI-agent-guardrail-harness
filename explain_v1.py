@@ -36,6 +36,8 @@ TEMPLATES = {
 }
 # E6 for a dialogue (T1) task: the second sentence reports the status instead of tests.
 E6_DIALOGUE = "step {d}에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 처리 상태는 '{status}'입니다."
+# DM-61 ①: E7 when every step of the streak went back (o = n). "나머지는 변화가 없었습니다" is written only when o < n.
+E7_ALL = "최근 {n} step 모두 이전 상태로 되돌아갔습니다."
 # DM-50: a template is chosen only with all of its required values. Every other value of a template is auxiliary.
 # E1 is the last fallback and has none: it alone writes "(측정 안 됨)".
 FALLBACK = "E1"
@@ -191,6 +193,7 @@ def explain(signals, role_labels=None, status_labels=None):
         template = REDUCED[template_id]
     else:
         template = (E6_DIALOGUE if template_id == "E6" and signals.get("task_kind") == "dialogue"
+                    else E7_ALL if template_id == "E7" and values["o"] == values["n"]
                     else TEMPLATES[template_id])
     text = template.format_map({k: Slot(render(v)) for k, v in values.items()})
     return {"explanation_version": VERSION, "template_id": template_id, "text": text, "values": values,
