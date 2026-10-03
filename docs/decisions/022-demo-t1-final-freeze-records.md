@@ -134,3 +134,28 @@ C-18-1 교착판 기록의 첫 STOP 이 step 15 E6 (DM-62 문장 그대로).
   "step 3에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 '조사'입니다." `max_steps` 30
 - 판정 함수 단위 : MR 출처가 결과에 없음·보이지 않은 결과·행 부족·빈 값, 점유율 출처 1 개·같은 호스트 2 개·결과 밖 출처. LR 개수·중복·없는 버전·두 줄 요약,
   교착판 조건(결과에 이름이 있으면 통과), `escalated`
+
+## 파트 3 — 최종 동결 도구 (DM-33) `tools/final_freeze.py` (`demo-final-freeze-v1`)
+
+- 기록 파일 `docs/criteria/demo-final-freeze.json`. **이 단위에서는 만들지 않았다** (PM 이 T1 시험을 확인한 뒤 `create`). 지금 `check` 는 "기록 없음" 으로 실패한다
+- **담는 것**
+  - `deadlock-v0.3` 동결 (`criteria_freeze.freeze` : 구현 파일 3 개 해시 + 설명 템플릿 해시)과 데모 프록시 설정 두 개(관측·차단)의 판정 파라미터 해시
+  - 본 실행이 읽는 파일마다 sha256 : v0.3 구현 파일, 동결 기록 2 개 (`docs/criteria/deadlock-v0.3.json`, `explain-v1.json`), 데모 프록시 설정 2 개, `demo-conditions.yaml`,
+    본 실행 계획 `batch_plans/demo-main-v1.yaml`, 그리고 계획의 시나리오 11 개 각각의 시나리오 파일·판정 함수·`fixture_dir` 또는 `inputs_dir` 의 모든 파일
+    (`__pycache__`·`.pyc` 제외). 지금 체크아웃 기준 61 개 (CT-N 의 `scenario_assets/A-1` 포함)
+  - `sha256` = 위 내용 전체(시각·커밋 제외) 하나의 해시. 같은 내용이면 같은 값이다. 그리고 `created_at`, `git_commit`
+- **`create`** : 기록이 이미 있으면 거절 (최종 동결은 한 번, 다시 하려면 PM 결정). 계획의 시나리오가 11 개가 아니면 거절. 담을 파일 중 HEAD 와 다른 것(수정·추적 안 됨)이
+  있으면 목록을 알리고 거절 — 기록이 커밋된 내용을 가리키게. 기록 파일 자체는 PM 이 커밋한다
+- **`check`** : 지금 파일로 내용을 다시 계산해 기록과 비교. 다른 파일 (`changed` / `not in the record` = 계획이 읽는 폴더에 새 파일 / `no longer read by the plan or missing`),
+  동결·파라미터·시나리오 목록 차이를 모두 알린다. 하나라도 있거나 기록이 없으면 종료 코드 1
+- **배치 실행기** (`tools/run_batch.py`) : 계획 파일 키 `requires_final_freeze` (참/거짓, 없으면 거짓)를 더했다. 본 실행 계획 `demo-main-v1.yaml` 에 `true` 를 넣었다
+  (계획 sha256 이 바뀐다 — 본 실행 세션 0 개). 시험 계획은 키가 없어 지금처럼 돈다 (검사 함수를 부르지도 않는다, 테스트)
+  - 필요한 계획은 레인 시작 때와 **세션마다 시작 직전**에 `check` 를 돌리고, 실패하면 그 자리에서 레인을 멈춘다 (본 실행 중 파일이 바뀌면 다음 세션을 시작하지 않는다)
+  - 통과하면 기록 파일의 sha256 을 배치 항목 `final_freeze_sha256` 으로 실행기에 넘긴다 → `conditions.json` `batch.final_freeze_sha256` → 매니페스트 v0.7 `run.batch`
+    (필드는 v0.7 의 `run.batch` 안에 들어가므로 매니페스트 버전은 그대로). 레인 기록의 `lane_started`·`session` 줄에도 남긴다. `status` 출력에 `requires_final_freeze`
+- **실행기 변경** (`experiments/run_scenario.py`, 보고) : `--batch-item` 이 `final_freeze_sha256` (sha256 16 진 64 자)을 **선택 키**로 받는다. 기존 8 개 키는 그대로 필수다.
+  선택으로 둔 이유 : PM 의 CT·CT-N 시험 레인(이전 배치 실행기)이 이 키 없이 세션을 시작해도 거절되지 않게
+- 테스트 `tests/test_c18_3_part3.py` : 담는 범위(11 시나리오·판정 함수·자산·계획·설정·구현), 내용 해시 안정, 이 체크아웃은 기록 없음, 임시 git 저장소의 사본에서
+  `create`→`check` 통과·두 번째 `create` 거절·커밋 안 된 파일 거절·판정 함수/조건 파일/구현 파일 변경과 새 입력 파일·지운 파일을 모두 짚음, 배치 실행기
+  (검사 실패면 세션 0, 레인 중간 변경이면 다음 세션 전에 멈춤, 해시가 배치 항목·레인 기록에, 시험 계획은 검사 안 부름), 실행기 선택 키 검사,
+  실제 실행기·프록시로 레인 하나 (해시가 `conditions.json` 과 매니페스트 `run.batch` 에)

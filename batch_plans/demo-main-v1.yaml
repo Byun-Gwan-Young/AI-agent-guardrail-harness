@@ -1,9 +1,11 @@
 # C-19 본 실행 계획 (DM-6, DM-7, DM-63) : 관측 11 시나리오 × 5 = 55, 차단 교착판 5 × 3 = 15 (DEMO-CT-N 은 차단 없음), 합 70.
-# 최종 동결(DM-33) 뒤에 돌린다. DEMO-CS·MR·LR 시나리오 파일은 C-18-3 에서 만든다 (그 전에는 그 항목이 든 레인이 실행 전에 멈춘다).
+# 최종 동결(DM-33) 뒤에 돌린다. DEMO-CS·MR·LR 시나리오 파일은 C-18-3 에서 만들었다.
 # LR (academic_search) 은 one_at_a_time : 레인이 2 개 이상이면 마지막 레인이 LR 만 돈다 (DM-52 ④).
 # 실행 : tools/run_batch.py run --plan batch_plans/demo-main-v1.yaml --lane <k> --lanes <n>
+# 최종 동결 (C-18-3, DM-33) : requires_final_freeze 이므로 tools/final_freeze.py check 가 통과할 때만 세션을 시작한다 (기록 없으면 레인이 멈춘다).
 plan_version: demo-batch-plan-v1
 plan_id: demo-main-v1
+requires_final_freeze: true
 description: 데모 본 실행 — 관측 55 + 차단 15
 items:
 - {scenario: scenarios/DEMO-CL-normal-v1.yaml, mode: observe, repeats: [1, 2, 3, 4, 5]}

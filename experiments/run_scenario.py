@@ -89,6 +89,8 @@ ARTIFACT_CLOSED_LIST_CHECK = {'mode': 'after_receipt', 'decision': 'D-13', 'enum
 # C-18-2 (DM-63): a demo run may carry the PM's account label (never a key) and the batch plan item it ran for.
 ACCOUNT_LABEL_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-'
 BATCH_ITEM_KEYS = ('plan_id', 'plan_sha256', 'item', 'mode', 'repeat', 'lane', 'lanes', 'rerun_of')
+# C-18-3 (DM-33): a main-run item also carries the sha256 of the final freeze record it was checked against.
+OPTIONAL_BATCH_ITEM_KEYS = ('final_freeze_sha256',)
 
 
 def run_labels(args, demo_run):
@@ -106,8 +108,14 @@ def run_labels(args, demo_run):
             batch = json.loads(batch)
         except ValueError:
             raise ValueError('--batch-item must be a JSON object') from None
-        if not isinstance(batch, dict) or set(batch) != set(BATCH_ITEM_KEYS):
-            raise ValueError('--batch-item needs exactly ' + ', '.join(BATCH_ITEM_KEYS))
+        if not isinstance(batch, dict) or not set(BATCH_ITEM_KEYS) <= set(batch) \
+                or set(batch) - set(BATCH_ITEM_KEYS) - set(OPTIONAL_BATCH_ITEM_KEYS):
+            raise ValueError('--batch-item needs exactly ' + ', '.join(BATCH_ITEM_KEYS)
+                             + ' (and optionally ' + ', '.join(OPTIONAL_BATCH_ITEM_KEYS) + ')')
+        freeze = batch.get('final_freeze_sha256')
+        if 'final_freeze_sha256' in batch and not (isinstance(freeze, str) and len(freeze) == 64
+                                                    and set(freeze) <= set('0123456789abcdef')):
+            raise ValueError('--batch-item final_freeze_sha256 must be a sha256 hex string')
         if batch['mode'] not in ('observe', 'block') or batch['repeat'] != getattr(args, 'run_index', None):
             raise ValueError('--batch-item mode must be observe or block and its repeat the --run-index')
     return {'account_label': label, 'batch': batch}

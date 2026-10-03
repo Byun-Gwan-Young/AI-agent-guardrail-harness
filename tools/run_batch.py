@@ -15,6 +15,11 @@ conditions.json (batch) and ended other than runner_error. Done items are skippe
 again runs nothing twice. A runner_error or interrupted item is not run again unless --rerun-failed is given (the new
 run records rerun_of). Two runner_errors in a row stop the lane.
 
+Final freeze (C-18-3, DM-33): a plan with requires_final_freeze: true (the main plan) runs only while
+tools/final_freeze.py check passes, checked when the lane starts and again before each session; a missing record or
+any difference stops the lane before the session. The record file's sha256 goes into each session's batch item
+(conditions.json batch.final_freeze_sha256, manifest run.batch) and the lane record. Trial plans run as before.
+
 After each session tools/summarize_demo_session.py runs here (key scan with this window's keys) and one JSON line goes
 to runs/demo-batches/<plan id>/lane-<k>-of-<n>.jsonl; the runner's output goes to the .log beside it. A key found by
 the scan stops the lane. Key values are never printed or written; only the PM's --account-label is recorded.
@@ -42,7 +47,7 @@ from experiment_config import load_run_conditions  # noqa: E402
 from scenario_schema import load_scenario  # noqa: E402
 
 PLAN_VERSION = 'demo-batch-plan-v1'
-PLAN_KEYS = {'plan_version', 'plan_id', 'description', 'items'}
+PLAN_KEYS = {'plan_version', 'plan_id', 'description', 'items', 'requires_final_freeze'}
 ITEM_KEYS = {'scenario', 'mode', 'repeats', 'one_at_a_time'}
 MODES = ('observe', 'block')
 ID_CHARS = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.-')
@@ -106,7 +111,11 @@ def load_plan(path):
     keys = [i.key for i in items]
     if not items or len(set(keys)) != len(keys):
         raise ValueError('A plan lists at least one session and each scenario, mode and repeat once')
-    return {'plan_id': plan_id, 'plan_sha256': hashlib.sha256(raw).hexdigest(), 'path': str(path), 'items': items}
+    requires_freeze = data.get('requires_final_freeze', False)
+    if type(requires_freeze) is not bool:
+        raise ValueError('requires_final_freeze must be true or false')
+    return {'plan_id': plan_id, 'plan_sha256': hashlib.sha256(raw).hexdigest(), 'path': str(path), 'items': items,
+            'requires_final_freeze': requires_freeze}
 
 
 def lane_items(plan, lane, lanes):
@@ -194,10 +203,12 @@ def required_keys(scenario):
     return [KMU_KEY] + ([SEARCH_KEY] if 'web_search' in tools else [])
 
 
-def command(item, scenario, proxy_url, plan, lane, lanes, account_label, rerun_of=None):
+def command(item, scenario, proxy_url, plan, lane, lanes, account_label, rerun_of=None, final_freeze=None):
     contract = DIALOGUE_CONTRACT if scenario.task_kind == 'dialogue' else scenario.output_contract
     batch = {'plan_id': plan['plan_id'], 'plan_sha256': plan['plan_sha256'], 'item': item.key, 'mode': item.mode,
              'repeat': item.repeat, 'lane': lane, 'lanes': lanes, 'rerun_of': rerun_of}
+    if final_freeze is not None:
+        batch['final_freeze_sha256'] = final_freeze
     args = [sys.executable, 'experiments/run_scenario.py', item.scenario, '--phase', 'demo',
             '--runner-protocol', PROTOCOL_V10, '--output-contract', contract, '--collection-policy', INDEPENDENT,
             '--api-key-env', KMU_KEY, '--proxy-url', proxy_url, '--run-index', str(item.repeat),
@@ -233,6 +244,11 @@ def short_summary(folder, summarize):
             'key_scan_clean': s['key_scan']['clean'], 'key_values_checked': s['key_scan']['key_values_checked']}
 
 
+def default_freeze_check():
+    from tools.final_freeze import check
+    return check()
+
+
 def default_summarize(folder):
     from tools.summarize_demo_session import summarize
     return summarize(folder)
@@ -240,7 +256,7 @@ def default_summarize(folder):
 
 def run_lane(plan, lane, lanes, *, proxies=None, account_label=None, rerun_failed=False, runner=run_subprocess,
              get=proxy_conditions, summarize=default_summarize, runs_root=DEMO_RUNS, records_root=RECORDS_ROOT,
-             environ=None, root=ROOT, out=print):
+             environ=None, root=ROOT, out=print, freeze_check=default_freeze_check):
     """Runs one lane to its end or to a stop. Returns what happened (also written to the lane record)."""
     proxies = {**DEFAULT_PROXIES, **(proxies or {})}
     environ = os.environ if environ is None else environ
@@ -275,7 +291,22 @@ def run_lane(plan, lane, lanes, *, proxies=None, account_label=None, rerun_faile
     missing = sorted({k for s in scenarios.values() for k in required_keys(s) if not environ.get(k)})
     if missing:
         return stop('not set in this window: ' + ', '.join(missing))
-    write({'event': 'lane_started', 'items': [i.key for i in items], 'account_label': account_label})
+
+    def freeze_problem():
+        """(record file sha256, None) when the final freeze holds, (None, reason) otherwise; (None, None) for a plan
+        that does not require it."""
+        if not plan.get('requires_final_freeze'):
+            return None, None
+        result = freeze_check()
+        if not result['ok']:
+            return None, 'final freeze check failed: ' + '; '.join(result['differences'][:5])
+        return result['record_file_sha256'], None
+
+    final_freeze, problem = freeze_problem()
+    if problem:
+        return stop(problem)
+    write({'event': 'lane_started', 'items': [i.key for i in items], 'account_label': account_label,
+           'final_freeze_sha256': final_freeze})
     out(f'lane {lane}/{lanes}: {len(items)} items, plan {plan["plan_id"]}')
     errors_in_row = 0
     for item in items:
@@ -293,17 +324,21 @@ def run_lane(plan, lane, lanes, *, proxies=None, account_label=None, rerun_faile
             problems = [f'cannot read {url}/conditions: {type(error).__name__}']
         if problems:
             return stop(f'{item.key}: ' + '; '.join(problems))
+        final_freeze, problem = freeze_problem()
+        if problem:
+            return stop(f'{item.key}: ' + problem)
         rerun_of = sessions[-1]['session_id'] if sessions else None
         out(f'  run {item.key} -> {url}')
         with log_path.open('a', encoding='utf-8') as log:
             log.write(f'=== {now()} {item.key}\n')
-            code, session_id = runner(command(item, scenario, url, plan, lane, lanes, account_label, rerun_of), log)
+            code, session_id = runner(command(item, scenario, url, plan, lane, lanes, account_label, rerun_of,
+                                              final_freeze), log)
         session_folder = Path(runs_root) / session_id if session_id else None
         finished = session_folder is not None and (session_folder / 'summary.json').exists()
         termination = (json.loads((session_folder / 'summary.json').read_text(encoding='utf-8'))
                        ['termination_reason'] if finished else RUNNER_ERROR)
         entry = {'event': 'session', 'item': item.key, 'rerun_of': rerun_of, 'exit_code': code,
-                 'session_id': session_id, 'termination_reason': termination}
+                 'session_id': session_id, 'termination_reason': termination, 'final_freeze_sha256': final_freeze}
         if finished:
             try:
                 entry['summary'] = short_summary(session_folder, summarize)
@@ -327,7 +362,8 @@ def run_lane(plan, lane, lanes, *, proxies=None, account_label=None, rerun_faile
 def status(plan, lanes, runs_root=DEMO_RUNS):
     """Plan against session folders, lane by lane: done, failed, interrupted, pending, and how sessions ended."""
     found = plan_sessions(plan, runs_root)
-    report = {'plan_id': plan['plan_id'], 'plan_sha256': plan['plan_sha256'], 'lanes': {}, 'total': Counter()}
+    report = {'plan_id': plan['plan_id'], 'plan_sha256': plan['plan_sha256'], 'lanes': {}, 'total': Counter(),
+              'requires_final_freeze': plan.get('requires_final_freeze', False)}
     for lane in range(1, lanes + 1):
         rows = {'done': [], 'failed': [], 'interrupted': [], 'pending': []}
         endings = Counter()
