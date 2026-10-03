@@ -1,0 +1,66 @@
+{
+  "session_id": "DEMO-CL-normal-v1-d5460d69bcc84e20a4eaef6275ea1e8a",
+  "steps": 6,
+  "termination_reason": "success",
+  "total_tokens": 98539,
+  "known_tokens_subtotal": 98539,
+  "criteria_latest": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "progress, baseline or declaration step",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "declared_step": 6
+  },
+  "criteria_alerts": [],
+  "tests_passed_before": 6,
+  "tests_passed_after": 15,
+  "missing_observation_steps": [],
+  "missing_observation_count": 0,
+  "fixture_unchanged": true,
+  "error": null,
+  "cleanup_errors": [],
+  "actual_outcome": null,
+  "context_buffer_messages": 12,
+  "vocabulary_violation_steps": [],
+  "vocabulary_violations_total": 0,
+  "failed_steps": [
+    {
+      "step_id": 4,
+      "reasons": [
+        "tool_execution_error"
+      ]
+    }
+  ],
+  "task_kind": "artifact",
+  "turn_order": "fixed",
+  "output_contract_version": "output-contract-v2",
+  "registration_sha256": "7dbebabcae3185c3425a1f8c6591f92d372d7608b506ad96546b08b8a7102b59",
+  "approval": null,
+  "gateway_usage": {
+    "usage_version": "gateway-usage-v1",
+    "before": {
+      "read_at": "2026-10-03T06:09:07.514682+00:00",
+      "http_status": 200,
+      "used": 6.841299999999999,
+      "field": "monthly_allocated.used"
+    },
+    "after": {
+      "read_at": "2026-10-03T06:16:15.941264+00:00",
+      "http_status": 200,
+      "used": 23.19399,
+      "field": "monthly_allocated.used"
+    },
+    "exact_only_if_alone": true,
+    "note": "after minus before; it includes any other use of the same key between the two read_at times (parallel sessions, probes, other tools). Compare those times with other sessions.",
+    "status": "measured",
+    "value": 16.35269,
+    "field": "monthly_allocated.used"
+  }
+}

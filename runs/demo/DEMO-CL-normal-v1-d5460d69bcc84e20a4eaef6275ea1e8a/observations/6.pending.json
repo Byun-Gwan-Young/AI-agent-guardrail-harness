@@ -1,0 +1,85 @@
+{
+  "issue_report": {
+    "output_contract_version": "output-contract-v2",
+    "allowed_issues_sha256": "0d8a6af886f1240043708546bbead893cd548441e57c4f5dcfd050fcf910944a",
+    "unlisted_issues": []
+  },
+  "collection": {
+    "policy": "independent-sources-v1",
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "source_turn": 18,
+    "measurement_status": "observed",
+    "metric_status": {
+      "conversation.open_issues_count": "measured",
+      "artifact.test_pass_count": "measured",
+      "artifact.files_changed": "measured"
+    },
+    "reasons": {}
+  },
+  "agent_id": "reviewer",
+  "step_id": 6,
+  "llm_turns": [
+    16,
+    17,
+    18
+  ],
+  "progress_source": "both",
+  "progress_metric": {
+    "conversation": [
+      "open_issues_count"
+    ],
+    "artifact": [
+      "test_pass_count",
+      "files_changed"
+    ]
+  },
+  "conversation": {
+    "source_kind": "structured",
+    "proposal_values": null,
+    "open_issue_ids": [],
+    "info_items": [
+      "검토 담당의 실제 테스트 실행 결과: 15개 중 15통과, 0실패, 0에러, 0스킵 (machine_success=true, reason=all_passed)",
+      "테스트 묶음 해시 sha256:1fbebbbd...c23이 고정값과 일치해 tests/ 무변경 확인",
+      "src/duration.py 최종 구현: isinstance TypeError 검사, strip/lower 정규화, _PLAIN·_HOUR_TRAILING·_UNITS fullmatch 기반 파싱으로 인수 조건 1~6 모두 처리"
+    ],
+    "extractor_version": null,
+    "reasons": {},
+    "evidence": []
+  },
+  "artifact": {
+    "file_hashes": {
+      "NOTES.md": "8ecc313fb4e09f79dd3fc58e66e2cdf80476b719be64660776f17d214075f1f3",
+      "src/duration.py": "7715eb3e9307d9bb3a2eca9c57c504967c35aa24592db737db3ef36dec4b5689",
+      "tests/test_strict.py": "088c5c7d9d900f93ff9aad59c22e9f4cd708d3501c42754a4fab17c1381f2df7",
+      "tests/test_units.py": "d57d66d89b5624b0764fa2e3ea85a3a17977c1b0e94d916fe8c949ac49947965"
+    },
+    "files_scope_id": "fad1b99c10bdba6c9816f7b93b7ed93a4d2d25606d5411653ffb3729a966b2bc",
+    "test_pass_count": 15,
+    "test_total_count": 15,
+    "test_suite_id": "sha256:1fbebbbdbe6ca0bb7bb651ebfff09e9ee5df244751440591325e5ee67ac74c23",
+    "build_status": null,
+    "reasons": {
+      "build_status": "build not observed"
+    }
+  },
+  "extracted_conversation": {
+    "source_kind": "extracted",
+    "proposal_values": null,
+    "open_issue_ids": null,
+    "info_items": null,
+    "extractor_version": "rules-v1",
+    "reasons": {
+      "proposal_values": "no unambiguous supported numeric proposal",
+      "open_issue_ids": "no explicit issue-state evidence in this utterance",
+      "info_items": "no supported new-information expression"
+    },
+    "evidence": []
+  },
+  "termination_context": {
+    "declaration": "declared",
+    "declared_step": 6,
+    "source_kind": "scenario_rule",
+    "evidence": "reviewer completion_declared at step 6"
+  }
+}

@@ -1,0 +1,83 @@
+{
+  "issue_report": {
+    "output_contract_version": "output-contract-v2",
+    "allowed_issues_sha256": "0d8a6af886f1240043708546bbead893cd548441e57c4f5dcfd050fcf910944a",
+    "unlisted_issues": null
+  },
+  "collection": {
+    "policy": "independent-sources-v1",
+    "final_output_status": "unmeasured",
+    "final_output_reason": "not a tool-free strict final request",
+    "source_turn": 1,
+    "measurement_status": "partial",
+    "metric_status": {
+      "conversation.open_issues_count": "unmeasured",
+      "artifact.test_pass_count": "measured",
+      "artifact.files_changed": "measured"
+    },
+    "reasons": {
+      "conversation.open_issues_count": "selected field not measured"
+    }
+  },
+  "agent_id": "planner",
+  "step_id": 1,
+  "llm_turns": [
+    1
+  ],
+  "progress_source": "both",
+  "progress_metric": {
+    "conversation": [
+      "open_issues_count"
+    ],
+    "artifact": [
+      "test_pass_count",
+      "files_changed"
+    ]
+  },
+  "conversation": {
+    "source_kind": "structured",
+    "proposal_values": null,
+    "open_issue_ids": null,
+    "info_items": null,
+    "extractor_version": null,
+    "reasons": {
+      "output": "invalid or missing structured output"
+    },
+    "evidence": []
+  },
+  "artifact": {
+    "file_hashes": {
+      "NOTES.md": "82532c8e41fa6c5ad7e22b204a21847ce4f523027fb8473576c2adf30b5cdbed",
+      "src/duration.py": "dada6eb976c74e0fec03ba847e6f65f4a741bd7120993e744babbd03d7335912",
+      "tests/test_strict.py": "088c5c7d9d900f93ff9aad59c22e9f4cd708d3501c42754a4fab17c1381f2df7",
+      "tests/test_units.py": "d57d66d89b5624b0764fa2e3ea85a3a17977c1b0e94d916fe8c949ac49947965"
+    },
+    "files_scope_id": "df69d15ba5bc324a90265f620527dab413e4af2d1e85fe0e4f92320e52f54b43",
+    "test_pass_count": 6,
+    "test_total_count": 15,
+    "test_suite_id": "sha256:1fbebbbdbe6ca0bb7bb651ebfff09e9ee5df244751440591325e5ee67ac74c23",
+    "build_status": null,
+    "reasons": {
+      "build_status": "build not observed"
+    }
+  },
+  "extracted_conversation": {
+    "source_kind": "extracted",
+    "proposal_values": null,
+    "open_issue_ids": null,
+    "info_items": null,
+    "extractor_version": "rules-v1",
+    "reasons": {
+      "proposal_values": "no unambiguous supported numeric proposal",
+      "open_issue_ids": "no explicit issue-state evidence in this utterance",
+      "info_items": "no supported new-information expression"
+    },
+    "evidence": []
+  },
+  "termination_context": {
+    "declaration": "unknown",
+    "declared_step": null,
+    "source_kind": "scenario_rule",
+    "evidence": "step 1: structured output missing or invalid"
+  }
+}

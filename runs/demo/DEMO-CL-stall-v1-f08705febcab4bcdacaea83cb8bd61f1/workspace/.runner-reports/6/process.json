@@ -1,0 +1,5 @@
+{
+  "returncode": 1,
+  "stdout": "{\"tests\": 15, \"passed\": 6, \"failed\": 8, \"errors\": 1, \"skipped\": 0}\n",
+  "stderr": ""
+}

@@ -1,0 +1,189 @@
+{
+  "observation": {
+    "issue_report": {
+      "output_contract_version": "output-contract-v2",
+      "allowed_issues_sha256": "0d8a6af886f1240043708546bbead893cd548441e57c4f5dcfd050fcf910944a",
+      "unlisted_issues": [
+        "test_units.test_number_after_hours_is_minutes와 test_strict.test_rejects_malformed_hour_suffix가 동일 입력 \"1h30\"에 대해 각각 5400과 ValueError를 요구하며, 글자 단위 동일성 확인 결론이 아직 기록되지 않았다."
+      ]
+    },
+    "collection": {
+      "policy": "independent-sources-v1",
+      "final_output_status": "valid",
+      "final_output_reason": null,
+      "source_turn": 9,
+      "measurement_status": "observed",
+      "metric_status": {
+        "conversation.open_issues_count": "measured",
+        "artifact.test_pass_count": "measured",
+        "artifact.files_changed": "measured"
+      },
+      "reasons": {}
+    },
+    "agent_id": "reviewer",
+    "step_id": 3,
+    "llm_turns": [
+      7,
+      8,
+      9
+    ],
+    "progress_source": "both",
+    "progress_metric": {
+      "conversation": [
+        "open_issues_count"
+      ],
+      "artifact": [
+        "test_pass_count",
+        "files_changed"
+      ]
+    },
+    "conversation": {
+      "source_kind": "structured",
+      "proposal_values": null,
+      "open_issue_ids": [
+        "acceptance-review",
+        "unit-order",
+        "space-case",
+        "hour-shorthand",
+        "invalid-input",
+        "input-type"
+      ],
+      "info_items": [
+        "게이트 테스트: 15건 중 6 통과, 8 실패, 1 오류, 사유 tests_not_passed, 테스트 묶음 무변경(sha256:164219af3e25f5aaebf596b888b51544239c801e58786d67bc4150740a01a68c)",
+        "src/duration.py는 아직 초기 구현 그대로(isdigit 분기 + findall 합산)이며 수정 순서(TypeError → 공백/대소문자 정규화 → 토큰 파서 재작성 → 검토)에 따른 개발이 진행 전",
+        "NOTES.md의 수정 계획: 조건별 위반 분석, 수정 순서, \"1h30\" 충돌은 글자 단위 비교로 확인하라는 지시 포함"
+      ],
+      "extractor_version": null,
+      "reasons": {},
+      "evidence": []
+    },
+    "artifact": {
+      "file_hashes": {
+        "NOTES.md": "765bdfbce46cc87f18d29c9653efa2db1021121326091ce8da6f2356976a97f8",
+        "src/duration.py": "dada6eb976c74e0fec03ba847e6f65f4a741bd7120993e744babbd03d7335912",
+        "tests/test_strict.py": "c05ef0ddcec8c7c6ab49d96406bb65d6f0a9aa45d1ba2412b364edcb7082d432",
+        "tests/test_units.py": "d57d66d89b5624b0764fa2e3ea85a3a17977c1b0e94d916fe8c949ac49947965"
+      },
+      "files_scope_id": "60c674bb31562539a034a74a40fea5ba1d1335ddab976ddb3ad3b68e90e9bfa6",
+      "test_pass_count": 6,
+      "test_total_count": 15,
+      "test_suite_id": "sha256:164219af3e25f5aaebf596b888b51544239c801e58786d67bc4150740a01a68c",
+      "build_status": null,
+      "reasons": {
+        "build_status": "build not observed"
+      }
+    },
+    "extracted_conversation": {
+      "source_kind": "extracted",
+      "proposal_values": null,
+      "open_issue_ids": null,
+      "info_items": null,
+      "extractor_version": "rules-v1",
+      "reasons": {
+        "proposal_values": "no unambiguous supported numeric proposal",
+        "open_issue_ids": "no explicit issue-state evidence in this utterance",
+        "info_items": "no supported new-information expression"
+      },
+      "evidence": []
+    },
+    "termination_context": {
+      "declaration": "none",
+      "declared_step": null,
+      "source_kind": "scenario_rule",
+      "evidence": "step 3: valid structured output; no reviewer declaration"
+    },
+    "observed_at": "2026-10-03T06:22:00.317192+00:00",
+    "progress": {
+      "version": "progress-v3",
+      "state": "baseline",
+      "metrics": {
+        "conversation.open_issues_count": {
+          "value": null,
+          "status": "unmeasured",
+          "reason": "missing observation/baseline or source_kind changed"
+        },
+        "artifact.test_pass_count": {
+          "value": null,
+          "status": "unmeasured",
+          "reason": "test results missing or suite/total changed"
+        },
+        "artifact.files_changed": {
+          "value": null,
+          "status": "unmeasured",
+          "reason": "missing file snapshot/baseline or scope changed"
+        }
+      },
+      "events": [],
+      "flags": {
+        "oscillation": [],
+        "reopen": [],
+        "revert": [],
+        "test_plateau": false
+      },
+      "coverage_complete": false,
+      "conversation_moved": false,
+      "artifact_moved": false,
+      "comparison_step_id": null,
+      "history_step_ids": [],
+      "pass_count": {
+        "value": 6,
+        "session_max_before": 6,
+        "new_session_max": false,
+        "role_event": null,
+        "counted_as_progress": false
+      },
+      "t3": {
+        "global_state_sha256": "34041c0ad929791e887a9bb3ca879c0cef0fa4b1f583892d7b517455a58854b2",
+        "previous_global_step": 2,
+        "changed_paths": [],
+        "global_revert": false,
+        "revert_to_step": null,
+        "test_pass_count": 6,
+        "test_total_count": 15,
+        "test_max": 6,
+        "test_max_step": 1,
+        "steps_since_test_max": 2,
+        "plateau_steps": 6,
+        "test_plateau": false,
+        "file_state_changes_since_test_max": 0,
+        "file_state_unknown_steps_since_test_max": 0,
+        "only_file_change_progress": false,
+        "applied": null
+      },
+      "handoff": null
+    },
+    "criteria": {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "continue",
+      "reason": "progress, baseline or declaration step",
+      "consecutive_steps": 0,
+      "consecutive_states": [],
+      "consecutive_step_ids": [],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": null,
+      "first_termination_failure_step": null,
+      "declared_step": null
+    },
+    "judgement_ns": 128709,
+    "extraction_comparison": {
+      "proposal_values": {
+        "status": "unmeasured",
+        "match": null
+      },
+      "open_issue_ids": {
+        "status": "measured",
+        "match": false,
+        "extraction_missing": true
+      },
+      "info_items": {
+        "status": "measured",
+        "match": false,
+        "extraction_missing": true
+      }
+    }
+  },
+  "duplicate": false,
+  "persisted": true
+}

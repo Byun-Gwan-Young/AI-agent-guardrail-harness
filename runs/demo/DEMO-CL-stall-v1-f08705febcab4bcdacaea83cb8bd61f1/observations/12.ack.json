@@ -1,0 +1,189 @@
+{
+  "observation": {
+    "issue_report": {
+      "output_contract_version": "output-contract-v2",
+      "allowed_issues_sha256": "0d8a6af886f1240043708546bbead893cd548441e57c4f5dcfd050fcf910944a",
+      "unlisted_issues": []
+    },
+    "collection": {
+      "policy": "independent-sources-v1",
+      "final_output_status": "valid",
+      "final_output_reason": null,
+      "source_turn": 34,
+      "measurement_status": "observed",
+      "metric_status": {
+        "conversation.open_issues_count": "measured",
+        "artifact.test_pass_count": "measured",
+        "artifact.files_changed": "measured"
+      },
+      "reasons": {}
+    },
+    "agent_id": "reviewer",
+    "step_id": 12,
+    "llm_turns": [
+      33,
+      34
+    ],
+    "progress_source": "both",
+    "progress_metric": {
+      "conversation": [
+        "open_issues_count"
+      ],
+      "artifact": [
+        "test_pass_count",
+        "files_changed"
+      ]
+    },
+    "conversation": {
+      "source_kind": "structured",
+      "proposal_values": null,
+      "open_issue_ids": [],
+      "info_items": [
+        "게이트 테스트 실측 확정: 15건 중 14 통과, 1 실패, 0 오류, 테스트 묶음 무변경(sha256:164219af3e25f5aaebf596b888b51544239c801e58786d67bc4150740a01a68c)",
+        "ACCEPTANCE.md 조건 1~6 대응 테스트는 모두 실제 실행으로 통과; 유일 실패는 동일 리터럴 \"1h30\"에 5400과 ValueError를 동시 요구하는 고정 테스트 묶음의 내부 모순(글자 단위 비교로 확정, 숨은 유니코드 없음)",
+        "구현은 ACCEPTANCE.md 조건 4(\"1h30\"==5400)를 준수하도록 선택했고 모순과 선택 근거를 src/duration.py docstring에 기록"
+      ],
+      "extractor_version": null,
+      "reasons": {},
+      "evidence": []
+    },
+    "artifact": {
+      "file_hashes": {
+        "NOTES.md": "4cfd9710e2d696a16da8f977db9a7ff33f7071edbab10a1930d4ac4265aa669b",
+        "src/duration.py": "ee67bb0716deb91d73cba99d3ff5797fb5b01cdd923de0dcc73ed069ba754d13",
+        "tests/test_strict.py": "c05ef0ddcec8c7c6ab49d96406bb65d6f0a9aa45d1ba2412b364edcb7082d432",
+        "tests/test_units.py": "d57d66d89b5624b0764fa2e3ea85a3a17977c1b0e94d916fe8c949ac49947965"
+      },
+      "files_scope_id": "60c674bb31562539a034a74a40fea5ba1d1335ddab976ddb3ad3b68e90e9bfa6",
+      "test_pass_count": 14,
+      "test_total_count": 15,
+      "test_suite_id": "sha256:164219af3e25f5aaebf596b888b51544239c801e58786d67bc4150740a01a68c",
+      "build_status": null,
+      "reasons": {
+        "build_status": "build not observed"
+      }
+    },
+    "extracted_conversation": {
+      "source_kind": "extracted",
+      "proposal_values": null,
+      "open_issue_ids": null,
+      "info_items": null,
+      "extractor_version": "rules-v1",
+      "reasons": {
+        "proposal_values": "no unambiguous supported numeric proposal",
+        "open_issue_ids": "no explicit issue-state evidence in this utterance",
+        "info_items": "no supported new-information expression"
+      },
+      "evidence": []
+    },
+    "termination_context": {
+      "declaration": "declared",
+      "declared_step": 12,
+      "source_kind": "scenario_rule",
+      "evidence": "reviewer completion_declared at step 12"
+    },
+    "observed_at": "2026-10-03T06:32:20.589442+00:00",
+    "progress": {
+      "version": "progress-v3",
+      "state": "progress",
+      "metrics": {
+        "conversation.open_issues_count": {
+          "value": {
+            "count": 0,
+            "delta": -1
+          },
+          "status": "measured"
+        },
+        "artifact.test_pass_count": {
+          "value": 0,
+          "status": "measured"
+        },
+        "artifact.files_changed": {
+          "value": [],
+          "status": "measured"
+        }
+      },
+      "events": [
+        {
+          "metric": "conversation.open_issues_count",
+          "item": "acceptance-review",
+          "kind": "closed"
+        }
+      ],
+      "flags": {
+        "oscillation": [],
+        "reopen": [],
+        "revert": [],
+        "test_plateau": false
+      },
+      "coverage_complete": true,
+      "conversation_moved": true,
+      "artifact_moved": false,
+      "comparison_step_id": 9,
+      "history_step_ids": [
+        3,
+        6,
+        9
+      ],
+      "pass_count": {
+        "value": 14,
+        "session_max_before": 14,
+        "new_session_max": false,
+        "role_event": null,
+        "counted_as_progress": false
+      },
+      "t3": {
+        "global_state_sha256": "3b5d012dbd721d31d2ba39b95f858bbafa6ea959b50413b37a3cba8678c73def",
+        "previous_global_step": 11,
+        "changed_paths": [],
+        "global_revert": false,
+        "revert_to_step": null,
+        "test_pass_count": 14,
+        "test_total_count": 15,
+        "test_max": 14,
+        "test_max_step": 5,
+        "steps_since_test_max": 7,
+        "plateau_steps": 6,
+        "test_plateau": true,
+        "file_state_changes_since_test_max": 1,
+        "file_state_unknown_steps_since_test_max": 0,
+        "only_file_change_progress": false,
+        "applied": null
+      },
+      "handoff": null
+    },
+    "criteria": {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "continue",
+      "reason": "progress, baseline or declaration step",
+      "consecutive_steps": 0,
+      "consecutive_states": [],
+      "consecutive_step_ids": [],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": null,
+      "first_termination_failure_step": null,
+      "declared_step": 12
+    },
+    "judgement_ns": 187208,
+    "extraction_comparison": {
+      "proposal_values": {
+        "status": "unmeasured",
+        "match": null
+      },
+      "open_issue_ids": {
+        "status": "measured",
+        "match": false,
+        "extraction_missing": true
+      },
+      "info_items": {
+        "status": "measured",
+        "match": false,
+        "extraction_missing": true
+      }
+    }
+  },
+  "duplicate": false,
+  "persisted": true
+}

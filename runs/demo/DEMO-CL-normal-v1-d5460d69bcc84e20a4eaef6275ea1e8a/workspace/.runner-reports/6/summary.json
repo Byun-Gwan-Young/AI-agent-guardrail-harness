@@ -1,0 +1,69 @@
+{
+  "tests": 15,
+  "passed": 1,
+  "failed": 0,
+  "errors": 14,
+  "skipped": 0,
+  "cases": [
+    {
+      "name": "test_strict.DurationRejects.test_rejects_empty",
+      "status": "error"
+    },
+    {
+      "name": "test_strict.DurationRejects.test_rejects_malformed_hour_suffix",
+      "status": "error"
+    },
+    {
+      "name": "test_strict.DurationRejects.test_rejects_non_string",
+      "status": "error"
+    },
+    {
+      "name": "test_strict.DurationRejects.test_rejects_repeated_unit",
+      "status": "error"
+    },
+    {
+      "name": "test_strict.DurationRejects.test_rejects_sign",
+      "status": "error"
+    },
+    {
+      "name": "test_strict.DurationRejects.test_rejects_unit_without_number",
+      "status": "error"
+    },
+    {
+      "name": "test_strict.DurationRejects.test_rejects_units_out_of_order",
+      "status": "error"
+    },
+    {
+      "name": "test_units.DurationUnits.test_bare_number_is_seconds",
+      "status": "passed"
+    },
+    {
+      "name": "test_units.DurationUnits.test_hours_and_minutes",
+      "status": "error"
+    },
+    {
+      "name": "test_units.DurationUnits.test_minutes_and_seconds",
+      "status": "error"
+    },
+    {
+      "name": "test_units.DurationUnits.test_number_after_hours_is_minutes",
+      "status": "error"
+    },
+    {
+      "name": "test_units.DurationUnits.test_seconds_unit",
+      "status": "error"
+    },
+    {
+      "name": "test_units.DurationUnits.test_surrounding_spaces",
+      "status": "error"
+    },
+    {
+      "name": "test_units.DurationUnits.test_uppercase_unit",
+      "status": "error"
+    },
+    {
+      "name": "test_units.DurationUnits.test_zero",
+      "status": "error"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+[
+  {
+    "step_id": 1,
+    "agent": "planner",
+    "llm_turns": [
+      1
+    ],
+    "prompt_tokens_per_call": [
+      null
+    ],
+    "prompt_tokens_sum": null,
+    "known_prompt_tokens_subtotal": 0,
+    "seed_audit": [
+      {
+        "requested_seed": null,
+        "forwarded_seed": null,
+        "forwarded": false,
+        "response_status": 400,
+        "request_succeeded": false,
+        "model_applied_seed": null,
+        "note": "Forwarded body and HTTP outcome only; success does not prove seed was applied"
+      }
+    ]
+  }
+]

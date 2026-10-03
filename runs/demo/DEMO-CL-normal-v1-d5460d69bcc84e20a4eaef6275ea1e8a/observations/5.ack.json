@@ -1,0 +1,221 @@
+{
+  "observation": {
+    "issue_report": {
+      "output_contract_version": "output-contract-v2",
+      "allowed_issues_sha256": "0d8a6af886f1240043708546bbead893cd548441e57c4f5dcfd050fcf910944a",
+      "unlisted_issues": []
+    },
+    "collection": {
+      "policy": "independent-sources-v1",
+      "final_output_status": "valid",
+      "final_output_reason": null,
+      "source_turn": 15,
+      "measurement_status": "observed",
+      "metric_status": {
+        "conversation.open_issues_count": "measured",
+        "artifact.test_pass_count": "measured",
+        "artifact.files_changed": "measured"
+      },
+      "reasons": {}
+    },
+    "agent_id": "developer",
+    "step_id": 5,
+    "llm_turns": [
+      13,
+      14,
+      15
+    ],
+    "progress_source": "both",
+    "progress_metric": {
+      "conversation": [
+        "open_issues_count"
+      ],
+      "artifact": [
+        "test_pass_count",
+        "files_changed"
+      ]
+    },
+    "conversation": {
+      "source_kind": "structured",
+      "proposal_values": null,
+      "open_issue_ids": [
+        "acceptance-review"
+      ],
+      "info_items": [
+        "최신 게이트 실행: 15개 중 1통과(test_bare_number_is_seconds), 14에러, reason: tests_not_passed (machine_success=false)",
+        "테스트 묶음 해시 sha256:1fbebbbdbe6ca0bb7bb651ebfff09e9ee5df244751440591325e5ee67ac74c23 가 고정값과 일치해 무변경으로 확인됨",
+        "개발 담당이 parse_duration 본문을 TypeError 검사, strip/lower 정규화, _HOUR_TRAILING·_PLAIN·_UNITS fullmatch 기반으로 재작성해 조건 1~6을 코드상 모두 구현함",
+        "NOTES.md에는 조건 6→2→1·3·4→5 순서의 수정 계획이 기록되어 있어 requirements 이슈는 해소된 상태",
+        "이번 편집 후 테스트 재실행과 검토 담당의 인수 확인이 아직 이루어지지 않음"
+      ],
+      "extractor_version": null,
+      "reasons": {},
+      "evidence": []
+    },
+    "artifact": {
+      "file_hashes": {
+        "NOTES.md": "8ecc313fb4e09f79dd3fc58e66e2cdf80476b719be64660776f17d214075f1f3",
+        "src/duration.py": "7715eb3e9307d9bb3a2eca9c57c504967c35aa24592db737db3ef36dec4b5689",
+        "tests/test_strict.py": "088c5c7d9d900f93ff9aad59c22e9f4cd708d3501c42754a4fab17c1381f2df7",
+        "tests/test_units.py": "d57d66d89b5624b0764fa2e3ea85a3a17977c1b0e94d916fe8c949ac49947965"
+      },
+      "files_scope_id": "fad1b99c10bdba6c9816f7b93b7ed93a4d2d25606d5411653ffb3729a966b2bc",
+      "test_pass_count": 15,
+      "test_total_count": 15,
+      "test_suite_id": "sha256:1fbebbbdbe6ca0bb7bb651ebfff09e9ee5df244751440591325e5ee67ac74c23",
+      "build_status": null,
+      "reasons": {
+        "build_status": "build not observed"
+      }
+    },
+    "extracted_conversation": {
+      "source_kind": "extracted",
+      "proposal_values": null,
+      "open_issue_ids": null,
+      "info_items": null,
+      "extractor_version": "rules-v1",
+      "reasons": {
+        "proposal_values": "no unambiguous supported numeric proposal",
+        "open_issue_ids": "no explicit issue-state evidence in this utterance",
+        "info_items": "no supported new-information expression"
+      },
+      "evidence": []
+    },
+    "termination_context": {
+      "declaration": "none",
+      "declared_step": null,
+      "source_kind": "scenario_rule",
+      "evidence": "step 5: valid structured output; no reviewer declaration"
+    },
+    "observed_at": "2026-10-03T06:15:43.902498+00:00",
+    "progress": {
+      "version": "progress-v3",
+      "state": "progress",
+      "metrics": {
+        "conversation.open_issues_count": {
+          "value": {
+            "count": 1,
+            "delta": -4
+          },
+          "status": "measured"
+        },
+        "artifact.test_pass_count": {
+          "value": 14,
+          "status": "measured"
+        },
+        "artifact.files_changed": {
+          "value": [
+            "src/duration.py"
+          ],
+          "status": "measured"
+        }
+      },
+      "events": [
+        {
+          "metric": "conversation.open_issues_count",
+          "item": "hour-shorthand",
+          "kind": "closed"
+        },
+        {
+          "metric": "conversation.open_issues_count",
+          "item": "input-type",
+          "kind": "closed"
+        },
+        {
+          "metric": "conversation.open_issues_count",
+          "item": "invalid-input",
+          "kind": "closed"
+        },
+        {
+          "metric": "conversation.open_issues_count",
+          "item": "space-case",
+          "kind": "closed"
+        },
+        {
+          "metric": "artifact.test_pass_count",
+          "item": "tests",
+          "kind": "improved"
+        },
+        {
+          "metric": "artifact.files_changed",
+          "item": "src/duration.py",
+          "kind": "new"
+        }
+      ],
+      "flags": {
+        "oscillation": [],
+        "reopen": [],
+        "revert": [],
+        "test_plateau": false
+      },
+      "coverage_complete": true,
+      "conversation_moved": true,
+      "artifact_moved": true,
+      "comparison_step_id": 2,
+      "history_step_ids": [
+        2
+      ],
+      "pass_count": {
+        "value": 15,
+        "session_max_before": 6,
+        "new_session_max": true,
+        "role_event": "improved",
+        "counted_as_progress": true
+      },
+      "t3": {
+        "global_state_sha256": "ef6c69c69f9e515c82701e23c65b4654538832efedbb16ad43952f5445f92f00",
+        "previous_global_step": 4,
+        "changed_paths": [
+          "src/duration.py"
+        ],
+        "global_revert": false,
+        "revert_to_step": null,
+        "test_pass_count": 15,
+        "test_total_count": 15,
+        "test_max": 15,
+        "test_max_step": 5,
+        "steps_since_test_max": 0,
+        "plateau_steps": 6,
+        "test_plateau": false,
+        "file_state_changes_since_test_max": 0,
+        "file_state_unknown_steps_since_test_max": 0,
+        "only_file_change_progress": false,
+        "applied": null
+      },
+      "handoff": null
+    },
+    "criteria": {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "continue",
+      "reason": "progress, baseline or declaration step",
+      "consecutive_steps": 0,
+      "consecutive_states": [],
+      "consecutive_step_ids": [],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": null,
+      "first_termination_failure_step": null,
+      "declared_step": null
+    },
+    "judgement_ns": 312834,
+    "extraction_comparison": {
+      "proposal_values": {
+        "status": "unmeasured",
+        "match": null
+      },
+      "open_issue_ids": {
+        "status": "measured",
+        "match": false,
+        "extraction_missing": true
+      },
+      "info_items": {
+        "status": "measured",
+        "match": false,
+        "extraction_missing": true
+      }
+    }
+  },
+  "duplicate": false,
+  "persisted": true
+}
