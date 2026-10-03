@@ -1,0 +1,809 @@
+{
+ "dm57": {
+  "probes": {
+   "tools": {
+    "folder": "runs/gateway-probes/gateway-probe-a41f8d517c7d4772a7ef72720f83cc48",
+    "created_at": "2026-10-03T03:51:47.317579+00:00",
+    "scenario_id": "A-1-v4",
+    "requests": [
+     {
+      "model": "glm-5.3-flash",
+      "variant": "short-no-tools",
+      "http_status": 200,
+      "finish_reason": "stop",
+      "error_message": null,
+      "tool_calls": 0,
+      "contract_valid": null,
+      "prompt_tokens": 19,
+      "completion_tokens": 65,
+      "reasoning_tokens": 62,
+      "cached_tokens": 0,
+      "credits": 0.03535,
+      "credits_used_after": 0.4364
+     },
+     {
+      "model": "glm-5.3-flash",
+      "variant": "v8-tools-reasoning-high",
+      "http_status": 200,
+      "finish_reason": "tool_calls",
+      "error_message": null,
+      "tool_calls": 3,
+      "contract_valid": null,
+      "prompt_tokens": 1896,
+      "completion_tokens": 47,
+      "reasoning_tokens": 7,
+      "cached_tokens": 0,
+      "credits": 0.3079,
+      "credits_used_after": 0.7443000000000001
+     },
+     {
+      "model": "qwen3.8-flash",
+      "variant": "short-no-tools",
+      "http_status": 200,
+      "finish_reason": "stop",
+      "error_message": null,
+      "tool_calls": 0,
+      "contract_valid": null,
+      "prompt_tokens": 68,
+      "completion_tokens": 28,
+      "reasoning_tokens": 24,
+      "cached_tokens": 0,
+      "credits": 0.02336,
+      "credits_used_after": 0.76766
+     },
+     {
+      "model": "qwen3.8-flash",
+      "variant": "v8-tools-reasoning-high",
+      "http_status": 200,
+      "finish_reason": "tool_calls",
+      "error_message": null,
+      "tool_calls": 4,
+      "contract_valid": null,
+      "prompt_tokens": 1879,
+      "completion_tokens": 197,
+      "reasoning_tokens": 85,
+      "cached_tokens": 0,
+      "credits": 0.37444,
+      "credits_used_after": 1.1421000000000001
+     },
+     {
+      "model": "gpt-5.4-nano",
+      "variant": "short-no-tools",
+      "http_status": 200,
+      "finish_reason": "stop",
+      "error_message": null,
+      "tool_calls": 0,
+      "contract_valid": null,
+      "prompt_tokens": 13,
+      "completion_tokens": 4,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "credits": 0.0076,
+      "credits_used_after": 1.1497
+     },
+     {
+      "model": "gpt-5.4-nano",
+      "variant": "v8-tools-reasoning-high",
+      "http_status": 200,
+      "finish_reason": "tool_calls",
+      "error_message": null,
+      "tool_calls": 3,
+      "contract_valid": null,
+      "prompt_tokens": 1536,
+      "completion_tokens": 69,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "credits": 0.39345,
+      "credits_used_after": 1.54315
+     }
+    ],
+    "token_rates": {
+     "glm-5.3-flash": {
+      "status": "solved_from_two_requests",
+      "requests_used": 2,
+      "credits_per_million_prompt_tokens": 150.0,
+      "credits_per_million_completion_tokens": 500.0,
+      "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+     },
+     "qwen3.8-flash": {
+      "status": "solved_from_two_requests",
+      "requests_used": 2,
+      "credits_per_million_prompt_tokens": 150.0,
+      "credits_per_million_completion_tokens": 470.0,
+      "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+     },
+     "gpt-5.4-nano": {
+      "status": "solved_from_two_requests",
+      "requests_used": 2,
+      "credits_per_million_prompt_tokens": 200.0,
+      "credits_per_million_completion_tokens": 1250.0,
+      "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+     }
+    }
+   },
+   "strict": {
+    "folder": "runs/gateway-probes/gateway-probe-44ec8e433e484bdca241870732522a6a",
+    "created_at": "2026-10-03T03:54:20.847534+00:00",
+    "scenario_id": "TEST-T1-v2",
+    "requests": [
+     {
+      "model": "glm-5.3-flash",
+      "variant": "v3-final-strict-no-enums",
+      "http_status": 200,
+      "finish_reason": "stop",
+      "error_message": null,
+      "tool_calls": 0,
+      "contract_valid": true,
+      "prompt_tokens": 1094,
+      "completion_tokens": 204,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "credits": 0.2661,
+      "credits_used_after": 1.80925
+     },
+     {
+      "model": "glm-5.3-flash",
+      "variant": "v3-final-strict-enums",
+      "http_status": 200,
+      "finish_reason": "stop",
+      "error_message": null,
+      "tool_calls": 0,
+      "contract_valid": true,
+      "prompt_tokens": 1094,
+      "completion_tokens": 610,
+      "reasoning_tokens": 410,
+      "cached_tokens": 1088,
+      "credits": 0.33854,
+      "credits_used_after": 2.14779
+     },
+     {
+      "model": "qwen3.8-flash",
+      "variant": "v3-final-strict-no-enums",
+      "http_status": 200,
+      "finish_reason": "stop",
+      "error_message": null,
+      "tool_calls": 0,
+      "contract_valid": true,
+      "prompt_tokens": 1091,
+      "completion_tokens": 5239,
+      "reasoning_tokens": 5031,
+      "cached_tokens": 0,
+      "credits": 2.62598,
+      "credits_used_after": 4.773770000000001
+     },
+     {
+      "model": "qwen3.8-flash",
+      "variant": "v3-final-strict-enums",
+      "http_status": 200,
+      "finish_reason": "stop",
+      "error_message": null,
+      "tool_calls": 0,
+      "contract_valid": true,
+      "prompt_tokens": 1091,
+      "completion_tokens": 1223,
+      "reasoning_tokens": 1103,
+      "cached_tokens": 1024,
+      "credits": 0.61558,
+      "credits_used_after": 5.38935
+     },
+     {
+      "model": "gpt-5.4-nano",
+      "variant": "v3-final-strict-no-enums",
+      "http_status": 200,
+      "finish_reason": "stop",
+      "error_message": null,
+      "tool_calls": 0,
+      "contract_valid": true,
+      "prompt_tokens": 1342,
+      "completion_tokens": 376,
+      "reasoning_tokens": 199,
+      "cached_tokens": 0,
+      "credits": 0.7384,
+      "credits_used_after": 6.127749999999999
+     },
+     {
+      "model": "gpt-5.4-nano",
+      "variant": "v3-final-strict-enums",
+      "http_status": 200,
+      "finish_reason": "stop",
+      "error_message": null,
+      "tool_calls": 0,
+      "contract_valid": true,
+      "prompt_tokens": 1374,
+      "completion_tokens": 351,
+      "reasoning_tokens": 205,
+      "cached_tokens": 0,
+      "credits": 0.71355,
+      "credits_used_after": 6.841299999999999
+     }
+    ],
+    "token_rates": {
+     "glm-5.3-flash": {
+      "status": "solved_from_two_requests",
+      "requests_used": 2,
+      "credits_per_million_prompt_tokens": 209.964878,
+      "credits_per_million_completion_tokens": 178.423645,
+      "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+     },
+     "qwen3.8-flash": {
+      "status": "solved_from_two_requests",
+      "requests_used": 2,
+      "credits_per_million_prompt_tokens": 3.069774,
+      "credits_per_million_completion_tokens": 500.59761,
+      "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+     },
+     "gpt-5.4-nano": {
+      "status": "solved_from_two_requests",
+      "requests_used": 2,
+      "credits_per_million_prompt_tokens": 200.0,
+      "credits_per_million_completion_tokens": 1250.0,
+      "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+     }
+    }
+   },
+   "nano": {
+    "folder": "runs/gateway-probes/gateway-probe-e38debdea39e4facbe74808762aec984",
+    "created_at": "2026-10-02T14:43:23.693682+00:00",
+    "scenario_id": "A-1-v4",
+    "requests": [
+     {
+      "model": "gpt-5.4-nano",
+      "variant": "short-no-tools",
+      "http_status": 200,
+      "finish_reason": "stop",
+      "error_message": null,
+      "tool_calls": 0,
+      "contract_valid": null,
+      "prompt_tokens": 13,
+      "completion_tokens": 4,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "credits": 0.0076,
+      "credits_used_after": 0.0076
+     },
+     {
+      "model": "gpt-5.4-nano",
+      "variant": "v8-tools-reasoning-high",
+      "http_status": 200,
+      "finish_reason": "tool_calls",
+      "error_message": null,
+      "tool_calls": 3,
+      "contract_valid": null,
+      "prompt_tokens": 1536,
+      "completion_tokens": 69,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "credits": 0.39345,
+      "credits_used_after": 0.40105
+     }
+    ],
+    "token_rates": {
+     "gpt-5.4-nano": {
+      "status": "solved_from_two_requests",
+      "requests_used": 2,
+      "credits_per_million_prompt_tokens": 200.0,
+      "credits_per_million_completion_tokens": 1250.0,
+      "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+     }
+    }
+   },
+   "gpt_oss_strict": {
+    "folder": "runs/gateway-probes/gateway-probe-8f022e0a96b845afbc433e48f2b14140",
+    "created_at": "2026-10-02T14:20:28.394628+00:00",
+    "scenario_id": "TEST-T1-v2",
+    "requests": [
+     {
+      "model": "accounts/fireworks/models/gpt-oss-120b",
+      "variant": "v3-final-strict-no-enums",
+      "http_status": 404,
+      "finish_reason": null,
+      "error_message": "invalid_request_error - Model 'accounts/fireworks/models/gpt-oss-120b' not found",
+      "tool_calls": 0,
+      "contract_valid": null,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "reasoning_tokens": null,
+      "cached_tokens": null,
+      "credits": 0,
+      "credits_used_after": 0
+     },
+     {
+      "model": "accounts/fireworks/models/gpt-oss-120b",
+      "variant": "v3-final-strict-enums",
+      "http_status": 404,
+      "finish_reason": null,
+      "error_message": "invalid_request_error - Model 'accounts/fireworks/models/gpt-oss-120b' not found",
+      "tool_calls": 0,
+      "contract_valid": null,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "reasoning_tokens": null,
+      "cached_tokens": null,
+      "credits": 0,
+      "credits_used_after": 0
+     }
+    ],
+    "token_rates": {}
+   },
+   "gpt_oss_general": {
+    "folder": "runs/gateway-probes/gateway-probe-2992b509a32a4127a715934f575a5260",
+    "created_at": "2026-10-02T14:25:33.513895+00:00",
+    "scenario_id": "A-1-v4",
+    "requests": [
+     {
+      "model": "accounts/fireworks/models/gpt-oss-120b",
+      "variant": "short-no-tools",
+      "http_status": 404,
+      "finish_reason": null,
+      "error_message": "invalid_request_error - Model 'accounts/fireworks/models/gpt-oss-120b' not found",
+      "tool_calls": 0,
+      "contract_valid": null,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "reasoning_tokens": null,
+      "cached_tokens": null,
+      "credits": 0,
+      "credits_used_after": 0
+     },
+     {
+      "model": "accounts/fireworks/models/gpt-oss-120b",
+      "variant": "v8-tools-reasoning-high",
+      "http_status": 404,
+      "finish_reason": null,
+      "error_message": "invalid_request_error - Model 'accounts/fireworks/models/gpt-oss-120b' not found",
+      "tool_calls": 0,
+      "contract_valid": null,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "reasoning_tokens": null,
+      "cached_tokens": null,
+      "credits": 0,
+      "credits_used_after": 0
+     }
+    ],
+    "token_rates": {
+     "accounts/fireworks/models/gpt-oss-120b": {
+      "status": "unmeasured",
+      "reason": "fewer than two requests with usage and measured credits"
+     }
+    }
+   }
+  },
+  "gate_1": {
+   "glm-5.3-flash": {
+    "tools_reasoning_high_200_with_tool_calls": true,
+    "strict_no_enums_200_contract_valid": true,
+    "strict_enums_200_contract_valid": true
+   },
+   "qwen3.8-flash": {
+    "tools_reasoning_high_200_with_tool_calls": true,
+    "strict_no_enums_200_contract_valid": true,
+    "strict_enums_200_contract_valid": true
+   },
+   "gpt-5.4-nano": {
+    "tools_reasoning_high_200_with_tool_calls": true,
+    "strict_no_enums_200_contract_valid": true,
+    "strict_enums_200_contract_valid": true
+   }
+  },
+  "checks": {
+   "gate_1_all_pass": true,
+   "rates": {
+    "glm-5.3-flash": {
+     "probe": [
+      150.0,
+      500.0
+     ],
+     "dm57": [
+      150,
+      500
+     ],
+     "same": true
+    },
+    "qwen3.8-flash": {
+     "probe": [
+      150.0,
+      470.0
+     ],
+     "dm57": [
+      150,
+      470
+     ],
+     "same": true
+    },
+    "gpt-5.4-nano": {
+     "probe": [
+      200.0,
+      1250.0
+     ],
+     "dm57": [
+      200,
+      1250
+     ],
+     "same": true
+    }
+   },
+   "nano_alone_rates": {
+    "status": "solved_from_two_requests",
+    "requests_used": 2,
+    "credits_per_million_prompt_tokens": 200.0,
+    "credits_per_million_completion_tokens": 1250.0,
+    "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+   },
+   "thirty_step_credits": {
+    "glm-5.3-flash": {
+     "computed": 120.13,
+     "dm57_about": 120,
+     "within_one_credit": true
+    },
+    "qwen3.8-flash": {
+     "computed": 116.92,
+     "dm57_about": 117,
+     "within_one_credit": true
+    },
+    "gpt-5.4-nano": {
+     "computed": 222.51,
+     "dm57_about": 222,
+     "within_one_credit": true
+    }
+   },
+   "strict_final_completion_tokens": {
+    "glm-5.3-flash": {
+     "probe": 204,
+     "dm57": 204,
+     "same": true
+    },
+    "qwen3.8-flash": {
+     "probe": 5239,
+     "dm57": 5239,
+     "same": true
+    },
+    "gpt-5.4-nano": {
+     "probe": 376,
+     "dm57": 376,
+     "same": true
+    }
+   },
+   "tool_calls_per_response": {
+    "probe": {
+     "glm-5.3-flash": 3,
+     "qwen3.8-flash": 4,
+     "gpt-5.4-nano": 3
+    },
+    "dm57_range": [
+     3,
+     4
+    ],
+    "within": true,
+    "nano_alone_probe": 3
+   },
+   "second_strict_request_cached_tokens": {
+    "probe": {
+     "glm-5.3-flash": 1088,
+     "qwen3.8-flash": 1024,
+     "gpt-5.4-nano": 0
+    },
+    "dm57_range": [
+     1024,
+     1088
+    ],
+    "models_in_range": [
+     "glm-5.3-flash",
+     "qwen3.8-flash"
+    ]
+   },
+   "gpt_oss_404": {
+    "requests": [
+     {
+      "probe": "gpt_oss_strict",
+      "model": "accounts/fireworks/models/gpt-oss-120b",
+      "variant": "v3-final-strict-no-enums",
+      "http_status": 404,
+      "error_message": "invalid_request_error - Model 'accounts/fireworks/models/gpt-oss-120b' not found"
+     },
+     {
+      "probe": "gpt_oss_strict",
+      "model": "accounts/fireworks/models/gpt-oss-120b",
+      "variant": "v3-final-strict-enums",
+      "http_status": 404,
+      "error_message": "invalid_request_error - Model 'accounts/fireworks/models/gpt-oss-120b' not found"
+     },
+     {
+      "probe": "gpt_oss_general",
+      "model": "accounts/fireworks/models/gpt-oss-120b",
+      "variant": "short-no-tools",
+      "http_status": 404,
+      "error_message": "invalid_request_error - Model 'accounts/fireworks/models/gpt-oss-120b' not found"
+     },
+     {
+      "probe": "gpt_oss_general",
+      "model": "accounts/fireworks/models/gpt-oss-120b",
+      "variant": "v8-tools-reasoning-high",
+      "http_status": 404,
+      "error_message": "invalid_request_error - Model 'accounts/fireworks/models/gpt-oss-120b' not found"
+     }
+    ],
+    "all_404_model_not_found": true
+   },
+   "strict_probe_token_rates_not_prices": {
+    "glm-5.3-flash": {
+     "status": "solved_from_two_requests",
+     "requests_used": 2,
+     "credits_per_million_prompt_tokens": 209.964878,
+     "credits_per_million_completion_tokens": 178.423645,
+     "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+    },
+    "qwen3.8-flash": {
+     "status": "solved_from_two_requests",
+     "requests_used": 2,
+     "credits_per_million_prompt_tokens": 3.069774,
+     "credits_per_million_completion_tokens": 500.59761,
+     "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+    },
+    "gpt-5.4-nano": {
+     "status": "solved_from_two_requests",
+     "requests_used": 2,
+     "credits_per_million_prompt_tokens": 200.0,
+     "credits_per_million_completion_tokens": 1250.0,
+     "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+    }
+   },
+   "model_list_change": "not in these probe files (the PM read /models/); recorded from DM-57 only",
+   "all_same_as_dm57": true
+  },
+  "a1v4_tokens": {
+   "session": "A-1-v4-e174aafe805b4f59bb62d7c95716b8b7",
+   "prompt": 444636,
+   "completion": 106866,
+   "source": "docs/design/demo-budget.json rate_check (proxy log usage)"
+  },
+  "monthly_used_after_last_probe_request": 6.841299999999999,
+  "secret_scan": {
+   "files_scanned": 41,
+   "patterns": [
+    "authorization_field",
+    "bearer_value",
+    "env:KMU_API_KEY",
+    "groq_key",
+    "openai_style_key"
+   ],
+   "environment_variables_checked": {
+    "KMU_API_KEY": "set"
+   },
+   "hits": {},
+   "clean": true
+  }
+ },
+ "gpt_oss_references": {
+  "base_commit": "4d425e5",
+  "at_base": {
+   "record": {
+    "deadlock_test.py": [
+     10
+    ],
+    "docs/A1-preflight.md": [
+     113
+    ],
+    "docs/A1-strict-implementation.md": [
+     28
+    ],
+    "docs/A1-strict-preflight-and-fallback.md": [
+     31
+    ],
+    "docs/decisions/011-provider-switch-gateway.md": [
+     36
+    ],
+    "docs/decisions/019-model-run-condition.md": [
+     3,
+     43,
+     89,
+     103
+    ],
+    "docs/design/demo-model-probe.md": [
+     46,
+     47
+    ],
+    "docs/findings/error-evidence.json": [
+     95,
+     291,
+     478,
+     665,
+     832,
+     879
+    ],
+    "experiments/probe_strict_output.py": [
+     14
+    ],
+    "logs/ (files)": 9,
+    "reports/ (files)": 12,
+    "runs/ (files)": 35,
+    "test.py": [
+     5
+    ],
+    "tests/fixtures/scenario-v2-artifact.yaml": [
+     9
+    ],
+    "tests/fixtures/scenario-v2-dialogue.yaml": [
+     8
+    ],
+    "tests/test_harness_facts.py": [
+     183
+    ],
+    "tests/test_model_run_condition.py": [
+     21
+    ],
+    "tests/test_multi_tool_calls.py": [
+     3
+    ],
+    "tests/test_probe_models.py": [
+     14
+    ],
+    "tests/test_probe_v3_strict.py": [
+     105
+    ],
+    "tools/analyze_session.py": [
+     387
+    ]
+   },
+   "demo": {
+    "docs/design/demo-scenarios.md": [
+     20
+    ],
+    "guardrail-deadlock-v0.3-kmu-block.yaml": [
+     1
+    ],
+    "guardrail-deadlock-v0.3-kmu.yaml": [
+     1
+    ]
+   },
+   "dataset_scenario_c20": {
+    "guardrail-deadlock-v0.2-kmu.yaml": [
+     1
+    ],
+    "scenarios/A-1-ambiguous-task-query.yaml": [
+     8
+    ],
+    "scenarios/A-1-v2-ambiguous-task-query.yaml": [
+     13
+    ],
+    "scenarios/A-1-v3-ambiguous-task-query.yaml": [
+     7,
+     12
+    ],
+    "scenarios/A-1-v4-ambiguous-task-query.yaml": [
+     12
+    ]
+   }
+  },
+  "now_tracked": {
+   "record": {
+    "deadlock_test.py": [
+     10
+    ],
+    "docs/A1-preflight.md": [
+     113
+    ],
+    "docs/A1-strict-implementation.md": [
+     28
+    ],
+    "docs/A1-strict-preflight-and-fallback.md": [
+     31
+    ],
+    "docs/decisions/011-provider-switch-gateway.md": [
+     36
+    ],
+    "docs/decisions/019-model-run-condition.md": [
+     3,
+     44,
+     90,
+     104,
+     135,
+     175,
+     179,
+     185,
+     198,
+     233,
+     236
+    ],
+    "docs/design/demo-model-probe.md": [
+     46,
+     47
+    ],
+    "docs/design/demo_budget.py": [
+     10,
+     12,
+     21,
+     68,
+     134
+    ],
+    "docs/findings/error-evidence.json": [
+     95,
+     291,
+     478,
+     665,
+     832,
+     879
+    ],
+    "experiments/probe_strict_output.py": [
+     14
+    ],
+    "logs/ (files)": 9,
+    "reports/ (files)": 14,
+    "runs/ (files)": 48,
+    "test.py": [
+     5
+    ],
+    "tests/fixtures/scenario-v2-artifact.yaml": [
+     9
+    ],
+    "tests/fixtures/scenario-v2-dialogue.yaml": [
+     8
+    ],
+    "tests/test_c17_8_part1.py": [
+     34
+    ],
+    "tests/test_harness_facts.py": [
+     183
+    ],
+    "tests/test_model_run_condition.py": [
+     21
+    ],
+    "tests/test_multi_tool_calls.py": [
+     3
+    ],
+    "tests/test_probe_models.py": [
+     14
+    ],
+    "tests/test_probe_v3_strict.py": [
+     105
+    ],
+    "tools/analyze_session.py": [
+     387
+    ],
+    "tools/c17_8_evidence.py": [
+     7,
+     8,
+     29,
+     152,
+     159,
+     173
+    ]
+   },
+   "demo": {
+    "docs/design/demo-scenarios.md": [
+     20,
+     21
+    ]
+   },
+   "dataset_scenario_c20": {
+    "guardrail-deadlock-v0.2-kmu.yaml": [
+     1
+    ],
+    "scenarios/A-1-ambiguous-task-query.yaml": [
+     8
+    ],
+    "scenarios/A-1-v2-ambiguous-task-query.yaml": [
+     13
+    ],
+    "scenarios/A-1-v3-ambiguous-task-query.yaml": [
+     7,
+     12
+    ],
+    "scenarios/A-1-v4-ambiguous-task-query.yaml": [
+     12
+    ]
+   }
+  },
+  "notes": {
+   "guardrail-deadlock-v0.2-kmu.yaml": "header comment; byte-protected (C-17-1), changed with the dataset model (C-20)",
+   "tools/analyze_session.py": "price table for the recorded gpt-oss sessions; a glm price is a PM decision (C-17-7)",
+   "experiments/probe_strict_output.py": "Groq-era strict probe (G0-3); Groq clean-up after the demo track",
+   "test.py": "Groq-era script; Groq clean-up after the demo track",
+   "deadlock_test.py": "Groq-era script; Groq clean-up after the demo track",
+   "tests/": "constants and C-17 fixtures (TEST-T1-v2, TEST-T2-v2, the DM-37 copy of A-1-v4) kept as written",
+   "docs/design/demo-scenarios.md": "C-18 follows its common conditions line",
+   "tools/c17_8_evidence.py": "this script (the probe evidence names the removed model)"
+  },
+  "rule": "demo = used by demo runs (replaced in C-17-8); dataset_scenario_c20 = dataset path, a new scenario version with the dataset model (C-20); record = recorded sessions, reports, decisions, test fixtures and constants, Groq-era scripts (left as they are)"
+ }
+}
