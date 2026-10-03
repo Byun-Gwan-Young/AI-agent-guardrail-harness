@@ -1,0 +1,107 @@
+{
+ "session_id": "DEMO-CL-normal-v1-d5460d69bcc84e20a4eaef6275ea1e8a",
+ "scenario_id": "DEMO-CL-normal-v1",
+ "termination_reason": "success",
+ "steps": 6,
+ "error": null,
+ "tests_passed": {
+  "before": 6,
+  "after": 15,
+  "max": 15
+ },
+ "first_stop": null,
+ "stop_steps": [],
+ "tokens": {
+  "prompt": 82155,
+  "cached_prompt": 34688,
+  "completion": 16384,
+  "reasoning": 9800,
+  "turns": 18,
+  "usage_missing_turns": 0
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 16.35269,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-03T06:09:07.514682+00:00",
+   "2026-10-03T06:16:15.941264+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 16.35269,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 7,
+  "1": 6,
+  "2": 3,
+  "3": 1,
+  "4": 1
+ },
+ "tool_results": {
+  "executed": 19,
+  "refused_before_approval": 0,
+  "error_results": 2,
+  "error_results_by_tool": {
+   "replace_in_file": 2
+  },
+  "error_results_by_summary": {
+   "Role is not authorized to edit this file": 2
+  },
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 0,
+  "vocabulary_violations": 0,
+  "by_kind": {},
+  "failed_steps": [
+   {
+    "step_id": 4,
+    "reasons": [
+     "tool_execution_error"
+    ]
+   }
+  ]
+ },
+ "condition_group": "cg-9bfd9889d4f8",
+ "condition_group_missing_fields": [
+  "closed_list_check",
+  "dialogue_flow",
+  "recent_messages_rule",
+  "requested_seed",
+  "search_settings_sha256"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [
+   "dialogue_flow",
+   "recent_messages_rule",
+   "search_settings_sha256"
+  ],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": [
+   "closed_list_check"
+  ]
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "observe",
+ "session_times": {
+  "started_at": "2026-10-03T06:09:07.512055+00:00",
+  "ended_at": "2026-10-03T06:16:15.918671+00:00"
+ },
+ "account_label": null,
+ "batch": null,
+ "key_scan": {
+  "files_scanned": 52,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

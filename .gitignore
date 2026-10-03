@@ -5,6 +5,9 @@ __pycache__/
 *.pyc
 runs/
 logs/
+# Demo sessions (DM-64 ⑤, tools/demo_records.py): the raw files of runs/demo/<id>/ (session.json, steps.json,
+# observations/, workspace/, search/, tool-dispatch.json) and logs/demo/ stay local and go into the backup outside the
+# repository. Only the commit files of demo-records-v1 are added, by `tools/demo_records.py stage` (git add -f).
 docs/handoff/
 data/raw/
 *.bak

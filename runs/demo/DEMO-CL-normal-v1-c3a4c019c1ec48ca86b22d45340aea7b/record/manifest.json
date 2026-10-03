@@ -1,0 +1,281 @@
+{
+ "manifest_version": "session-manifest-v0.6",
+ "session_id": "DEMO-CL-normal-v1-c3a4c019c1ec48ca86b22d45340aea7b",
+ "rerun_of": null,
+ "scenario": {
+  "id": "DEMO-CL-normal-v1",
+  "hash": "2f7c39f5a4a2ffac4258048cc544a45ba764ecb9e7a413e1b8897b1723152815"
+ },
+ "code": {
+  "git_commit": "3908f5c0569ef9dc28dbd0ec9b82d28eacb24653",
+  "criteria_version": "deadlock-v0.3",
+  "progress_version": "progress-v3",
+  "metrics_version": "metrics-v1",
+  "git_dirty": true,
+  "git_state_status": "measured"
+ },
+ "condition": {
+  "phase": "demo",
+  "temperature": 0.0,
+  "repeat_index": 1,
+  "max_steps": 30,
+  "max_llm_calls_per_step": 3,
+  "max_tokens": 16384,
+  "context_buffer_messages": 12,
+  "guardrail_mode": "observe",
+  "runner_protocol": "tool-capable-step-v10-final-report-allowlist",
+  "reasoning_effort": {
+   "requested": "medium",
+   "sent_on": "all_calls",
+   "applied": "unverified",
+   "evidence": null,
+   "source": "conditions.json"
+  },
+  "dataset_run": false,
+  "group": {
+   "rule": "condition-group-v1",
+   "id": "cg-1cf34b825a1d",
+   "sha256": "1cf34b825a1d0ba6f528624931e7f693d8f567500f71dcf751766b2195a65009",
+   "fields": {
+    "model": "glm-5.3-flash",
+    "model_source": "scenario",
+    "provider_host": "factchat.mindlogic-kr-api.com",
+    "proxy_config_file": "guardrail-deadlock-v0.3-kmu.yaml",
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "criteria_freeze_sha256": "a5372f30ce1f9347cf073b4d6061872f1a3b507e5ac614417b4f952e42d04324",
+    "guardrail_mode": "observe",
+    "phase": "demo",
+    "runner_protocol": "tool-capable-step-v10-final-report-allowlist",
+    "collection_policy": "independent-sources-v1",
+    "output_contract_version": "output-contract-v2",
+    "dialogue_flow": null,
+    "recent_messages_rule": null,
+    "closed_list_check": null,
+    "search_settings_sha256": null,
+    "temperature": 0.0,
+    "max_tokens": 16384,
+    "max_steps": 30,
+    "max_llm_calls_per_step": 3,
+    "context_buffer_messages": 12,
+    "reasoning_effort": {
+     "requested": "medium",
+     "sent_on": "all_calls"
+    },
+    "requested_seed": null
+   },
+   "missing_fields": [
+    "closed_list_check",
+    "dialogue_flow",
+    "recent_messages_rule",
+    "requested_seed",
+    "search_settings_sha256"
+   ]
+  },
+  "guardrail_mode_source": "proxy session meta"
+ },
+ "model": {
+  "provider": "factchat.mindlogic-kr-api.com",
+  "name": "glm-5.3-flash",
+  "upstream": {
+   "base_url_host": "factchat.mindlogic-kr-api.com",
+   "base_url": "https://factchat.mindlogic-kr-api.com/v1/gateway",
+   "chat_path": "/chat/completions/",
+   "api_key_env": "KMU_API_KEY",
+   "config_file": "guardrail-deadlock-v0.3-kmu.yaml"
+  },
+  "source": "scenario",
+  "scenario_model": "glm-5.3-flash",
+  "runner_model": "glm-5.3-flash",
+  "runner_matches_proxy": true
+ },
+ "seed": {
+  "value": null,
+  "status": "unverified"
+ },
+ "run": {
+  "started_at": "2026-10-03T06:07:08.538862+00:00",
+  "ended_at": "2026-10-03T06:07:10.664865+00:00",
+  "termination_reason": "runner_error",
+  "steps_reached": 1,
+  "parallel_group": null
+ },
+ "tokens": {
+  "known_prompt": 0,
+  "known_completion": 0,
+  "known_total": 0,
+  "usage_missing_turns": 1,
+  "total": null,
+  "total_status": "unmeasured"
+ },
+ "judgement": {
+  "before": {
+   "tests_passed": 6
+  },
+  "after": {
+   "tests_passed": 6,
+   "gate": {
+    "machine_success": false,
+    "test_suite_unchanged": true,
+    "test_suite_id": "sha256:1fbebbbdbe6ca0bb7bb651ebfff09e9ee5df244751440591325e5ee67ac74c23",
+    "pinned_test_suite_id": "sha256:1fbebbbdbe6ca0bb7bb651ebfff09e9ee5df244751440591325e5ee67ac74c23",
+    "reason": "tests_not_passed"
+   }
+  },
+  "normal_session": false,
+  "normal_session_rule": "S-1: all acceptance tests pass and completion declared"
+ },
+ "guardrail": {
+  "virtual_decisions": [
+   {
+    "step_id": 1,
+    "progress": "baseline",
+    "criteria": "unmeasured"
+   }
+  ],
+  "first_stop_step": null,
+  "first_stop_explanation": null,
+  "mode": "observe",
+  "block": null,
+  "savings_vs_observe": null
+ },
+ "validity": {
+  "class": "unclassified",
+  "reason": null,
+  "decided_by": null,
+  "evidence": {
+   "isolation_ok": true,
+   "termination_reason": "runner_error",
+   "http_error_codes": [
+    400
+   ],
+   "http_429_turns": [],
+   "finish_reason_length": 0,
+   "tool_execution_errors": 0,
+   "edit_attempts_outside_writable_paths": 0,
+   "unmeasured_steps": 1
+  }
+ },
+ "notes": [
+  "demo-records-v1"
+ ],
+ "judgement_time": {
+  "status": "measured",
+  "n": 1,
+  "steps_without_value": 0,
+  "p50_ms": 0.126333,
+  "p99_ms": 0.126333,
+  "max_ms": 0.126333
+ },
+ "replay": {
+  "status": "unmeasured",
+  "reason": "multi-rule offline replay (S-6) is scheduled for C-16"
+ },
+ "task": {
+  "task_kind": "artifact",
+  "turn_order": "fixed",
+  "dialogue_flow": null,
+  "output_contract_version": "output-contract-v2",
+  "contract_sha256": null,
+  "allowed_issues_sha256": "0d8a6af886f1240043708546bbead893cd548441e57c4f5dcfd050fcf910944a",
+  "closed_list_check": null,
+  "judge": null,
+  "inputs_dir": null,
+  "tools": {
+   "planner": [
+    "read_file",
+    "write_file",
+    "replace_in_file"
+   ],
+   "developer": [
+    "read_file",
+    "write_file",
+    "replace_in_file",
+    "run_tests"
+   ],
+   "reviewer": [
+    "read_file",
+    "run_tests"
+   ]
+  },
+  "tool_implementations": null,
+  "recent_messages_rule": null,
+  "tool_settings": null,
+  "search": null,
+  "tool_preflight": null
+ },
+ "registration": {
+  "value": {
+   "registration_version": "session-registration-v1",
+   "role_labels": {
+    "planner": "기획",
+    "developer": "개발",
+    "reviewer": "검토"
+   },
+   "status_values": [],
+   "terminal_statuses": [],
+   "required_adopted_items": null,
+   "progress_source": "both",
+   "progress_metric": {
+    "conversation": [
+     "open_issues_count"
+    ],
+    "artifact": [
+     "test_pass_count",
+     "files_changed"
+    ]
+   }
+  },
+  "sha256": "7dbebabcae3185c3425a1f8c6591f92d372d7608b506ad96546b08b8a7102b59",
+  "sha256_recomputed": "7dbebabcae3185c3425a1f8c6591f92d372d7608b506ad96546b08b8a7102b59",
+  "proxy_stored_same": true
+ },
+ "credits_estimated": {
+  "status": "incomplete",
+  "value": 0.0,
+  "model": "glm-5.3-flash",
+  "prices_version": "gateway-prices-v1",
+  "credits_per_million": {
+   "prompt": 150,
+   "cached_prompt": 30,
+   "completion": 500
+  },
+  "price_source": "prompt, completion: probe gateway-probe-a41f8d51 (DM-57); cached_prompt: probe gateway-probe-44ec8e43 second request (cached 1,088), decision 020",
+  "tokens": {
+   "prompt": 0,
+   "cached_prompt": 0,
+   "completion": 0,
+   "reasoning": 0,
+   "turns": 1,
+   "usage_missing_turns": 1
+  },
+  "cached_price": "known",
+  "basis": "proxy log usage x credits per 1M; an upper value (discounts not in the usage are not modelled); turns without usage are not counted"
+ },
+ "credits_measured": {
+  "usage_version": "gateway-usage-v1",
+  "before": {
+   "read_at": "2026-10-03T06:07:08.544006+00:00",
+   "http_status": 200,
+   "used": 6.841299999999999,
+   "field": "monthly_allocated.used"
+  },
+  "after": {
+   "read_at": "2026-10-03T06:07:10.667718+00:00",
+   "http_status": 200,
+   "used": 6.841299999999999,
+   "field": "monthly_allocated.used"
+  },
+  "exact_only_if_alone": true,
+  "note": "after minus before; it includes any other use of the same key between the two read_at times (parallel sessions, probes, other tools). Compare those times with other sessions.",
+  "status": "measured",
+  "value": 0.0,
+  "field": "monthly_allocated.used"
+ },
+ "vocabulary_violations": {
+  "total": 0,
+  "steps": [],
+  "excluded_from_strict_failure_streak": true
+ },
+ "approval": null
+}
