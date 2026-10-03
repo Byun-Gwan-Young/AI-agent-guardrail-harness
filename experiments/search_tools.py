@@ -10,8 +10,9 @@ Replay (judge recomputation, session replay) reads only these stored responses: 
 against its sha256, normalizes it again and rebuilds the model text; replay_tool_records() gives the judge the same
 tool records from them. Nothing is searched again.
 
-Settings come from the scenario's tool_settings (no code default): result count, Tavily depth and topic, arXiv sort,
-the longest model text, the per-session call limit, the timeout and the arXiv request interval. The Tavily key is read
+Settings come from the scenario's tool_settings: result count, Tavily depth and topic, arXiv sort, the longest model
+text, the per-session call limit, the timeout and the arXiv request interval. Only the per-session call limit has a
+default (20, DM-52 ①, scenario_schema.DEFAULT_SEARCH_CALLS_PER_SESSION); the value used is recorded. The Tavily key is read
 from TAVILY_API_KEY only and is never written: requests are recorded without it, and a stored response or error text
 that contains it has it replaced. A network error, an HTTP error or a timeout is a fact-sentence error result with an
 error record instead of a stored response; there is no automatic retry.

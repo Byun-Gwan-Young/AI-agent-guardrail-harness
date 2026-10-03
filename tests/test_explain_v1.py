@@ -63,7 +63,7 @@ class TemplateTests(unittest.TestCase):
             "E6": (signals(decision="termination_failure", declared_step=5),
                    "step 5에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 통과 테스트 7/16."),
             "E7": (signals(consecutive_states=["stagnant", "oscillating", "stagnant"]),
-                   "최근 3 step 중 1 step 은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다."),
+                   "최근 3 step 중 1 step은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다."),
             "E1-T1": (signals(task_kind="dialogue", status="received", test_observed_in_session=False,
                               test_pass_count=None, test_total_count=None, selected_metrics=T1_METRICS),
                       "최근 3 step 동안 planner·developer·reviewer 모두 처리 상태 변화·채택 항목·새 쟁점이 없습니다. "
@@ -192,7 +192,7 @@ class StopRecordTests(unittest.TestCase):
         rows = replay([artifact_obs(s, {"code.py": "same"}, issues=i) for s, i in enumerate(issues, 1)], configured())
         self.assertEqual(rows[-1]["criteria"]["consecutive_states"], ["stagnant", "stagnant", "oscillating"])
         self.assertEqual(rows[-1]["criteria"]["explanation"]["text"],
-                         "최근 3 step 중 1 step 은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다.")
+                         "최근 3 step 중 1 step은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다.")
 
     def test_dialogue_without_tests_gives_the_t1_sentence(self):
         # DM-27: no test observation in the session -> E1-T1, not E1 with "(측정 안 됨)/(측정 안 됨)" tests.

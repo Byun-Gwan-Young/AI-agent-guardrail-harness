@@ -193,6 +193,12 @@ class WriteGate(Definition):
     spec_path: str = Field(min_length=1)
 
 
+# DM-52 ①: requests one session may send per search tool unless the scenario says otherwise. 20 = the search role's
+# 10 turns in 30 steps x 2 calls that may use tools (the last of 3 calls has none). The value used is recorded with
+# the run (conditions.json tool_settings / search, manifest).
+DEFAULT_SEARCH_CALLS_PER_SESSION = 20
+
+
 class WebSearchSettings(Definition):
     """web_search (DEMO-MR, DM-21: Tavily). Read by experiments/search_tools.py and recorded with the run (decision 018)."""
     provider: Literal["tavily"]
@@ -200,7 +206,7 @@ class WebSearchSettings(Definition):
     search_depth: Literal["basic", "advanced"]
     topic: Literal["general", "news"]
     max_result_chars: int = Field(ge=200)  # longest text handed to the model for one call
-    max_calls_per_session: int = Field(ge=1)
+    max_calls_per_session: int = Field(default=DEFAULT_SEARCH_CALLS_PER_SESSION, ge=1)
     timeout_seconds: float = Field(gt=0, le=120)
 
 
@@ -211,7 +217,7 @@ class AcademicSearchSettings(Definition):
     sort_by: Literal["relevance", "lastUpdatedDate", "submittedDate"]
     sort_order: Literal["descending", "ascending"]
     max_result_chars: int = Field(ge=200)
-    max_calls_per_session: int = Field(ge=1)
+    max_calls_per_session: int = Field(default=DEFAULT_SEARCH_CALLS_PER_SESSION, ge=1)
     timeout_seconds: float = Field(gt=0, le=120)
     # arXiv API terms of use: no more than one request every three seconds.
     min_interval_seconds: float = Field(ge=3)

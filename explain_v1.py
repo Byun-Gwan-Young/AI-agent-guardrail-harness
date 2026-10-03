@@ -11,7 +11,8 @@ attached to the name by the DM-31 final-consonant rule. DM-42: after a quoted st
 attached with no space, and a path slot reads "{path} 파일이". DM-43: E4 is chosen only when both role names and the
 round-trip count are known; otherwise selection moves on to the next template. DM-49: a particle or '입니다' after a
 number is attached too ("step 1의", "12/16입니다"); number units keep their space ("3 step", "5 번"), and a particle
-that follows a final consonant is chosen by the number read aloud. DM-50: each template has required values (without
+that follows a final consonant is chosen by the number read aloud. DM-52 ⑥: a particle after the unit word "step" is
+attached as well ("6 step은"), "step" counting as a word with a final consonant (스텝). DM-50: each template has required values (without
 one, selection moves on to the next template) and auxiliary values (without one, its phrase is left out: the
 REDUCED sentence). "(측정 안 됨)" is written only in the last fallback E1.
 """
@@ -30,7 +31,8 @@ TEMPLATES = {
     "E4": "{role_a:과/와} {role_b:이/가} 문의를 서로 {h} 번 넘겼고 처리 상태는 '{status}'에서 바뀌지 않았습니다.",
     "E5": "최근 {n} step 동안 채택 항목이 {adopted}/{required}에서 늘지 않았고 처리 상태는 '{status}'입니다.",
     "E6": "step {d}에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 통과 테스트 {pass}/{total}.",
-    "E7": "최근 {n} step 중 {o} step 은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다.",
+    # DM-52 ⑥: a particle after the unit word "step" is attached too; "step" has a final consonant (스텝), so 은.
+    "E7": "최근 {n} step 중 {o} step은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다.",
 }
 # E6 for a dialogue (T1) task: the second sentence reports the status instead of tests.
 E6_DIALOGUE = "step {d}에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 처리 상태는 '{status}'입니다."

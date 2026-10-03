@@ -57,6 +57,9 @@ JUDGE_RESULTS = ('resolved', 'escalated', 'unfinished')
 SHARED_FIELDS = ('status', 'handoff_to', 'adopted_items', 'deliverable')
 OBSERVED_FIELDS = ('open_issue_ids', 'info_items', 'status', 'adopted_items', 'handoff_to')
 STOP_DECISIONS = ('deadlock', 'termination_failure')
+# DM-52 ④: printed by the pre-run check of a run with academic_search and kept in its record.
+LR_ONE_AT_A_TIME = ('academic_search keeps the arXiv request interval inside this runner process only: '
+                    'run one academic_search (LR) session at a time (DM-52)')
 
 
 canonical_sha256 = common.canonical_sha256
@@ -242,8 +245,12 @@ def tool_preflight(scenario, root, environ):
                    if problem != 'inputs_dir not found'])
     if problems:
         raise ValueError('Pre-run check failed: ' + '; '.join(problems))
-    return {'check': 'dialogue-tool-preflight-v1', 'tools_implemented': used, 'keys': keys,
-            'inputs_dir': scenario.inputs_dir, 'input_problems': inputs}
+    record = {'check': 'dialogue-tool-preflight-v1', 'tools_implemented': used, 'keys': keys,
+              'inputs_dir': scenario.inputs_dir, 'input_problems': inputs}
+    if 'academic_search' in used:
+        # DM-52 ④: the arXiv interval is kept per runner process (decision 018); no lock between processes.
+        record['notices'] = [LR_ONE_AT_A_TIME]
+    return record
 
 
 async def run_dialogue(args, scenario, scenario_path):
@@ -252,6 +259,8 @@ async def run_dialogue(args, scenario, scenario_path):
     mode = check_arguments(args, scenario)
     model_name, model_record = common.run_model(scenario, args)
     preflight = tool_preflight(scenario, SCENARIO_ROOT, os.environ)
+    for notice in preflight.get('notices', []):
+        print('notice:', notice, flush=True)
     key_env = getattr(args, 'api_key_env', None) or 'GROQ_API_KEY'
     key = os.environ.get(key_env)
     if not key:

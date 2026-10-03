@@ -67,7 +67,8 @@ seconds, and limit requests to a single connection at a time". 사용 설명서�
 - **한계 (보고)** : 간격은 **실행기 프로세스 하나 안에서만** 지킨다. LR 세션 여러 개를 수동 병렬(DM-24, 창 3 개)로 돌리면 프로세스끼리는 간격을 모른다.
   LR 세션은 한 번에 하나만 돌리는 것을 제안한다 (보고 6 절)
 
-**설정** — 시나리오 `tool_settings` 에서만 읽는다. 코드에 기본값이 없다. 역할이 쓰는 검색 도구마다 설정이 정확히 있어야 하고(없으면 스키마 오류),
+**설정** — 시나리오 `tool_settings` 에서만 읽는다. 코드에 기본값이 없다 (C-17-8 부터 `max_calls_per_session` 만 예외 : 기본값 20, DM-52 ①, 아래 C-17-8 절).
+역할이 쓰는 검색 도구마다 설정이 정확히 있어야 하고(없으면 스키마 오류),
 쓰지 않는 도구의 설정도 오류. 산출물 과제는 `tool_settings` 를 가질 수 없다. 설정과 그 해시는 `conditions.json` (`tool_settings`, `search`),
 검색 기록 한 줄마다, 매니페스트 v0.6 `task.tool_settings`·`task.search` 에 남는다.
 
@@ -211,8 +212,54 @@ Tavily 요청·원문 바이트 저장·정규화·모델 텍스트·호출 참�
 ```bash
 cd ~/AI-agent-guardrail-harness
 export TAVILY_API_KEY="$(pbpaste)"
-echo ${#TAVILY_API_KEY} ${TAVILY_API_KEY:0:4}
+echo ${#TAVILY_API_KEY}
 venv/bin/python tools/probe_search.py
+unset TAVILY_API_KEY
 ```
 
+(C-17-8 : DM-53 형식으로 고쳤다 — 키는 길이만 출력하고 끝나면 `unset`. C-17-6 원래 블록은 앞 4 자리를 출력했다)
+
 - 결과 폴더는 `runs/search-probes/` 아래 (`runs/` 는 `.gitignore` 대상). 커밋은 D-11 검사 뒤 `git add -f` (기존 probe 와 같은 절차)
+
+## C-17-8 파트 0 — C-17-6 결정 반영 (DM-52) · 검색 probe 결과
+
+**① 세션당 검색 호출 상한 기본값 20 확정** — 시나리오가 `max_calls_per_session` 을 쓰지 않으면 20 (`scenario_schema.DEFAULT_SEARCH_CALLS_PER_SESSION`).
+C-17-6 에서는 필수 값(기본값 없음)이었다. 근거는 위 "기본값 제안" 과 같다 (검색 담당 차례 10 × 도구를 쓸 수 있는 호출 2). 시나리오 값이 있으면 그 값을 쓴다.
+쓰인 값은 스키마가 채운 뒤 기록되므로 `conditions.json` `tool_settings`·`search.<tool>.settings`, 검색 기록 한 줄마다, 매니페스트에 그대로 남는다 (테스트).
+`max_results` 등 나머지 설정은 계속 필수다.
+
+**④ LR 세션은 동시에 하나만** — arXiv 간격(3 초)은 실행기 프로세스 하나 안에서만 지킨다. 프로세스 사이 잠금은 만들지 않았다 (지시대로).
+대신 `academic_search` 를 쓰는 실행의 실행 전 검사가 안내를 낸다 : 표준 출력 `notice: academic_search keeps the arXiv request interval inside this runner
+process only: run one academic_search (LR) session at a time (DM-52)` 과 `conditions.json` `tool_preflight.notices`. `academic_search` 가 없는 실행의
+검사 기록은 C-17-6 과 같다 (`notices` 키 없음, 테스트). C-19 수동 병렬(DM-24)에서 LR 창은 하나만 연다.
+
+**②③⑤** — 구현대로라 바꾼 것 없음 (결과 수는 설정값만, `read_policy` 오류 문장 유지, arXiv 질의 그대로·Tavily 세 값 false).
+
+**⑥** — 결정 문서 013 "C-17-8 파트 0 재동결" 절.
+
+**검색 probe `runs/search-probes/search-probe-46ec37a0…` (PM 실행 2026-10-02) 반영**
+
+| 제공자 | 결과 | 모양 비교 (fixture 대비) |
+|---|---|---|
+| Tavily | 200, 결과 5 건, 정규화 성공 | `same_shape: true`. 응답에만 있는 경로 `follow_up_questions`, `results[].id` (도구가 읽지 않는 필드, 변경 없음) |
+| arXiv | 200, 결과 5 건, 전체 1,056 건, 정규화 성공, `tool_fields_present: true` | `same_shape: false` — 아래 세 속성이 응답에 없음 |
+
+arXiv 응답에 없던 것 (fixture 에만 있었다) :
+
+- `feed/link@rel` — 피드의 `link` 에 `rel="self"` 가 없다 (`href`, `type` 만)
+- `feed/title@type` — 피드 `title` 에 `type="html"` 이 없다
+- `feed/entry/arxiv:primary_category@scheme` — 항목의 `arxiv:primary_category` 에 `scheme` 이 없다 (`term` 만. `category` 에는 `scheme` 이 있다)
+- 선택 요소 (변화로 치지 않음) : 다섯 항목 모두 `arxiv:doi`, `arxiv:journal_ref`, `author/arxiv:affiliation` 이 없다. `arxiv:comment` 는 다섯 항목 모두 있다
+- 그 밖에 보이는 차이 (모양 비교 대상 아님) : 이름공간 선언이 루트에 모여 있고, 피드 `id`·링크가 `https://arxiv.org/…` 다. 항목 `id` 는 여전히 `http://arxiv.org/abs/…` 라
+  `ABS_ID` (http·https 모두 허용) 로 읽힌다
+
+반영 :
+
+- `tests/fixtures/search/arxiv-query-200.xml` 에서 세 속성을 뺐다 (내용은 합성 그대로). 이제 probe 응답과 비교하면 `same_shape: true`, 선택 요소 셋만 `optional_absent`
+  (테스트 `tests/test_c17_8_part0.py` 가 커밋된 probe 응답 파일과 직접 비교한다). fixture 의 다른 항목은 doi·journal_ref·affiliation 을 그대로 가져 두 경우를 함께 시험한다
+- 파서(`search_tools.normalize`)는 고치지 않았다. 세 속성은 원래 읽지 않는다. 항목마다 있거나 없는 요소를 견디는지 테스트를 더했다 :
+  선택 요소 전부 있음 / 전부 없음(`title` 만) / `summary` 없음 / `title`·`author/name`·`published` 날짜·`totalResults` 없음 → 각각 빈 문자열·빈 목록·`null` 로 정규화.
+  항목 `id` 가 arXiv 초록 주소가 아니면 지금처럼 `parse_error` (판정 함수가 대조하는 값이라 없으면 결과를 쓸 수 없다)
+- D-11 : probe 폴더를 `secret_scan` (기본 패턴 + Tavily 패턴 `tvly-…` + `TAVILY_API_KEY` 값) 으로 검사한 뒤 `git add -f` 로 커밋했다 (`reports/c17-8/evidence-search-probe.json`).
+  이 환경에는 `TAVILY_API_KEY` 가 없어 **키 값 자체 검사는 하지 못했다** — PM 명령은 C-17-8 보고서
+

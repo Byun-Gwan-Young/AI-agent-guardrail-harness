@@ -9,7 +9,7 @@
     "E4": "{role_a:과/와} {role_b:이/가} 문의를 서로 {h} 번 넘겼고 처리 상태는 '{status}'에서 바뀌지 않았습니다.",
     "E5": "최근 {n} step 동안 채택 항목이 {adopted}/{required}에서 늘지 않았고 처리 상태는 '{status}'입니다.",
     "E6": "step {d}에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다. 통과 테스트 {pass}/{total}.",
-    "E7": "최근 {n} step 중 {o} step 은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다."
+    "E7": "최근 {n} step 중 {o} step은 이전 상태로 되돌아갔고, 나머지는 변화가 없었습니다."
   },
   "variants": {
     "E6": {
@@ -151,5 +151,5 @@
     "E6": "step {d}에 완료가 선언됐지만 이후 {n} step 동안 진전이 없습니다."
   },
   "fallback": "E1",
-  "templates_sha256": "485aec746740f6ecf59126fe122b6e210c6048515a186057f7146b6327800ac8"
+  "templates_sha256": "1236f4b7170e5d9417255ce93c244869fc3bbfb13a5099ed1b288d2e78124a9f"
 }

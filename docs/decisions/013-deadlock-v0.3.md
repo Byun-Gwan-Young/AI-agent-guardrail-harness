@@ -344,3 +344,31 @@ E1-T1 `no_test_observation_in_session` → E1 `otherwise`
 **기존 세션 재계산** (`--previous reports/c17-5/v03-recompute.json --output reports/c17-6/v03-recompute.json`) :
 첫 STOP 6 / 없음 / 9, A-1-v3 새 STOP 없음, v0.2 바이트 동일, 이전 대비 상태·판정 변화 0, 첫 STOP 문장 동일.
 STOP 기록 전체(G0-8 8 건, A-1-v4 22 건)의 문장도 이전 보고와 같다 — 모두 E1 이고 E1 에는 숫자 뒤 조사 자리가 없다
+
+## C-17-8 파트 0 재동결 (DM-52 ⑥ 단위 낱말 뒤 조사)
+
+- **DM-52 ⑥** : 단위 낱말 뒤 조사도 붙여 쓴다 ("6 step은", "step에"). "step" 은 받침 있음(스텝)으로 보고 받침형 조사(은·이·을·과)를 쓴다
+  - 고친 자리 : **E7 "{o} step 은" → "{o} step은"** 하나뿐이다
+  - 찾은 방법 (보고) : 템플릿 전체(`TEMPLATES`, `E6_DIALOGUE`, `REDUCED`)와 코드·설정·시나리오의 한국어 문장에서 "step" 바로 뒤 한국어 글자를 모두 뽑았다.
+    E7 외에는 "step 동안"(E1·E1-T1·E2·E3·E5·E6), "step 이후"(E3), "step 중"(E7) 처럼 뒤가 조사가 아닌 명사라 띄어 쓰는 것이 맞다.
+    숫자 뒤 "step {k}의"·"step {d}에" 는 DM-49 에서 이미 붙였다. "{c} 번", "{h} 번" 뒤는 조사가 아니라 동사라 그대로다
+  - 테스트 (`tests/test_c17_8_part0.py`) : 모든 템플릿·축약형에서 "step" 과 조사 사이 공백 없음, "step" 뒤 비받침형(는·가·를·와) 없음, E7 문장 전체
+  - 받침 규칙(`has_final_consonant`)은 바꾸지 않았다. "step" 은 값 자리(slot)가 아니라 템플릿 글자라 조사를 템플릿에 직접 쓴다
+- 판정·선택 순서·필수 값은 바뀌지 않았다
+
+**이전 해시 (C-17-6 파트 0, `a3f1c95`) → 새 해시 (C-17-8 파트 0)**
+
+| 대상 | 이전 | 새 |
+|---|---|---|
+| `docs/criteria/deadlock-v0.3.json` 파일 | `5c1ce57602b4904a918c766d67a8a37e9d56599594b5a270d464b424178eb7bf` | `2522b94ab5640d2e9ed54e44a6be01323a7b9e2ebade259110b0849eb8275be3` |
+| `criteria_sha256` (파라미터) | `a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50` | 같음 |
+| `deadlock_policy_v03.py` | `794f65e26211b7bcebbe4deadfa3e30f30dbaecc6fe361681854db23e2cef3b0` | 같음 |
+| `explain_v1.py` | `f009b56dd55b53618bb42ad1327754a711df4793a4b4115502f8d0795c6c8e42` | `764e649db00a70dba8d5a4c326bc3ab67298552972ff665d9929acd68dfd5f12` |
+| `progress_signal_v3.py` | `dc727697e0832a305569839d3fc347f36c093a09811e93183cc4fc478a8d6c94` | 같음 |
+| `docs/criteria/explain-v1.json` 파일 | `47da1ef21c8f9b4675b729ac7d9e7143efca32fbbb8d782c6d90222011e53631` | `a53e6408169accd3398cab9d3e21856b9cf05a2935420a188aff62183f4703e7` |
+| `explanation_templates_sha256` | `485aec746740f6ecf59126fe122b6e210c6048515a186057f7146b6327800ac8` | `1236f4b7170e5d9417255ce93c244869fc3bbfb13a5099ed1b288d2e78124a9f` |
+
+**기존 세션 재계산** (`--previous reports/c17-6/v03-recompute.json --output reports/c17-8/v03-recompute.json`) :
+첫 STOP 6 / 없음 / 9, A-1-v3 새 STOP 없음, v0.2 바이트 동일, 이전 대비 상태·판정 변화 0, 첫 STOP 문장 동일.
+STOP 기록 전체(G0-8 8 건, A-1-v4 22 건)의 문장도 C-17-6 보고와 같다 — 모두 E1 이고 E1 에는 단위 낱말 뒤 조사 자리가 없다 (E7 은 세 세션에서 골라지지 않는다)
+
