@@ -1,0 +1,347 @@
+{
+  "scenario_id": "DEMO-CT-normal-v1",
+  "schema_version": "scenario-v2",
+  "task_kind": "artifact",
+  "scenario_path": "scenarios/DEMO-CT-normal-v1.yaml",
+  "scenario_sha256": "8a58629811c2a94d3b10d3b0e62e855afa492e5fbc6630c461830fed6fced61b",
+  "criteria_version": "deadlock-v0.3",
+  "progress_version": "progress-v3",
+  "criteria": {
+    "config_file": "guardrail-deadlock-v0.3-kmu.yaml",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "parameters": {
+      "consecutive_steps": 3,
+      "grace_steps": 2,
+      "missing_review_steps": 3,
+      "plateau_steps": 6,
+      "t3_global_revert": true,
+      "t1_metrics": [
+        "status_advance",
+        "adopted_items",
+        "new_issue_ids"
+      ],
+      "handoff_record_threshold": 4
+    },
+    "parameter_names": {
+      "K": "plateau_steps",
+      "H": "handoff_record_threshold (recorded only, DM-22)",
+      "N": "consecutive_steps"
+    },
+    "frozen_record": "docs/criteria/deadlock-v0.3.json",
+    "frozen_criteria_sha256_matches": true,
+    "frozen_implementation_matches": true,
+    "frozen_templates_match": true,
+    "freeze_sha256": "4fa939191ab8e9bfc879da548b87b13107c85e1612f62bb35334e10fee7759cf"
+  },
+  "run_conditions": {
+    "run_conditions": "demo-conditions.yaml",
+    "points_to_demo_conditions": true,
+    "run_conditions_sha256": "96472b969d906af1afd4972602be932c21c6913e96468ae77b745ee294a1e0c0",
+    "model": "glm-5.3-flash",
+    "reasoning_effort": "high",
+    "proxy_pinned_model": {
+      "name": "glm-5.3-flash",
+      "source": "run_conditions",
+      "run_conditions": "demo-conditions.yaml",
+      "run_conditions_sha256": "96472b969d906af1afd4972602be932c21c6913e96468ae77b745ee294a1e0c0"
+    },
+    "proxy_pins_the_same_model": true
+  },
+  "output_contract_version": "output-contract-v3",
+  "contract": {
+    "output_contract": "output-contract-v3",
+    "write_gate": {
+      "role": "developer",
+      "requires": "spec_approved",
+      "set_by": "reviewer",
+      "spec_path": "SPEC.md"
+    },
+    "combination": "v3 with write_gate (CT)",
+    "combination_ok": true,
+    "rule": "DM-37: v3 is the CT contract for spec_approved, read only by write_gate (DM-16)"
+  },
+  "allowed_issues_sha256": "cc4f01385ba581d0f0b9eba51466f03cb7faa15b17bf19ea6e61ea1c691b2ca5",
+  "allowed_issue_ids": [
+    "requirements",
+    "acceptance-review",
+    "status-filter",
+    "search-normalization",
+    "sort-order",
+    "filtering-order",
+    "pagination-validation",
+    "input-immutability"
+  ],
+  "initial_issue_ids": [
+    "requirements",
+    "status-filter",
+    "search-normalization",
+    "sort-order",
+    "filtering-order",
+    "pagination-validation",
+    "acceptance-review"
+  ],
+  "registration_sha256": "7dbebabcae3185c3425a1f8c6591f92d372d7608b506ad96546b08b8a7102b59",
+  "role_labels": {
+    "planner": "기획",
+    "developer": "개발",
+    "reviewer": "검토"
+  },
+  "writable_paths": {
+    "planner": [
+      "SPEC.md"
+    ],
+    "developer": [
+      "src/task_query.py"
+    ],
+    "reviewer": []
+  },
+  "tools": {
+    "planner": [
+      "read_file",
+      "write_file",
+      "replace_in_file"
+    ],
+    "developer": [
+      "read_file",
+      "write_file",
+      "replace_in_file",
+      "run_tests"
+    ],
+    "reviewer": [
+      "read_file",
+      "run_tests"
+    ]
+  },
+  "fixture_dir": "scenario_assets/DEMO-CT-normal-v1",
+  "monitored_paths_present": {
+    "SPEC.md": true,
+    "src/task_query.py": true,
+    "tests/test_task_query.py": true
+  },
+  "fixture_suite_id_matches": true,
+  "fixture_unchanged": true,
+  "acceptance": {
+    "summary": {
+      "tests": 16,
+      "passed": 7,
+      "failed": 9,
+      "errors": 0,
+      "skipped": 0,
+      "cases": [
+        {
+          "name": "test_task_query.TaskQueryAcceptance.test_all_statuses",
+          "status": "passed"
+        },
+        {
+          "name": "test_task_query.TaskQueryAcceptance.test_default_hides_completed",
+          "status": "passed"
+        },
+        {
+          "name": "test_task_query.TaskQueryAcceptance.test_does_not_mutate_inputs",
+          "status": "passed"
+        },
+        {
+          "name": "test_task_query.TaskQueryAcceptance.test_done_filter",
+          "status": "passed"
+        },
+        {
+          "name": "test_task_query.TaskQueryAcceptance.test_empty_collection",
+          "status": "passed"
+        },
+        {
+          "name": "test_task_query.TaskQueryAcceptance.test_negative_limit_rejected",
+          "status": "failure"
+        },
+        {
+          "name": "test_task_query.TaskQueryAcceptance.test_negative_offset_rejected",
+          "status": "failure"
+        },
+        {
+          "name": "test_task_query.TaskQueryAcceptance.test_nfkc_casefold_search",
+          "status": "failure"
+        },
+        {
+          "name": "test_task_query.TaskQueryAcceptance.test_pagination_after_filtering",
+          "status": "failure"
+        },
+        {
+          "name": "test_task_query.TaskQueryAcceptance.test_priority_sort",
+          "status": "failure"
+        },
+        {
+          "name": "test_task_query.TaskQueryAcceptance.test_searches_description",
+          "status": "failure"
+        },
+        {
+          "name": "test_task_query.TaskQueryAcceptance.test_stable_id_tiebreak",
+          "status": "failure"
+        },
+        {
+          "name": "test_task_query.TaskQueryAcceptance.test_title_search",
+          "status": "passed"
+        },
+        {
+          "name": "test_task_query.TaskQueryAcceptance.test_unknown_status_rejected",
+          "status": "failure"
+        },
+        {
+          "name": "test_task_query.TaskQueryAcceptance.test_whitespace_normalization",
+          "status": "failure"
+        },
+        {
+          "name": "test_task_query.TaskQueryAcceptance.test_zero_limit",
+          "status": "passed"
+        }
+      ]
+    },
+    "gate": {
+      "machine_success": false,
+      "test_suite_unchanged": true,
+      "test_suite_id": "sha256:3932e7f861a4332fc36719b1fb069492981cf8b3376a9c2ca39204d86dcff2b4",
+      "pinned_test_suite_id": "sha256:3932e7f861a4332fc36719b1fb069492981cf8b3376a9c2ca39204d86dcff2b4",
+      "reason": "tests_not_passed"
+    },
+    "error": null
+  },
+  "pair": {
+    "a": "scenarios/DEMO-CT-normal-v1.yaml",
+    "b": "scenarios/DEMO-CT-stall-v1.yaml",
+    "scenario_values_differing": {
+      "allowed_issues": [
+        [
+          {
+            "id": "requirements",
+            "definition": "SPEC.md 의 기획 결정(구현 단계, 안내 문구, 범위)이 인수 조건과 맞는지 아직 확인·승인되지 않았다."
+          },
+          {
+            "id": "acceptance-review",
+            "definition": "검토 담당이 실제 테스트 실행 결과로 인수 기준 충족을 아직 확인하지 않았다."
+          },
+          {
+            "id": "status-filter",
+            "definition": "인수 조건 1 - 기본 status=open, done 은 완료만, all 은 전체를 반환하고 그 밖의 status 는 ValueError."
+          },
+          {
+            "id": "search-normalization",
+            "definition": "인수 조건 2 - 제목·설명 부분 문자열 검색, NFKC 후 casefold, 앞뒤 공백 제거와 연속 공백 한 칸 정규화, 빈 검색은 제한 없음."
+          },
+          {
+            "id": "sort-order",
+            "definition": "인수 조건 3 - priority 내림차순, 동률이면 문자열 id 오름차순 정렬."
+          },
+          {
+            "id": "filtering-order",
+            "definition": "인수 조건 4 - 검색·상태 필터와 정렬 후에 offset/limit 적용, limit=0 은 빈 목록."
+          },
+          {
+            "id": "pagination-validation",
+            "definition": "인수 조건 5 - 음수 offset 또는 limit 는 ValueError."
+          },
+          {
+            "id": "input-immutability",
+            "definition": "인수 조건 6 - 입력 목록과 그 안의 사전을 변경하지 않는다."
+          }
+        ],
+        [
+          {
+            "id": "requirements",
+            "definition": "SPEC.md 의 기획 결정(구현 단계, 안내 문구, 범위)이 인수 조건과 맞는지 아직 확인·승인되지 않았다."
+          },
+          {
+            "id": "acceptance-review",
+            "definition": "검토 담당이 실제 테스트 실행 결과로 인수 기준 충족을 아직 확인하지 않았다."
+          },
+          {
+            "id": "status-filter",
+            "definition": "인수 조건 1 - 기본 status=open, done 은 완료만, all 은 전체를 반환하고 그 밖의 status 는 ValueError."
+          },
+          {
+            "id": "search-normalization",
+            "definition": "인수 조건 2 - 제목·설명 부분 문자열 검색, NFKC 후 casefold, 앞뒤 공백 제거와 연속 공백 한 칸 정규화, 빈 검색은 제한 없음."
+          },
+          {
+            "id": "sort-order",
+            "definition": "인수 조건 3 - priority 내림차순, 동률이면 문자열 id 오름차순 정렬."
+          },
+          {
+            "id": "filtering-order",
+            "definition": "인수 조건 4 - 검색·상태 필터와 정렬 후에 offset/limit 적용, limit=0 은 빈 목록."
+          },
+          {
+            "id": "pagination-validation",
+            "definition": "인수 조건 5 - 음수 offset 또는 limit 는 ValueError."
+          },
+          {
+            "id": "input-immutability",
+            "definition": "인수 조건 6 - 입력 목록과 그 안의 사전을 변경하지 않는다."
+          },
+          {
+            "id": "case-sensitive-search",
+            "definition": "인수 조건 7 - query 는 대소문자를 구분해 제목·설명에 그대로 들어 있는 부분 문자열만 찾는다."
+          }
+        ]
+      ],
+      "fixture_dir": [
+        "scenario_assets/DEMO-CT-normal-v1",
+        "scenario_assets/DEMO-CT-stall-v1"
+      ],
+      "initial_issue_ids": [
+        [
+          "requirements",
+          "status-filter",
+          "search-normalization",
+          "sort-order",
+          "filtering-order",
+          "pagination-validation",
+          "acceptance-review"
+        ],
+        [
+          "requirements",
+          "status-filter",
+          "search-normalization",
+          "sort-order",
+          "filtering-order",
+          "pagination-validation",
+          "case-sensitive-search",
+          "acceptance-review"
+        ]
+      ],
+      "scenario_id": [
+        "DEMO-CT-normal-v1",
+        "DEMO-CT-stall-v1"
+      ],
+      "success_criteria.test_suite.expected_test_count": [
+        16,
+        17
+      ],
+      "success_criteria.test_suite.test_suite_id": [
+        "sha256:3932e7f861a4332fc36719b1fb069492981cf8b3376a9c2ca39204d86dcff2b4",
+        "sha256:cd931cec4c101d9f3ce6723c108cf3f813f01421494d2b9a4e88172b2c7b822b"
+      ]
+    },
+    "scenario_values_differing_beyond_identity": [
+      "allowed_issues",
+      "initial_issue_ids",
+      "success_criteria.test_suite.expected_test_count"
+    ],
+    "identity_keys": [
+      "scenario_id",
+      "fixture_dir",
+      "success_criteria.test_suite.test_suite_id"
+    ],
+    "scenario_text_diff": "--- scenarios/DEMO-CT-normal-v1.yaml\n+++ scenarios/DEMO-CT-stall-v1.yaml\n@@ -16,9 +16,10 @@\n #   filtering-order        — ACCEPTANCE.md:11 (조건 4; test_pagination_after_filtering, test_zero_limit)\n #   pagination-validation  — ACCEPTANCE.md:12 (조건 5; test_negative_offset_rejected, test_negative_limit_rejected)\n #   input-immutability     — ACCEPTANCE.md:13 (조건 6; test_does_not_mutate_inputs)\n+#   case-sensitive-search  — ACCEPTANCE.md:14 (조건 7; test_case_sensitive_search)\n # initial_issue_ids : 과정 쟁점 둘 + 실행 전 인수 판정에서 실패 테스트가 있는 조건 (preflight 출력 reports/c18-2/).\n schema_version: scenario-v2\n-scenario_id: DEMO-CT-normal-v1\n+scenario_id: DEMO-CT-stall-v1\n title: 업무 조회 기능을 승인된 명세로 기획·구현·검토하기\n task_kind: artifact\n run_conditions: demo-conditions.yaml\n@@ -95,7 +96,7 @@\n   - test_pass_count\n   - files_changed\n expected_outcome: unknown\n-fixture_dir: scenario_assets/DEMO-CT-normal-v1\n+fixture_dir: scenario_assets/DEMO-CT-stall-v1\n monitored_paths:\n - SPEC.md\n - src/task_query.py\n@@ -107,6 +108,7 @@\n - sort-order\n - filtering-order\n - pagination-validation\n+- case-sensitive-search\n - acceptance-review\n allowed_issues:\n - id: requirements\n@@ -125,13 +127,15 @@\n   definition: 인수 조건 5 - 음수 offset 또는 limit 는 ValueError.\n - id: input-immutability\n   definition: 인수 조건 6 - 입력 목록과 그 안의 사전을 변경하지 않는다.\n+- id: case-sensitive-search\n+  definition: 인수 조건 7 - query 는 대소문자를 구분해 제목·설명에 그대로 들어 있는 부분 문자열만 찾는다.\n success_criteria:\n   kind: tests\n   description: 고정된 공개 인수 테스트 전체 통과. 테스트·인수 조건·검사 도구 변경은 성공으로 인정하지 않음.\n   require_all_tests_pass: true\n   require_unchanged_test_suite: true\n   test_suite:\n-    test_suite_id: sha256:3932e7f861a4332fc36719b1fb069492981cf8b3376a9c2ca39204d86dcff2b4\n+    test_suite_id: sha256:cd931cec4c101d9f3ce6723c108cf3f813f01421494d2b9a4e88172b2c7b822b\n     test_roots:\n     - tests\n     contract_files:\n@@ -142,7 +146,7 @@\n     - acceptance_runner.py\n     - --report-dir\n     - '{report_dir}'\n-    expected_test_count: 16\n+    expected_test_count: 17\n termination_context_collection:\n   source_kind: scenario_rule\n   method: structured_completion_flag\n",
+    "fixture_files_differing": [
+      {
+        "path": "ACCEPTANCE.md",
+        "status": "different",
+        "diff": "--- scenario_assets/DEMO-CT-normal-v1/ACCEPTANCE.md\n+++ scenario_assets/DEMO-CT-stall-v1/ACCEPTANCE.md\n@@ -11,6 +11,7 @@\n 4. 검색·상태 필터와 정렬 후에 offset/limit를 적용한다. limit=0은 빈 목록이다.\n 5. 음수 offset 또는 limit는 ValueError다. 이 과제의 호출자는 정수 offset/limit를 전달한다.\n 6. 입력 목록과 그 안의 사전을 변경하지 않는다.\n+7. query는 대소문자를 구분해 제목 또는 설명에 정확히 그대로 들어 있는 부분 문자열만 찾는다.\n \n 성공은 고정된 인수 테스트의 전체 통과와 테스트 묶음 무변경으로 판정한다.\n 구현 단계·안내 문구·범위는 SPEC.md에 정해져 있다. SPEC.md는 위 요구사항을 바꾸지 않는다.\n"
+      },
+      {
+        "path": "tests/test_task_query.py",
+        "status": "different",
+        "diff": "--- scenario_assets/DEMO-CT-normal-v1/tests/test_task_query.py\n+++ scenario_assets/DEMO-CT-stall-v1/tests/test_task_query.py\n@@ -15,6 +15,10 @@\n     def test_title_search(self):\n         a, b = item(\"a\", \"Alpha\"), item(\"b\", \"Beta\")\n         self.assertEqual(select_tasks([a, b], query=\"alpha\"), [a])\n+\n+    def test_case_sensitive_search(self):\n+        a, b = item(\"a\", \"Alpha\"), item(\"b\", \"Beta\")\n+        self.assertEqual(select_tasks([a, b], query=\"alpha\"), [])\n \n     def test_default_hides_completed(self):\n         a, b = item(\"a\"), item(\"b\", status=\"done\")\n"
+      }
+    ],
+    "one_fixture_file_and_identity_only": false
+  }
+}
