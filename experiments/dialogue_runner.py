@@ -33,7 +33,7 @@ from importlib.metadata import version
 
 import httpx
 
-from experiments import cs_tools, dialogue_tools, search_tools
+from experiments import cs_tools, dialogue_tools, gateway_usage, search_tools
 from experiments import run_scenario as common
 from experiments.dialogue_contract import V3, VOCABULARY_VIOLATIONS_V3, for_dialogue_scenario
 from experiments.observation_collection import INDEPENDENT, collection_metadata, select_sources
@@ -365,6 +365,8 @@ async def run_dialogue(args, scenario, scenario_path, run_conditions=None):
     steps, missing, observation_first, claims = [], [], None, []
     reason, error, session, started = 'max_steps', None, None, False
     guardrail_block, escalated_by, latest_report, gate = None, None, None, None
+    # DM-58 ③: /credits/ read before the first model request and after the session ends (gateway_usage).
+    usage_before, upstream_meta = None, None
     history, cursors, pending_feedback = [], [0] * len(agents), [None] * len(agents)
     strict_streak = StrictFailureStreak()
     vocabulary_streak, vocabulary_total = StrictFailureStreak(), 0
@@ -391,6 +393,8 @@ async def run_dialogue(args, scenario, scenario_path, run_conditions=None):
                              guardrail_mode=meta.get('guardrail_mode'), proxy_pinned_model=pin)
             common.save(conditions_path, effective)
             common.enforce_observe_proxy(dataset_run, meta.get('guardrail_mode'))
+            upstream_meta = meta.get('upstream')
+            usage_before = await gateway_usage.reading(upstream_meta, key)
             for step in range(1, scenario.termination.max_steps + 1):
                 name = agents[index].name
                 budget.reset()
@@ -544,6 +548,7 @@ async def run_dialogue(args, scenario, scenario_path, run_conditions=None):
                     common.save(out / 'prompt-trend.json', common.prompt_trace(steps, session))
                 except httpx.HTTPError as exc:
                     cleanup_errors.append('log: ' + str(exc))
+            usage_after = await gateway_usage.reading(upstream_meta, key) if usage_before is not None else None
             await model.close()
             await model_http.aclose()
             turns = session.get('turns', []) if session else []
@@ -571,7 +576,8 @@ async def run_dialogue(args, scenario, scenario_path, run_conditions=None):
                 'recent_messages_rule': RECENT_MESSAGES_RULE,
                 'route_fallbacks': [{'step_id': s['step_id'], 'reason': s['route']['fallback_reason']}
                                     for s in steps if (s.get('route') or {}).get('fallback_reason')],
-                'search': search.summary() if search is not None else None}
+                'search': search.summary() if search is not None else None,
+                'gateway_usage': gateway_usage.record(usage_before, usage_after)}
             if guardrail_block is not None:
                 summary['guardrail_stop'] = guardrail_block
             common.save(out / 'summary.json', summary)

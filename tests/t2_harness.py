@@ -98,13 +98,19 @@ def scenario_file(directory, contract=V3, gate=None, max_steps=8, **changes):
 
 async def run_t2(reports, *, tools=None, config=OBSERVE_CONFIG, contract=V3, gate=None, max_steps=8,
                  output_contract=None, runner_protocol=PROTOCOL_V10, phase="demo", dataset_run=False,
-                 output_root=None, closed_list_check=None, scenario_changes=None, tests=None):
-    """Returns the run folder files, the proxy log and every upstream request."""
+                 output_root=None, closed_list_check=None, scenario_changes=None, tests=None, scenario_path=None,
+                 real_acceptance=False):
+    """Returns the run folder files, the proxy log and every upstream request.
+
+    scenario_path runs that scenario file as it is (C-18-1: the DEMO-CL files) instead of a changed copy of FIXTURE;
+    real_acceptance keeps the runner's own acceptance run (the scenario's tests in a subprocess, offline).
+    """
     import experiments.run_scenario as runner
     from proxy import create_app
     upstream = Upstream(reports, tools)
     root = Path(tests.enterContext(tempfile.TemporaryDirectory()) if tests else tempfile.mkdtemp())
-    path = scenario_file(root, contract, gate, max_steps, **(scenario_changes or {}))
+    path = (Path(scenario_path) if scenario_path is not None
+            else scenario_file(root, contract, gate, max_steps, **(scenario_changes or {})))
     from pinned_configs import for_model
     # A scenario with run_conditions (DM-57) runs through the real demo configuration.
     sent_model = yaml.safe_load(path.read_text(encoding="utf-8")).get("model")
@@ -125,9 +131,10 @@ async def run_t2(reports, *, tools=None, config=OBSERVE_CONFIG, contract=V3, gat
                            closed_list_check=closed_list_check)
     clean = {"git_commit": "0" * 40, "git_dirty": False, "git_state_status": "measured", "git_state_reason": None}
     stdout = io.StringIO()
+    acceptance = runner.Workspace.acceptance if real_acceptance else measured
     with mock.patch.object(runner, "DEMO_OUTPUT_ROOT", demo_root), \
             mock.patch.object(runner, "git_state", return_value=clean), \
-            mock.patch.object(runner.Workspace, "acceptance", measured), \
+            mock.patch.object(runner.Workspace, "acceptance", acceptance), \
             mock.patch("httpx.AsyncClient", OfflineClient), mock.patch.dict("os.environ", {"KMU_API_KEY": "fake"}), \
             contextlib.redirect_stdout(stdout):
         code = await runner.run(args)

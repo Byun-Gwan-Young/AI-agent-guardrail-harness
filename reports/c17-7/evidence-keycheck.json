@@ -1,0 +1,243 @@
+{
+ "probe_9d2b2053": {
+  "folder": "runs/gateway-probes/gateway-probe-9d2b2053fa2d41e982e3352bf1adacc7",
+  "created_at": "2026-09-29T03:01:46.694263+00:00",
+  "scenario_id": "A-1-v4",
+  "models": [
+   "accounts/fireworks/models/gpt-oss-120b",
+   "claude-sonnet-5",
+   "claude-haiku-4-5-20251001",
+   "gpt-5.5",
+   "gpt-6-sol",
+   "gpt-6-luna"
+  ],
+  "requests": [
+   {
+    "model": "accounts/fireworks/models/gpt-oss-120b",
+    "variant": "short-no-tools",
+    "http_status": 200,
+    "error_message_in_result": null,
+    "error_message_from_response": null,
+    "error_param": null,
+    "sent_fields": {},
+    "tool_calls_returned": 0
+   },
+   {
+    "model": "accounts/fireworks/models/gpt-oss-120b",
+    "variant": "v8-tools-reasoning-high",
+    "http_status": 200,
+    "error_message_in_result": null,
+    "error_message_from_response": null,
+    "error_param": null,
+    "sent_fields": {
+     "tools": 4,
+     "tool_choice": "auto",
+     "reasoning_effort": "high"
+    },
+    "tool_calls_returned": 1
+   },
+   {
+    "model": "claude-sonnet-5",
+    "variant": "short-no-tools",
+    "http_status": 200,
+    "error_message_in_result": null,
+    "error_message_from_response": null,
+    "error_param": null,
+    "sent_fields": {},
+    "tool_calls_returned": 0
+   },
+   {
+    "model": "claude-sonnet-5",
+    "variant": "v8-tools-reasoning-high",
+    "http_status": 200,
+    "error_message_in_result": null,
+    "error_message_from_response": null,
+    "error_param": null,
+    "sent_fields": {
+     "tools": 4,
+     "tool_choice": "auto",
+     "reasoning_effort": "high"
+    },
+    "tool_calls_returned": 3
+   },
+   {
+    "model": "claude-haiku-4-5-20251001",
+    "variant": "short-no-tools",
+    "http_status": 200,
+    "error_message_in_result": null,
+    "error_message_from_response": null,
+    "error_param": null,
+    "sent_fields": {},
+    "tool_calls_returned": 0
+   },
+   {
+    "model": "claude-haiku-4-5-20251001",
+    "variant": "v8-tools-reasoning-high",
+    "http_status": 200,
+    "error_message_in_result": null,
+    "error_message_from_response": null,
+    "error_param": null,
+    "sent_fields": {
+     "tools": 4,
+     "tool_choice": "auto",
+     "reasoning_effort": "high"
+    },
+    "tool_calls_returned": 3
+   },
+   {
+    "model": "gpt-5.5",
+    "variant": "short-no-tools",
+    "http_status": 200,
+    "error_message_in_result": null,
+    "error_message_from_response": null,
+    "error_param": null,
+    "sent_fields": {},
+    "tool_calls_returned": 0
+   },
+   {
+    "model": "gpt-5.5",
+    "variant": "v8-tools-reasoning-high",
+    "http_status": 200,
+    "error_message_in_result": null,
+    "error_message_from_response": null,
+    "error_param": null,
+    "sent_fields": {
+     "tools": 4,
+     "tool_choice": "auto",
+     "reasoning_effort": "high"
+    },
+    "tool_calls_returned": 3
+   },
+   {
+    "model": "gpt-6-sol",
+    "variant": "short-no-tools",
+    "http_status": 200,
+    "error_message_in_result": null,
+    "error_message_from_response": null,
+    "error_param": null,
+    "sent_fields": {},
+    "tool_calls_returned": 0
+   },
+   {
+    "model": "gpt-6-sol",
+    "variant": "v8-tools-reasoning-high",
+    "http_status": 400,
+    "error_message_in_result": null,
+    "error_message_from_response": "invalid_request_error - [400] Error code: 400 - {'error': {'message': \"Function tools with reasoning_effort are not supported for gpt-6-sol in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'.\", 'type': 'invalid_request_error', 'param': 'reasoning_effort', 'code': None}}",
+    "error_param": "reasoning_effort",
+    "sent_fields": {
+     "tools": 4,
+     "tool_choice": "auto",
+     "reasoning_effort": "high"
+    },
+    "tool_calls_returned": null
+   },
+   {
+    "model": "gpt-6-luna",
+    "variant": "short-no-tools",
+    "http_status": 200,
+    "error_message_in_result": null,
+    "error_message_from_response": null,
+    "error_param": null,
+    "sent_fields": {},
+    "tool_calls_returned": 0
+   },
+   {
+    "model": "gpt-6-luna",
+    "variant": "v8-tools-reasoning-high",
+    "http_status": 400,
+    "error_message_in_result": null,
+    "error_message_from_response": "invalid_request_error - [400] Error code: 400 - {'error': {'message': \"Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'.\", 'type': 'invalid_request_error', 'param': 'reasoning_effort', 'code': None}}",
+    "error_param": "reasoning_effort",
+    "sent_fields": {
+     "tools": 4,
+     "tool_choice": "auto",
+     "reasoning_effort": "high"
+    },
+    "tool_calls_returned": null
+   }
+  ],
+  "http_400": [
+   {
+    "model": "gpt-6-sol",
+    "variant": "v8-tools-reasoning-high",
+    "http_status": 400,
+    "error_message_in_result": null,
+    "error_message_from_response": "invalid_request_error - [400] Error code: 400 - {'error': {'message': \"Function tools with reasoning_effort are not supported for gpt-6-sol in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'.\", 'type': 'invalid_request_error', 'param': 'reasoning_effort', 'code': None}}",
+    "error_param": "reasoning_effort",
+    "sent_fields": {
+     "tools": 4,
+     "tool_choice": "auto",
+     "reasoning_effort": "high"
+    },
+    "tool_calls_returned": null
+   },
+   {
+    "model": "gpt-6-luna",
+    "variant": "v8-tools-reasoning-high",
+    "http_status": 400,
+    "error_message_in_result": null,
+    "error_message_from_response": "invalid_request_error - [400] Error code: 400 - {'error': {'message': \"Function tools with reasoning_effort are not supported for gpt-6-luna in /v1/chat/completions. To use function tools, use /v1/responses or set reasoning_effort to 'none'.\", 'type': 'invalid_request_error', 'param': 'reasoning_effort', 'code': None}}",
+    "error_param": "reasoning_effort",
+    "sent_fields": {
+     "tools": 4,
+     "tool_choice": "auto",
+     "reasoning_effort": "high"
+    },
+    "tool_calls_returned": null
+   }
+  ],
+  "retried": false,
+  "retry_note": "C-17-7: the 400 requests are recorded, not re-sent"
+ },
+ "probe_9d2b2053_secret_scan": {
+  "files_scanned": 25,
+  "patterns": [
+   "authorization_field",
+   "bearer_value",
+   "env:KMU_API_KEY",
+   "groq_key",
+   "openai_style_key"
+  ],
+  "environment_variables_checked": {
+   "KMU_API_KEY": "set"
+  },
+  "hits": {},
+  "clean": true
+ },
+ "multi_tool_calls": [
+  {
+   "session_id": "A-1-v2-b51f67df2fb9402ba15fccb35c3db53e",
+   "turns": 40,
+   "responses_200_by_tool_call_count": {
+    "0": 20,
+    "1": 19
+   },
+   "responses_with_more_than_one_tool_call": 0,
+   "requests_setting_parallel_tool_calls": {},
+   "runner_calls_with_more_than_one_execution": []
+  },
+  {
+   "session_id": "A-1-v3-4a0087756b2641f4b8f9b025c0419f73",
+   "turns": 23,
+   "responses_200_by_tool_call_count": {
+    "0": 13,
+    "1": 10
+   },
+   "responses_with_more_than_one_tool_call": 0,
+   "requests_setting_parallel_tool_calls": {},
+   "runner_calls_with_more_than_one_execution": []
+  },
+  {
+   "session_id": "A-1-v4-e174aafe805b4f59bb62d7c95716b8b7",
+   "turns": 74,
+   "responses_200_by_tool_call_count": {
+    "0": 46,
+    "1": 28
+   },
+   "responses_with_more_than_one_tool_call": 0,
+   "requests_setting_parallel_tool_calls": {},
+   "runner_calls_with_more_than_one_execution": []
+  }
+ ]
+}

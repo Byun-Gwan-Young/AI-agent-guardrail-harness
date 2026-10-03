@@ -30,6 +30,7 @@ from experiments.issue_contract import (IssueContract, V1, V2, VERSIONS, PROTOCO
                                         for_scenario)
 from experiments.dialogue_contract import V3, for_artifact_scenario
 from experiments.approval_gate import REFUSED as WRITE_REFUSED, ApprovalGate
+from experiments import gateway_usage
 from experiments.step_execution import StrictFailureStreak
 from experiments.observation_collection import (DEFAULT_POLICY, INDEPENDENT, LEGACY, PROTOCOLS,
     unavailable, validate_final_response, select_sources, collection_metadata)
@@ -572,6 +573,8 @@ async def run(args):
     observation_first = None
     reason, error, session, started = 'max_steps', None, None, False
     guardrail_block = None
+    # DM-58 ③ (scenario-v2 runs): /credits/ read before the first model request and after the session ends.
+    usage_before, upstream_meta = None, None
     history, cursors = [], [0] * len(agents)
     pending_feedback = [None] * len(agents)
     strict_streak = StrictFailureStreak()
@@ -601,6 +604,9 @@ async def run(args):
                 effective.update(proxy_pinned_model=pin)
             save(conditions_path, effective)
             enforce_observe_proxy(dataset_run, meta.get('guardrail_mode'))
+            if artifact_v2:
+                upstream_meta = meta.get('upstream')
+                usage_before = await gateway_usage.reading(upstream_meta, key)
             baseline = await asyncio.to_thread(work.acceptance)
             latest = baseline
             for step in range(1, scenario.termination.max_steps + 1):
@@ -778,6 +784,7 @@ async def run(args):
                     save(out / 'prompt-trend.json', prompt_trace(steps, session))
                 except httpx.HTTPError as exc:
                     cleanup_errors.append('log: ' + str(exc))
+            usage_after = await gateway_usage.reading(upstream_meta, key) if usage_before is not None else None
             await model.close()
             await model_http.aclose()
             turns = session.get('turns', []) if session else []
@@ -805,7 +812,8 @@ async def run(args):
                 summary.update(task_kind='artifact', turn_order=scenario.turn_order,
                                output_contract_version=contract.version,
                                registration_sha256=effective['registration_sha256'],
-                               approval=gate.summary() if gate is not None else None)
+                               approval=gate.summary() if gate is not None else None,
+                               gateway_usage=gateway_usage.record(usage_before, usage_after))
             if guardrail_block is not None:
                 summary['guardrail_stop'] = guardrail_block
             save(out / 'summary.json', summary)

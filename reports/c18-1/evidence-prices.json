@@ -1,0 +1,77 @@
+{
+  "tools_probe": "gateway-probe-a41f8d517c7d4772a7ef72720f83cc48",
+  "strict_probe": "gateway-probe-44ec8e433e484bdca241870732522a6a",
+  "solved_input_output": {
+    "glm-5.3-flash": {
+      "status": "solved_from_two_requests",
+      "requests_used": 2,
+      "credits_per_million_prompt_tokens": 150.0,
+      "credits_per_million_completion_tokens": 500.0,
+      "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+    },
+    "qwen3.8-flash": {
+      "status": "solved_from_two_requests",
+      "requests_used": 2,
+      "credits_per_million_prompt_tokens": 150.0,
+      "credits_per_million_completion_tokens": 470.0,
+      "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+    },
+    "gpt-5.4-nano": {
+      "status": "solved_from_two_requests",
+      "requests_used": 2,
+      "credits_per_million_prompt_tokens": 200.0,
+      "credits_per_million_completion_tokens": 1250.0,
+      "note": "Exact solution of two equations; not checked against a third request. Cached tokens not separated."
+    }
+  },
+  "glm_strict_requests": [
+    {
+      "variant": "v3-final-strict-no-enums",
+      "prompt_tokens": 1094,
+      "cached_tokens": 0,
+      "completion_tokens": 204,
+      "credits": 0.2661,
+      "credits_without_cached_part": 0.2661,
+      "cached_part": 0.0,
+      "cached_rate_per_million": null
+    },
+    {
+      "variant": "v3-final-strict-enums",
+      "prompt_tokens": 1094,
+      "cached_tokens": 1088,
+      "completion_tokens": 610,
+      "credits": 0.33854,
+      "credits_without_cached_part": 0.3059,
+      "cached_part": 0.03264,
+      "cached_rate_per_million": 30.0
+    }
+  ],
+  "glm_no_cache_check": {
+    "requests": 1,
+    "residual_credits": [
+      0.0
+    ],
+    "prices_reproduce_credits": true
+  },
+  "glm_cached_rate_per_million": 30.0,
+  "formula": "cached_rate = (credits - (prompt - cached) x prompt_rate - completion x completion_rate) / cached",
+  "table_matches": {
+    "glm-5.3-flash": {
+      "prompt": true,
+      "completion": true
+    },
+    "qwen3.8-flash": {
+      "prompt": true,
+      "completion": true
+    },
+    "gpt-5.4-nano": {
+      "prompt": true,
+      "completion": true
+    },
+    "glm-5.3-flash cached_prompt": true
+  },
+  "limits": [
+    "each price is the exact solution of one or two requests; no third request checks it",
+    "the cached price is solved from one request; the gateway documentation was not checked"
+  ]
+}

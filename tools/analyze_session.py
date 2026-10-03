@@ -17,6 +17,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from experiments.step_execution import PROTOCOL_V8, PROTOCOL_V9, PROTOCOL_V10
+from tools import gateway_prices
 from scenario_schema import load_scenario
 
 STOP_DECISIONS = ('deadlock', 'termination_failure')
@@ -399,8 +400,12 @@ def judgement_time(observations):
             'p99_ms': values[max(0, math.ceil(0.99 * len(values)) - 1)] / 1e6, 'max_ms': values[-1] / 1e6}
 
 
-def session_credits(model, token_counts):
+def session_credits(model, token_counts, turns=None):
+    """Tokens x price. gpt-oss keeps its C-11 USD form; the other gateway models (DM-58 ③) use gateway_prices, which
+    also prices cached input (glm-5.3-flash) and needs the proxy log turns."""
     price = PRICE_PER_M.get(model)
+    if price is None and turns is not None and model in gateway_prices.CREDITS_PER_MILLION:
+        return gateway_prices.estimate(model, turns)
     if price is None:
         return {'status': 'unmeasured', 'value': None, 'reason': 'no price recorded for this model'}
     if token_counts['total_status'] != 'measured':
@@ -477,7 +482,7 @@ def model_record(result, conditions, meta):
             'runner_matches_proxy': None if not recorded else recorded.get('name') == meta.get('model')}
 
 
-def v03_fields(result, a, conditions, observations, meta=None):
+def v03_fields(result, a, conditions, observations, meta=None, turns=None):
     """session-manifest-v0.3 (S-8, S-1, S-23) for sessions whose runner recorded the Git state. Condition group and
     model source (C-17-7) were added in place: no session with a v0.3 or later manifest exists (DM-51 principle)."""
     result['manifest_version'] = 'session-manifest-v0.3'
@@ -496,7 +501,7 @@ def v03_fields(result, a, conditions, observations, meta=None):
     result['judgement']['normal_session'] = a['termination']['reason'] == 'success'
     result['judgement']['normal_session_rule'] = 'S-1: all acceptance tests pass and completion declared'
     result['judgement_time'] = judgement_time(observations)
-    result['credits'] = session_credits(a['meta']['model'], a['tokens'])
+    result['credits'] = session_credits(a['meta']['model'], a['tokens'], turns)
     result['replay'] = {'status': 'unmeasured', 'reason': 'multi-rule offline replay (S-6) is scheduled for C-16'}
     result['validity']['evidence'] = validity_evidence(a)
     result['notes'] = [n for n in result['notes'] if not n.startswith('git_commit is null')
@@ -565,6 +570,10 @@ def v06_fields(result, conditions, summary, log):
         'sha256_recomputed': hashlib.sha256(json.dumps(registration, ensure_ascii=False, sort_keys=True,
                                                        separators=(',', ':')).encode('utf-8')).hexdigest(),
         'proxy_stored_same': log['meta'].get('registration') == registration}
+    # DM-58 ③ (C-18-1): the token x price estimate and the /credits/ difference the runner recorded, side by side.
+    result['credits_estimated'] = result.pop('credits')
+    result['credits_measured'] = summary.get('gateway_usage') or {
+        'status': 'unmeasured', 'value': None, 'reason': 'the runner of this session recorded no gateway usage'}
     result['vocabulary_violations'] = {'total': summary.get('vocabulary_violations_total'),
                                        'steps': summary.get('vocabulary_violation_steps'),
                                        'excluded_from_strict_failure_streak': True}
@@ -601,7 +610,7 @@ def manifest(a, phase, notes):
         # v0.3 only for sessions recorded by the Git-aware runner; earlier manifests are never rewritten.
         log = load(log_file(a['session_id']))
         observations = log['observations']
-        result = v03_fields(result, a, conditions, observations, log['meta'])
+        result = v03_fields(result, a, conditions, observations, log['meta'], log['turns'])
         if a['meta']['criteria_version'] != 'deadlock-v0.3':
             return result
         result = v04_fields(result, observations)
