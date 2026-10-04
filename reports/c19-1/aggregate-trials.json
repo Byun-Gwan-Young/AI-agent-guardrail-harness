@@ -1,0 +1,1016 @@
+{
+ "aggregate_version": "demo-aggregate-v1",
+ "scope": "데모 세션 기준 (데이터셋 아님, DM-2)",
+ "plans": [
+  "demo-trial-c18-2",
+  "demo-trial-c18-3"
+ ],
+ "named_sessions": [
+  "DEMO-CL-normal-v1-d5460d69bcc84e20a4eaef6275ea1e8a",
+  "DEMO-CL-stall-v1-f08705febcab4bcdacaea83cb8bd61f1"
+ ],
+ "final_freeze_sha256": null,
+ "freeze_check": "not applied (no --final-freeze-sha256: trial plans)",
+ "sessions": 11,
+ "excluded": [],
+ "headline": {
+  "scope": "데모 세션 기준 (데이터셋 아님, DM-2)",
+  "normal_runs_with_stop": 1,
+  "normal_runs": 5,
+  "normal_false_positive_runs": 0,
+  "stall_runs_stalled": 2,
+  "stall_runs_detected": 2,
+  "stall_runs_escalated": 2,
+  "stall_runs": 5,
+  "if_stopped_token_ratio_mean_detected": 0.67015,
+  "credits_measured_total": 459.83184
+ },
+ "types": [
+  {
+   "task_type": "T1",
+   "label": "T1 대화 교착",
+   "observe_runs": 6,
+   "normal_runs": 3,
+   "normal_success": 2,
+   "normal_with_stop": 1,
+   "normal_false_positive": 0,
+   "stall_runs": 3,
+   "stall_stalled": 0,
+   "stall_escalated": 2,
+   "stall_detected": 0,
+   "if_stopped_token_ratio_mean_detected": null
+  },
+  {
+   "task_type": "T2",
+   "label": "T2 대화+산출물 교착",
+   "observe_runs": 3,
+   "normal_runs": 1,
+   "normal_success": 1,
+   "normal_with_stop": 0,
+   "normal_false_positive": 0,
+   "stall_runs": 1,
+   "stall_stalled": 1,
+   "stall_escalated": 0,
+   "stall_detected": 1,
+   "if_stopped_token_ratio_mean_detected": 0.7755
+  },
+  {
+   "task_type": "T3",
+   "label": "T3 산출물 교착",
+   "observe_runs": 2,
+   "normal_runs": 1,
+   "normal_success": 1,
+   "normal_with_stop": 0,
+   "normal_false_positive": 0,
+   "stall_runs": 1,
+   "stall_stalled": 1,
+   "stall_escalated": 0,
+   "stall_detected": 1,
+   "if_stopped_token_ratio_mean_detected": 0.5648
+  }
+ ],
+ "scenarios": [
+  {
+   "scenario_id": "DEMO-CL-normal-v1",
+   "task": "DEMO-CL",
+   "variant": "normal",
+   "task_type": "T3",
+   "observe_runs": 1,
+   "classes": {
+    "success": 1,
+    "stalled": 0,
+    "escalated": 0,
+    "other": 0
+   },
+   "stalled_k_of_n": "0 / 1",
+   "escalated_by": {},
+   "other_reasons": {},
+   "runs_with_stop": 0,
+   "first_stop_steps": [],
+   "first_stop_templates": {},
+   "explanation_example": null,
+   "false_positive_runs": {
+    "success_with_stop": 0,
+    "escalated_with_stop": 0
+   },
+   "detected_runs": null,
+   "detection_delay": {
+    "method": "first STOP step - stall start (S-27: step after the last change of the acceptance pass count or the workspace state)",
+    "values": [],
+    "median_of_non_negative": null,
+    "early_stops": 0
+   },
+   "if_stopped_token_ratio_mean": null,
+   "if_stopped_credits_after_sum": 0,
+   "credits_measured_sum": 16.35269,
+   "credits_estimated_sum": 16.35269,
+   "failed_step_reasons": {
+    "tool_execution_error": 1
+   },
+   "vocabulary_steps_in_first_stop_window": 0,
+   "replay_missing": []
+  },
+  {
+   "scenario_id": "DEMO-CL-stall-v1",
+   "task": "DEMO-CL",
+   "variant": "stall",
+   "task_type": "T3",
+   "observe_runs": 1,
+   "classes": {
+    "success": 0,
+    "stalled": 1,
+    "escalated": 0,
+    "other": 0
+   },
+   "stalled_k_of_n": "1 / 1",
+   "escalated_by": {},
+   "other_reasons": {},
+   "runs_with_stop": 1,
+   "first_stop_steps": [
+    15
+   ],
+   "first_stop_templates": {
+    "E6": 1
+   },
+   "explanation_example": "step 12에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 통과 테스트 14/15.",
+   "false_positive_runs": null,
+   "detected_runs": {
+    "stalled": 1,
+    "stalled_with_stop": 1
+   },
+   "detection_delay": {
+    "method": "first STOP step - stall start (S-27: step after the last change of the acceptance pass count or the workspace state)",
+    "values": [
+     6
+    ],
+    "median_of_non_negative": 6,
+    "early_stops": 0
+   },
+   "if_stopped_token_ratio_mean": 0.5648,
+   "if_stopped_credits_after_sum": 71.29028,
+   "credits_measured_sum": 126.5433,
+   "credits_estimated_sum": 126.5433,
+   "failed_step_reasons": {
+    "tool_execution_error": 1
+   },
+   "vocabulary_steps_in_first_stop_window": 0,
+   "replay_missing": []
+  },
+  {
+   "scenario_id": "DEMO-CS-normal-v1",
+   "task": "DEMO-CS",
+   "variant": "normal",
+   "task_type": "T1",
+   "observe_runs": 1,
+   "classes": {
+    "success": 1,
+    "stalled": 0,
+    "escalated": 0,
+    "other": 0
+   },
+   "stalled_k_of_n": "0 / 1",
+   "escalated_by": {},
+   "other_reasons": {},
+   "runs_with_stop": 0,
+   "first_stop_steps": [],
+   "first_stop_templates": {},
+   "explanation_example": null,
+   "false_positive_runs": {
+    "success_with_stop": 0,
+    "escalated_with_stop": 0
+   },
+   "detected_runs": null,
+   "detection_delay": {
+    "method": "not computed: a T1 task has no result signal independent of the guardrail",
+    "values": [],
+    "median_of_non_negative": null,
+    "early_stops": 0
+   },
+   "if_stopped_token_ratio_mean": null,
+   "if_stopped_credits_after_sum": 0,
+   "credits_measured_sum": 2.06035,
+   "credits_estimated_sum": 2.06035,
+   "failed_step_reasons": {},
+   "vocabulary_steps_in_first_stop_window": 0,
+   "replay_missing": []
+  },
+  {
+   "scenario_id": "DEMO-CS-stall-v1",
+   "task": "DEMO-CS",
+   "variant": "stall",
+   "task_type": "T1",
+   "observe_runs": 1,
+   "classes": {
+    "success": 1,
+    "stalled": 0,
+    "escalated": 0,
+    "other": 0
+   },
+   "stalled_k_of_n": "0 / 1",
+   "escalated_by": {},
+   "other_reasons": {},
+   "runs_with_stop": 0,
+   "first_stop_steps": [],
+   "first_stop_templates": {},
+   "explanation_example": null,
+   "false_positive_runs": null,
+   "detected_runs": {
+    "stalled": 0,
+    "stalled_with_stop": 0
+   },
+   "detection_delay": {
+    "method": "not computed: a T1 task has no result signal independent of the guardrail",
+    "values": [],
+    "median_of_non_negative": null,
+    "early_stops": 0
+   },
+   "if_stopped_token_ratio_mean": null,
+   "if_stopped_credits_after_sum": 0,
+   "credits_measured_sum": 1.5849,
+   "credits_estimated_sum": 1.5849,
+   "failed_step_reasons": {},
+   "vocabulary_steps_in_first_stop_window": 0,
+   "replay_missing": []
+  },
+  {
+   "scenario_id": "DEMO-CT-N-v1",
+   "task": "DEMO-CT-N",
+   "variant": "natural",
+   "task_type": "T2",
+   "observe_runs": 1,
+   "classes": {
+    "success": 1,
+    "stalled": 0,
+    "escalated": 0,
+    "other": 0
+   },
+   "stalled_k_of_n": "0 / 1",
+   "escalated_by": {},
+   "other_reasons": {},
+   "runs_with_stop": 0,
+   "first_stop_steps": [],
+   "first_stop_templates": {},
+   "explanation_example": null,
+   "false_positive_runs": null,
+   "detected_runs": {
+    "stalled": 0,
+    "stalled_with_stop": 0
+   },
+   "detection_delay": {
+    "method": "first STOP step - stall start (S-27: step after the last change of the acceptance pass count or the workspace state)",
+    "values": [],
+    "median_of_non_negative": null,
+    "early_stops": 0
+   },
+   "if_stopped_token_ratio_mean": null,
+   "if_stopped_credits_after_sum": 0,
+   "credits_measured_sum": 6.91565,
+   "credits_estimated_sum": 6.91565,
+   "failed_step_reasons": {},
+   "vocabulary_steps_in_first_stop_window": 0,
+   "replay_missing": []
+  },
+  {
+   "scenario_id": "DEMO-CT-normal-v1",
+   "task": "DEMO-CT",
+   "variant": "normal",
+   "task_type": "T2",
+   "observe_runs": 1,
+   "classes": {
+    "success": 1,
+    "stalled": 0,
+    "escalated": 0,
+    "other": 0
+   },
+   "stalled_k_of_n": "0 / 1",
+   "escalated_by": {},
+   "other_reasons": {},
+   "runs_with_stop": 0,
+   "first_stop_steps": [],
+   "first_stop_templates": {},
+   "explanation_example": null,
+   "false_positive_runs": {
+    "success_with_stop": 0,
+    "escalated_with_stop": 0
+   },
+   "detected_runs": null,
+   "detection_delay": {
+    "method": "first STOP step - stall start (S-27: step after the last change of the acceptance pass count or the workspace state)",
+    "values": [],
+    "median_of_non_negative": null,
+    "early_stops": 0
+   },
+   "if_stopped_token_ratio_mean": null,
+   "if_stopped_credits_after_sum": 0,
+   "credits_measured_sum": 13.41093,
+   "credits_estimated_sum": 13.41093,
+   "failed_step_reasons": {
+    "write_refused_before_approval": 1,
+    "tool_execution_error": 1
+   },
+   "vocabulary_steps_in_first_stop_window": 0,
+   "replay_missing": []
+  },
+  {
+   "scenario_id": "DEMO-CT-stall-v1",
+   "task": "DEMO-CT",
+   "variant": "stall",
+   "task_type": "T2",
+   "observe_runs": 1,
+   "classes": {
+    "success": 0,
+    "stalled": 1,
+    "escalated": 0,
+    "other": 0
+   },
+   "stalled_k_of_n": "1 / 1",
+   "escalated_by": {},
+   "other_reasons": {},
+   "runs_with_stop": 1,
+   "first_stop_steps": [
+    9
+   ],
+   "first_stop_templates": {
+    "E1": 1
+   },
+   "explanation_example": "최근 3 step 동안 기획·개발·검토 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 7/17.",
+   "false_positive_runs": null,
+   "detected_runs": {
+    "stalled": 1,
+    "stalled_with_stop": 1
+   },
+   "detection_delay": {
+    "method": "first STOP step - stall start (S-27: step after the last change of the acceptance pass count or the workspace state)",
+    "values": [
+     -21
+    ],
+    "median_of_non_negative": null,
+    "early_stops": 1
+   },
+   "if_stopped_token_ratio_mean": 0.7755,
+   "if_stopped_credits_after_sum": 103.02651,
+   "credits_measured_sum": 132.59626,
+   "credits_estimated_sum": 132.59626,
+   "failed_step_reasons": {
+    "write_refused_before_approval": 2
+   },
+   "vocabulary_steps_in_first_stop_window": 0,
+   "replay_missing": []
+  },
+  {
+   "scenario_id": "DEMO-LR-normal-v1",
+   "task": "DEMO-LR",
+   "variant": "normal",
+   "task_type": "T1",
+   "observe_runs": 1,
+   "classes": {
+    "success": 1,
+    "stalled": 0,
+    "escalated": 0,
+    "other": 0
+   },
+   "stalled_k_of_n": "0 / 1",
+   "escalated_by": {},
+   "other_reasons": {},
+   "runs_with_stop": 0,
+   "first_stop_steps": [],
+   "first_stop_templates": {},
+   "explanation_example": null,
+   "false_positive_runs": {
+    "success_with_stop": 0,
+    "escalated_with_stop": 0
+   },
+   "detected_runs": null,
+   "detection_delay": {
+    "method": "not computed: a T1 task has no result signal independent of the guardrail",
+    "values": [],
+    "median_of_non_negative": null,
+    "early_stops": 0
+   },
+   "if_stopped_token_ratio_mean": null,
+   "if_stopped_credits_after_sum": 0,
+   "credits_measured_sum": 16.64686,
+   "credits_estimated_sum": 16.64686,
+   "failed_step_reasons": {},
+   "vocabulary_steps_in_first_stop_window": 0,
+   "replay_missing": []
+  },
+  {
+   "scenario_id": "DEMO-LR-stall-v1",
+   "task": "DEMO-LR",
+   "variant": "stall",
+   "task_type": "T1",
+   "observe_runs": 1,
+   "classes": {
+    "success": 0,
+    "stalled": 0,
+    "escalated": 1,
+    "other": 0
+   },
+   "stalled_k_of_n": "0 / 1",
+   "escalated_by": {
+    "writer": 1
+   },
+   "other_reasons": {},
+   "runs_with_stop": 0,
+   "first_stop_steps": [],
+   "first_stop_templates": {},
+   "explanation_example": null,
+   "false_positive_runs": null,
+   "detected_runs": {
+    "stalled": 0,
+    "stalled_with_stop": 0
+   },
+   "detection_delay": {
+    "method": "not computed: a T1 task has no result signal independent of the guardrail",
+    "values": [],
+    "median_of_non_negative": null,
+    "early_stops": 0
+   },
+   "if_stopped_token_ratio_mean": null,
+   "if_stopped_credits_after_sum": 0,
+   "credits_measured_sum": 6.14067,
+   "credits_estimated_sum": 6.14067,
+   "failed_step_reasons": {},
+   "vocabulary_steps_in_first_stop_window": 0,
+   "replay_missing": []
+  },
+  {
+   "scenario_id": "DEMO-MR-normal-v1",
+   "task": "DEMO-MR",
+   "variant": "normal",
+   "task_type": "T1",
+   "observe_runs": 1,
+   "classes": {
+    "success": 0,
+    "stalled": 1,
+    "escalated": 0,
+    "other": 0
+   },
+   "stalled_k_of_n": "1 / 1",
+   "escalated_by": {},
+   "other_reasons": {},
+   "runs_with_stop": 1,
+   "first_stop_steps": [
+    6
+   ],
+   "first_stop_templates": {
+    "E6": 1
+   },
+   "explanation_example": "step 3에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다.",
+   "false_positive_runs": {
+    "success_with_stop": 0,
+    "escalated_with_stop": 0
+   },
+   "detected_runs": null,
+   "detection_delay": {
+    "method": "not computed: a T1 task has no result signal independent of the guardrail",
+    "values": [],
+    "median_of_non_negative": null,
+    "early_stops": 0
+   },
+   "if_stopped_token_ratio_mean": 0.8624,
+   "if_stopped_credits_after_sum": 111.69704,
+   "credits_measured_sum": 128.01972,
+   "credits_estimated_sum": 128.01972,
+   "failed_step_reasons": {},
+   "vocabulary_steps_in_first_stop_window": 0,
+   "replay_missing": []
+  },
+  {
+   "scenario_id": "DEMO-MR-stall-v1",
+   "task": "DEMO-MR",
+   "variant": "stall",
+   "task_type": "T1",
+   "observe_runs": 1,
+   "classes": {
+    "success": 0,
+    "stalled": 0,
+    "escalated": 1,
+    "other": 0
+   },
+   "stalled_k_of_n": "0 / 1",
+   "escalated_by": {
+    "searcher": 1
+   },
+   "other_reasons": {},
+   "runs_with_stop": 0,
+   "first_stop_steps": [],
+   "first_stop_templates": {},
+   "explanation_example": null,
+   "false_positive_runs": null,
+   "detected_runs": {
+    "stalled": 0,
+    "stalled_with_stop": 0
+   },
+   "detection_delay": {
+    "method": "not computed: a T1 task has no result signal independent of the guardrail",
+    "values": [],
+    "median_of_non_negative": null,
+    "early_stops": 0
+   },
+   "if_stopped_token_ratio_mean": null,
+   "if_stopped_credits_after_sum": 0,
+   "credits_measured_sum": 9.56051,
+   "credits_estimated_sum": 9.56051,
+   "failed_step_reasons": {},
+   "vocabulary_steps_in_first_stop_window": 0,
+   "replay_missing": []
+  }
+ ],
+ "accounts": {
+  "(없음)": {
+   "sessions": 2,
+   "credits_measured": 142.89599
+  },
+  "A": {
+   "sessions": 3,
+   "credits_measured": 17.05618
+  },
+  "C": {
+   "sessions": 3,
+   "credits_measured": 29.70318
+  },
+  "B": {
+   "sessions": 3,
+   "credits_measured": 270.17649
+  }
+ },
+ "representatives": [
+  {
+   "scenario_id": "DEMO-CL-normal-v1",
+   "task_type": "T3 산출물 교착",
+   "role": "정상판",
+   "session_id": "DEMO-CL-normal-v1-d5460d69bcc84e20a4eaef6275ea1e8a",
+   "first_stop_step": null,
+   "template_id": null,
+   "reason": "정상판 성공 1 회 중 step 수가 아래 중앙값(6)인 세션"
+  },
+  {
+   "scenario_id": "DEMO-CL-stall-v1",
+   "task_type": "T3 산출물 교착",
+   "role": "교착판",
+   "session_id": "DEMO-CL-stall-v1-f08705febcab4bcdacaea83cb8bd61f1",
+   "first_stop_step": 15,
+   "template_id": "E6",
+   "reason": "첫 STOP 이 난 1 회 중 가장 많은 템플릿 E6(1 회) 가운데 첫 STOP step 이 아래 중앙값(15)인 세션"
+  },
+  {
+   "scenario_id": "DEMO-CS-normal-v1",
+   "task_type": "T1 대화 교착",
+   "role": "정상판",
+   "session_id": "DEMO-CS-normal-v1-47da0f11c48f407abb18959ba283433d",
+   "first_stop_step": null,
+   "template_id": null,
+   "reason": "정상판 성공 1 회 중 step 수가 아래 중앙값(1)인 세션"
+  },
+  {
+   "scenario_id": "DEMO-CT-normal-v1",
+   "task_type": "T2 대화+산출물 교착",
+   "role": "정상판",
+   "session_id": "DEMO-CT-normal-v1-f854545930f34bd5bd828142116d1271",
+   "first_stop_step": null,
+   "template_id": null,
+   "reason": "정상판 성공 1 회 중 step 수가 아래 중앙값(6)인 세션"
+  },
+  {
+   "scenario_id": "DEMO-CT-stall-v1",
+   "task_type": "T2 대화+산출물 교착",
+   "role": "교착판",
+   "session_id": "DEMO-CT-stall-v1-819eb0783b724840b9333f480a599666",
+   "first_stop_step": 9,
+   "template_id": "E1",
+   "reason": "첫 STOP 이 난 1 회 중 가장 많은 템플릿 E1(1 회) 가운데 첫 STOP step 이 아래 중앙값(9)인 세션"
+  },
+  {
+   "scenario_id": "DEMO-LR-normal-v1",
+   "task_type": "T1 대화 교착",
+   "role": "정상판",
+   "session_id": "DEMO-LR-normal-v1-433f48c2145948259077ce99f0495111",
+   "first_stop_step": null,
+   "template_id": null,
+   "reason": "정상판 성공 1 회 중 step 수가 아래 중앙값(6)인 세션"
+  }
+ ],
+ "session_rows": [
+  {
+   "session_id": "DEMO-CL-normal-v1-d5460d69bcc84e20a4eaef6275ea1e8a",
+   "scenario_id": "DEMO-CL-normal-v1",
+   "task": "DEMO-CL",
+   "variant": "normal",
+   "task_type": "T3",
+   "mode": "observe",
+   "repeat": null,
+   "plan_id": null,
+   "account_label": null,
+   "final_freeze_sha256": null,
+   "condition_group": "cg-9bfd9889d4f8",
+   "termination_reason": "success",
+   "class": "success",
+   "escalated_by": null,
+   "steps": 6,
+   "first_stop_step": null,
+   "first_stop_template": null,
+   "first_stop_text": null,
+   "stop_steps": [],
+   "stall_start": null,
+   "detection_delay": null,
+   "vocabulary_steps_in_first_stop_window": 0,
+   "failed_step_reasons": {
+    "tool_execution_error": 1
+   },
+   "tokens": 98539,
+   "credits_measured": 16.35269,
+   "credits_estimated": 16.35269,
+   "if_stopped": null,
+   "replay_recorded": true
+  },
+  {
+   "session_id": "DEMO-CL-stall-v1-f08705febcab4bcdacaea83cb8bd61f1",
+   "scenario_id": "DEMO-CL-stall-v1",
+   "task": "DEMO-CL",
+   "variant": "stall",
+   "task_type": "T3",
+   "mode": "observe",
+   "repeat": null,
+   "plan_id": null,
+   "account_label": null,
+   "final_freeze_sha256": null,
+   "condition_group": "cg-9bfd9889d4f8",
+   "termination_reason": "max_steps",
+   "class": "stalled",
+   "escalated_by": null,
+   "steps": 30,
+   "first_stop_step": 15,
+   "first_stop_template": "E6",
+   "first_stop_text": "step 12에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 통과 테스트 14/15.",
+   "stop_steps": [
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30
+   ],
+   "stall_start": 9,
+   "detection_delay": 6,
+   "vocabulary_steps_in_first_stop_window": 0,
+   "failed_step_reasons": {
+    "tool_execution_error": 1
+   },
+   "tokens": 725373,
+   "credits_measured": 126.5433,
+   "credits_estimated": 126.5433,
+   "if_stopped": {
+    "stop_step": 15,
+    "token_ratio": 0.5648,
+    "tokens_after": 409687,
+    "credits_after": 71.29028,
+    "credits_total": 126.5433
+   },
+   "replay_recorded": true
+  },
+  {
+   "session_id": "DEMO-CS-normal-v1-47da0f11c48f407abb18959ba283433d",
+   "scenario_id": "DEMO-CS-normal-v1",
+   "task": "DEMO-CS",
+   "variant": "normal",
+   "task_type": "T1",
+   "mode": "observe",
+   "repeat": 1,
+   "plan_id": "demo-trial-c18-3",
+   "account_label": "A",
+   "final_freeze_sha256": null,
+   "condition_group": "cg-10a2d89b5543",
+   "termination_reason": "success",
+   "class": "success",
+   "escalated_by": null,
+   "steps": 1,
+   "first_stop_step": null,
+   "first_stop_template": null,
+   "first_stop_text": null,
+   "stop_steps": [],
+   "stall_start": null,
+   "detection_delay": null,
+   "vocabulary_steps_in_first_stop_window": 0,
+   "failed_step_reasons": {},
+   "tokens": 10269,
+   "credits_measured": 2.06035,
+   "credits_estimated": 2.06035,
+   "if_stopped": null,
+   "replay_recorded": true
+  },
+  {
+   "session_id": "DEMO-CS-stall-v1-89187184d4cb46b09b6e173a1a264ffa",
+   "scenario_id": "DEMO-CS-stall-v1",
+   "task": "DEMO-CS",
+   "variant": "stall",
+   "task_type": "T1",
+   "mode": "observe",
+   "repeat": 1,
+   "plan_id": "demo-trial-c18-3",
+   "account_label": "A",
+   "final_freeze_sha256": null,
+   "condition_group": "cg-10a2d89b5543",
+   "termination_reason": "success",
+   "class": "success",
+   "escalated_by": null,
+   "steps": 1,
+   "first_stop_step": null,
+   "first_stop_template": null,
+   "first_stop_text": null,
+   "stop_steps": [],
+   "stall_start": null,
+   "detection_delay": null,
+   "vocabulary_steps_in_first_stop_window": 0,
+   "failed_step_reasons": {},
+   "tokens": 9067,
+   "credits_measured": 1.5849,
+   "credits_estimated": 1.5849,
+   "if_stopped": null,
+   "replay_recorded": true
+  },
+  {
+   "session_id": "DEMO-CT-N-v1-b9003e8ffbc146bb99111768272eaf56",
+   "scenario_id": "DEMO-CT-N-v1",
+   "task": "DEMO-CT-N",
+   "variant": "natural",
+   "task_type": "T2",
+   "mode": "observe",
+   "repeat": 1,
+   "plan_id": "demo-trial-c18-2",
+   "account_label": "C",
+   "final_freeze_sha256": null,
+   "condition_group": "cg-f50509c825e1",
+   "termination_reason": "success",
+   "class": "success",
+   "escalated_by": null,
+   "steps": 3,
+   "first_stop_step": null,
+   "first_stop_template": null,
+   "first_stop_text": null,
+   "stop_steps": [],
+   "stall_start": null,
+   "detection_delay": null,
+   "vocabulary_steps_in_first_stop_window": 0,
+   "failed_step_reasons": {},
+   "tokens": 38761,
+   "credits_measured": 6.91565,
+   "credits_estimated": 6.91565,
+   "if_stopped": null,
+   "replay_recorded": true
+  },
+  {
+   "session_id": "DEMO-CT-normal-v1-f854545930f34bd5bd828142116d1271",
+   "scenario_id": "DEMO-CT-normal-v1",
+   "task": "DEMO-CT",
+   "variant": "normal",
+   "task_type": "T2",
+   "mode": "observe",
+   "repeat": 1,
+   "plan_id": "demo-trial-c18-2",
+   "account_label": "A",
+   "final_freeze_sha256": null,
+   "condition_group": "cg-6c5c13fb016a",
+   "termination_reason": "success",
+   "class": "success",
+   "escalated_by": null,
+   "steps": 6,
+   "first_stop_step": null,
+   "first_stop_template": null,
+   "first_stop_text": null,
+   "stop_steps": [],
+   "stall_start": null,
+   "detection_delay": null,
+   "vocabulary_steps_in_first_stop_window": 0,
+   "failed_step_reasons": {
+    "write_refused_before_approval": 1,
+    "tool_execution_error": 1
+   },
+   "tokens": 98032,
+   "credits_measured": 13.41093,
+   "credits_estimated": 13.41093,
+   "if_stopped": null,
+   "replay_recorded": true
+  },
+  {
+   "session_id": "DEMO-CT-stall-v1-819eb0783b724840b9333f480a599666",
+   "scenario_id": "DEMO-CT-stall-v1",
+   "task": "DEMO-CT",
+   "variant": "stall",
+   "task_type": "T2",
+   "mode": "observe",
+   "repeat": 1,
+   "plan_id": "demo-trial-c18-2",
+   "account_label": "B",
+   "final_freeze_sha256": null,
+   "condition_group": "cg-6c5c13fb016a",
+   "termination_reason": "max_steps",
+   "class": "stalled",
+   "escalated_by": null,
+   "steps": 30,
+   "first_stop_step": 9,
+   "first_stop_template": "E1",
+   "first_stop_text": "최근 3 step 동안 기획·개발·검토 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 7/17.",
+   "stop_steps": [
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26
+   ],
+   "stall_start": 30,
+   "detection_delay": -21,
+   "vocabulary_steps_in_first_stop_window": 0,
+   "failed_step_reasons": {
+    "write_refused_before_approval": 2
+   },
+   "tokens": 785742,
+   "credits_measured": 132.59626,
+   "credits_estimated": 132.59626,
+   "if_stopped": {
+    "stop_step": 9,
+    "token_ratio": 0.7755,
+    "tokens_after": 609312,
+    "credits_after": 103.02651,
+    "credits_total": 132.59626
+   },
+   "replay_recorded": true
+  },
+  {
+   "session_id": "DEMO-LR-normal-v1-433f48c2145948259077ce99f0495111",
+   "scenario_id": "DEMO-LR-normal-v1",
+   "task": "DEMO-LR",
+   "variant": "normal",
+   "task_type": "T1",
+   "mode": "observe",
+   "repeat": 1,
+   "plan_id": "demo-trial-c18-3",
+   "account_label": "C",
+   "final_freeze_sha256": null,
+   "condition_group": "cg-880cb785600f",
+   "termination_reason": "success",
+   "class": "success",
+   "escalated_by": null,
+   "steps": 6,
+   "first_stop_step": null,
+   "first_stop_template": null,
+   "first_stop_text": null,
+   "stop_steps": [],
+   "stall_start": null,
+   "detection_delay": null,
+   "vocabulary_steps_in_first_stop_window": 0,
+   "failed_step_reasons": {},
+   "tokens": 94068,
+   "credits_measured": 16.64686,
+   "credits_estimated": 16.64686,
+   "if_stopped": null,
+   "replay_recorded": true
+  },
+  {
+   "session_id": "DEMO-LR-stall-v1-bd57f54b0a0347c7bbf03bbab250aa4d",
+   "scenario_id": "DEMO-LR-stall-v1",
+   "task": "DEMO-LR",
+   "variant": "stall",
+   "task_type": "T1",
+   "mode": "observe",
+   "repeat": 1,
+   "plan_id": "demo-trial-c18-3",
+   "account_label": "C",
+   "final_freeze_sha256": null,
+   "condition_group": "cg-880cb785600f",
+   "termination_reason": "escalated",
+   "class": "escalated",
+   "escalated_by": "writer",
+   "steps": 3,
+   "first_stop_step": null,
+   "first_stop_template": null,
+   "first_stop_text": null,
+   "stop_steps": [],
+   "stall_start": null,
+   "detection_delay": null,
+   "vocabulary_steps_in_first_stop_window": 0,
+   "failed_step_reasons": {},
+   "tokens": 31303,
+   "credits_measured": 6.14067,
+   "credits_estimated": 6.14067,
+   "if_stopped": null,
+   "replay_recorded": true
+  },
+  {
+   "session_id": "DEMO-MR-normal-v1-e948ebfd108d45f596b37026c26b415b",
+   "scenario_id": "DEMO-MR-normal-v1",
+   "task": "DEMO-MR",
+   "variant": "normal",
+   "task_type": "T1",
+   "mode": "observe",
+   "repeat": 1,
+   "plan_id": "demo-trial-c18-3",
+   "account_label": "B",
+   "final_freeze_sha256": null,
+   "condition_group": "cg-eef67a007285",
+   "termination_reason": "max_steps",
+   "class": "stalled",
+   "escalated_by": null,
+   "steps": 30,
+   "first_stop_step": 6,
+   "first_stop_template": "E6",
+   "first_stop_text": "step 3에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다.",
+   "stop_steps": [
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30
+   ],
+   "stall_start": null,
+   "detection_delay": null,
+   "vocabulary_steps_in_first_stop_window": 0,
+   "failed_step_reasons": {},
+   "tokens": 774167,
+   "credits_measured": 128.01972,
+   "credits_estimated": 128.01972,
+   "if_stopped": {
+    "stop_step": 6,
+    "token_ratio": 0.8624,
+    "tokens_after": 667673,
+    "credits_after": 111.69704,
+    "credits_total": 128.01972
+   },
+   "replay_recorded": true
+  },
+  {
+   "session_id": "DEMO-MR-stall-v1-d454a7cd328e4cbd919539f4ccb60d2a",
+   "scenario_id": "DEMO-MR-stall-v1",
+   "task": "DEMO-MR",
+   "variant": "stall",
+   "task_type": "T1",
+   "mode": "observe",
+   "repeat": 1,
+   "plan_id": "demo-trial-c18-3",
+   "account_label": "B",
+   "final_freeze_sha256": null,
+   "condition_group": "cg-eef67a007285",
+   "termination_reason": "escalated",
+   "class": "escalated",
+   "escalated_by": "searcher",
+   "steps": 2,
+   "first_stop_step": null,
+   "first_stop_template": null,
+   "first_stop_text": null,
+   "stop_steps": [],
+   "stall_start": null,
+   "detection_delay": null,
+   "vocabulary_steps_in_first_stop_window": 0,
+   "failed_step_reasons": {},
+   "tokens": 52044,
+   "credits_measured": 9.56051,
+   "credits_estimated": 9.56051,
+   "if_stopped": null,
+   "replay_recorded": true
+  }
+ ]
+}
