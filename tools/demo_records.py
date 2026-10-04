@@ -12,6 +12,8 @@ a plain `git add`; a session is committed only through `stage` here, which adds 
   check    --index              every tracked file under runs/demo/ and logs/demo/ keeps the rule
   stage    runs/demo/<id> ...   check, key scan, then git add -f exactly the commit files
   backup   runs/demo/<id> ... --output <file outside the repository>.tar.gz
+  --plan <plan id> in place of (or with) the sessions: every runs/demo/ session whose conditions.json batch.plan_id is
+  that plan (C-18-4), so a batch's sessions are named without copying their IDs
 
 Offline. `record` and `stage` refuse a folder whose key scan (D-11 patterns, KMU_API_KEY and TAVILY_API_KEY values
 when set here) finds anything; `backup` scans the raw files too and refuses before writing. No model text is written
@@ -70,6 +72,18 @@ def session_dir(value, runs_root=DEMO_RUNS):
     if folder.parent != Path(runs_root).resolve() or not (folder / 'conditions.json').is_file():
         raise ValueError(f'not a demo session folder under {Path(runs_root)}: {value}')
     return folder
+
+
+def plan_sessions(plan_id, runs_root=DEMO_RUNS):
+    """The demo session folders a batch plan ran (conditions.json batch.plan_id), in name order."""
+    found = []
+    for folder in sorted(Path(runs_root).iterdir()) if Path(runs_root).is_dir() else []:
+        conditions = folder / 'conditions.json'
+        if conditions.is_file() and (load(conditions).get('batch') or {}).get('plan_id') == plan_id:
+            found.append(folder.resolve())
+    if not found:
+        raise ValueError(f'no session under {Path(runs_root)} ran plan {plan_id}')
+    return found
 
 
 def key_scan(paths):
@@ -232,22 +246,27 @@ def main():
     sub = parser.add_subparsers(dest='action', required=True)
     for name in ('record', 'stage', 'backup'):
         command = sub.add_parser(name)
-        command.add_argument('sessions', nargs='+', help='runs/demo/<id> or the session ID')
+        command.add_argument('sessions', nargs='*', help='runs/demo/<id> or the session ID')
+        command.add_argument('--plan', help='every session of this batch plan ID (conditions.json batch.plan_id)')
         if name == 'backup':
             command.add_argument('--output', type=Path, required=True)
     check = sub.add_parser('check')
     check.add_argument('sessions', nargs='*')
+    check.add_argument('--plan', help='every session of this batch plan ID (conditions.json batch.plan_id)')
     check.add_argument('--index', action='store_true', help='check the tracked files under runs/demo and logs/demo')
     args = parser.parse_args()
     try:
+        folders = [session_dir(s) for s in args.sessions] + (plan_sessions(args.plan) if args.plan else [])
+        folders = list(dict.fromkeys(folders))
+        if args.action != 'check' and not folders:
+            raise ValueError('name sessions or --plan')
         if args.action == 'check':
-            result = {'sessions': [check_session(session_dir(s)) for s in args.sessions]}
+            result = {'sessions': [check_session(f) for f in folders]}
             if args.index:
                 result['index'] = check_index()
             ok = not any(c['problems'] for c in result['sessions']) and result.get('index', {'ok': True})['ok']
             print(dump({**result, 'ok': ok}), end='')
             return 0 if ok else 1
-        folders = [session_dir(s) for s in args.sessions]
         if args.action == 'record':
             result = [record(f) for f in folders]
         elif args.action == 'stage':
