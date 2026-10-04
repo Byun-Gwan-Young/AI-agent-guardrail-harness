@@ -8,6 +8,8 @@ gate reasons are shown.
        -> reports/c18-4/mr-normal-diagnosis.json
   cs   DEMO-CS trial pair (DM-67 ①): the recorded claims and the claims judged again with the current judge, which now
        needs the owner role's own verified report. -> reports/c18-4/cs-rejudge.json
+  trial  credits the retest plan (batch_plans/demo-trial-c18-4.yaml) is expected to use, from the measured T1 trial
+       sessions' committed summaries (record/demo-summary.json). An estimate. -> reports/c18-4/estimate-retest.json
 """
 import argparse
 import collections
@@ -26,7 +28,11 @@ from tools.rejudge_dialogue import rejudge  # noqa: E402
 MR_NORMAL = ROOT / 'runs/demo/DEMO-MR-normal-v1-e948ebfd108d45f596b37026c26b415b'
 CS_TRIALS = (ROOT / 'runs/demo/DEMO-CS-normal-v1-47da0f11c48f407abb18959ba283433d',
              ROOT / 'runs/demo/DEMO-CS-stall-v1-89187184d4cb46b09b6e173a1a264ffa')
-OUTPUTS = {'mr': ROOT / 'reports/c18-4/mr-normal-diagnosis.json', 'cs': ROOT / 'reports/c18-4/cs-rejudge.json'}
+OUTPUTS = {'mr': ROOT / 'reports/c18-4/mr-normal-diagnosis.json', 'cs': ROOT / 'reports/c18-4/cs-rejudge.json',
+           'trial': ROOT / 'reports/c18-4/estimate-retest.json'}
+RETEST_PLAN = ROOT / 'batch_plans/demo-trial-c18-4.yaml'
+T1_TRIALS = {'DEMO-CS-normal-v1': CS_TRIALS[0].name, 'DEMO-CS-stall-v1': CS_TRIALS[1].name,
+             'DEMO-MR-normal-v1': MR_NORMAL.name, 'DEMO-MR-stall-v1': 'DEMO-MR-stall-v1-d454a7cd328e4cbd919539f4ccb60d2a'}
 
 
 def load(path):
@@ -133,12 +139,44 @@ def cs_rejudge(run_dirs=CS_TRIALS):
             'any_claim_passes_now': any(c['recomputed']['machine_success'] for r in rows for c in r['claims'])}
 
 
+def retest_estimate(plan_path=RETEST_PLAN, runs=ROOT / 'runs/demo'):
+    """Each retest session: its C-18-3 trial value (measured) for reference, and as the upper value the largest
+    measured T1 trial session that ran all 30 steps (MR normal), since the changed CS and MR can now run longer."""
+    from tools import run_batch
+    plan = run_batch.load_plan(plan_path)
+    measured = {}
+    for scenario_id, session in T1_TRIALS.items():
+        summary = load(Path(runs) / session / 'record/demo-summary.json')
+        measured[scenario_id] = {'session_id': session, 'steps': summary['steps'],
+                                 'termination_reason': summary['termination_reason'],
+                                 'credits_measured': summary['credits_measured']['value']}
+    full = max((m for m in measured.values() if m['steps'] == 30), key=lambda m: m['credits_measured'])
+    rows = []
+    for item in plan['items']:
+        scenario_id = load_scenario_id(item.scenario)
+        rows.append({'item': item.key, 'c18_3_trial': measured[scenario_id], 'high': full['credits_measured']})
+    return {'script': 'tools/c18_4_evidence.py trial', 'status': 'estimated', 'plan_id': plan['plan_id'],
+            'plan_sha256': plan['plan_sha256'], 'upper_reference': full, 'sessions': rows,
+            'lanes': {k: [i.key for i in run_batch.lane_items(plan, k, 2)] for k in (1, 2)},
+            'total': {'c18_3_trial_sum': round(sum(r['c18_3_trial']['credits_measured'] for r in rows), 5),
+                      'high': round(sum(r['high'] for r in rows), 5)},
+            'limits': ['the C-18-3 values are of the scenarios before the C-18-4 changes (CS ended at step 1, MR '
+                       'normal ran 30 steps); a retest session can end at any step up to 30',
+                       'the upper value is one measured 30-step MR session; a 30-step session with more search text '
+                       'in context can cost more']}
+
+
+def load_scenario_id(path):
+    from scenario_schema import load_scenario
+    return load_scenario(ROOT / path).scenario_id
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('part', choices=sorted(OUTPUTS))
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
-    result = mr_diagnosis() if args.part == 'mr' else cs_rejudge()
+    result = {'mr': mr_diagnosis, 'cs': cs_rejudge, 'trial': retest_estimate}[args.part]()
     output = args.output or OUTPUTS[args.part]
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(result, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')

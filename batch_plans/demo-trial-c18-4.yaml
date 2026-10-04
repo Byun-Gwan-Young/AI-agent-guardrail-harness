@@ -1,0 +1,11 @@
+# C-18-4 재시험 계획 (DM-67 ①②, DM-68 : CS 담당 확정·MR 검색 담당 출처 전달을 고친 뒤 시나리오당 1 회). 관측만, 차단 없음. 최종 동결 전이라 requires_final_freeze 없음.
+# 레인 2 개면 : 레인 1 = CS 2 개 (KMU_API_KEY), 레인 2 = MR 2 개 (KMU_API_KEY + TAVILY_API_KEY). 항목 순서가 이 나눔을 정한다. LR 은 바뀌지 않아 다시 돌리지 않는다.
+# 실행 : tools/run_batch.py run --plan batch_plans/demo-trial-c18-4.yaml --lane <k> --lanes 2
+plan_version: demo-batch-plan-v1
+plan_id: demo-trial-c18-4
+description: DEMO-CS·MR 정상판·교착판 재시험 각 1 회 (observe)
+items:
+- {scenario: scenarios/DEMO-CS-normal-v1.yaml, mode: observe, repeats: [1]}
+- {scenario: scenarios/DEMO-MR-normal-v1.yaml, mode: observe, repeats: [1]}
+- {scenario: scenarios/DEMO-CS-stall-v1.yaml, mode: observe, repeats: [1]}
+- {scenario: scenarios/DEMO-MR-stall-v1.yaml, mode: observe, repeats: [1]}
