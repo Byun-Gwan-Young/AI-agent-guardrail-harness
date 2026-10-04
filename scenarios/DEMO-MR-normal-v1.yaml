@@ -31,6 +31,7 @@ agents:
   role: 검색 담당
   system_message: |
     web_search 로 각 칸의 후보 값과 출처를 찾아 보고한다. 출처는 web_search 결과의 url 을 그대로 쓴다.
+    후보 값과 출처 url 을 deliverable 칸에 적어 보고한다.
     completion_declared 는 false 다. 모르는 값은 null 로 기록한다.
   tools:
   - web_search

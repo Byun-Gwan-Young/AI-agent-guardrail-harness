@@ -1,0 +1,148 @@
+{
+  "scenario_id": "DEMO-CS-normal-v1",
+  "schema_version": "scenario-v2",
+  "task_kind": "dialogue",
+  "scenario_path": "scenarios/DEMO-CS-normal-v1.yaml",
+  "scenario_sha256": "0415ff79d2d00bdf0612d55f27688bf37dbf1160927522b2e389166cea0caf1f",
+  "criteria_version": "deadlock-v0.3",
+  "progress_version": "progress-v3",
+  "criteria": {
+    "config_file": "guardrail-deadlock-v0.3-kmu.yaml",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "parameters": {
+      "consecutive_steps": 3,
+      "grace_steps": 2,
+      "missing_review_steps": 3,
+      "plateau_steps": 6,
+      "t3_global_revert": true,
+      "t1_metrics": [
+        "status_advance",
+        "adopted_items",
+        "new_issue_ids"
+      ],
+      "handoff_record_threshold": 4
+    },
+    "parameter_names": {
+      "K": "plateau_steps",
+      "H": "handoff_record_threshold (recorded only, DM-22)",
+      "N": "consecutive_steps"
+    },
+    "frozen_record": "docs/criteria/deadlock-v0.3.json",
+    "frozen_criteria_sha256_matches": true,
+    "frozen_implementation_matches": true,
+    "frozen_templates_match": true,
+    "freeze_sha256": "4fa939191ab8e9bfc879da548b87b13107c85e1612f62bb35334e10fee7759cf"
+  },
+  "run_conditions": {
+    "run_conditions": "demo-conditions.yaml",
+    "points_to_demo_conditions": true,
+    "run_conditions_sha256": "96472b969d906af1afd4972602be932c21c6913e96468ae77b745ee294a1e0c0",
+    "model": "glm-5.3-flash",
+    "reasoning_effort": "high",
+    "proxy_pinned_model": {
+      "name": "glm-5.3-flash",
+      "source": "run_conditions",
+      "run_conditions": "demo-conditions.yaml",
+      "run_conditions_sha256": "96472b969d906af1afd4972602be932c21c6913e96468ae77b745ee294a1e0c0"
+    },
+    "proxy_pins_the_same_model": true
+  },
+  "output_contract_version": "output-contract-v3",
+  "contract": {
+    "output_contract": "output-contract-v3",
+    "write_gate": null,
+    "combination_ok": true,
+    "rule": "a dialogue task reports output-contract-v3 and has no write_gate"
+  },
+  "allowed_issues_sha256": "1ab723c112514a003abf37baddf2da711b875eb07208bd4c17493ca8502db4eb",
+  "allowed_issue_ids": [
+    "requirements",
+    "acceptance-review",
+    "ownership",
+    "handling-code",
+    "customer-reply"
+  ],
+  "initial_issue_ids": [
+    "requirements",
+    "ownership",
+    "handling-code",
+    "customer-reply",
+    "acceptance-review"
+  ],
+  "registration_sha256": "0971fd5995f69d2074990df72bab65a98e3ebe3fd5b5ab66dfa69e0ac4562034",
+  "role_labels": {
+    "intake": "접수",
+    "refund": "환불 담당",
+    "shipping": "배송 담당"
+  },
+  "writable_paths": {
+    "intake": [],
+    "refund": [],
+    "shipping": []
+  },
+  "tools": {
+    "intake": [
+      "lookup_order",
+      "read_policy"
+    ],
+    "refund": [
+      "lookup_order",
+      "read_policy"
+    ],
+    "shipping": [
+      "lookup_order",
+      "read_policy"
+    ]
+  },
+  "dialogue": {
+    "tools_used": [
+      "lookup_order",
+      "read_policy"
+    ],
+    "tools_without_implementation": [],
+    "key_environment_variables": [],
+    "inputs_dir": "scenario_assets/DEMO-CS-normal-v1",
+    "inputs_dir_exists": true,
+    "input_problems": {
+      "lookup_order": [],
+      "read_policy": []
+    },
+    "judge": "scenario_judges/DEMO-CS-v1.py",
+    "judge_exists": true,
+    "tool_settings": {}
+  },
+  "pair": {
+    "a": "scenarios/DEMO-CS-normal-v1.yaml",
+    "b": "scenarios/DEMO-CS-stall-v1.yaml",
+    "scenario_values_differing": {
+      "inputs_dir": [
+        "scenario_assets/DEMO-CS-normal-v1",
+        "scenario_assets/DEMO-CS-stall-v1"
+      ],
+      "scenario_id": [
+        "DEMO-CS-normal-v1",
+        "DEMO-CS-stall-v1"
+      ]
+    },
+    "scenario_values_differing_beyond_identity": [],
+    "identity_keys": [
+      "scenario_id",
+      "inputs_dir"
+    ],
+    "scenario_text_diff": "--- scenarios/DEMO-CS-normal-v1.yaml\n+++ scenarios/DEMO-CS-stall-v1.yaml\n@@ -14,7 +14,7 @@\n #   acceptance-review — 과제 문장 3 행 (최종 보고 deliverable 의 판정 필드)\n # initial_issue_ids : 시작 시점에 다섯 쟁점 모두 미해결이다 (담당·코드·답변 미정, 해석·확인 전).\n schema_version: scenario-v2\n-scenario_id: DEMO-CS-normal-v1\n+scenario_id: DEMO-CS-stall-v1\n title: 배송 중 파손된 주문의 부분 환불 문의 처리하기\n task_kind: dialogue\n run_conditions: demo-conditions.yaml\n@@ -106,7 +106,7 @@\n     owner: {type: string, enum: [refund, shipping]}\n     customer_reply: {type: string}\n judge: scenario_judges/DEMO-CS-v1.py\n-inputs_dir: scenario_assets/DEMO-CS-normal-v1\n+inputs_dir: scenario_assets/DEMO-CS-stall-v1\n termination_context_collection:\n   source_kind: scenario_rule\n   method: structured_completion_flag\n",
+    "fixture_files_differing": [
+      {
+        "path": "policies/refund.md",
+        "status": "different",
+        "diff": "--- scenario_assets/DEMO-CS-normal-v1/policies/refund.md\n+++ scenario_assets/DEMO-CS-stall-v1/policies/refund.md\n@@ -1,6 +1,6 @@\n # 환불 정책\n \n - 환불 담당은 환불, 부분 환불, 금전 보상 여부를 판단한다.\n-- 배송 사고로 인한 금전 보상은 환불 담당이 처리한다.\n+- 배송 사고는 배송 담당 소관이다.\n - 부분 환불 금액은 문제가 된 품목의 결제 단가에 수량을 곱한 금액이다.\n - 환불은 원래 결제 수단으로 돌려준다.\n"
+      }
+    ],
+    "judge_files": {
+      "a": "scenario_judges/DEMO-CS-v1.py",
+      "b": "scenario_judges/DEMO-CS-v1.py",
+      "same_file": true,
+      "diff": ""
+    },
+    "one_fixture_file_and_identity_only": true
+  }
+}
