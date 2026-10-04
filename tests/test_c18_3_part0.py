@@ -62,6 +62,11 @@ def fake_summary(folder):
     return {"session_id": folder.name, "key_scan": {"clean": True}}
 
 
+def fake_replay(folder):
+    # C-19-1: record also writes record/replay.json (tools/replay_demo.py); tests/test_c19_1_part2.py covers it.
+    return {"replay_version": "demo-replay-v1", "session_id": folder.name, "steps": []}
+
+
 class RecordFiles(unittest.TestCase):
     def setUp(self):
         self.root = Path(self.enterContext(tempfile.TemporaryDirectory()))
@@ -71,38 +76,39 @@ class RecordFiles(unittest.TestCase):
 
     def test_record_writes_the_three_record_files_without_model_text(self):
         folder = make_session(self.root)
-        result = demo_records.record(folder, manifest=fake_manifest, summary=fake_summary)
-        self.assertEqual(result["written"], ["record/manifest.json", "record/demo-summary.json", "record/judgements.json"])
+        result = demo_records.record(folder, manifest=fake_manifest, summary=fake_summary, replay=fake_replay)
+        self.assertEqual(result["written"], ["record/manifest.json", "record/demo-summary.json", "record/judgements.json",
+                                             "record/replay.json"])
         judgements = json.loads((folder / "record/judgements.json").read_text(encoding="utf-8"))
         self.assertEqual((judgements["first_stop_step"], judgements["stop_steps"]), (2, [2]))
         self.assertEqual(judgements["steps"][1]["criteria"]["explanation"]["text"], "최근 3 step 동안 변화가 없습니다.")
         self.assertEqual([s["judgement_ns"] for s in judgements["steps"]], [1001, 1002])
-        for name in ("judgements.json", "manifest.json", "demo-summary.json"):
+        for name in ("judgements.json", "manifest.json", "demo-summary.json", "replay.json"):
             self.assertNotIn(MODEL_TEXT, (folder / "record" / name).read_text(encoding="utf-8"))
 
     def test_a_key_in_the_folder_writes_nothing(self):
         folder = make_session(self.root, extra={"steps.json": '"Bearer abcdefghijklmnop"'})
         with self.assertRaisesRegex(ValueError, "key scan found .*steps.json"):
-            demo_records.record(folder, manifest=fake_manifest, summary=fake_summary)
+            demo_records.record(folder, manifest=fake_manifest, summary=fake_summary, replay=fake_replay)
         self.assertFalse((folder / "record").exists())
 
     def test_the_key_value_set_here_is_scanned(self):
         os.environ["TAVILY_API_KEY"] = "plain-value-0123456789"
         folder = make_session(self.root, extra={"search.txt": "plain-value-0123456789"})
         with self.assertRaisesRegex(ValueError, "key scan"):
-            demo_records.record(folder, manifest=fake_manifest, summary=fake_summary)
+            demo_records.record(folder, manifest=fake_manifest, summary=fake_summary, replay=fake_replay)
 
     def test_a_manifest_that_is_not_demo_is_refused(self):
         folder = make_session(self.root)
         with self.assertRaisesRegex(ValueError, "phase is not demo"):
-            demo_records.record(folder, manifest=lambda f: {"condition": {"phase": "measure"}}, summary=fake_summary)
+            demo_records.record(folder, manifest=lambda f: {"condition": {"phase": "measure"}}, summary=fake_summary, replay=fake_replay)
 
     def test_size_limits_and_required_files(self):
         folder = make_session(self.root)
         self.assertEqual(demo_records.check_session(folder)["problems"],
                          [f"{folder.name}/record/{n}: missing" for n in ("manifest.json", "demo-summary.json",
                                                                          "judgements.json")])
-        demo_records.record(folder, manifest=fake_manifest, summary=fake_summary)
+        demo_records.record(folder, manifest=fake_manifest, summary=fake_summary, replay=fake_replay)
         self.assertEqual(demo_records.check_session(folder)["problems"], [])
         (folder / "summary.json").write_text("x" * (demo_records.MAX_FILE_BYTES + 1))
         self.assertEqual(demo_records.check_session(folder)["problems"],
@@ -132,7 +138,7 @@ class Staging(unittest.TestCase):
 
     def test_stage_adds_exactly_the_commit_files_of_an_ignored_folder(self):
         folder = make_session(self.root)
-        demo_records.record(folder, manifest=fake_manifest, summary=fake_summary)
+        demo_records.record(folder, manifest=fake_manifest, summary=fake_summary, replay=fake_replay)
         demo_records.stage([folder], root=self.root)
         prefix = "runs/demo/" + folder.name + "/"
         self.assertEqual(self.tracked(), sorted(prefix + n for n in demo_records.COMMIT_FILES))

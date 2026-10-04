@@ -1,0 +1,90 @@
+{
+ "replay_version": "demo-replay-v1",
+ "session_id": "DEMO-CS-normal-v1-47da0f11c48f407abb18959ba283433d",
+ "scenario_id": "DEMO-CS-normal-v1",
+ "title": "배송 중 파손된 주문의 부분 환불 문의 처리하기",
+ "task_kind": "dialogue",
+ "guardrail_mode": "observe",
+ "model": "glm-5.3-flash",
+ "termination_reason": "success",
+ "escalated_by": null,
+ "steps_reached": 1,
+ "max_steps": 30,
+ "batch": {
+  "item": "DEMO-CS-normal-v1:observe:1",
+  "lane": 1,
+  "lanes": 3,
+  "mode": "observe",
+  "plan_id": "demo-trial-c18-3",
+  "plan_sha256": "ac81565ed32414f8d67166e52b05cf5a239cd5d440a1cd5690b459bd59730e29",
+  "repeat": 1,
+  "rerun_of": null
+ },
+ "role_labels": {
+  "intake": "접수",
+  "refund": "환불 담당",
+  "shipping": "배송 담당"
+ },
+ "first_stop_step": null,
+ "stop_steps": [],
+ "blocked_step": null,
+ "if_stopped": null,
+ "steps": [
+  {
+   "step_id": 1,
+   "agent": "intake",
+   "role": "접수",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "resolved",
+    "status_label": "해결",
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": true,
+    "reasons": [],
+    "missing": []
+   },
+   "tools": [
+    {
+     "tool": "lookup_order",
+     "is_error": false
+    },
+    {
+     "tool": "read_policy",
+     "is_error": false
+    },
+    {
+     "tool": "read_policy",
+     "is_error": false
+    },
+    {
+     "tool": "read_policy",
+     "is_error": false
+    }
+   ],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 8125,
+    "cached_prompt": 1920,
+    "completion": 2144,
+    "reasoning": 105
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 2.06035,
+   "cumulative_tokens": 10269,
+   "cumulative_credits": 2.06035
+  }
+ ]
+}

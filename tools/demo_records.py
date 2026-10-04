@@ -40,8 +40,11 @@ RECORD_DIR = 'record'
 # The only files of a demo session folder that are committed (DM-64 ⑤): runner records of the run and its outcome,
 # and the record/ files written here. Everything else (session.json = the proxy log copy, steps.json with the model's
 # reports, observations/, workspace/, search/, tool-dispatch.json) and logs/demo/ stay local and go into the backup.
+# record/replay.json (C-19-1, tools/replay_demo.py): the small replay record a session page is made from; optional, so
+# the sessions recorded before C-19-1 keep the rule.
 COMMIT_FILES = ('conditions.json', 'summary.json', 'scenario.yaml', 'registered-tools.json', 'prompt-trend.json',
-                RECORD_DIR + '/manifest.json', RECORD_DIR + '/demo-summary.json', RECORD_DIR + '/judgements.json')
+                RECORD_DIR + '/manifest.json', RECORD_DIR + '/demo-summary.json', RECORD_DIR + '/judgements.json',
+                RECORD_DIR + '/replay.json')
 # Required among them: a run that has no prompt-trend.json or registered-tools.json is still recorded.
 REQUIRED_FILES = ('conditions.json', 'summary.json', 'scenario.yaml', RECORD_DIR + '/manifest.json',
                   RECORD_DIR + '/demo-summary.json', RECORD_DIR + '/judgements.json')
@@ -131,13 +134,18 @@ def default_summary(folder):
     return summarize(folder)
 
 
-def record(folder, *, manifest=default_manifest, summary=default_summary):
+def default_replay(folder):
+    from tools.replay_demo import extract
+    return extract(folder)
+
+
+def record(folder, *, manifest=default_manifest, summary=default_summary, replay=default_replay):
     """Write record/ for one session. Nothing is written if the folder's key scan is not clean."""
     scan = key_scan([folder])
     if not scan['clean']:
         raise ValueError(f'{folder.name}: key scan found {sorted(scan["hits"])}; nothing written')
     made = {'manifest.json': manifest(folder), 'demo-summary.json': summary(folder),
-            'judgements.json': judgements(load(folder / 'session.json'))}
+            'judgements.json': judgements(load(folder / 'session.json')), 'replay.json': replay(folder)}
     if made['manifest.json'].get('condition', {}).get('phase') != 'demo':
         raise ValueError(f'{folder.name}: the manifest phase is not demo')
     out = folder / RECORD_DIR

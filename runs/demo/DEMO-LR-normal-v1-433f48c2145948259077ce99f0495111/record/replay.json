@@ -1,0 +1,290 @@
+{
+ "replay_version": "demo-replay-v1",
+ "session_id": "DEMO-LR-normal-v1-433f48c2145948259077ce99f0495111",
+ "scenario_id": "DEMO-LR-normal-v1",
+ "title": "멀티에이전트 LLM 실패 원인 논문 5 편 고르고 한 줄 요약하기",
+ "task_kind": "dialogue",
+ "guardrail_mode": "observe",
+ "model": "glm-5.3-flash",
+ "termination_reason": "success",
+ "escalated_by": null,
+ "steps_reached": 6,
+ "max_steps": 30,
+ "batch": {
+  "item": "DEMO-LR-normal-v1:observe:1",
+  "lane": 3,
+  "lanes": 3,
+  "mode": "observe",
+  "plan_id": "demo-trial-c18-3",
+  "plan_sha256": "ac81565ed32414f8d67166e52b05cf5a239cd5d440a1cd5690b459bd59730e29",
+  "repeat": 1,
+  "rerun_of": null
+ },
+ "role_labels": {
+  "lead": "조사 책임",
+  "searcher": "검색 담당",
+  "writer": "작성 담당"
+ },
+ "first_stop_step": null,
+ "stop_steps": [],
+ "blocked_step": null,
+ "if_stopped": null,
+ "steps": [
+  {
+   "step_id": 1,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "scoping",
+    "status_label": "범위 확정",
+    "handoff_to": "searcher",
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "paper-selection",
+     "summaries",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 3334,
+    "cached_prompt": 0,
+    "completion": 1043,
+    "reasoning": 201
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 1.0216,
+   "cumulative_tokens": 4377,
+   "cumulative_credits": 1.0216
+  },
+  {
+   "step_id": 2,
+   "agent": "searcher",
+   "role": "검색 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "researching",
+    "status_label": "조사",
+    "handoff_to": "lead",
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "paper-selection",
+     "summaries",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "academic_search",
+     "is_error": false
+    },
+    {
+     "tool": "academic_search",
+     "is_error": false
+    },
+    {
+     "tool": "academic_search",
+     "is_error": false
+    },
+    {
+     "tool": "academic_search",
+     "is_error": false
+    }
+   ],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 21301,
+    "cached_prompt": 1984,
+    "completion": 1418,
+    "reasoning": 337
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 3.66607,
+   "cumulative_tokens": 27096,
+   "cumulative_credits": 4.68767
+  },
+  {
+   "step_id": 3,
+   "agent": "writer",
+   "role": "작성 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "drafting",
+    "status_label": "작성",
+    "handoff_to": "writer",
+    "adopted_items": 5,
+    "open_issue_ids": [
+     "summaries",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 5329,
+    "cached_prompt": 1344,
+    "completion": 1825,
+    "reasoning": 310
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 1.55057,
+   "cumulative_tokens": 34250,
+   "cumulative_credits": 6.23824
+  },
+  {
+   "step_id": 4,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 5,
+    "open_issue_ids": [],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer"
+    ],
+    "missing": []
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "progress",
+   "state_label": "진전",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 7820,
+    "cached_prompt": 1792,
+    "completion": 2536,
+    "reasoning": 557
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 2.22596,
+   "cumulative_tokens": 44606,
+   "cumulative_credits": 8.4642
+  },
+  {
+   "step_id": 5,
+   "agent": "searcher",
+   "role": "검색 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 5,
+    "open_issue_ids": [],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer"
+    ],
+    "missing": []
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 30762,
+    "cached_prompt": 8512,
+    "completion": 3142,
+    "reasoning": 267
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.16386,
+   "cumulative_tokens": 78510,
+   "cumulative_credits": 13.62806
+  },
+  {
+   "step_id": 6,
+   "agent": "writer",
+   "role": "작성 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 5,
+    "open_issue_ids": [],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": true,
+    "reasons": [],
+    "missing": []
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 13052,
+    "cached_prompt": 1600,
+    "completion": 2506,
+    "reasoning": 81
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 3.0188,
+   "cumulative_tokens": 94068,
+   "cumulative_credits": 16.64686
+  }
+ ]
+}
