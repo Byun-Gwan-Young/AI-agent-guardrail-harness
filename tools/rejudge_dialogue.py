@@ -1,14 +1,13 @@
 """Recompute a dialogue (T1) run's judge results from what its run folder stored (C-17-6 part 2, DM-13).
 
-Inputs: steps.json (the verified reports), tool-dispatch.json and the stored search responses, read through
-experiments.search_tools.replay_tool_records (each response checked against its sha256 and normalized again). No
-search, no model call, no proxy. Every step's completion gate and every completion claim is judged again with the
+Inputs: steps.json (the verified reports, also handed to a judge that reads them, C-18-4), tool-dispatch.json and the
+stored search responses, read through experiments.search_tools.replay_tool_records (each response checked against its
+sha256 and normalized again). No search, no model call, no proxy. Every step's completion gate and every completion claim is judged again with the
 scenario's judge and compared with the recorded one. The judge file is compared with the hash the run recorded.
 
     venv/bin/python tools/rejudge_dialogue.py runs/demo/<session id> [--output <file>]
 """
 import argparse
-import copy
 import json
 from pathlib import Path
 import sys
@@ -16,7 +15,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from experiments import search_tools  # noqa: E402
-from experiments.dialogue_runner import checked_gate, load_judge  # noqa: E402
+from experiments.dialogue_runner import checked_gate, judge_call, load_judge  # noqa: E402
 from experiments.run_scenario import safe_path  # noqa: E402
 from scenario_schema import load_scenario  # noqa: E402
 
@@ -35,9 +34,12 @@ def rejudge(run_dir, scenario_root=ROOT):
     inputs_dir = safe_path(scenario_root, scenario.inputs_dir)
     records = search_tools.replay_tool_records(run_dir)
 
+    verified = [s['observed_final_report'] for s in steps if s.get('observed_final_report') is not None]
+
     def again(report, step_id):
         known = [r for r in records if r['step_id'] is not None and r['step_id'] <= step_id]
-        return checked_gate(judge(copy.deepcopy(report), tool_records=copy.deepcopy(known), inputs_dir=inputs_dir))
+        reports = [r for r in verified if r['step_id'] <= step_id]
+        return checked_gate(judge_call(judge, report, tool_records=known, inputs_dir=inputs_dir, reports=reports))
     latest, rows = None, []
     for step in steps:
         if step.get('completion_gate') is None:

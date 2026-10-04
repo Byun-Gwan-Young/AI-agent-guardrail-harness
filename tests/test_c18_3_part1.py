@@ -86,9 +86,12 @@ class Scenarios(unittest.TestCase):
 
 class Judge(unittest.TestCase):
     def judged(self, deliverable, status="resolved", variant="normal"):
+        # C-18-4 (DM-67 ①): the owner role's own verified report confirms the code (tests/test_c18_4_part2.py).
         judge = load_judge()
+        confirmed = [{**report("assigned", deliverable=deliverable), "agent_id": (deliverable or {}).get("owner"),
+                      "step_id": 1}]
         return judge(report(status, deliverable=deliverable), tool_records=[],
-                     inputs_dir=ROOT / f"scenario_assets/DEMO-CS-{variant}-v1")
+                     inputs_dir=ROOT / f"scenario_assets/DEMO-CS-{variant}-v1", reports=confirmed)
 
     def test_the_answer_report_passes_on_both_inputs(self):
         for variant in ("normal", "stall"):
@@ -115,7 +118,8 @@ class Flows(unittest.IsolatedAsyncioTestCase):
     async def test_normal_path_succeeds(self):
         tools = {1: ("lookup_order", {"order_id": "B-2041"}), 2: ("read_policy", {"name": "refund"})}
         reports = [report("triage", handoff="refund", issues=("ownership", "handling-code", "customer-reply")),
-                   report("assigned", handoff="intake", issues=("handling-code", "customer-reply")),
+                   # C-18-4 (DM-67 ①): the owner (refund) decides the code in its own report.
+                   report("assigned", handoff="intake", issues=("customer-reply",), deliverable=ANSWER),
                    report("resolved", deliverable=ANSWER, declared=True, issues=())]
         run = await self.run_cs(NORMAL, reports, tools)
         summary, steps = run["summary"], run["steps"]

@@ -1,13 +1,17 @@
 """Completion judge of DEMO-CS (C-18-3), shared by DEMO-CS-normal-v1 and DEMO-CS-stall-v1 (DM-15: the pair differs in
 one policy sentence only, so the judge is one file). Agents cannot read it (scenario_judges/, outside inputs_dir).
 
-judge(report, *, tool_records, inputs_dir) reads only the report it is given and the task's own inputs (C-16 definition,
-docs/design/demo-scenarios.md 1):
+judge(report, *, tool_records, inputs_dir, reports) reads the report it is given, the session's verified reports and the
+task's own inputs (C-16 definition, docs/design/demo-scenarios.md 1; owner confirmation C-18-4, DM-67 ①):
 - handling_code is one of the codes listed in policies/handling_codes.md (lines "- `CODE` — ...")
 - owner is refund or shipping
+- owner confirmation: a verified report of the owner role itself (reports, agent_id == owner) has the same
+  deliverable.handling_code. The policy (handling_codes.md, both versions) says the owner decides the code and the
+  intake confirms the reply with it; in the trial both runs ended at step 1 with a code the intake chose alone
 - customer_reply is not empty
 - order_id is an order of orders.json
 Whether the code, owner or reply is right for the ticket is not judged (content accuracy is out of scope, a limit).
+Success is still the declarer's (intake) own claim (DM-45); reports only decide whether the owner confirmed the code.
 """
 import json
 from pathlib import Path
@@ -26,7 +30,12 @@ def order_ids(inputs_dir):
     return {order['order_id'] for order in data['orders']}
 
 
-def judge(report, *, tool_records, inputs_dir):
+def owner_confirmed(owner, code, reports):
+    return any(r.get('agent_id') == owner and (r.get('deliverable') or {}).get('handling_code') == code
+               for r in reports or ())
+
+
+def judge(report, *, tool_records, inputs_dir, reports=()):
     report = report or {}
     if report.get('status') == 'escalated':
         return {'machine_success': False, 'result': 'escalated', 'missing': []}
@@ -40,6 +49,9 @@ def judge(report, *, tool_records, inputs_dir):
         missing.append('handling_code')
     if deliverable.get('owner') not in OWNERS:
         missing.append('owner')
+    elif 'handling_code' not in missing and not owner_confirmed(deliverable['owner'], deliverable['handling_code'],
+                                                                 reports):
+        missing.append('owner_confirmation')
     if not (deliverable.get('customer_reply') or '').strip():
         missing.append('customer_reply')
     return {'machine_success': not missing, 'result': 'unfinished' if missing else 'resolved', 'missing': missing}

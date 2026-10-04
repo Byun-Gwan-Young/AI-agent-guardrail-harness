@@ -25,6 +25,7 @@ import asyncio
 import copy
 import hashlib
 import importlib.util
+import inspect
 import json
 import os
 import shutil
@@ -105,7 +106,7 @@ class SentContract:
 
 
 def load_judge(scenario, root):
-    """The scenario's completion judge: judge(report, *, tool_records, inputs_dir) -> gate."""
+    """The scenario's completion judge: judge(report, *, tool_records, inputs_dir[, reports]) -> gate."""
     path = common.safe_path(root, scenario.judge)
     if not path.is_file():
         raise ValueError('Judge not found: ' + scenario.judge)
@@ -115,6 +116,14 @@ def load_judge(scenario, root):
     if not callable(getattr(module, 'judge', None)):
         raise ValueError('Judge module must define judge(report, *, tool_records, inputs_dir)')
     return module.judge, {'path': scenario.judge, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+
+
+def judge_call(judge, report, *, tool_records, inputs_dir, reports):
+    """Calls the judge on deep copies. reports (C-18-4, DM-67 ①) = the session's verified reports so far, in step
+    order, each with agent_id and step_id; it is passed only to a judge that names a reports parameter, so the other
+    judges are called as before (judge(report, *, tool_records, inputs_dir))."""
+    extra = {'reports': copy.deepcopy(reports)} if 'reports' in inspect.signature(judge).parameters else {}
+    return judge(copy.deepcopy(report), tool_records=copy.deepcopy(tool_records), inputs_dir=inputs_dir, **extra)
 
 
 def checked_gate(gate):
@@ -367,6 +376,7 @@ async def run_dialogue(args, scenario, scenario_path, run_conditions=None):
     steps, missing, observation_first, claims = [], [], None, []
     reason, error, session, started = 'max_steps', None, None, False
     guardrail_block, escalated_by, latest_report, gate = None, None, None, None
+    verified_reports = []  # every verified report of the session, for a judge that reads them (judge_call)
     # DM-58 ③: /credits/ read before the first model request and after the session ends (gateway_usage).
     usage_before, upstream_meta = None, None
     history, cursors, pending_feedback = [], [0] * len(agents), [None] * len(agents)
@@ -446,6 +456,7 @@ async def run_dialogue(args, scenario, scenario_path, run_conditions=None):
                 if observed is not None:
                     observed.update(agent_id=name, step_id=step)
                     latest_report = observed
+                    verified_reports.append(observed)
                 # DM-44: a contract vocabulary violation leaves no verified report, so the two never meet.
                 self_handoff = observed is not None and observed['handoff_to'] == name
                 if self_handoff:
@@ -455,8 +466,8 @@ async def run_dialogue(args, scenario, scenario_path, run_conditions=None):
                 # Observation declaration must not alter execution success/stop control.
                 observation_first, termination = common.termination_context(observation_first, observed, step,
                                                                              declarer)
-                gate = checked_gate(judge(copy.deepcopy(latest_report), tool_records=copy.deepcopy(dispatch.records),
-                                          inputs_dir=inputs_dir))
+                gate = checked_gate(judge_call(judge, latest_report, tool_records=dispatch.records,
+                                               inputs_dir=inputs_dir, reports=verified_reports))
                 metadata = collection_metadata(INDEPENDENT, receipt, observed, None, scenario.progress_source,
                                                scenario.progress_metric.model_dump())
                 next_index, route = next_turn(scenario, index, observed, outcome['strict_failure'])
@@ -480,8 +491,8 @@ async def run_dialogue(args, scenario, scenario_path, run_conditions=None):
                 if not outcome['failed'] and (parsed['status'] == scenario.status_values[-1].id
                                               or parsed['completion_declared']):
                     # DM-45: judged on this report itself, not on an earlier one or another role's.
-                    claim = completion_claim(scenario, name, parsed, checked_gate(judge(
-                        copy.deepcopy(parsed), tool_records=copy.deepcopy(dispatch.records), inputs_dir=inputs_dir)))
+                    claim = completion_claim(scenario, name, parsed, checked_gate(judge_call(
+                        judge, parsed, tool_records=dispatch.records, inputs_dir=inputs_dir, reports=verified_reports)))
                     claims.append({'step_id': step, **claim})
                     record['completion_claim'] = claim
                 steps.append(record)

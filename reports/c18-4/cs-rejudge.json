@@ -1,0 +1,60 @@
+{
+ "script": "tools/c18_4_evidence.py cs",
+ "sessions": [
+  {
+   "session_id": "DEMO-CS-normal-v1-47da0f11c48f407abb18959ba283433d",
+   "termination_reason": "success",
+   "judge": {
+    "path": "scenario_judges/DEMO-CS-v1.py",
+    "sha256_recorded": "4a596d989be19737070b99a8323b3649c87c14f232554e1446ea6cf30233ed97",
+    "sha256_now": "e21694dcd9a1094109ac82fc64b7d6e683621caeff116efd0909ea5837e08674",
+    "same_file": false
+   },
+   "claims": [
+    {
+     "step_id": 1,
+     "recorded": {
+      "machine_success": true,
+      "result": "resolved",
+      "missing": []
+     },
+     "recomputed": {
+      "machine_success": false,
+      "result": "unfinished",
+      "missing": [
+       "owner_confirmation"
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "session_id": "DEMO-CS-stall-v1-89187184d4cb46b09b6e173a1a264ffa",
+   "termination_reason": "success",
+   "judge": {
+    "path": "scenario_judges/DEMO-CS-v1.py",
+    "sha256_recorded": "4a596d989be19737070b99a8323b3649c87c14f232554e1446ea6cf30233ed97",
+    "sha256_now": "e21694dcd9a1094109ac82fc64b7d6e683621caeff116efd0909ea5837e08674",
+    "same_file": false
+   },
+   "claims": [
+    {
+     "step_id": 1,
+     "recorded": {
+      "machine_success": true,
+      "result": "resolved",
+      "missing": []
+     },
+     "recomputed": {
+      "machine_success": false,
+      "result": "unfinished",
+      "missing": [
+       "owner_confirmation"
+      ]
+     }
+    }
+   ]
+  }
+ ],
+ "any_claim_passes_now": false
+}

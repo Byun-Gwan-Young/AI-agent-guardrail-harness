@@ -52,13 +52,18 @@ class Upstream:
 
     def __init__(self, reports, tools=None):
         self.reports, self.tools, self.requests = list(reports), dict(tools or {}), []
-        self.finals, self.tool_steps_done = 0, set()
+        self.finals, self.tool_steps_done, self.exhausted = 0, set(), 0
 
     def __call__(self, request):
         body = json.loads(request.content)
         self.requests.append(body)
         if "response_format" in body:
             self.finals += 1
+            if not self.reports:
+                # C-18-4 (DM-68): no scripted report left fails at once (a 400 is not retried) instead of raising in
+                # the transport, which the client retries with back-off on every remaining step.
+                self.exhausted += 1
+                return httpx.Response(400, json={"error": {"message": "fake upstream: no scripted report left"}})
             item = self.reports.pop(0)
             return completion(item if isinstance(item, str) else json.dumps(item, ensure_ascii=False))
         step = self.finals + 1
