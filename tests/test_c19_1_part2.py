@@ -141,6 +141,20 @@ class Pages(unittest.TestCase):
         self.assertIn("T2 대화+산출물 교착", page)
 
 
+class AllPages(unittest.TestCase):
+    def test_pages_renders_every_representative_and_the_index(self):
+        result = aggregate_demo.aggregate(["demo-trial-c18-2", "demo-trial-c18-3"])
+        with tempfile.TemporaryDirectory() as directory:
+            done = replay_demo.pages(result, directory)
+            names = sorted(p.name for p in Path(directory).iterdir())
+            index = (Path(directory) / "index.html").read_text(encoding="utf-8")
+        expected = sorted(r["session_id"] + ".html" for r in result["representatives"])
+        self.assertEqual((done["pages"], done["replay_missing"]), (expected, []))
+        self.assertEqual(names, sorted(expected + ["index.html"]))
+        for name in expected:
+            self.assertIn(f'href="{name}"', index)
+
+
 class CommittedTrials(unittest.TestCase):
     def test_each_trial_replay_adds_up_to_its_summary(self):
         records = sorted((ROOT / "runs/demo").glob("*/record/replay.json"))

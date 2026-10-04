@@ -3,6 +3,7 @@
   extract  <runs/demo/<id> raw folder> [--output <file>]   write record/replay.json (default: in that folder)
   render   <record/replay.json> --output <file.html>         one session page
   index    <aggregate.json> --pages <folder> --output <index.html>   the list page of the representative sessions
+  pages    <aggregate.json> --output-dir <folder> [--runs-root runs/demo]   every representative's page and index.html
 
 record/replay.json (demo-replay-v1) holds only what a page shows, per step: the role (its Korean label), the facts of
 the verified final report's structured fields (status, handoff_to, adopted item and open issue counts, whether a
@@ -254,6 +255,24 @@ def index_page(aggregate, pages):
 """
 
 
+def pages(aggregate, output_dir, runs_root=ROOT / 'runs' / 'demo'):
+    """Each representative session's page (<session id>.html, from its record/replay.json) and index.html."""
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    written, missing = {}, []
+    for row in aggregate.get('representatives', []):
+        record = Path(runs_root) / row['session_id'] / 'record'
+        if not (record / 'replay.json').is_file():
+            missing.append(row['session_id'])
+            continue
+        summary = load(record / 'demo-summary.json') if (record / 'demo-summary.json').is_file() else None
+        name = row['session_id'] + '.html'
+        (output_dir / name).write_text(page(load(record / 'replay.json'), summary), encoding='utf-8')
+        written[row['session_id']] = name
+    (output_dir / 'index.html').write_text(index_page(aggregate, written), encoding='utf-8')
+    return {'pages': sorted(written.values()), 'index': 'index.html', 'replay_missing': missing}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest='action', required=True)
@@ -267,7 +286,15 @@ def main():
     three.add_argument('aggregate', type=Path)
     three.add_argument('--pages', type=Path, required=True, help='folder of the session pages (<session id>.html)')
     three.add_argument('--output', type=Path, required=True)
+    four = sub.add_parser('pages')
+    four.add_argument('aggregate', type=Path)
+    four.add_argument('--output-dir', type=Path, required=True)
+    four.add_argument('--runs-root', type=Path, default=ROOT / 'runs' / 'demo')
     args = parser.parse_args()
+    if args.action == 'pages':
+        result = pages(load(args.aggregate), args.output_dir, args.runs_root)
+        print(json.dumps(result, ensure_ascii=False))
+        return 1 if result['replay_missing'] else 0
     if args.action == 'extract':
         replay = extract(args.run_dir)
         output = args.output or args.run_dir / 'record' / 'replay.json'
