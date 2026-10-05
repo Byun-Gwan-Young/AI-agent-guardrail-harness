@@ -1,0 +1,272 @@
+{
+  "session_id": "DEMO-MR-normal-v1-653feb85bfb844268358ab344f8eca61",
+  "steps": 6,
+  "termination_reason": "success",
+  "total_tokens": 93668,
+  "known_tokens_subtotal": 93668,
+  "criteria_latest": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "termination_failure",
+    "reason": "post-declaration nonprogress beyond grace",
+    "consecutive_steps": 3,
+    "consecutive_states": [
+      "stagnant",
+      "stagnant",
+      "stagnant"
+    ],
+    "consecutive_step_ids": [
+      4,
+      5,
+      6
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": 6,
+    "declared_step": 3,
+    "explanation": {
+      "explanation_version": "explain-v1",
+      "template_id": "E6",
+      "text": "step 3에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다.",
+      "values": {
+        "d": 3,
+        "n": 3,
+        "status": "완료"
+      },
+      "missing_values": [],
+      "form": "full",
+      "skipped_templates": [],
+      "signals": {
+        "decision": "termination_failure",
+        "stop_step": 6,
+        "task_kind": "dialogue",
+        "consecutive_steps": 3,
+        "consecutive_states": [
+          "stagnant",
+          "stagnant",
+          "stagnant"
+        ],
+        "streak_roles": [
+          "lead",
+          "searcher",
+          "writer"
+        ],
+        "declared_step": 3,
+        "test_pass_count": null,
+        "test_total_count": null,
+        "global_revert": null,
+        "test_plateau_in_streak": false,
+        "test_max_step": null,
+        "steps_since_test_max": null,
+        "file_state_changes_since_test_max": null,
+        "handoff": null,
+        "handoff_threshold": 4,
+        "status": "completed",
+        "adopted_metric_selected": true,
+        "adopted_count": 6,
+        "test_observed_in_session": false,
+        "selected_metrics": [
+          "conversation.status_advance",
+          "conversation.adopted_items",
+          "conversation.new_issue_ids"
+        ],
+        "adopted_required": 6
+      },
+      "role_labels": {
+        "lead": "조사 책임",
+        "searcher": "검색 담당",
+        "writer": "작성 담당"
+      },
+      "status_labels": {
+        "scoping": "범위 확정",
+        "researching": "조사",
+        "drafting": "작성",
+        "completed": "완료",
+        "escalated": "에스컬레이션"
+      }
+    }
+  },
+  "criteria_alerts": [
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "termination_failure",
+      "reason": "post-declaration nonprogress beyond grace",
+      "consecutive_steps": 3,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        4,
+        5,
+        6
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": null,
+      "first_termination_failure_step": 6,
+      "declared_step": 3,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E6",
+        "text": "step 3에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다.",
+        "values": {
+          "d": 3,
+          "n": 3,
+          "status": "완료"
+        },
+        "missing_values": [],
+        "form": "full",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "termination_failure",
+          "stop_step": 6,
+          "task_kind": "dialogue",
+          "consecutive_steps": 3,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "lead",
+            "searcher",
+            "writer"
+          ],
+          "declared_step": 3,
+          "test_pass_count": null,
+          "test_total_count": null,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": null,
+          "steps_since_test_max": null,
+          "file_state_changes_since_test_max": null,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": "completed",
+          "adopted_metric_selected": true,
+          "adopted_count": 6,
+          "test_observed_in_session": false,
+          "selected_metrics": [
+            "conversation.status_advance",
+            "conversation.adopted_items",
+            "conversation.new_issue_ids"
+          ],
+          "adopted_required": 6
+        },
+        "role_labels": {
+          "lead": "조사 책임",
+          "searcher": "검색 담당",
+          "writer": "작성 담당"
+        },
+        "status_labels": {
+          "scoping": "범위 확정",
+          "researching": "조사",
+          "drafting": "작성",
+          "completed": "완료",
+          "escalated": "에스컬레이션"
+        }
+      }
+    }
+  ],
+  "missing_observation_steps": [],
+  "missing_observation_count": 0,
+  "error": null,
+  "cleanup_errors": [],
+  "actual_outcome": null,
+  "context_buffer_messages": 12,
+  "task_kind": "dialogue",
+  "turn_order": "fixed",
+  "output_contract_version": "output-contract-v3",
+  "registration_sha256": "4914aa9895861bec397aae908371727779760a05cbc62c751d2ab2f4d8f1ff6f",
+  "vocabulary_violation_steps": [
+    1
+  ],
+  "vocabulary_violations_total": 1,
+  "failed_steps": [],
+  "final_status": "completed",
+  "escalated_by": null,
+  "completion_gate": {
+    "machine_success": true,
+    "result": "resolved",
+    "missing": []
+  },
+  "completion_claims": [
+    {
+      "step_id": 3,
+      "agent": "writer",
+      "status": "completed",
+      "completion_declared": true,
+      "accepted": false,
+      "reasons": [
+        "judge_unfinished"
+      ]
+    },
+    {
+      "step_id": 4,
+      "agent": "lead",
+      "status": "completed",
+      "completion_declared": true,
+      "accepted": false,
+      "reasons": [
+        "not_declarer",
+        "judge_unfinished"
+      ]
+    },
+    {
+      "step_id": 5,
+      "agent": "searcher",
+      "status": "completed",
+      "completion_declared": true,
+      "accepted": false,
+      "reasons": [
+        "not_declarer"
+      ]
+    },
+    {
+      "step_id": 6,
+      "agent": "writer",
+      "status": "completed",
+      "completion_declared": true,
+      "accepted": true,
+      "reasons": []
+    }
+  ],
+  "recent_messages_rule": "t1-handoff-v1",
+  "route_fallbacks": [],
+  "search": {
+    "requests_sent": {
+      "web_search": 7
+    },
+    "calls_recorded": 7,
+    "outcomes": {
+      "ok": 7
+    },
+    "responses_stored": 7,
+    "records_file": "search/records.jsonl",
+    "records_sha256": "423b808d0faf23c98f8e76b507f13210132dc58531e2a4475dd9bb03215f08f7"
+  },
+  "gateway_usage": {
+    "usage_version": "gateway-usage-v1",
+    "before": {
+      "read_at": "2026-10-05T16:38:05.276320+00:00",
+      "http_status": 200,
+      "used": 176.74363,
+      "field": "monthly_allocated.used"
+    },
+    "after": {
+      "read_at": "2026-10-05T16:42:57.841246+00:00",
+      "http_status": 200,
+      "used": 193.11014999999998,
+      "field": "monthly_allocated.used"
+    },
+    "exact_only_if_alone": true,
+    "note": "after minus before; it includes any other use of the same key between the two read_at times (parallel sessions, probes, other tools). Compare those times with other sessions.",
+    "status": "measured",
+    "value": 16.36652,
+    "field": "monthly_allocated.used"
+  }
+}

@@ -1,0 +1,1563 @@
+{
+ "replay_version": "demo-replay-v1",
+ "session_id": "DEMO-MR-stall-v1-e9211faaf2b04d2c829808c7867b30cb",
+ "scenario_id": "DEMO-MR-stall-v1",
+ "title": "AI 코딩 도구 3 종의 공개 요금·주요 기능 비교표 만들기",
+ "task_kind": "dialogue",
+ "guardrail_mode": "observe",
+ "model": "glm-5.3-flash",
+ "termination_reason": "max_steps",
+ "escalated_by": null,
+ "steps_reached": 30,
+ "max_steps": 30,
+ "batch": {
+  "item": "DEMO-MR-stall-v1:observe:1",
+  "lane": 1,
+  "lanes": 1,
+  "mode": "observe",
+  "plan_id": "demo-trial-c18-5",
+  "plan_sha256": "126f2e8f6d62f53e933b11720631ef4144dbb1332539028a2090e2c6d2452f94",
+  "repeat": 1,
+  "rerun_of": null
+ },
+ "role_labels": {
+  "lead": "조사 책임",
+  "searcher": "검색 담당",
+  "writer": "작성 담당"
+ },
+ "first_stop_step": 9,
+ "stop_steps": [
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  25,
+  26,
+  27,
+  28,
+  29,
+  30
+ ],
+ "blocked_step": null,
+ "if_stopped": {
+  "stop_step": 9,
+  "tokens_after": 673574,
+  "tokens_total": 872022,
+  "token_ratio": 0.7724,
+  "credits_after": 115.92268,
+  "credits_total": 150.36663,
+  "basis": "tokens (prompt + completion) of the steps after the first STOP step: a block-mode proxy refuses the next request after the STOP (DM-7); credits are the token x price estimate"
+ },
+ "steps": [
+  {
+   "step_id": 1,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "researching",
+    "status_label": "조사",
+    "handoff_to": "lead",
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "pricing",
+     "features",
+     "market-share",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 4648,
+    "cached_prompt": 0,
+    "completion": 1733,
+    "reasoning": 424
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 1.5637,
+   "cumulative_tokens": 6381,
+   "cumulative_credits": 1.5637
+  },
+  {
+   "step_id": 2,
+   "agent": "searcher",
+   "role": "검색 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "researching",
+    "status_label": "조사",
+    "handoff_to": "searcher",
+    "adopted_items": 5,
+    "open_issue_ids": [
+     "requirements",
+     "pricing",
+     "market-share",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    }
+   ],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 24336,
+    "cached_prompt": 2560,
+    "completion": 2504,
+    "reasoning": 1567
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 4.5952,
+   "cumulative_tokens": 33221,
+   "cumulative_credits": 6.1589
+  },
+  {
+   "step_id": 3,
+   "agent": "writer",
+   "role": "작성 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "researching",
+    "status_label": "조사",
+    "handoff_to": "lead",
+    "adopted_items": 5,
+    "open_issue_ids": [
+     "requirements",
+     "pricing",
+     "market-share",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 6904,
+    "cached_prompt": 1856,
+    "completion": 2420,
+    "reasoning": 503
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 2.02288,
+   "cumulative_tokens": 42545,
+   "cumulative_credits": 8.18178
+  },
+  {
+   "step_id": 4,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "progress",
+   "state_label": "진전",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 10903,
+    "cached_prompt": 1856,
+    "completion": 3365,
+    "reasoning": 1381
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 3.09523,
+   "cumulative_tokens": 56813,
+   "cumulative_credits": 11.27701
+  },
+  {
+   "step_id": 5,
+   "agent": "searcher",
+   "role": "검색 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 35529,
+    "cached_prompt": 8832,
+    "completion": 2265,
+    "reasoning": 561
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.40201,
+   "cumulative_tokens": 94607,
+   "cumulative_credits": 16.67902
+  },
+  {
+   "step_id": 6,
+   "agent": "writer",
+   "role": "작성 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 14808,
+    "cached_prompt": 1856,
+    "completion": 2322,
+    "reasoning": 184
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 3.15948,
+   "cumulative_tokens": 111737,
+   "cumulative_credits": 19.8385
+  },
+  {
+   "step_id": 7,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 18854,
+    "cached_prompt": 1856,
+    "completion": 2358,
+    "reasoning": 93
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 3.78438,
+   "cumulative_tokens": 132949,
+   "cumulative_credits": 23.62288
+  },
+  {
+   "step_id": 8,
+   "agent": "searcher",
+   "role": "검색 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 37271,
+    "cached_prompt": 0,
+    "completion": 1935,
+    "reasoning": 152
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 6.55815,
+   "cumulative_tokens": 172155,
+   "cumulative_credits": 30.18103
+  },
+  {
+   "step_id": 9,
+   "agent": "writer",
+   "role": "작성 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 23714,
+    "cached_prompt": 4864,
+    "completion": 2579,
+    "reasoning": 55
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 4.26292,
+   "cumulative_tokens": 198448,
+   "cumulative_credits": 34.44395
+  },
+  {
+   "step_id": 10,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 4 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 26477,
+    "cached_prompt": 1472,
+    "completion": 2515,
+    "reasoning": 48
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.05241,
+   "cumulative_tokens": 227440,
+   "cumulative_credits": 39.49636
+  },
+  {
+   "step_id": 11,
+   "agent": "searcher",
+   "role": "검색 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 5 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 24988,
+    "cached_prompt": 1472,
+    "completion": 1911,
+    "reasoning": 53
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 4.52706,
+   "cumulative_tokens": 254339,
+   "cumulative_credits": 44.02342
+  },
+  {
+   "step_id": 12,
+   "agent": "writer",
+   "role": "작성 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 6 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 29615,
+    "cached_prompt": 1472,
+    "completion": 2551,
+    "reasoning": 54
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.54111,
+   "cumulative_tokens": 286505,
+   "cumulative_credits": 49.56453
+  },
+  {
+   "step_id": 13,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 7 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 29700,
+    "cached_prompt": 1472,
+    "completion": 2507,
+    "reasoning": 40
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.53186,
+   "cumulative_tokens": 318712,
+   "cumulative_credits": 55.09639
+  },
+  {
+   "step_id": 14,
+   "agent": "searcher",
+   "role": "검색 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 8 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 27352,
+    "cached_prompt": 1472,
+    "completion": 1774,
+    "reasoning": 12
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 4.81316,
+   "cumulative_tokens": 347838,
+   "cumulative_credits": 59.90955
+  },
+  {
+   "step_id": 15,
+   "agent": "writer",
+   "role": "작성 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 9 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 31033,
+    "cached_prompt": 1472,
+    "completion": 2585,
+    "reasoning": 81
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.77081,
+   "cumulative_tokens": 381456,
+   "cumulative_credits": 65.68036
+  },
+  {
+   "step_id": 16,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 10 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 30919,
+    "cached_prompt": 1472,
+    "completion": 2471,
+    "reasoning": 12
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.69671,
+   "cumulative_tokens": 414846,
+   "cumulative_credits": 71.37707
+  },
+  {
+   "step_id": 17,
+   "agent": "searcher",
+   "role": "검색 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 11 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 27612,
+    "cached_prompt": 1472,
+    "completion": 1864,
+    "reasoning": 5
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 4.89716,
+   "cumulative_tokens": 444322,
+   "cumulative_credits": 76.27423
+  },
+  {
+   "step_id": 18,
+   "agent": "writer",
+   "role": "작성 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 12 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 31779,
+    "cached_prompt": 1472,
+    "completion": 2641,
+    "reasoning": 79
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.91071,
+   "cumulative_tokens": 478742,
+   "cumulative_credits": 82.18494
+  },
+  {
+   "step_id": 19,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 13 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 31176,
+    "cached_prompt": 1472,
+    "completion": 2502,
+    "reasoning": 42
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.75076,
+   "cumulative_tokens": 512420,
+   "cumulative_credits": 87.9357
+  },
+  {
+   "step_id": 20,
+   "agent": "searcher",
+   "role": "검색 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 14 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 27704,
+    "cached_prompt": 0,
+    "completion": 1897,
+    "reasoning": 50
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.1041,
+   "cumulative_tokens": 542021,
+   "cumulative_credits": 93.0398
+  },
+  {
+   "step_id": 21,
+   "agent": "writer",
+   "role": "작성 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 15 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 31972,
+    "cached_prompt": 0,
+    "completion": 2676,
+    "reasoning": 80
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 6.1338,
+   "cumulative_tokens": 576669,
+   "cumulative_credits": 99.1736
+  },
+  {
+   "step_id": 22,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 16 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 31169,
+    "cached_prompt": 1472,
+    "completion": 2492,
+    "reasoning": 32
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.74471,
+   "cumulative_tokens": 610330,
+   "cumulative_credits": 104.91831
+  },
+  {
+   "step_id": 23,
+   "agent": "searcher",
+   "role": "검색 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 17 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 27676,
+    "cached_prompt": 0,
+    "completion": 1811,
+    "reasoning": 52
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.0569,
+   "cumulative_tokens": 639817,
+   "cumulative_credits": 109.97521
+  },
+  {
+   "step_id": 24,
+   "agent": "writer",
+   "role": "작성 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 18 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 32247,
+    "cached_prompt": 1472,
+    "completion": 2662,
+    "reasoning": 74
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.99141,
+   "cumulative_tokens": 674726,
+   "cumulative_credits": 115.96662
+  },
+  {
+   "step_id": 25,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 19 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 31264,
+    "cached_prompt": 0,
+    "completion": 2526,
+    "reasoning": 10
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.9526,
+   "cumulative_tokens": 708516,
+   "cumulative_credits": 121.91922
+  },
+  {
+   "step_id": 26,
+   "agent": "searcher",
+   "role": "검색 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 20 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 27719,
+    "cached_prompt": 0,
+    "completion": 1951,
+    "reasoning": 65
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.13335,
+   "cumulative_tokens": 738186,
+   "cumulative_credits": 127.05257
+  },
+  {
+   "step_id": 27,
+   "agent": "writer",
+   "role": "작성 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 21 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 32385,
+    "cached_prompt": 0,
+    "completion": 2633,
+    "reasoning": 38
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 6.17425,
+   "cumulative_tokens": 773204,
+   "cumulative_credits": 133.22682
+  },
+  {
+   "step_id": 28,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 22 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 31498,
+    "cached_prompt": 0,
+    "completion": 2606,
+    "reasoning": 39
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 6.0277,
+   "cumulative_tokens": 807308,
+   "cumulative_credits": 139.25452
+  },
+  {
+   "step_id": 29,
+   "agent": "searcher",
+   "role": "검색 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 23 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 27905,
+    "cached_prompt": 0,
+    "completion": 1862,
+    "reasoning": 65
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.11675,
+   "cumulative_tokens": 837075,
+   "cumulative_credits": 144.37127
+  },
+  {
+   "step_id": 30,
+   "agent": "writer",
+   "role": "작성 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:market_share:value",
+     "cursor:market_share:value",
+     "gemini-code-assist:market_share:value"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 6에 완료가 선언됐지만 이후 24 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 32290,
+    "cached_prompt": 1472,
+    "completion": 2657,
+    "reasoning": 69
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.99536,
+   "cumulative_tokens": 872022,
+   "cumulative_credits": 150.36663
+  }
+ ]
+}
