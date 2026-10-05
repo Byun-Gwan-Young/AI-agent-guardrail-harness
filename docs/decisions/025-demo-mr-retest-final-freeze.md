@@ -46,3 +46,14 @@ step 5 검색 담당이 6 칸을 모두 검색 결과의 출처로 채웠고 (6 
 
 두 세션을 `demo-records-v1` 로 `record`·`check`·`stage` 했다 (원본은 커밋하지 않음). 이 창의 기록 키 검사는 키 값 없이 D-11 패턴만 봤다.
 키 값까지 본 검사는 PM 창의 레인 기록(`key_scan_clean: true`, KMU·Tavily)이다.
+
+## 동결 범위 62 파일 (파트 2, DM-73 ②)
+
+`tools/final_freeze.py` 에 `SCHEMA_FILES = ('json_subset.py',)` 를 더했다 (61 → 62 파일). 모델에 보내는 deliverable 스키마를 정하는 파일이라 시나리오 파일과 같은 종류다.
+그 밖의 실행 코드는 지금처럼 범위 밖이고, 세션 매니페스트의 `git_commit`·`git_dirty` 로 추적한다 → 본 실행 동안 main 에 커밋하지 않는다.
+테스트 `tests/test_c18_3_part3.py` 가 `json_subset.py` 포함과 파일 수 62 를 확인한다.
+MR 두 판의 preflight (`reports/c18-5/DEMO-MR-{normal,stall}-v1-preflight.json`) 는 C-18-5 변경과 같은 커밋(`6aca742`)에서 만들어졌고 시나리오 해시가
+지금 파일과 같다 (정상판 `e27cd64e…`, 교착판 `39a77647…`) → 다시 만들지 않았다.
+
+테스트 기준선 : C-18-5 보고의 157 은 `tools/run_offline_tests.py` 의 기본 `--baseline` 이 P0-2 목록(`tests/fixtures/p0-2-baseline-test-ids.json`, 157 개)이라서다.
+202 는 P0-3 목록(`tests/fixtures/p0-3-mechanism-test-ids.json`)이고, 이번부터 `--baseline` 으로 그 목록을 준다.

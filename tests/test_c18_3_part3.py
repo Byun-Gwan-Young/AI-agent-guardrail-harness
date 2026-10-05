@@ -49,7 +49,7 @@ class Coverage(unittest.TestCase):
         self.assertEqual(values["scenario_ids"], SCENARIOS)
         files = set(values["files"])
         for name in (*criteria_freeze.V03_IMPLEMENTATION, *final_freeze.FROZEN_RECORDS, *final_freeze.PROXY_CONFIGS,
-                     "demo-conditions.yaml", "batch_plans/demo-main-v1.yaml"):
+                     "demo-conditions.yaml", "batch_plans/demo-main-v1.yaml", "json_subset.py"):
             self.assertIn(name, files)
         for scenario in SCENARIOS:
             self.assertIn(f"scenarios/{scenario}.yaml", files)
@@ -59,6 +59,7 @@ class Coverage(unittest.TestCase):
                      "scenario_assets/DEMO-CL-stall-v1/tests/test_strict.py", "scenario_assets/A-1/SPEC.md"):
             self.assertIn(name, files)
         self.assertFalse(any("__pycache__" in f or f.endswith(".pyc") for f in files))
+        self.assertEqual(len(files), 62)  # 61 (C-18-3) + json_subset.py (C-18-6, DM-73 ②)
         self.assertEqual(values["criteria_freeze"], criteria_freeze.freeze("deadlock-v0.3"))
         self.assertEqual({v["guardrail_mode"] for v in values["proxy_criteria"].values()}, {None, "block"})
 

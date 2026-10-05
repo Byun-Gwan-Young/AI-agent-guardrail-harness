@@ -5,8 +5,9 @@ The record (docs/criteria/demo-final-freeze.json, demo-final-freeze-v1) holds:
 - the deadlock-v0.3 freeze of this checkout (implementation files and explanation templates, criteria_freeze.freeze)
   and the criteria parameter hash of each demo proxy configuration (observe and block)
 - the sha256 of every file the main run reads: the v0.3 implementation files and frozen records, the two demo proxy
-  configurations, demo-conditions.yaml, the main plan (batch_plans/demo-main-v1.yaml), and for each of its scenarios
-  (11) the scenario file, its judge and every file of its fixture_dir or inputs_dir
+  configurations, demo-conditions.yaml, the main plan (batch_plans/demo-main-v1.yaml), json_subset.py (it decides the
+  deliverable schema sent to the model, C-18-6 DM-73 ②), and for each of its scenarios (11) the scenario file, its judge
+  and every file of its fixture_dir or inputs_dir
 - the commit it was made at, and sha256 = one hash over all of the above except the time and the commit
 
   create   PM, after the T1 trial is confirmed: refuses when a record exists or when a covered file differs from HEAD
@@ -38,6 +39,7 @@ RUN_CONDITIONS = 'demo-conditions.yaml'
 PROXY_CONFIGS = ('guardrail-deadlock-v0.3-kmu.yaml', 'guardrail-deadlock-v0.3-kmu-block.yaml')
 FROZEN_RECORDS = ('docs/criteria/deadlock-v0.3.json', criteria_freeze.EXPLANATION_RECORD)
 SCENARIOS = 11  # DM-59: CL, CT, CS, MR, LR normal and stall + CT-N
+SCHEMA_FILES = ('json_subset.py',)  # DM-73 ②: the schema subset the scenarios' deliverable_schema is sent through
 
 
 def sha256_file(path):
@@ -57,7 +59,8 @@ def plan_scenarios(root, plan=MAIN_PLAN):
 
 def covered_paths(root, plan=MAIN_PLAN):
     """Every file the record hashes, and the scenario IDs of the plan."""
-    paths = set(criteria_freeze.V03_IMPLEMENTATION) | set(FROZEN_RECORDS) | set(PROXY_CONFIGS) | {RUN_CONDITIONS, plan}
+    paths = (set(criteria_freeze.V03_IMPLEMENTATION) | set(FROZEN_RECORDS) | set(PROXY_CONFIGS) | set(SCHEMA_FILES)
+             | {RUN_CONDITIONS, plan})
     scenario_ids = []
     for relative in plan_scenarios(root, plan):
         scenario = load_scenario(Path(root) / relative)
