@@ -1,0 +1,9 @@
+# C-18-5 재시험 계획 (DM-72 (나) : MR deliverable 부분 보고로 고친 뒤 MR 정상판·교착판 각 1 회, 한 번만). 관측만, 차단 없음.
+# 최종 동결 전이라 requires_final_freeze 없음. 레인 1 개 (KMU_API_KEY + TAVILY_API_KEY). CS·LR 은 바뀌지 않아 다시 돌리지 않는다.
+# 실행 : tools/run_batch.py run --plan batch_plans/demo-trial-c18-5.yaml --lane 1 --lanes 1
+plan_version: demo-batch-plan-v1
+plan_id: demo-trial-c18-5
+description: DEMO-MR 정상판·교착판 재시험 각 1 회 (observe)
+items:
+- {scenario: scenarios/DEMO-MR-normal-v1.yaml, mode: observe, repeats: [1]}
+- {scenario: scenarios/DEMO-MR-stall-v1.yaml, mode: observe, repeats: [1]}

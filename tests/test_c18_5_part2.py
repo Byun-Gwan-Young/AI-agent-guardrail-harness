@@ -132,5 +132,19 @@ class PartialFlow(part2.Flows):
     test_lr_stall_selection_without_the_benchmark_is_refused_and_stopped = None
 
 
+class RetestPlan(unittest.TestCase):
+    def test_mr_normal_and_stall_once_on_one_lane_without_the_final_freeze(self):
+        from tools import c18_5_estimate, run_batch
+        plan = run_batch.load_plan(ROOT / "batch_plans/demo-trial-c18-5.yaml")
+        self.assertEqual(plan["plan_id"], "demo-trial-c18-5")
+        self.assertFalse(plan.get("requires_final_freeze"))
+        self.assertEqual([i.key for i in run_batch.lane_items(plan, 1, 1)],
+                         ["DEMO-MR-normal-v1:observe:1", "DEMO-MR-stall-v1:observe:1"])
+        estimate = c18_5_estimate.estimate()
+        self.assertEqual([r["c18_4_retest"]["scenario_id"] for r in estimate["sessions"]],
+                         ["DEMO-MR-normal-v1", "DEMO-MR-stall-v1"])
+        self.assertEqual(estimate["upper_reference"]["termination_reason"], "max_steps")
+
+
 if __name__ == "__main__":
     unittest.main()

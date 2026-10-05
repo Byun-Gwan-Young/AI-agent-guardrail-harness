@@ -1,0 +1,41 @@
+{
+ "script": "tools/c18_5_estimate.py",
+ "status": "estimated",
+ "plan_id": "demo-trial-c18-5",
+ "plan_sha256": "126f2e8f6d62f53e933b11720631ef4144dbb1332539028a2090e2c6d2452f94",
+ "upper_reference": {
+  "scenario_id": "DEMO-MR-normal-v1",
+  "session_id": "DEMO-MR-normal-v1-e948ebfd108d45f596b37026c26b415b",
+  "steps": 30,
+  "termination_reason": "max_steps",
+  "credits_measured": 128.01972
+ },
+ "sessions": [
+  {
+   "item": "DEMO-MR-normal-v1:observe:1",
+   "c18_4_retest": {
+    "scenario_id": "DEMO-MR-normal-v1",
+    "session_id": "DEMO-MR-normal-v1-bbd8ff94cd494384860dc0875131ebfd",
+    "steps": 3,
+    "termination_reason": "escalated",
+    "credits_measured": 10.43541
+   },
+   "high": 128.01972
+  },
+  {
+   "item": "DEMO-MR-stall-v1:observe:1",
+   "c18_4_retest": {
+    "scenario_id": "DEMO-MR-stall-v1",
+    "session_id": "DEMO-MR-stall-v1-bc8136dfab144a7793d2fc936ba8dc6d",
+    "steps": 4,
+    "termination_reason": "escalated",
+    "credits_measured": 15.31706
+   },
+   "high": 128.01972
+  }
+ ],
+ "total": {
+  "c18_4_retest_sum": 25.75247,
+  "high": 256.03944
+ }
+}
