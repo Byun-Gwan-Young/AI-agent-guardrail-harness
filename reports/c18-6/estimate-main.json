@@ -1,0 +1,707 @@
+{
+ "script": "tools/c18_6_estimate.py",
+ "status": "estimated",
+ "plan_id": "demo-main-v1",
+ "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+ "lanes": [
+  {
+   "lane": 1,
+   "sessions": 19,
+   "credits": 912.59,
+   "high": 1426.13,
+   "hours": 3.25,
+   "items": [
+    {
+     "item": "DEMO-CL-normal-v1:observe:1",
+     "mode": "observe",
+     "credits": 16.35269,
+     "minutes": 7.14,
+     "high": 16.35269
+    },
+    {
+     "item": "DEMO-CL-normal-v1:observe:4",
+     "mode": "observe",
+     "credits": 16.35269,
+     "minutes": 7.14,
+     "high": 16.35269
+    },
+    {
+     "item": "DEMO-CL-stall-v1:observe:2",
+     "mode": "observe",
+     "credits": 126.5433,
+     "minutes": 27.6,
+     "high": 126.5433
+    },
+    {
+     "item": "DEMO-CL-stall-v1:observe:5",
+     "mode": "observe",
+     "credits": 126.5433,
+     "minutes": 27.6,
+     "high": 126.5433
+    },
+    {
+     "item": "DEMO-CT-normal-v1:observe:3",
+     "mode": "observe",
+     "credits": 13.41093,
+     "minutes": 3.74,
+     "high": 13.41093
+    },
+    {
+     "item": "DEMO-CT-stall-v1:observe:1",
+     "mode": "observe",
+     "credits": 132.59626,
+     "minutes": 24.18,
+     "high": 132.59626
+    },
+    {
+     "item": "DEMO-CT-stall-v1:observe:4",
+     "mode": "observe",
+     "credits": 132.59626,
+     "minutes": 24.18,
+     "high": 132.59626
+    },
+    {
+     "item": "DEMO-CT-N-v1:observe:2",
+     "mode": "observe",
+     "credits": 6.91565,
+     "minutes": 2.51,
+     "high": 6.91565
+    },
+    {
+     "item": "DEMO-CT-N-v1:observe:5",
+     "mode": "observe",
+     "credits": 6.91565,
+     "minutes": 2.51,
+     "high": 6.91565
+    },
+    {
+     "item": "DEMO-CS-normal-v1:observe:3",
+     "mode": "observe",
+     "credits": 10.49577,
+     "minutes": 3.34,
+     "high": 10.49577
+    },
+    {
+     "item": "DEMO-CS-stall-v1:observe:1",
+     "mode": "observe",
+     "credits": 7.16652,
+     "minutes": 2.53,
+     "high": 7.16652
+    },
+    {
+     "item": "DEMO-CS-stall-v1:observe:4",
+     "mode": "observe",
+     "credits": 7.16652,
+     "minutes": 2.53,
+     "high": 7.16652
+    },
+    {
+     "item": "DEMO-MR-normal-v1:observe:2",
+     "mode": "observe",
+     "credits": 16.36652,
+     "minutes": 4.88,
+     "high": 128.01972
+    },
+    {
+     "item": "DEMO-MR-normal-v1:observe:5",
+     "mode": "observe",
+     "credits": 16.36652,
+     "minutes": 4.88,
+     "high": 128.01972
+    },
+    {
+     "item": "DEMO-MR-stall-v1:observe:3",
+     "mode": "observe",
+     "credits": 150.36663,
+     "minutes": 18.96,
+     "high": 150.36663
+    },
+    {
+     "item": "DEMO-CL-stall-v1:block:1",
+     "mode": "block",
+     "credits": 55.25302,
+     "minutes": 14.89,
+     "high": 126.5433
+    },
+    {
+     "item": "DEMO-CT-stall-v1:block:1",
+     "mode": "block",
+     "credits": 29.56975,
+     "minutes": 8.06,
+     "high": 132.59626
+    },
+    {
+     "item": "DEMO-CS-stall-v1:block:1",
+     "mode": "block",
+     "credits": 7.16652,
+     "minutes": 2.53,
+     "high": 7.16652
+    },
+    {
+     "item": "DEMO-MR-stall-v1:block:1",
+     "mode": "block",
+     "credits": 34.44395,
+     "minutes": 5.91,
+     "high": 150.36663
+    }
+   ]
+  },
+  {
+   "lane": 2,
+   "sessions": 19,
+   "credits": 937.04,
+   "high": 1338.93,
+   "hours": 3.1,
+   "items": [
+    {
+     "item": "DEMO-CL-normal-v1:observe:2",
+     "mode": "observe",
+     "credits": 16.35269,
+     "minutes": 7.14,
+     "high": 16.35269
+    },
+    {
+     "item": "DEMO-CL-normal-v1:observe:5",
+     "mode": "observe",
+     "credits": 16.35269,
+     "minutes": 7.14,
+     "high": 16.35269
+    },
+    {
+     "item": "DEMO-CL-stall-v1:observe:3",
+     "mode": "observe",
+     "credits": 126.5433,
+     "minutes": 27.6,
+     "high": 126.5433
+    },
+    {
+     "item": "DEMO-CT-normal-v1:observe:1",
+     "mode": "observe",
+     "credits": 13.41093,
+     "minutes": 3.74,
+     "high": 13.41093
+    },
+    {
+     "item": "DEMO-CT-normal-v1:observe:4",
+     "mode": "observe",
+     "credits": 13.41093,
+     "minutes": 3.74,
+     "high": 13.41093
+    },
+    {
+     "item": "DEMO-CT-stall-v1:observe:2",
+     "mode": "observe",
+     "credits": 132.59626,
+     "minutes": 24.18,
+     "high": 132.59626
+    },
+    {
+     "item": "DEMO-CT-stall-v1:observe:5",
+     "mode": "observe",
+     "credits": 132.59626,
+     "minutes": 24.18,
+     "high": 132.59626
+    },
+    {
+     "item": "DEMO-CT-N-v1:observe:3",
+     "mode": "observe",
+     "credits": 6.91565,
+     "minutes": 2.51,
+     "high": 6.91565
+    },
+    {
+     "item": "DEMO-CS-normal-v1:observe:1",
+     "mode": "observe",
+     "credits": 10.49577,
+     "minutes": 3.34,
+     "high": 10.49577
+    },
+    {
+     "item": "DEMO-CS-normal-v1:observe:4",
+     "mode": "observe",
+     "credits": 10.49577,
+     "minutes": 3.34,
+     "high": 10.49577
+    },
+    {
+     "item": "DEMO-CS-stall-v1:observe:2",
+     "mode": "observe",
+     "credits": 7.16652,
+     "minutes": 2.53,
+     "high": 7.16652
+    },
+    {
+     "item": "DEMO-CS-stall-v1:observe:5",
+     "mode": "observe",
+     "credits": 7.16652,
+     "minutes": 2.53,
+     "high": 7.16652
+    },
+    {
+     "item": "DEMO-MR-normal-v1:observe:3",
+     "mode": "observe",
+     "credits": 16.36652,
+     "minutes": 4.88,
+     "high": 128.01972
+    },
+    {
+     "item": "DEMO-MR-stall-v1:observe:1",
+     "mode": "observe",
+     "credits": 150.36663,
+     "minutes": 18.96,
+     "high": 150.36663
+    },
+    {
+     "item": "DEMO-MR-stall-v1:observe:4",
+     "mode": "observe",
+     "credits": 150.36663,
+     "minutes": 18.96,
+     "high": 150.36663
+    },
+    {
+     "item": "DEMO-CL-stall-v1:block:2",
+     "mode": "block",
+     "credits": 55.25302,
+     "minutes": 14.89,
+     "high": 126.5433
+    },
+    {
+     "item": "DEMO-CT-stall-v1:block:2",
+     "mode": "block",
+     "credits": 29.56975,
+     "minutes": 8.06,
+     "high": 132.59626
+    },
+    {
+     "item": "DEMO-CS-stall-v1:block:2",
+     "mode": "block",
+     "credits": 7.16652,
+     "minutes": 2.53,
+     "high": 7.16652
+    },
+    {
+     "item": "DEMO-MR-stall-v1:block:2",
+     "mode": "block",
+     "credits": 34.44395,
+     "minutes": 5.91,
+     "high": 150.36663
+    }
+   ]
+  },
+  {
+   "lane": 3,
+   "sessions": 19,
+   "credits": 930.75,
+   "high": 1444.29,
+   "hours": 3.12,
+   "items": [
+    {
+     "item": "DEMO-CL-normal-v1:observe:3",
+     "mode": "observe",
+     "credits": 16.35269,
+     "minutes": 7.14,
+     "high": 16.35269
+    },
+    {
+     "item": "DEMO-CL-stall-v1:observe:1",
+     "mode": "observe",
+     "credits": 126.5433,
+     "minutes": 27.6,
+     "high": 126.5433
+    },
+    {
+     "item": "DEMO-CL-stall-v1:observe:4",
+     "mode": "observe",
+     "credits": 126.5433,
+     "minutes": 27.6,
+     "high": 126.5433
+    },
+    {
+     "item": "DEMO-CT-normal-v1:observe:2",
+     "mode": "observe",
+     "credits": 13.41093,
+     "minutes": 3.74,
+     "high": 13.41093
+    },
+    {
+     "item": "DEMO-CT-normal-v1:observe:5",
+     "mode": "observe",
+     "credits": 13.41093,
+     "minutes": 3.74,
+     "high": 13.41093
+    },
+    {
+     "item": "DEMO-CT-stall-v1:observe:3",
+     "mode": "observe",
+     "credits": 132.59626,
+     "minutes": 24.18,
+     "high": 132.59626
+    },
+    {
+     "item": "DEMO-CT-N-v1:observe:1",
+     "mode": "observe",
+     "credits": 6.91565,
+     "minutes": 2.51,
+     "high": 6.91565
+    },
+    {
+     "item": "DEMO-CT-N-v1:observe:4",
+     "mode": "observe",
+     "credits": 6.91565,
+     "minutes": 2.51,
+     "high": 6.91565
+    },
+    {
+     "item": "DEMO-CS-normal-v1:observe:2",
+     "mode": "observe",
+     "credits": 10.49577,
+     "minutes": 3.34,
+     "high": 10.49577
+    },
+    {
+     "item": "DEMO-CS-normal-v1:observe:5",
+     "mode": "observe",
+     "credits": 10.49577,
+     "minutes": 3.34,
+     "high": 10.49577
+    },
+    {
+     "item": "DEMO-CS-stall-v1:observe:3",
+     "mode": "observe",
+     "credits": 7.16652,
+     "minutes": 2.53,
+     "high": 7.16652
+    },
+    {
+     "item": "DEMO-MR-normal-v1:observe:1",
+     "mode": "observe",
+     "credits": 16.36652,
+     "minutes": 4.88,
+     "high": 128.01972
+    },
+    {
+     "item": "DEMO-MR-normal-v1:observe:4",
+     "mode": "observe",
+     "credits": 16.36652,
+     "minutes": 4.88,
+     "high": 128.01972
+    },
+    {
+     "item": "DEMO-MR-stall-v1:observe:2",
+     "mode": "observe",
+     "credits": 150.36663,
+     "minutes": 18.96,
+     "high": 150.36663
+    },
+    {
+     "item": "DEMO-MR-stall-v1:observe:5",
+     "mode": "observe",
+     "credits": 150.36663,
+     "minutes": 18.96,
+     "high": 150.36663
+    },
+    {
+     "item": "DEMO-CL-stall-v1:block:3",
+     "mode": "block",
+     "credits": 55.25302,
+     "minutes": 14.89,
+     "high": 126.5433
+    },
+    {
+     "item": "DEMO-CT-stall-v1:block:3",
+     "mode": "block",
+     "credits": 29.56975,
+     "minutes": 8.06,
+     "high": 132.59626
+    },
+    {
+     "item": "DEMO-CS-stall-v1:block:3",
+     "mode": "block",
+     "credits": 7.16652,
+     "minutes": 2.53,
+     "high": 7.16652
+    },
+    {
+     "item": "DEMO-MR-stall-v1:block:3",
+     "mode": "block",
+     "credits": 34.44395,
+     "minutes": 5.91,
+     "high": 150.36663
+    }
+   ]
+  },
+  {
+   "lane": 4,
+   "sessions": 13,
+   "credits": 132.36,
+   "high": 132.36,
+   "hours": 0.59,
+   "items": [
+    {
+     "item": "DEMO-LR-normal-v1:observe:1",
+     "mode": "observe",
+     "credits": 16.64686,
+     "minutes": 3.97,
+     "high": 16.64686
+    },
+    {
+     "item": "DEMO-LR-normal-v1:observe:2",
+     "mode": "observe",
+     "credits": 16.64686,
+     "minutes": 3.97,
+     "high": 16.64686
+    },
+    {
+     "item": "DEMO-LR-normal-v1:observe:3",
+     "mode": "observe",
+     "credits": 16.64686,
+     "minutes": 3.97,
+     "high": 16.64686
+    },
+    {
+     "item": "DEMO-LR-normal-v1:observe:4",
+     "mode": "observe",
+     "credits": 16.64686,
+     "minutes": 3.97,
+     "high": 16.64686
+    },
+    {
+     "item": "DEMO-LR-normal-v1:observe:5",
+     "mode": "observe",
+     "credits": 16.64686,
+     "minutes": 3.97,
+     "high": 16.64686
+    },
+    {
+     "item": "DEMO-LR-stall-v1:observe:1",
+     "mode": "observe",
+     "credits": 6.14067,
+     "minutes": 1.93,
+     "high": 6.14067
+    },
+    {
+     "item": "DEMO-LR-stall-v1:observe:2",
+     "mode": "observe",
+     "credits": 6.14067,
+     "minutes": 1.93,
+     "high": 6.14067
+    },
+    {
+     "item": "DEMO-LR-stall-v1:observe:3",
+     "mode": "observe",
+     "credits": 6.14067,
+     "minutes": 1.93,
+     "high": 6.14067
+    },
+    {
+     "item": "DEMO-LR-stall-v1:observe:4",
+     "mode": "observe",
+     "credits": 6.14067,
+     "minutes": 1.93,
+     "high": 6.14067
+    },
+    {
+     "item": "DEMO-LR-stall-v1:observe:5",
+     "mode": "observe",
+     "credits": 6.14067,
+     "minutes": 1.93,
+     "high": 6.14067
+    },
+    {
+     "item": "DEMO-LR-stall-v1:block:1",
+     "mode": "block",
+     "credits": 6.14067,
+     "minutes": 1.93,
+     "high": 6.14067
+    },
+    {
+     "item": "DEMO-LR-stall-v1:block:2",
+     "mode": "block",
+     "credits": 6.14067,
+     "minutes": 1.93,
+     "high": 6.14067
+    },
+    {
+     "item": "DEMO-LR-stall-v1:block:3",
+     "mode": "block",
+     "credits": 6.14067,
+     "minutes": 1.93,
+     "high": 6.14067
+    }
+   ]
+  }
+ ],
+ "total": {
+  "sessions": 70,
+  "credits": 2912.74,
+  "high": 4341.71,
+  "longest_lane_hours": 3.25,
+  "ceiling_30_steps": {
+   "per_session": 150.36663,
+   "session_id": "DEMO-MR-stall-v1-e9211faaf2b04d2c829808c7867b30cb",
+   "credits": 10525.66,
+   "note": "every session as long as the costliest measured 30-step trial"
+  }
+ },
+ "references": {
+  "DEMO-CL-normal-v1": {
+   "reference": {
+    "session_id": "DEMO-CL-normal-v1-d5460d69bcc84e20a4eaef6275ea1e8a",
+    "started": "2026-10-03T06:09:07.514682+00:00",
+    "steps": 6,
+    "termination_reason": "success",
+    "first_stop_step": null,
+    "credits": 16.35269,
+    "minutes": 7.14
+   },
+   "high": 16.35269,
+   "high_minutes": 7.14,
+   "trials": 2
+  },
+  "DEMO-CL-stall-v1": {
+   "reference": {
+    "session_id": "DEMO-CL-stall-v1-f08705febcab4bcdacaea83cb8bd61f1",
+    "started": "2026-10-03T06:18:30.013079+00:00",
+    "steps": 30,
+    "termination_reason": "max_steps",
+    "first_stop_step": 15,
+    "credits": 126.5433,
+    "minutes": 27.6
+   },
+   "high": 126.5433,
+   "high_minutes": 27.6,
+   "trials": 1
+  },
+  "DEMO-CS-normal-v1": {
+   "reference": {
+    "session_id": "DEMO-CS-normal-v1-e42eed86ae354e518c7d9022575ed75a",
+    "started": "2026-10-04T15:16:00.548756+00:00",
+    "steps": 4,
+    "termination_reason": "success",
+    "first_stop_step": null,
+    "credits": 10.49577,
+    "minutes": 3.34
+   },
+   "high": 10.49577,
+   "high_minutes": 3.34,
+   "trials": 2
+  },
+  "DEMO-CS-stall-v1": {
+   "reference": {
+    "session_id": "DEMO-CS-stall-v1-efbf439a3184420da2ebe74ccad9ad02",
+    "started": "2026-10-04T15:19:22.734213+00:00",
+    "steps": 4,
+    "termination_reason": "success",
+    "first_stop_step": null,
+    "credits": 7.16652,
+    "minutes": 2.53
+   },
+   "high": 7.16652,
+   "high_minutes": 2.53,
+   "trials": 2
+  },
+  "DEMO-CT-N-v1": {
+   "reference": {
+    "session_id": "DEMO-CT-N-v1-b9003e8ffbc146bb99111768272eaf56",
+    "started": "2026-10-03T12:50:52.483910+00:00",
+    "steps": 3,
+    "termination_reason": "success",
+    "first_stop_step": null,
+    "credits": 6.91565,
+    "minutes": 2.51
+   },
+   "high": 6.91565,
+   "high_minutes": 2.51,
+   "trials": 1
+  },
+  "DEMO-CT-normal-v1": {
+   "reference": {
+    "session_id": "DEMO-CT-normal-v1-f854545930f34bd5bd828142116d1271",
+    "started": "2026-10-03T12:49:17.505066+00:00",
+    "steps": 6,
+    "termination_reason": "success",
+    "first_stop_step": null,
+    "credits": 13.41093,
+    "minutes": 3.74
+   },
+   "high": 13.41093,
+   "high_minutes": 3.74,
+   "trials": 1
+  },
+  "DEMO-CT-stall-v1": {
+   "reference": {
+    "session_id": "DEMO-CT-stall-v1-819eb0783b724840b9333f480a599666",
+    "started": "2026-10-03T12:50:45.966023+00:00",
+    "steps": 30,
+    "termination_reason": "max_steps",
+    "first_stop_step": 9,
+    "credits": 132.59626,
+    "minutes": 24.18
+   },
+   "high": 132.59626,
+   "high_minutes": 24.18,
+   "trials": 1
+  },
+  "DEMO-LR-normal-v1": {
+   "reference": {
+    "session_id": "DEMO-LR-normal-v1-433f48c2145948259077ce99f0495111",
+    "started": "2026-10-03T13:30:58.415515+00:00",
+    "steps": 6,
+    "termination_reason": "success",
+    "first_stop_step": null,
+    "credits": 16.64686,
+    "minutes": 3.97
+   },
+   "high": 16.64686,
+   "high_minutes": 3.97,
+   "trials": 1
+  },
+  "DEMO-LR-stall-v1": {
+   "reference": {
+    "session_id": "DEMO-LR-stall-v1-bd57f54b0a0347c7bbf03bbab250aa4d",
+    "started": "2026-10-03T13:34:58.075838+00:00",
+    "steps": 3,
+    "termination_reason": "escalated",
+    "first_stop_step": null,
+    "credits": 6.14067,
+    "minutes": 1.93
+   },
+   "high": 6.14067,
+   "high_minutes": 1.93,
+   "trials": 1
+  },
+  "DEMO-MR-normal-v1": {
+   "reference": {
+    "session_id": "DEMO-MR-normal-v1-653feb85bfb844268358ab344f8eca61",
+    "started": "2026-10-05T16:38:05.276320+00:00",
+    "steps": 6,
+    "termination_reason": "success",
+    "first_stop_step": 6,
+    "credits": 16.36652,
+    "minutes": 4.88
+   },
+   "high": 128.01972,
+   "high_minutes": 15.47,
+   "trials": 3
+  },
+  "DEMO-MR-stall-v1": {
+   "reference": {
+    "session_id": "DEMO-MR-stall-v1-e9211faaf2b04d2c829808c7867b30cb",
+    "started": "2026-10-05T16:42:59.566215+00:00",
+    "steps": 30,
+    "termination_reason": "max_steps",
+    "first_stop_step": 9,
+    "credits": 150.36663,
+    "minutes": 18.96
+   },
+   "high": 150.36663,
+   "high_minutes": 18.96,
+   "trials": 3
+  }
+ },
+ "limits": [
+  "one trial session per scenario is the reference; a main-run session can end at any step up to 30, so a normal run that does not finish can cost as much as a 30-step stall run",
+  "minutes are wall time of the trial between the gateway usage reads; parallel lanes and the gateway load change them",
+  "block items assume the session takes the same path as the reference up to its first STOP"
+ ]
+}
