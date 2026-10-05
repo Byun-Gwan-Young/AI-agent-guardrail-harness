@@ -78,7 +78,7 @@ def mr_diagnosis(run_dir=MR_NORMAL):
         deliverables.add(json.dumps(deliverable, sort_keys=True, ensure_ascii=False))
         for row in deliverable.get('rows') or []:
             for column, cell in row.items():
-                if column == 'product':
+                if column == 'product' or cell is None:  # null cell: partial report (C-18-5, DM-72)
                     continue
                 url = cell.get('source_url')
                 entry = cells.setdefault((row.get('product'), column, url), {'steps': []})

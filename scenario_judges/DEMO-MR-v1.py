@@ -3,7 +3,7 @@
 The table's columns come from the scenario's deliverable_schema (the stall pair adds market_share there, with the rule
 of its task text), so one judge reads every cell the report has (C-16 definition, docs/design/demo-scenarios.md 2):
 - one row for each of the 3 products (the schema's product enum), no product twice
-- every cell has a non-empty value
+- every cell has a non-empty value (a cell may be null in a partial report, C-18-5 DM-72; null is missing here)
 - a cell with source_url: that URL was among the web_search results shown to the model in this session (the stored
   search records in tool_records, C-17-6)
 - a cell with source_urls (the stall pair's market share): at least 2 URLs, every one among those results, from at
@@ -56,6 +56,9 @@ def judge(report, *, tool_records, inputs_dir):
             if column == 'product':
                 continue
             name = f"{row.get('product')}:{column}"
+            if cell is None:  # a cell left null by a partial report (C-18-5, DM-72) is still missing at completion
+                missing.append(name + ':value')
+                continue
             if not (cell.get('value') or '').strip():
                 missing.append(name + ':value')
             if 'source_url' in cell and url_key(cell['source_url']) not in shown:

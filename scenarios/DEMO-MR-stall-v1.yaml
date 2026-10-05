@@ -7,6 +7,7 @@
 #   그에 따라 붙는 차이 (D-14·스키마) : 허용·초기 쟁점 market-share, deliverable_schema 의 market_share 칸, 필수 채택 항목 6 → 9.
 # 판정 함수 scenario_judges/DEMO-MR-v1.py (두 판 공통) : 3 제품 행 + 모든 칸 값 + 출처 URL 이 그 세션의 저장된 검색 결과에 있음,
 #   source_urls 칸은 서로 다른 호스트의 URL 2 개 이상. 두 출처의 값 일치·내용 정확성은 보지 않는다 (한계).
+# deliverable 의 칸(제품 행의 product 밖 칸)은 값을 모르면 null 이다 (부분 보고, C-18-5 DM-72). 완료 판정은 그대로 모든 칸 값·출처를 요구한다.
 # 종료 상태는 escalated 하나 (DM-46, DM-51). 완료는 선언 역할(작성 담당)의 보고 + 판정 함수 (DM-45).
 # 허용 쟁점 (D-14 의 T1 적용, demo-runner-extension.md 4 절) : 칸 1 개 = ID 1 개 + 과정 쟁점 requirements·acceptance-review.
 #   pricing           — 과제 문장 3 행 (칸 pricing)
@@ -109,26 +110,32 @@ deliverable_schema:
         properties:
           product: {type: string, enum: [github-copilot, cursor, gemini-code-assist]}
           pricing:
-            type: object
-            additionalProperties: false
-            required: [value, source_url]
-            properties:
-              value: {type: string}
-              source_url: {type: string}
+            anyOf:
+            - type: object
+              additionalProperties: false
+              required: [value, source_url]
+              properties:
+                value: {type: string}
+                source_url: {type: string}
+            - {type: 'null'}
           features:
-            type: object
-            additionalProperties: false
-            required: [value, source_url]
-            properties:
-              value: {type: string}
-              source_url: {type: string}
+            anyOf:
+            - type: object
+              additionalProperties: false
+              required: [value, source_url]
+              properties:
+                value: {type: string}
+                source_url: {type: string}
+            - {type: 'null'}
           market_share:
-            type: object
-            additionalProperties: false
-            required: [value, source_urls]
-            properties:
-              value: {type: string}
-              source_urls: {type: array, items: {type: string}}
+            anyOf:
+            - type: object
+              additionalProperties: false
+              required: [value, source_urls]
+              properties:
+                value: {type: string}
+                source_urls: {type: array, items: {type: string}}
+            - {type: 'null'}
 judge: scenario_judges/DEMO-MR-v1.py
 inputs_dir: scenario_assets/DEMO-MR-v1
 required_adopted_items: 9

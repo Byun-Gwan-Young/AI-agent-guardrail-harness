@@ -2,8 +2,11 @@
 
 No JSON-schema library is installed, so the scenario is limited to keywords this module validates in full. The
 same rules make the schema acceptable to a provider's strict mode: every object closes additionalProperties and
-requires all of its properties. Nullability is added by output-contract-v3, not written in the scenario.
+requires all of its properties. Output-contract-v3 makes the whole deliverable nullable. Inside it, a property may be
+nullable only in that same form, {"anyOf": [<subset schema>, {"type": "null"}]} (C-18-5, DM-72: a partial report
+leaves an unknown cell null); no other anyOf.
 """
+NULL = {"type": "null"}
 KEYWORDS = {"type", "properties", "required", "additionalProperties", "items", "enum", "minItems", "maxItems",
             "minLength", "maxLength", "description", "title"}
 TYPES = ("object", "array", "string", "integer", "number", "boolean")
@@ -14,6 +17,12 @@ def check_schema(schema, path="deliverable_schema"):
     """Raise ValueError unless schema stays inside the subset (load time, never at run time)."""
     if not isinstance(schema, dict):
         raise ValueError(f"{path} must be an object")
+    if "anyOf" in schema:
+        inner = nullable_inner(schema)
+        if inner is None or path.split(".")[-2:-1] != ["properties"]:
+            raise ValueError(f"{path}: anyOf is only [<schema>, {{\"type\": \"null\"}}] on a property")
+        check_schema(inner, f"{path}.anyOf[0]")
+        return
     unknown = set(schema) - KEYWORDS
     if unknown:
         raise ValueError(f"{path} uses unsupported keywords: {', '.join(sorted(unknown))}")
@@ -45,6 +54,15 @@ def check_schema(schema, path="deliverable_schema"):
         raise ValueError(f"{path}.items belongs to an array")
 
 
+def nullable_inner(schema):
+    """The schema of a nullable property, or None unless schema is exactly {"anyOf": [<schema>, NULL]}."""
+    options = schema.get("anyOf")
+    if set(schema) != {"anyOf"} or not isinstance(options, list) or len(options) != 2 or options[1] != NULL:
+        return None
+    inner = options[0]
+    return inner if isinstance(inner, dict) and "anyOf" not in inner else None
+
+
 def matches(value, kind):
     if kind == "object":
         return isinstance(value, dict)
@@ -61,6 +79,8 @@ def matches(value, kind):
 
 def errors(value, schema, path="deliverable"):
     """Every place value breaks a schema that passed check_schema; [] means valid."""
+    if "anyOf" in schema:
+        return [] if value is None else errors(value, schema["anyOf"][0], path)
     kind = schema["type"]
     if not matches(value, kind):
         return [f"{path}: expected {kind}"]
