@@ -66,11 +66,12 @@ class Coverage(unittest.TestCase):
     def test_the_content_hash_is_stable(self):
         self.assertEqual(final_freeze.content()["sha256"], final_freeze.content()["sha256"])
 
-    def test_this_checkout_has_no_record_yet(self):
-        # The PM makes it after the T1 trial (DM-33); the check says so instead of passing.
+    def test_this_checkout_matches_its_final_freeze_record(self):
+        # Made once in C-18-6 (DM-33, DM-73 ⑤); a later change to a covered file fails here before the main run does.
         result = final_freeze.check()
-        self.assertFalse(result["ok"])
-        self.assertIn("no final freeze record", result["differences"][0])
+        self.assertEqual((result["ok"], result["differences"]), (True, []))
+        record = json.loads((ROOT / final_freeze.RECORD).read_text(encoding="utf-8"))
+        self.assertEqual((len(record["files"]), len(record["scenario_ids"])), (62, 11))
 
 
 class CreateAndCheck(unittest.TestCase):

@@ -57,3 +57,19 @@ MR 두 판의 preflight (`reports/c18-5/DEMO-MR-{normal,stall}-v1-preflight.json
 
 테스트 기준선 : C-18-5 보고의 157 은 `tools/run_offline_tests.py` 의 기본 `--baseline` 이 P0-2 목록(`tests/fixtures/p0-2-baseline-test-ids.json`, 157 개)이라서다.
 202 는 P0-3 목록(`tests/fixtures/p0-3-mechanism-test-ids.json`)이고, 이번부터 `--baseline` 으로 그 목록을 준다.
+
+## 최종 동결 (파트 3, DM-33 · DM-73 ⑤)
+
+작업 트리가 깨끗한 상태에서 `tools/final_freeze.py create` (외부 호출 없음) → `docs/criteria/demo-final-freeze.json` 커밋 → `check` 통과 (`differences: []`).
+`create` 는 시험 결과 조건을 스스로 검사하지 않으므로 고친 것이 없다.
+
+| | 값 |
+|---|---|
+| 동결 기준 커밋 (`git_commit`) | `afd28b565d88799371d135d36563d4c8cefc1f44` |
+| 내용 해시 (`sha256`, 62 파일) | `6a7bf8dcfc07bd922f62398d76742e3b0bbe16f87907dd768629dbc5b7807dd2` |
+| 기록 파일 해시 (배치 실행기가 세션에 남기는 `final_freeze_sha256`) | `5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776` |
+| 시나리오 / 파일 | 11 / 62 |
+| v0.3 동결 (`criteria_freeze`) | `4fa93919…` 그대로 |
+| 이전 내용 해시 (기록 없이 계산만) | 61 파일 C-18-5 합치기 전 `3bc0533121d4…`, C-18-5 뒤 `6a51b295b453…` |
+
+`tests/test_c18_3_part3.py` 의 "기록이 아직 없음" 테스트를 "이 checkout 이 기록과 같음 (62 파일, 11 시나리오)" 으로 바꿨다. 동결 범위 파일이 바뀌면 이 테스트가 먼저 실패한다.
