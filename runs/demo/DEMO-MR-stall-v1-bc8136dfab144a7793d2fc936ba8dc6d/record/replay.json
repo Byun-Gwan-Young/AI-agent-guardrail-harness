@@ -1,0 +1,229 @@
+{
+ "replay_version": "demo-replay-v1",
+ "session_id": "DEMO-MR-stall-v1-bc8136dfab144a7793d2fc936ba8dc6d",
+ "scenario_id": "DEMO-MR-stall-v1",
+ "title": "AI 코딩 도구 3 종의 공개 요금·주요 기능 비교표 만들기",
+ "task_kind": "dialogue",
+ "guardrail_mode": "observe",
+ "model": "glm-5.3-flash",
+ "termination_reason": "escalated",
+ "escalated_by": "lead",
+ "steps_reached": 4,
+ "max_steps": 30,
+ "batch": {
+  "item": "DEMO-MR-stall-v1:observe:1",
+  "lane": 2,
+  "lanes": 2,
+  "mode": "observe",
+  "plan_id": "demo-trial-c18-4",
+  "plan_sha256": "947342a87411e5f450caec3ce404a67729946cb5d928aeaeb958d8f07a60abb8",
+  "repeat": 1,
+  "rerun_of": null
+ },
+ "role_labels": {
+  "lead": "조사 책임",
+  "searcher": "검색 담당",
+  "writer": "작성 담당"
+ },
+ "first_stop_step": null,
+ "stop_steps": [],
+ "blocked_step": null,
+ "if_stopped": null,
+ "steps": [
+  {
+   "step_id": 1,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "researching",
+    "status_label": "조사",
+    "handoff_to": "lead",
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "pricing",
+     "features",
+     "market-share",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 4652,
+    "cached_prompt": 256,
+    "completion": 1722,
+    "reasoning": 271
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 1.52808,
+   "cumulative_tokens": 6374,
+   "cumulative_credits": 1.52808
+  },
+  {
+   "step_id": 2,
+   "agent": "searcher",
+   "role": "검색 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "researching",
+    "status_label": "조사",
+    "handoff_to": "searcher",
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    }
+   ],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 42111,
+    "cached_prompt": 2816,
+    "completion": 3692,
+    "reasoning": 2612
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 7.82473,
+   "cumulative_tokens": 52177,
+   "cumulative_credits": 9.35281
+  },
+  {
+   "step_id": 3,
+   "agent": "writer",
+   "role": "작성 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "researching",
+    "status_label": "조사",
+    "handoff_to": "searcher",
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share",
+     "acceptance-review"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 6941,
+    "cached_prompt": 0,
+    "completion": 3292,
+    "reasoning": 722
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 2.68715,
+   "cumulative_tokens": 62410,
+   "cumulative_credits": 12.03996
+  },
+  {
+   "step_id": 4,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "escalated",
+    "status_label": "에스컬레이션",
+    "handoff_to": "lead",
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "market-share",
+     "acceptance-review"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "unmeasured",
+   "state_label": "측정 안 됨",
+   "decision": "unmeasured",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 11914,
+    "cached_prompt": 0,
+    "completion": 2980,
+    "reasoning": 489
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 3.2771,
+   "cumulative_tokens": 77304,
+   "cumulative_credits": 15.31706
+  }
+ ]
+}

@@ -158,7 +158,10 @@ class AllPages(unittest.TestCase):
 class CommittedTrials(unittest.TestCase):
     def test_each_trial_replay_adds_up_to_its_summary(self):
         records = sorted((ROOT / "runs/demo").glob("*/record/replay.json"))
-        self.assertEqual(len(records), 12)
+        # Every recorded trial has its replay; 16 are committed since C-18-5 (C-18-4 retests added), more may be local.
+        manifests = sorted((ROOT / "runs/demo").glob("*/record/manifest.json"))
+        self.assertEqual([p.parent for p in records], [p.parent for p in manifests])
+        self.assertGreaterEqual(len(records), 16)
         for path in records:
             replay = json.loads(path.read_text(encoding="utf-8"))
             summary = json.loads((path.parent / "demo-summary.json").read_text(encoding="utf-8"))

@@ -99,7 +99,7 @@
  "account_label": null,
  "batch": null,
  "key_scan": {
-  "files_scanned": 52,
+  "files_scanned": 56,
   "key_values_checked": [],
   "hits": {},
   "clean": true

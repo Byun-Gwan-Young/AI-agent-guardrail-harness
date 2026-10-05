@@ -125,7 +125,7 @@
  "account_label": null,
  "batch": null,
  "key_scan": {
-  "files_scanned": 196,
+  "files_scanned": 200,
   "key_values_checked": [],
   "hits": {},
   "clean": true
