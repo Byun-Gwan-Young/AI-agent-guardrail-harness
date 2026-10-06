@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DEMO-LR-normal-v1 재생</title><style>
+:root{--bg:#fbfaf7;--fg:#1d1d1b;--muted:#6b6a65;--line:#dedbd2;--card:#fff;--stop:#b3261e;--stopbg:#fdecea;
+--prog:#1b6e3a;--stag:#8a6d00;--rev:#7a3e9d;--accent:#1f5fa8;--save:#e8f0fb}
+@media (prefers-color-scheme:dark){:root{--bg:#161614;--fg:#ecebe6;--muted:#a3a29b;--line:#36352f;--card:#1f1f1c;
+--stop:#ff8a80;--stopbg:#3a1f1d;--prog:#7fd29b;--stag:#e2c45c;--rev:#c79be6;--accent:#8ab8f0;--save:#1d2a3a}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 -apple-system,
+"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif}main{max-width:960px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.35rem;margin:0 0 4px}.sub{color:var(--muted);font-size:.9rem;margin-bottom:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:12px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.card b{display:block;font-size:1.1rem}.card span{color:var(--muted);font-size:.8rem}
+.nav{display:flex;gap:8px;align-items:center;margin:14px 0;flex-wrap:wrap}
+button{font:inherit;padding:4px 12px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--fg);cursor:pointer}
+input[type=range]{flex:1;min-width:160px}
+.step{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.step h2{font-size:1.05rem;margin:0 0 6px}.state{font-weight:600}
+.s-진전{color:var(--prog)}.s-정체{color:var(--stag)}.s-되돌림{color:var(--rev)}
+.stop{background:var(--stopbg);border-left:4px solid var(--stop);padding:8px 10px;margin:8px 0;border-radius:4px}
+.saved{background:var(--save);border-left:4px solid var(--accent);padding:8px 10px;margin:8px 0;border-radius:4px}
+dl{display:grid;grid-template-columns:max-content 1fr;gap:2px 12px;margin:6px 0}dt{color:var(--muted)}dd{margin:0}
+svg{width:100%;height:auto;display:block}.axis{stroke:var(--line)}.lineT{fill:none;stroke:var(--accent);stroke-width:2}
+.mark{stroke:var(--stop);stroke-width:1.5;stroke-dasharray:4 3}.cur{stroke:var(--fg);stroke-width:1}
+.dot{fill:var(--accent)}.lbl{fill:var(--muted);font-size:11px}
+table{border-collapse:collapse;width:100%;font-size:.9rem}td,th{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left}
+tr.sel{background:var(--save)}tr{cursor:pointer}a{color:var(--accent)}.note{color:var(--muted);font-size:.85rem}
+</style></head>
+<body><main><h1>DEMO-LR-normal-v1 — 세션 재생</h1>
+<div class="sub">멀티에이전트 LLM 실패 원인 논문 5 편 고르고 한 줄 요약하기 · 세션 DEMO-LR-normal-v1-447141e1675941319897a94157fb786b · 모델 glm-5.3-flash · 데모 세션 기준 (데이터셋 아님)</div>
+<div class="cards"><div class="card"><b>success</b><span>종료</span></div><div class="card"><b>6 / 30</b><span>도달 step</span></div><div class="card"><b>observe</b><span>모드</span></div><div class="card"><b>없음</b><span>첫 STOP</span></div><div class="card"><b>13.21305 (실측)</b><span>크레딧</span></div></div>
+<div id="chart"></div>
+<div class="nav"><button id="prev">◀ 이전</button><input id="range" type="range" min="0" value="0" aria-label="step"><button id="next">다음 ▶</button><button id="tostop">첫 STOP 으로</button></div>
+<section class="step" id="step"></section>
+<p class="note">판정 상태와 STOP 원인 설명은 프록시 판정 기록(deadlock-v0.3, explain-v1)이고, 사실 요약은 최종 보고의 구조화 필드·도구 호출 이름·테스트 결과에서 만들었다. 모델의 서술·추론 내용은 넣지 않았다. 크레딧은 토큰 × 단가 추정이다.</p>
+<table id="list"></table>
+<script type="application/json" id="replay-data">{"replay_version": "demo-replay-v1", "session_id": "DEMO-LR-normal-v1-447141e1675941319897a94157fb786b", "scenario_id": "DEMO-LR-normal-v1", "title": "멀티에이전트 LLM 실패 원인 논문 5 편 고르고 한 줄 요약하기", "task_kind": "dialogue", "guardrail_mode": "observe", "model": "glm-5.3-flash", "termination_reason": "success", "escalated_by": null, "steps_reached": 6, "max_steps": 30, "batch": {"final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776", "item": "DEMO-LR-normal-v1:observe:5", "lane": 1, "lanes": 1, "mode": "observe", "plan_id": "demo-main-v1-lr2", "plan_sha256": "09cc3ef0a108efc72df62078b111591760405bb5258233fdf471f923cd1cf17c", "repeat": 5, "rerun_of": null}, "role_labels": {"lead": "조사 책임", "searcher": "검색 담당", "writer": "작성 담당"}, "first_stop_step": null, "stop_steps": [], "blocked_step": null, "if_stopped": null, "steps": [{"step_id": 1, "agent": "lead", "role": "조사 책임", "step_status": "completed", "failure_reasons": [], "report": {"status": "researching", "status_label": "조사", "handoff_to": "searcher", "adopted_items": 0, "open_issue_ids": ["paper-selection", "summaries", "acceptance-review"], "deliverable_reported": false, "completion_declared": false}, "completion_claim": null, "tools": [], "tests": null, "changed_paths": [], "state": "baseline", "state_label": "기준", "decision": "continue", "stop": null, "blocked": false, "tokens": {"prompt": 3246, "cached_prompt": 1344, "completion": 853, "reasoning": 247}, "usage_missing_turns": 0, "credits_estimated": 0.75212, "cumulative_tokens": 4099, "cumulative_credits": 0.75212}, {"step_id": 2, "agent": "searcher", "role": "검색 담당", "step_status": "completed", "failure_reasons": [], "report": {"status": "researching", "status_label": "조사", "handoff_to": "lead", "adopted_items": 0, "open_issue_ids": ["paper-selection", "summaries", "acceptance-review"], "deliverable_reported": false, "completion_declared": false}, "completion_claim": null, "tools": [{"tool": "academic_search", "is_error": false}, {"tool": "academic_search", "is_error": false}, {"tool": "academic_search", "is_error": false}], "tests": null, "changed_paths": [], "state": "baseline", "state_label": "기준", "decision": "continue", "stop": null, "blocked": false, "tokens": {"prompt": 16284, "cached_prompt": 4928, "completion": 1476, "reasoning": 688}, "usage_missing_turns": 0, "credits_estimated": 2.58924, "cumulative_tokens": 21859, "cumulative_credits": 3.34136}, {"step_id": 3, "agent": "writer", "role": "작성 담당", "step_status": "completed", "failure_reasons": [], "report": {"status": "drafting", "status_label": "작성", "handoff_to": "writer", "adopted_items": 5, "open_issue_ids": ["summaries", "acceptance-review"], "deliverable_reported": false, "completion_declared": false}, "completion_claim": null, "tools": [], "tests": null, "changed_paths": [], "state": "baseline", "state_label": "기준", "decision": "continue", "stop": null, "blocked": false, "tokens": {"prompt": 4825, "cached_prompt": 1344, "completion": 1556, "reasoning": 419}, "usage_missing_turns": 0, "credits_estimated": 1.34047, "cumulative_tokens": 28240, "cumulative_credits": 4.68183}, {"step_id": 4, "agent": "lead", "role": "조사 책임", "step_status": "completed", "failure_reasons": [], "report": {"status": "drafting", "status_label": "작성", "handoff_to": "lead", "adopted_items": 5, "open_issue_ids": ["acceptance-review"], "deliverable_reported": true, "completion_declared": false}, "completion_claim": null, "tools": [], "tests": null, "changed_paths": [], "state": "stagnant", "state_label": "정체", "decision": "continue", "stop": null, "blocked": false, "tokens": {"prompt": 6826, "cached_prompt": 1728, "completion": 2506, "reasoning": 1288}, "usage_missing_turns": 0, "credits_estimated": 2.06954, "cumulative_tokens": 37572, "cumulative_credits": 6.75137}, {"step_id": 5, "agent": "searcher", "role": "검색 담당", "step_status": "completed", "failure_reasons": [], "report": {"status": "completed", "status_label": "완료", "handoff_to": null, "adopted_items": 5, "open_issue_ids": [], "deliverable_reported": true, "completion_declared": true}, "completion_claim": {"accepted": false, "reasons": ["not_declarer"], "missing": []}, "tools": [{"tool": "academic_search", "is_error": false}, {"tool": "academic_search", "is_error": false}], "tests": null, "changed_paths": [], "state": "progress", "state_label": "진전", "decision": "continue", "stop": null, "blocked": false, "tokens": {"prompt": 28889, "cached_prompt": 16832, "completion": 3490, "reasoning": 2189}, "usage_missing_turns": 0, "credits_estimated": 4.05851, "cumulative_tokens": 69951, "cumulative_credits": 10.80988}, {"step_id": 6, "agent": "writer", "role": "작성 담당", "step_status": "completed", "failure_reasons": [], "report": {"status": "completed", "status_label": "완료", "handoff_to": null, "adopted_items": 5, "open_issue_ids": [], "deliverable_reported": true, "completion_declared": true}, "completion_claim": {"accepted": true, "reasons": [], "missing": []}, "tools": [], "tests": null, "changed_paths": [], "state": "stagnant", "state_label": "정체", "decision": "continue", "stop": null, "blocked": false, "tokens": {"prompt": 11107, "cached_prompt": 1024, "completion": 1720, "reasoning": 98}, "usage_missing_turns": 0, "credits_estimated": 2.40317, "cumulative_tokens": 82778, "cumulative_credits": 13.21305}]}</script>
+<script>
+const D=JSON.parse(document.getElementById('replay-data').textContent);let i=0;
+const $=s=>document.querySelector(s);const esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function facts(s){const r=s.report,out=[];
+ if(r){if(r.status_label||r.status)out.push(['처리 상태',r.status_label||r.status]);if(r.handoff_to)out.push(['다음 담당',D.role_labels[r.handoff_to]||r.handoff_to]);
+  out.push(['채택 항목',r.adopted_items]);out.push(['열린 쟁점',r.open_issue_ids.length?r.open_issue_ids.join(', '):'없음']);
+  if(r.deliverable_reported)out.push(['결과물','보고함']);if(r.spec_approved!==undefined)out.push(['SPEC 승인',r.spec_approved?'승인':'미승인']);
+  if(r.completion_declared)out.push(['완료 선언','예']);}else out.push(['최종 보고','없음']);
+ if(s.completion_claim)out.push(['완료 주장',s.completion_claim.accepted?'통과':'거절 ('+s.completion_claim.reasons.concat(s.completion_claim.missing).join(', ')+')']);
+ if(s.tests)out.push(['통과 테스트',s.tests.passed+'/'+s.tests.total]);if(s.changed_paths.length)out.push(['바뀐 파일',s.changed_paths.join(', ')]);
+ if(s.tools.length){const c={};s.tools.forEach(t=>{const k=t.tool+(t.is_error?' (오류)':'');c[k]=(c[k]||0)+1});out.push(['도구 호출',Object.entries(c).map(([k,v])=>k+' ×'+v).join(', ')]);}
+ if(s.failure_reasons.length)out.push(['실패 사유',s.failure_reasons.join(', ')]);
+ out.push(['토큰 (입력/출력)',s.tokens.prompt+' / '+s.tokens.completion]);return out;}
+function chart(){const W=900,H=180,P=36,n=D.steps.length,max=Math.max(1,...D.steps.map(s=>s.cumulative_tokens));
+ const x=k=>P+(W-2*P)*(n<2?0:(k)/(n-1)),y=v=>H-24-(H-40)*v/max;let p='';
+ D.steps.forEach((s,k)=>{p+=(k?'L':'M')+x(k).toFixed(1)+' '+y(s.cumulative_tokens).toFixed(1)});
+ let g='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="누적 토큰"><line class="axis" x1="'+P+'" y1="'+(H-24)+'" x2="'+(W-P)+'" y2="'+(H-24)+'"/>'+
+  '<path class="lineT" d="'+p+'"/>';
+ const mk=(step,label)=>{const k=D.steps.findIndex(s=>s.step_id===step);if(k<0)return'';return '<line class="mark" x1="'+x(k)+'" y1="10" x2="'+x(k)+'" y2="'+(H-24)+'"/><text class="lbl" x="'+(x(k)+4)+'" y="20">'+label+'</text>'};
+ if(D.first_stop_step)g+=mk(D.first_stop_step,D.guardrail_mode==='block'?'STOP (차단)':'STOP — 여기서 멈췄다면');
+ if(D.blocked_step)g+=mk(D.blocked_step,'403 차단');
+ g+='<line class="cur" id="cur" x1="0" y1="10" x2="0" y2="'+(H-24)+'"/>';
+ g+='<text class="lbl" x="'+P+'" y="'+(H-6)+'">step '+D.steps[0].step_id+'</text><text class="lbl" x="'+(W-P-60)+'" y="'+(H-6)+'">step '+D.steps[n-1].step_id+'</text>';
+ g+='<text class="lbl" x="'+P+'" y="12">누적 토큰 '+max.toLocaleString()+'</text></svg>';$('#chart').innerHTML=g;
+ window._x=x;}
+function show(k){i=Math.max(0,Math.min(D.steps.length-1,k));const s=D.steps[i];$('#range').value=i;
+ let h='<h2>step '+s.step_id+' · '+esc(s.role)+'</h2><div class="state s-'+esc(s.state_label)+'">판정 상태 : '+esc(s.state_label||'-')+'</div>';
+ if(s.stop)h+='<div class="stop"><b>STOP ('+esc(s.stop.template_id)+')</b> '+esc(s.stop.text)+'</div>';
+ if(s.blocked)h+='<div class="stop"><b>차단</b> 이 step 의 요청은 STOP 뒤라 프록시가 403 으로 돌려보냈다 (업스트림에 보내지 않음).</div>';
+ if(D.if_stopped&&s.step_id===D.if_stopped.stop_step&&D.guardrail_mode!=='block')h+='<div class="saved">여기서 멈췄다면 뒤의 '+D.if_stopped.tokens_after.toLocaleString()+' 토큰 ('+(100*D.if_stopped.token_ratio).toFixed(1)+'%'+(D.if_stopped.credits_after!==null?', 약 '+D.if_stopped.credits_after+' 크레딧':'')+')을 아낄 수 있었다.</div>';
+ h+='<dl>'+facts(s).map(([a,b])=>'<dt>'+esc(a)+'</dt><dd>'+esc(b)+'</dd>').join('')+'<dt>누적</dt><dd>'+s.cumulative_tokens.toLocaleString()+' 토큰'+(s.cumulative_credits!==null?' · '+s.cumulative_credits+' 크레딧 (추정)':'')+'</dd></dl>';
+ $('#step').innerHTML=h;const c=$('#cur');if(c){c.setAttribute('x1',window._x(i));c.setAttribute('x2',window._x(i));}
+ document.querySelectorAll('#list tr[data-k]').forEach(r=>r.classList.toggle('sel',+r.dataset.k===i));}
+function list(){$('#list').innerHTML='<tr><th>step</th><th>역할</th><th>판정</th><th>STOP</th><th>통과/상태</th></tr>'+D.steps.map((s,k)=>
+ '<tr data-k="'+k+'"><td>'+s.step_id+'</td><td>'+esc(s.role)+'</td><td class="s-'+esc(s.state_label)+'">'+esc(s.state_label||'-')+'</td><td>'+(s.stop?esc(s.stop.template_id):(s.blocked?'403':''))+'</td><td>'+
+ (s.tests?s.tests.passed+'/'+s.tests.total:esc(s.report&&(s.report.status_label||s.report.status)||''))+'</td></tr>').join('');
+ document.querySelectorAll('#list tr[data-k]').forEach(r=>r.onclick=()=>show(+r.dataset.k));}
+$('#range').max=D.steps.length-1;$('#range').oninput=e=>show(+e.target.value);$('#prev').onclick=()=>show(i-1);$('#next').onclick=()=>show(i+1);
+$('#tostop').onclick=()=>show(Math.max(0,D.steps.findIndex(s=>s.stop)));
+document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')show(i-1);if(e.key==='ArrowRight')show(i+1)});
+chart();list();show(0);
+</script></main></body></html>

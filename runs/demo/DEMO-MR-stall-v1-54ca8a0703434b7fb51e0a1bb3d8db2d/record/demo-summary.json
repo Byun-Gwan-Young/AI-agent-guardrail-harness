@@ -1,0 +1,92 @@
+{
+ "session_id": "DEMO-MR-stall-v1-54ca8a0703434b7fb51e0a1bb3d8db2d",
+ "scenario_id": "DEMO-MR-stall-v1",
+ "termination_reason": "escalated",
+ "steps": 1,
+ "error": null,
+ "tests_passed": {
+  "before": null,
+  "after": null,
+  "max": null
+ },
+ "first_stop": null,
+ "stop_steps": [],
+ "tokens": {
+  "prompt": 4710,
+  "cached_prompt": 0,
+  "completion": 1959,
+  "reasoning": 541,
+  "turns": 2,
+  "usage_missing_turns": 0
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 1.686,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-06T15:03:35.318199+00:00",
+   "2026-10-06T15:04:13.286451+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 1.686,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 2
+ },
+ "tool_results": {
+  "executed": 0,
+  "refused_before_approval": 0,
+  "error_results": 0,
+  "error_results_by_tool": {},
+  "error_results_by_summary": {},
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 0,
+  "vocabulary_violations": 0,
+  "by_kind": {},
+  "failed_steps": []
+ },
+ "condition_group": "cg-7da0a5a24738",
+ "condition_group_missing_fields": [
+  "requested_seed"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": []
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "block",
+ "session_times": {
+  "started_at": "2026-10-06T15:03:35.315180+00:00",
+  "ended_at": "2026-10-06T15:04:13.279443+00:00"
+ },
+ "account_label": "A",
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-MR-stall-v1:block:1",
+  "lane": 1,
+  "lanes": 4,
+  "mode": "block",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 1,
+  "rerun_of": "DEMO-MR-stall-v1-173d03d693e447caabc808d3265a9d76"
+ },
+ "key_scan": {
+  "files_scanned": 10,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

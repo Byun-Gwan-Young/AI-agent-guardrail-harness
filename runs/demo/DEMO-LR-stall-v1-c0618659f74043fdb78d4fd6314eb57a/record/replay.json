@@ -1,0 +1,165 @@
+{
+ "replay_version": "demo-replay-v1",
+ "session_id": "DEMO-LR-stall-v1-c0618659f74043fdb78d4fd6314eb57a",
+ "scenario_id": "DEMO-LR-stall-v1",
+ "title": "멀티에이전트 LLM 실패 원인 논문 5 편 고르고 한 줄 요약하기",
+ "task_kind": "dialogue",
+ "guardrail_mode": "observe",
+ "model": "glm-5.3-flash",
+ "termination_reason": "escalated",
+ "escalated_by": "writer",
+ "steps_reached": 3,
+ "max_steps": 30,
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-LR-stall-v1:observe:3",
+  "lane": 1,
+  "lanes": 1,
+  "mode": "observe",
+  "plan_id": "demo-main-v1-lr2",
+  "plan_sha256": "09cc3ef0a108efc72df62078b111591760405bb5258233fdf471f923cd1cf17c",
+  "repeat": 3,
+  "rerun_of": null
+ },
+ "role_labels": {
+  "lead": "조사 책임",
+  "searcher": "검색 담당",
+  "writer": "작성 담당"
+ },
+ "first_stop_step": null,
+ "stop_steps": [],
+ "blocked_step": null,
+ "if_stopped": null,
+ "steps": [
+  {
+   "step_id": 1,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "researching",
+    "status_label": "조사",
+    "handoff_to": "lead",
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "paper-selection",
+     "summaries",
+     "benchmark-condition",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 3501,
+    "cached_prompt": 3008,
+    "completion": 1315,
+    "reasoning": 527
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 0.82169,
+   "cumulative_tokens": 4816,
+   "cumulative_credits": 0.82169
+  },
+  {
+   "step_id": 2,
+   "agent": "searcher",
+   "role": "검색 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "researching",
+    "status_label": "조사",
+    "handoff_to": "lead",
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "paper-selection",
+     "benchmark-condition",
+     "summaries",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "academic_search",
+     "is_error": false
+    },
+    {
+     "tool": "academic_search",
+     "is_error": false
+    }
+   ],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 12347,
+    "cached_prompt": 2240,
+    "completion": 2402,
+    "reasoning": 613
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 2.78425,
+   "cumulative_tokens": 19565,
+   "cumulative_credits": 3.60594
+  },
+  {
+   "step_id": 3,
+   "agent": "writer",
+   "role": "작성 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "escalated",
+    "status_label": "에스컬레이션",
+    "handoff_to": "lead",
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "paper-selection",
+     "benchmark-condition",
+     "summaries",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 5154,
+    "cached_prompt": 320,
+    "completion": 1687,
+    "reasoning": 337
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 1.5782,
+   "cumulative_tokens": 26406,
+   "cumulative_credits": 5.18414
+  }
+ ]
+}

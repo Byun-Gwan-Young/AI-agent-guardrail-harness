@@ -1,0 +1,373 @@
+{
+ "replay_version": "demo-replay-v1",
+ "session_id": "DEMO-CT-normal-v1-102725acfa354c7e9b823b76002af10e",
+ "scenario_id": "DEMO-CT-normal-v1",
+ "title": "업무 조회 기능을 승인된 명세로 기획·구현·검토하기",
+ "task_kind": "artifact",
+ "guardrail_mode": "observe",
+ "model": "glm-5.3-flash",
+ "termination_reason": "success",
+ "escalated_by": null,
+ "steps_reached": 6,
+ "max_steps": 30,
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-CT-normal-v1:observe:1",
+  "lane": 2,
+  "lanes": 4,
+  "mode": "observe",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 1,
+  "rerun_of": null
+ },
+ "role_labels": {
+  "planner": "기획",
+  "developer": "개발",
+  "reviewer": "검토"
+ },
+ "first_stop_step": null,
+ "stop_steps": [],
+ "blocked_step": null,
+ "if_stopped": null,
+ "steps": [
+  {
+   "step_id": 1,
+   "agent": "planner",
+   "role": "기획",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 16
+   },
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 9158,
+    "cached_prompt": 2432,
+    "completion": 1687,
+    "reasoning": 273
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 1.92536,
+   "cumulative_tokens": 10845,
+   "cumulative_credits": 1.92536
+  },
+  {
+   "step_id": 2,
+   "agent": "developer",
+   "role": "개발",
+   "step_status": "failed",
+   "failure_reasons": [
+    "write_refused_before_approval"
+   ],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "replace_in_file",
+     "is_error": true
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 16
+   },
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 11264,
+    "cached_prompt": 2944,
+    "completion": 1822,
+    "reasoning": 846
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 2.24732,
+   "cumulative_tokens": 23931,
+   "cumulative_credits": 4.17268
+  },
+  {
+   "step_id": 3,
+   "agent": "reviewer",
+   "role": "검토",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": true
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "run_tests",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 16
+   },
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 13065,
+    "cached_prompt": 4672,
+    "completion": 2258,
+    "reasoning": 382
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 2.52811,
+   "cumulative_tokens": 39254,
+   "cumulative_credits": 6.70079
+  },
+  {
+   "step_id": 4,
+   "agent": "planner",
+   "role": "기획",
+   "step_status": "failed",
+   "failure_reasons": [
+    "tool_execution_error"
+   ],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": true
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "replace_in_file",
+     "is_error": true
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 16
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 17896,
+    "cached_prompt": 9728,
+    "completion": 1815,
+    "reasoning": 618
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 2.42454,
+   "cumulative_tokens": 58965,
+   "cumulative_credits": 9.12533
+  },
+  {
+   "step_id": 5,
+   "agent": "developer",
+   "role": "개발",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": true
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "write_file",
+     "is_error": false
+    },
+    {
+     "tool": "run_tests",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 16,
+    "total": 16
+   },
+   "changed_paths": [
+    "src/task_query.py"
+   ],
+   "state": "progress",
+   "state_label": "진전",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 19512,
+    "cached_prompt": 12032,
+    "completion": 1014,
+    "reasoning": 273
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 1.98996,
+   "cumulative_tokens": 79491,
+   "cumulative_credits": 11.11529
+  },
+  {
+   "step_id": 6,
+   "agent": "reviewer",
+   "role": "검토",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [],
+    "deliverable_reported": false,
+    "completion_declared": true,
+    "spec_approved": true
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "run_tests",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 16,
+    "total": 16
+   },
+   "changed_paths": [],
+   "state": "progress",
+   "state_label": "진전",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 25571,
+    "cached_prompt": 9088,
+    "completion": 2013,
+    "reasoning": 195
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 3.75159,
+   "cumulative_tokens": 107075,
+   "cumulative_credits": 14.86688
+  }
+ ]
+}

@@ -1,0 +1,144 @@
+{
+ "replay_version": "demo-replay-v1",
+ "session_id": "DEMO-CT-stall-v1-b12151a11ca14792871b5dc6e3618eab",
+ "scenario_id": "DEMO-CT-stall-v1",
+ "title": "업무 조회 기능을 승인된 명세로 기획·구현·검토하기",
+ "task_kind": "artifact",
+ "guardrail_mode": "block",
+ "model": "glm-5.3-flash",
+ "termination_reason": "runner_error",
+ "escalated_by": null,
+ "steps_reached": 2,
+ "max_steps": 30,
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-CT-stall-v1:block:3",
+  "lane": 3,
+  "lanes": 4,
+  "mode": "block",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 3,
+  "rerun_of": "DEMO-CT-stall-v1-bf36c7d96b10472680da030ef2faf015"
+ },
+ "role_labels": {
+  "planner": "기획",
+  "developer": "개발",
+  "reviewer": "검토"
+ },
+ "first_stop_step": null,
+ "stop_steps": [],
+ "blocked_step": null,
+ "if_stopped": null,
+ "steps": [
+  {
+   "step_id": 1,
+   "agent": "planner",
+   "role": "기획",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "replace_in_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 9146,
+    "cached_prompt": 6144,
+    "completion": 2349,
+    "reasoning": 1434
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 1.80912,
+   "cumulative_tokens": 11495,
+   "cumulative_credits": 1.80912
+  },
+  {
+   "step_id": 2,
+   "agent": "developer",
+   "role": "개발",
+   "step_status": "failed",
+   "failure_reasons": [
+    "aborted"
+   ],
+   "report": null,
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "unmeasured",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 2915,
+    "cached_prompt": 0,
+    "completion": 173,
+    "reasoning": 133
+   },
+   "usage_missing_turns": 1,
+   "credits_estimated": null,
+   "cumulative_tokens": 14583,
+   "cumulative_credits": null
+  }
+ ]
+}

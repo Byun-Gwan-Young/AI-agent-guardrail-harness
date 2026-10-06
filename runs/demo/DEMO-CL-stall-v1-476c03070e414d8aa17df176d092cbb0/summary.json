@@ -1,0 +1,129 @@
+{
+  "session_id": "DEMO-CL-stall-v1-476c03070e414d8aa17df176d092cbb0",
+  "steps": 30,
+  "termination_reason": "max_steps",
+  "total_tokens": 628545,
+  "known_tokens_subtotal": 628545,
+  "criteria_latest": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "unmeasured",
+    "reason": "observation or termination context missing",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 1,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "declared_step": null
+  },
+  "criteria_alerts": [],
+  "tests_passed_before": 6,
+  "tests_passed_after": 14,
+  "missing_observation_steps": [],
+  "missing_observation_count": 0,
+  "fixture_unchanged": true,
+  "error": null,
+  "cleanup_errors": [],
+  "actual_outcome": null,
+  "context_buffer_messages": 12,
+  "vocabulary_violation_steps": [],
+  "vocabulary_violations_total": 0,
+  "failed_steps": [
+    {
+      "step_id": 4,
+      "reasons": [
+        "tool_execution_error"
+      ]
+    },
+    {
+      "step_id": 6,
+      "reasons": [
+        "strict_schema_mismatch",
+        "no_final_output"
+      ]
+    },
+    {
+      "step_id": 9,
+      "reasons": [
+        "strict_schema_mismatch",
+        "no_final_output"
+      ]
+    },
+    {
+      "step_id": 12,
+      "reasons": [
+        "strict_schema_mismatch",
+        "no_final_output"
+      ]
+    },
+    {
+      "step_id": 15,
+      "reasons": [
+        "strict_schema_mismatch",
+        "no_final_output"
+      ]
+    },
+    {
+      "step_id": 18,
+      "reasons": [
+        "strict_schema_mismatch",
+        "no_final_output"
+      ]
+    },
+    {
+      "step_id": 21,
+      "reasons": [
+        "strict_schema_mismatch",
+        "no_final_output"
+      ]
+    },
+    {
+      "step_id": 24,
+      "reasons": [
+        "strict_schema_mismatch",
+        "no_final_output"
+      ]
+    },
+    {
+      "step_id": 27,
+      "reasons": [
+        "strict_schema_mismatch",
+        "no_final_output"
+      ]
+    },
+    {
+      "step_id": 30,
+      "reasons": [
+        "strict_schema_mismatch",
+        "no_final_output"
+      ]
+    }
+  ],
+  "task_kind": "artifact",
+  "turn_order": "fixed",
+  "output_contract_version": "output-contract-v2",
+  "registration_sha256": "7dbebabcae3185c3425a1f8c6591f92d372d7608b506ad96546b08b8a7102b59",
+  "approval": null,
+  "gateway_usage": {
+    "usage_version": "gateway-usage-v1",
+    "before": {
+      "read_at": "2026-10-06T04:23:09.838014+00:00",
+      "http_status": 200,
+      "used": 276.98017999999996,
+      "field": "monthly_allocated.used"
+    },
+    "after": {
+      "read_at": "2026-10-06T04:43:44.526276+00:00",
+      "http_status": 200,
+      "used": 381.9841,
+      "field": "monthly_allocated.used"
+    },
+    "exact_only_if_alone": true,
+    "note": "after minus before; it includes any other use of the same key between the two read_at times (parallel sessions, probes, other tools). Compare those times with other sessions.",
+    "status": "measured",
+    "value": 105.00392,
+    "field": "monthly_allocated.used"
+  }
+}

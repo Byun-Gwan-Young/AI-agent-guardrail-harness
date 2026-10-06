@@ -1,0 +1,123 @@
+{
+ "session_id": "DEMO-CL-stall-v1-5a754c129a094e65bea0a57a07d53c3a",
+ "scenario_id": "DEMO-CL-stall-v1",
+ "termination_reason": "guardrail_stop",
+ "steps": 11,
+ "error": null,
+ "tests_passed": {
+  "before": 6,
+  "after": 14,
+  "max": 14
+ },
+ "first_stop": {
+  "step_id": 10,
+  "criteria_version": "deadlock-v0.3",
+  "decision": "deadlock",
+  "reason": "consecutive stagnant/oscillating steps without declaration",
+  "template_id": "E1",
+  "text": "최근 3 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15."
+ },
+ "stop_steps": [
+  10
+ ],
+ "tokens": {
+  "prompt": 177670,
+  "cached_prompt": 40704,
+  "completion": 25742,
+  "reasoning": 10687,
+  "turns": 29,
+  "usage_missing_turns": 0
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 34.63702,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-06T05:31:28.353347+00:00",
+   "2026-10-06T05:40:46.360390+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 34.63702,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 13,
+  "1": 5,
+  "2": 6,
+  "3": 3,
+  "4": 1
+ },
+ "tool_results": {
+  "executed": 30,
+  "refused_before_approval": 0,
+  "error_results": 1,
+  "error_results_by_tool": {
+   "replace_in_file": 1
+  },
+  "error_results_by_summary": {
+   "Role is not authorized to edit this file": 1
+  },
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 0,
+  "vocabulary_violations": 0,
+  "by_kind": {},
+  "failed_steps": [
+   {
+    "step_id": 4,
+    "reasons": [
+     "tool_execution_error"
+    ]
+   }
+  ]
+ },
+ "condition_group": "cg-79fa04a93ef7",
+ "condition_group_missing_fields": [
+  "dialogue_flow",
+  "recent_messages_rule",
+  "requested_seed",
+  "search_settings_sha256"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [
+   "dialogue_flow",
+   "recent_messages_rule",
+   "search_settings_sha256"
+  ],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": []
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "block",
+ "session_times": {
+  "started_at": "2026-10-06T05:31:28.349615+00:00",
+  "ended_at": "2026-10-06T05:40:46.317698+00:00"
+ },
+ "account_label": "B",
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-CL-stall-v1:block:2",
+  "lane": 2,
+  "lanes": 4,
+  "mode": "block",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 2,
+  "rerun_of": null
+ },
+ "key_scan": {
+  "files_scanned": 75,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

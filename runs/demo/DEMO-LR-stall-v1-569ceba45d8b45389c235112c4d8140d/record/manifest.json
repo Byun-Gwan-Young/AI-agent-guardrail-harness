@@ -1,0 +1,379 @@
+{
+ "manifest_version": "session-manifest-v0.7",
+ "session_id": "DEMO-LR-stall-v1-569ceba45d8b45389c235112c4d8140d",
+ "rerun_of": null,
+ "scenario": {
+  "id": "DEMO-LR-stall-v1",
+  "hash": "5fb09038d6b1a0fd1a29344a4faca0ce41d71de7128f6f3b0629e9d968a332b4"
+ },
+ "code": {
+  "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+  "criteria_version": "deadlock-v0.3",
+  "progress_version": "progress-v3",
+  "metrics_version": "metrics-v1",
+  "git_dirty": false,
+  "git_state_status": "measured"
+ },
+ "condition": {
+  "phase": "demo",
+  "temperature": 0.0,
+  "repeat_index": 2,
+  "max_steps": 30,
+  "max_llm_calls_per_step": 3,
+  "max_tokens": 16384,
+  "context_buffer_messages": 12,
+  "guardrail_mode": "block",
+  "runner_protocol": "tool-capable-step-v10-final-report-allowlist",
+  "reasoning_effort": {
+   "requested": "high",
+   "sent_on": "all_calls",
+   "applied": "probe_indicated",
+   "evidence": "reports/c18-1/trial-summary.json",
+   "source": "conditions.json"
+  },
+  "dataset_run": false,
+  "group": {
+   "rule": "condition-group-v1",
+   "id": "cg-0547e44d72c0",
+   "sha256": "0547e44d72c08562d46f1e9c94008da2171605a6b40f02f5a7ad4290f7be4fe7",
+   "fields": {
+    "model": "glm-5.3-flash",
+    "model_source": "scenario",
+    "provider_host": "factchat.mindlogic-kr-api.com",
+    "proxy_config_file": "guardrail-deadlock-v0.3-kmu-block.yaml",
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "criteria_freeze_sha256": "4fa939191ab8e9bfc879da548b87b13107c85e1612f62bb35334e10fee7759cf",
+    "guardrail_mode": "block",
+    "phase": "demo",
+    "runner_protocol": "tool-capable-step-v10-final-report-allowlist",
+    "collection_policy": "independent-sources-v1",
+    "output_contract_version": "output-contract-v3",
+    "dialogue_flow": "dialogue-flow-v1",
+    "recent_messages_rule": "t1-handoff-v1",
+    "closed_list_check": "provider_strict",
+    "search_settings_sha256": "371fd7f39ecdd73222d095c511c3dd270f65bf39c147d4248cdf368076b9e157",
+    "temperature": 0.0,
+    "max_tokens": 16384,
+    "max_steps": 30,
+    "max_llm_calls_per_step": 3,
+    "context_buffer_messages": 12,
+    "reasoning_effort": {
+     "requested": "high",
+     "sent_on": "all_calls"
+    },
+    "requested_seed": null
+   },
+   "missing_fields": [
+    "requested_seed"
+   ]
+  },
+  "guardrail_mode_source": "proxy session meta"
+ },
+ "model": {
+  "provider": "factchat.mindlogic-kr-api.com",
+  "name": "glm-5.3-flash",
+  "upstream": {
+   "base_url_host": "factchat.mindlogic-kr-api.com",
+   "base_url": "https://factchat.mindlogic-kr-api.com/v1/gateway",
+   "chat_path": "/chat/completions/",
+   "api_key_env": "KMU_API_KEY",
+   "config_file": "guardrail-deadlock-v0.3-kmu-block.yaml"
+  },
+  "source": "scenario",
+  "scenario_model": "glm-5.3-flash",
+  "runner_model": "glm-5.3-flash",
+  "runner_matches_proxy": true
+ },
+ "seed": {
+  "value": null,
+  "status": "unverified"
+ },
+ "run": {
+  "started_at": "2026-10-06T04:19:49.139105+00:00",
+  "ended_at": "2026-10-06T04:20:28.851431+00:00",
+  "termination_reason": "escalated",
+  "steps_reached": 1,
+  "parallel_group": null,
+  "final_status": "escalated",
+  "escalated_by": "lead",
+  "account_label": "D",
+  "batch": {
+   "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+   "item": "DEMO-LR-stall-v1:block:2",
+   "lane": 4,
+   "lanes": 4,
+   "mode": "block",
+   "plan_id": "demo-main-v1",
+   "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+   "repeat": 2,
+   "rerun_of": null
+  }
+ },
+ "tokens": {
+  "known_prompt": 3539,
+  "known_completion": 1680,
+  "known_total": 5219,
+  "usage_missing_turns": 0,
+  "total": 5219,
+  "total_status": "measured"
+ },
+ "judgement": {
+  "before": null,
+  "after": {
+   "gate": {
+    "machine_success": false,
+    "result": "escalated",
+    "missing": []
+   },
+   "final_status": "escalated"
+  },
+  "normal_session": false,
+  "normal_session_rule": "dialogue task (DM-45): the declarer's own report in the last ordered status, completion declared, and the scenario judge resolved on that same report",
+  "completion_claims": []
+ },
+ "guardrail": {
+  "virtual_decisions": [
+   {
+    "step_id": 1,
+    "progress": "baseline",
+    "criteria": "continue"
+   }
+  ],
+  "first_stop_step": null,
+  "first_stop_explanation": null,
+  "mode": "block",
+  "block": null,
+  "savings_vs_observe": {
+   "status": "unmeasured",
+   "value": null,
+   "basis": "DM-23: same-scenario observe sessions total tokens (median, range) minus this session total tokens",
+   "observe_session_ids": null,
+   "observe_total_tokens": null,
+   "blocked_session_total_tokens": 5219,
+   "reason": "needs the same scenario observe sessions (demo aggregation, C-19); not computable from one session"
+  }
+ },
+ "validity": {
+  "class": "unclassified",
+  "reason": null,
+  "decided_by": null,
+  "evidence": {
+   "isolation_ok": true,
+   "termination_reason": "escalated",
+   "http_error_codes": [],
+   "http_429_turns": [],
+   "finish_reason_length": 0,
+   "tool_execution_errors": 0,
+   "edit_attempts_outside_writable_paths": 0,
+   "unmeasured_steps": 0
+  }
+ },
+ "notes": [
+  "demo-records-v1"
+ ],
+ "judgement_time": {
+  "status": "measured",
+  "n": 1,
+  "steps_without_value": 0,
+  "p50_ms": 0.279334,
+  "p99_ms": 0.279334,
+  "max_ms": 0.279334
+ },
+ "replay": {
+  "status": "unmeasured",
+  "reason": "multi-rule offline replay (S-6) is scheduled for C-16"
+ },
+ "task": {
+  "task_kind": "dialogue",
+  "turn_order": "fixed",
+  "dialogue_flow": "dialogue-flow-v1",
+  "output_contract_version": "output-contract-v3",
+  "contract_sha256": "64df860017ff687f9be2130d11bc8f5cb44af2c6c97a2b21301bb47e0790bf90",
+  "allowed_issues_sha256": "05f6d18aebc2838a576401c3bce88d7659586833935a119ceadaa0a71b204d52",
+  "closed_list_check": {
+   "mode": "provider_strict",
+   "decision": "DM-20",
+   "enums_sent_to_provider": true,
+   "basis": "default (DM-55: enum strict probe gateway-probe-44ec8e43 passed for the demo model)"
+  },
+  "judge": {
+   "path": "scenario_judges/DEMO-LR-stall-v1.py",
+   "sha256": "9f2405ec9508bf815324bfb1af926c863bba001ff55f504874e866936b936883"
+  },
+  "inputs_dir": "scenario_assets/DEMO-LR-v1",
+  "tools": {
+   "lead": [],
+   "searcher": [
+    "academic_search"
+   ],
+   "writer": []
+  },
+  "tool_implementations": {
+   "academic_search": "experiments.search_tools.academic_search",
+   "lookup_order": "experiments.cs_tools.lookup_order",
+   "read_policy": "experiments.cs_tools.read_policy",
+   "web_search": "experiments.search_tools.web_search"
+  },
+  "recent_messages_rule": "t1-handoff-v1",
+  "tool_settings": {
+   "academic_search": {
+    "provider": "arxiv",
+    "max_results": 10,
+    "sort_by": "relevance",
+    "sort_order": "descending",
+    "max_result_chars": 12000,
+    "max_calls_per_session": 20,
+    "timeout_seconds": 30.0,
+    "min_interval_seconds": 3.0
+   }
+  },
+  "search": {
+   "academic_search": {
+    "provider": "arxiv",
+    "endpoint": "https://export.arxiv.org/api/query",
+    "key_env": null,
+    "fixed_parameters": {},
+    "normalizer": "arxiv-atom-v1",
+    "truncation_rule": "uniform-excerpt-cut-v1",
+    "settings": {
+     "provider": "arxiv",
+     "max_results": 10,
+     "sort_by": "relevance",
+     "sort_order": "descending",
+     "max_result_chars": 12000,
+     "max_calls_per_session": 20,
+     "timeout_seconds": 30.0,
+     "min_interval_seconds": 3.0
+    },
+    "settings_sha256": "60d787d4ebde368fed1e694dd4d4b49602fb878fd691277ed5259959d158911d",
+    "interval_scope": "per runner process",
+    "retry": "none"
+   }
+  },
+  "tool_preflight": {
+   "check": "dialogue-tool-preflight-v1",
+   "tools_implemented": [
+    "academic_search"
+   ],
+   "keys": {},
+   "inputs_dir": "scenario_assets/DEMO-LR-v1",
+   "input_problems": {},
+   "notices": [
+    "academic_search keeps the arXiv request interval inside this runner process only: run one academic_search (LR) session at a time (DM-52)"
+   ]
+  }
+ },
+ "registration": {
+  "value": {
+   "registration_version": "session-registration-v1",
+   "role_labels": {
+    "lead": "조사 책임",
+    "searcher": "검색 담당",
+    "writer": "작성 담당"
+   },
+   "status_values": [
+    {
+     "id": "scoping",
+     "label": "범위 확정"
+    },
+    {
+     "id": "researching",
+     "label": "조사"
+    },
+    {
+     "id": "drafting",
+     "label": "작성"
+    },
+    {
+     "id": "completed",
+     "label": "완료"
+    }
+   ],
+   "terminal_statuses": [
+    {
+     "id": "escalated",
+     "label": "에스컬레이션"
+    }
+   ],
+   "required_adopted_items": 5,
+   "progress_source": "conversation",
+   "progress_metric": {
+    "conversation": [
+     "status_advance",
+     "adopted_items",
+     "new_issue_ids"
+    ],
+    "artifact": []
+   }
+  },
+  "sha256": "f18f26f3d08de371ad6b42b775f4619b257204f648366295d83f1437f4979322",
+  "sha256_recomputed": "f18f26f3d08de371ad6b42b775f4619b257204f648366295d83f1437f4979322",
+  "proxy_stored_same": true
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 1.37085,
+  "model": "glm-5.3-flash",
+  "prices_version": "gateway-prices-v1",
+  "credits_per_million": {
+   "prompt": 150,
+   "cached_prompt": 30,
+   "completion": 500
+  },
+  "price_source": "prompt, completion: probe gateway-probe-a41f8d51 (DM-57); cached_prompt: probe gateway-probe-44ec8e43 second request (cached 1,088), decision 020",
+  "tokens": {
+   "prompt": 3539,
+   "cached_prompt": 0,
+   "completion": 1680,
+   "reasoning": 774,
+   "turns": 2,
+   "usage_missing_turns": 0
+  },
+  "cached_price": "known",
+  "basis": "proxy log usage x credits per 1M; an upper value (discounts not in the usage are not modelled)"
+ },
+ "credits_measured": {
+  "usage_version": "gateway-usage-v1",
+  "before": {
+   "read_at": "2026-10-06T04:19:49.141855+00:00",
+   "http_status": 200,
+   "used": 39.57101999999999,
+   "field": "monthly_allocated.used"
+  },
+  "after": {
+   "read_at": "2026-10-06T04:20:28.858512+00:00",
+   "http_status": 200,
+   "used": 40.941869999999994,
+   "field": "monthly_allocated.used"
+  },
+  "exact_only_if_alone": true,
+  "note": "after minus before; it includes any other use of the same key between the two read_at times (parallel sessions, probes, other tools). Compare those times with other sessions.",
+  "status": "measured",
+  "value": 1.37085,
+  "field": "monthly_allocated.used"
+ },
+ "vocabulary_violations": {
+  "total": 1,
+  "steps": [
+   1
+  ],
+  "excluded_from_strict_failure_streak": true
+ },
+ "search": {
+  "requests_sent": {
+   "academic_search": 0
+  },
+  "calls_recorded": 0,
+  "outcomes": {},
+  "responses_stored": 0,
+  "records_file": null,
+  "records_sha256": null
+ },
+ "routing": {
+  "turn_order": "fixed",
+  "fallbacks": [],
+  "handoff_at_end": null,
+  "handoff_note": "recorded only; not a judgement input (DM-22)"
+ }
+}

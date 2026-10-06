@@ -1,0 +1,95 @@
+{
+ "session_id": "DEMO-LR-normal-v1-af33de48dd324447b205dc711caf619f",
+ "scenario_id": "DEMO-LR-normal-v1",
+ "termination_reason": "success",
+ "steps": 6,
+ "error": null,
+ "tests_passed": {
+  "before": null,
+  "after": null,
+  "max": null
+ },
+ "first_stop": null,
+ "stop_steps": [],
+ "tokens": {
+  "prompt": 80496,
+  "cached_prompt": 29248,
+  "completion": 13144,
+  "reasoning": 5085,
+  "turns": 14,
+  "usage_missing_turns": 0
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 15.13664,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-06T05:28:50.541201+00:00",
+   "2026-10-06T05:33:33.724410+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 15.13664,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 10,
+  "1": 2,
+  "2": 1,
+  "3": 1
+ },
+ "tool_results": {
+  "executed": 7,
+  "refused_before_approval": 0,
+  "error_results": 0,
+  "error_results_by_tool": {},
+  "error_results_by_summary": {},
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 0,
+  "vocabulary_violations": 0,
+  "by_kind": {},
+  "failed_steps": []
+ },
+ "condition_group": "cg-880cb785600f",
+ "condition_group_missing_fields": [
+  "requested_seed"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": []
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "observe",
+ "session_times": {
+  "started_at": "2026-10-06T05:28:50.538548+00:00",
+  "ended_at": "2026-10-06T05:33:33.699599+00:00"
+ },
+ "account_label": "D",
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-LR-normal-v1:observe:3",
+  "lane": 1,
+  "lanes": 1,
+  "mode": "observe",
+  "plan_id": "demo-main-v1-lr2",
+  "plan_sha256": "09cc3ef0a108efc72df62078b111591760405bb5258233fdf471f923cd1cf17c",
+  "repeat": 3,
+  "rerun_of": null
+ },
+ "key_scan": {
+  "files_scanned": 28,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

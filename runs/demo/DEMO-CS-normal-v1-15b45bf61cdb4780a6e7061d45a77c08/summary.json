@@ -1,0 +1,108 @@
+{
+  "session_id": "DEMO-CS-normal-v1-15b45bf61cdb4780a6e7061d45a77c08",
+  "steps": 4,
+  "termination_reason": "success",
+  "total_tokens": 43800,
+  "known_tokens_subtotal": 43800,
+  "criteria_latest": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "progress, baseline or declaration step",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "declared_step": 4
+  },
+  "criteria_alerts": [],
+  "missing_observation_steps": [],
+  "missing_observation_count": 0,
+  "error": null,
+  "cleanup_errors": [],
+  "actual_outcome": null,
+  "context_buffer_messages": 12,
+  "task_kind": "dialogue",
+  "turn_order": "router",
+  "output_contract_version": "output-contract-v3",
+  "registration_sha256": "0971fd5995f69d2074990df72bab65a98e3ebe3fd5b5ab66dfa69e0ac4562034",
+  "vocabulary_violation_steps": [],
+  "vocabulary_violations_total": 0,
+  "failed_steps": [],
+  "final_status": "resolved",
+  "escalated_by": null,
+  "completion_gate": {
+    "machine_success": true,
+    "result": "resolved",
+    "missing": []
+  },
+  "completion_claims": [
+    {
+      "step_id": 2,
+      "agent": "refund",
+      "status": "resolved",
+      "completion_declared": true,
+      "accepted": false,
+      "reasons": [
+        "not_declarer"
+      ]
+    },
+    {
+      "step_id": 3,
+      "agent": "shipping",
+      "status": "resolved",
+      "completion_declared": true,
+      "accepted": false,
+      "reasons": [
+        "not_declarer"
+      ]
+    },
+    {
+      "step_id": 4,
+      "agent": "intake",
+      "status": "resolved",
+      "completion_declared": true,
+      "accepted": true,
+      "reasons": []
+    }
+  ],
+  "recent_messages_rule": "t1-handoff-v1",
+  "route_fallbacks": [
+    {
+      "step_id": 2,
+      "reason": "no_handoff"
+    },
+    {
+      "step_id": 3,
+      "reason": "no_handoff"
+    },
+    {
+      "step_id": 4,
+      "reason": "no_handoff"
+    }
+  ],
+  "search": null,
+  "gateway_usage": {
+    "usage_version": "gateway-usage-v1",
+    "before": {
+      "read_at": "2026-10-06T05:18:28.801752+00:00",
+      "http_status": 200,
+      "used": 554.0011300000001,
+      "field": "monthly_allocated.used"
+    },
+    "after": {
+      "read_at": "2026-10-06T05:21:01.967278+00:00",
+      "http_status": 200,
+      "used": 561.3321000000001,
+      "field": "monthly_allocated.used"
+    },
+    "exact_only_if_alone": true,
+    "note": "after minus before; it includes any other use of the same key between the two read_at times (parallel sessions, probes, other tools). Compare those times with other sessions.",
+    "status": "measured",
+    "value": 7.33097,
+    "field": "monthly_allocated.used"
+  }
+}

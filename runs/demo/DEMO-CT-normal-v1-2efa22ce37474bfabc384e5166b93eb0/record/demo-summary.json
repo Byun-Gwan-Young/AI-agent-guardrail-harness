@@ -1,0 +1,115 @@
+{
+ "session_id": "DEMO-CT-normal-v1-2efa22ce37474bfabc384e5166b93eb0",
+ "scenario_id": "DEMO-CT-normal-v1",
+ "termination_reason": "success",
+ "steps": 9,
+ "error": null,
+ "tests_passed": {
+  "before": 7,
+  "after": 16,
+  "max": 16
+ },
+ "first_stop": null,
+ "stop_steps": [],
+ "tokens": {
+  "prompt": 145949,
+  "cached_prompt": 38400,
+  "completion": 13114,
+  "reasoning": 3193,
+  "turns": 25,
+  "usage_missing_turns": 0
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 23.84135,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-06T04:37:26.923398+00:00",
+   "2026-10-06T04:43:21.480220+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 23.84135,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 14,
+  "1": 5,
+  "2": 5,
+  "3": 1
+ },
+ "tool_results": {
+  "executed": 18,
+  "refused_before_approval": 2,
+  "error_results": 0,
+  "error_results_by_tool": {},
+  "error_results_by_summary": {},
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 0,
+  "vocabulary_violations": 0,
+  "by_kind": {},
+  "failed_steps": [
+   {
+    "step_id": 2,
+    "reasons": [
+     "write_refused_before_approval"
+    ]
+   },
+   {
+    "step_id": 5,
+    "reasons": [
+     "write_refused_before_approval"
+    ]
+   }
+  ]
+ },
+ "condition_group": "cg-6c5c13fb016a",
+ "condition_group_missing_fields": [
+  "dialogue_flow",
+  "recent_messages_rule",
+  "requested_seed",
+  "search_settings_sha256"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [
+   "dialogue_flow",
+   "recent_messages_rule",
+   "search_settings_sha256"
+  ],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": []
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "observe",
+ "session_times": {
+  "started_at": "2026-10-06T04:37:26.920826+00:00",
+  "ended_at": "2026-10-06T04:43:21.445145+00:00"
+ },
+ "account_label": "A",
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-CT-normal-v1:observe:3",
+  "lane": 1,
+  "lanes": 4,
+  "mode": "observe",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 3,
+  "rerun_of": null
+ },
+ "key_scan": {
+  "files_scanned": 66,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

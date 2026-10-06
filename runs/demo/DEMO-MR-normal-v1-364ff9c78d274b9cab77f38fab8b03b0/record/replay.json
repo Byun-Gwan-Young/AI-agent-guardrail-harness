@@ -1,0 +1,307 @@
+{
+ "replay_version": "demo-replay-v1",
+ "session_id": "DEMO-MR-normal-v1-364ff9c78d274b9cab77f38fab8b03b0",
+ "scenario_id": "DEMO-MR-normal-v1",
+ "title": "AI 코딩 도구 3 종의 공개 요금·주요 기능 비교표 만들기",
+ "task_kind": "dialogue",
+ "guardrail_mode": "observe",
+ "model": "glm-5.3-flash",
+ "termination_reason": "success",
+ "escalated_by": null,
+ "steps_reached": 6,
+ "max_steps": 30,
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-MR-normal-v1:observe:4",
+  "lane": 3,
+  "lanes": 4,
+  "mode": "observe",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 4,
+  "rerun_of": null
+ },
+ "role_labels": {
+  "lead": "조사 책임",
+  "searcher": "검색 담당",
+  "writer": "작성 담당"
+ },
+ "first_stop_step": null,
+ "stop_steps": [],
+ "blocked_step": null,
+ "if_stopped": null,
+ "steps": [
+  {
+   "step_id": 1,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "researching",
+    "status_label": "조사",
+    "handoff_to": "lead",
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "pricing",
+     "features",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 4037,
+    "cached_prompt": 1792,
+    "completion": 1778,
+    "reasoning": 659
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 1.27951,
+   "cumulative_tokens": 5815,
+   "cumulative_credits": 1.27951
+  },
+  {
+   "step_id": 2,
+   "agent": "searcher",
+   "role": "검색 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "researching",
+    "status_label": "조사",
+    "handoff_to": "lead",
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "pricing",
+     "features",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    }
+   ],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 16316,
+    "cached_prompt": 3200,
+    "completion": 3012,
+    "reasoning": 2037
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 3.5694,
+   "cumulative_tokens": 25143,
+   "cumulative_credits": 4.84891
+  },
+  {
+   "step_id": 3,
+   "agent": "writer",
+   "role": "작성 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "researching",
+    "status_label": "조사",
+    "handoff_to": "lead",
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "pricing",
+     "features",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 5170,
+    "cached_prompt": 1600,
+    "completion": 2253,
+    "reasoning": 1207
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 1.71,
+   "cumulative_tokens": 32566,
+   "cumulative_credits": 6.55891
+  },
+  {
+   "step_id": 4,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "researching",
+    "status_label": "조사",
+    "handoff_to": "lead",
+    "adopted_items": 2,
+    "open_issue_ids": [
+     "requirements",
+     "pricing",
+     "features",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "progress",
+   "state_label": "진전",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 8972,
+    "cached_prompt": 1600,
+    "completion": 2428,
+    "reasoning": 667
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 2.3678,
+   "cumulative_tokens": 43966,
+   "cumulative_credits": 8.92671
+  },
+  {
+   "step_id": 5,
+   "agent": "searcher",
+   "role": "검색 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "researching",
+    "status_label": "조사",
+    "handoff_to": "lead",
+    "adopted_items": 2,
+    "open_issue_ids": [
+     "pricing",
+     "features",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    }
+   ],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 34271,
+    "cached_prompt": 16704,
+    "completion": 3331,
+    "reasoning": 2012
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 4.80167,
+   "cumulative_tokens": 81568,
+   "cumulative_credits": 13.72838
+  },
+  {
+   "step_id": 6,
+   "agent": "writer",
+   "role": "작성 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": "lead",
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "acceptance-review"
+    ],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": true,
+    "reasons": [],
+    "missing": []
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "progress",
+   "state_label": "진전",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 10219,
+    "cached_prompt": 1280,
+    "completion": 2628,
+    "reasoning": 1003
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 2.69325,
+   "cumulative_tokens": 94415,
+   "cumulative_credits": 16.42163
+  }
+ ]
+}

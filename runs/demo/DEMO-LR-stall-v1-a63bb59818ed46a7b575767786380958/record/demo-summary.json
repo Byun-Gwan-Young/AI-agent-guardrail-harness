@@ -1,0 +1,104 @@
+{
+ "session_id": "DEMO-LR-stall-v1-a63bb59818ed46a7b575767786380958",
+ "scenario_id": "DEMO-LR-stall-v1",
+ "termination_reason": "escalated",
+ "steps": 2,
+ "error": null,
+ "tests_passed": {
+  "before": null,
+  "after": null,
+  "max": null
+ },
+ "first_stop": null,
+ "stop_steps": [],
+ "tokens": {
+  "prompt": 9997,
+  "cached_prompt": 6080,
+  "completion": 2240,
+  "reasoning": 880,
+  "turns": 5,
+  "usage_missing_turns": 0
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 1.88995,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-06T04:08:04.614611+00:00",
+   "2026-10-06T04:09:24.149347+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 1.88995,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 3,
+  "2": 2
+ },
+ "tool_results": {
+  "executed": 4,
+  "refused_before_approval": 0,
+  "error_results": 4,
+  "error_results_by_tool": {
+   "academic_search": 4
+  },
+  "error_results_by_summary": {
+   "academic_search failed: HTTP 429 from arXiv. No results.": 4
+  },
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 0,
+  "vocabulary_violations": 0,
+  "by_kind": {},
+  "failed_steps": [
+   {
+    "step_id": 2,
+    "reasons": [
+     "tool_execution_error"
+    ]
+   }
+  ]
+ },
+ "condition_group": "cg-880cb785600f",
+ "condition_group_missing_fields": [
+  "requested_seed"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": []
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "observe",
+ "session_times": {
+  "started_at": "2026-10-06T04:08:04.611158+00:00",
+  "ended_at": "2026-10-06T04:09:24.141620+00:00"
+ },
+ "account_label": "D",
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-LR-stall-v1:observe:2",
+  "lane": 4,
+  "lanes": 4,
+  "mode": "observe",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 2,
+  "rerun_of": null
+ },
+ "key_scan": {
+  "files_scanned": 13,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

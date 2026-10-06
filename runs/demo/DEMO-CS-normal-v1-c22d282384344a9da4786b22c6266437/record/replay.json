@@ -1,0 +1,246 @@
+{
+ "replay_version": "demo-replay-v1",
+ "session_id": "DEMO-CS-normal-v1-c22d282384344a9da4786b22c6266437",
+ "scenario_id": "DEMO-CS-normal-v1",
+ "title": "배송 중 파손된 주문의 부분 환불 문의 처리하기",
+ "task_kind": "dialogue",
+ "guardrail_mode": "observe",
+ "model": "glm-5.3-flash",
+ "termination_reason": "success",
+ "escalated_by": null,
+ "steps_reached": 4,
+ "max_steps": 30,
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-CS-normal-v1:observe:2",
+  "lane": 3,
+  "lanes": 4,
+  "mode": "observe",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 2,
+  "rerun_of": null
+ },
+ "role_labels": {
+  "intake": "접수",
+  "refund": "환불 담당",
+  "shipping": "배송 담당"
+ },
+ "first_stop_step": null,
+ "stop_steps": [],
+ "blocked_step": null,
+ "if_stopped": null,
+ "steps": [
+  {
+   "step_id": 1,
+   "agent": "intake",
+   "role": "접수",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "triage",
+    "status_label": "분류",
+    "handoff_to": "refund",
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "handling-code",
+     "customer-reply",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "lookup_order",
+     "is_error": false
+    },
+    {
+     "tool": "read_policy",
+     "is_error": false
+    },
+    {
+     "tool": "read_policy",
+     "is_error": false
+    },
+    {
+     "tool": "read_policy",
+     "is_error": false
+    },
+    {
+     "tool": "read_policy",
+     "is_error": false
+    }
+   ],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 7370,
+    "cached_prompt": 6976,
+    "completion": 1217,
+    "reasoning": 380
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 0.87688,
+   "cumulative_tokens": 8587,
+   "cumulative_credits": 0.87688
+  },
+  {
+   "step_id": 2,
+   "agent": "refund",
+   "role": "환불 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "resolved",
+    "status_label": "해결",
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer"
+    ],
+    "missing": []
+   },
+   "tools": [
+    {
+     "tool": "read_policy",
+     "is_error": false
+    },
+    {
+     "tool": "read_policy",
+     "is_error": false
+    },
+    {
+     "tool": "lookup_order",
+     "is_error": false
+    },
+    {
+     "tool": "read_policy",
+     "is_error": false
+    }
+   ],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 7832,
+    "cached_prompt": 5376,
+    "completion": 1179,
+    "reasoning": 416
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 1.11918,
+   "cumulative_tokens": 17598,
+   "cumulative_credits": 1.99606
+  },
+  {
+   "step_id": 3,
+   "agent": "shipping",
+   "role": "배송 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "resolved",
+    "status_label": "해결",
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer"
+    ],
+    "missing": []
+   },
+   "tools": [
+    {
+     "tool": "read_policy",
+     "is_error": false
+    },
+    {
+     "tool": "read_policy",
+     "is_error": false
+    },
+    {
+     "tool": "lookup_order",
+     "is_error": false
+    }
+   ],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 11239,
+    "cached_prompt": 6208,
+    "completion": 2948,
+    "reasoning": 425
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 2.41489,
+   "cumulative_tokens": 31785,
+   "cumulative_credits": 4.41095
+  },
+  {
+   "step_id": 4,
+   "agent": "intake",
+   "role": "접수",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "resolved",
+    "status_label": "해결",
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": true,
+    "reasons": [],
+    "missing": []
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 11663,
+    "cached_prompt": 4480,
+    "completion": 2064,
+    "reasoning": 54
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 2.24385,
+   "cumulative_tokens": 45512,
+   "cumulative_credits": 6.6548
+  }
+ ]
+}

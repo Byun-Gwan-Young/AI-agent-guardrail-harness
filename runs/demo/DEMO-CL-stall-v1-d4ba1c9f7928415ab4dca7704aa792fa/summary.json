@@ -1,0 +1,2252 @@
+{
+  "session_id": "DEMO-CL-stall-v1-d4ba1c9f7928415ab4dca7704aa792fa",
+  "steps": 28,
+  "termination_reason": "runner_error",
+  "total_tokens": null,
+  "known_tokens_subtotal": 651429,
+  "criteria_latest": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "unmeasured",
+    "reason": "observation or termination context missing",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 1,
+    "needs_observation_review": false,
+    "first_deadlock_step": 10,
+    "first_termination_failure_step": null,
+    "declared_step": null
+  },
+  "criteria_alerts": [
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 3,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        8,
+        9,
+        10
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 10,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E1",
+        "text": "최근 3 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15.",
+        "values": {
+          "n": 3,
+          "roles": [
+            "개발",
+            "검토",
+            "기획"
+          ],
+          "signals": [
+            "산출물 변경",
+            "테스트 증가",
+            "새 쟁점"
+          ],
+          "pass": 14,
+          "total": 15
+        },
+        "missing_values": [],
+        "form": "fallback",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 10,
+          "task_kind": "artifact",
+          "consecutive_steps": 3,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner"
+          ],
+          "declared_step": null,
+          "test_pass_count": 14,
+          "test_total_count": 15,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 2,
+          "steps_since_test_max": 8,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    },
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 4,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 10,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E1",
+        "text": "최근 4 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15.",
+        "values": {
+          "n": 4,
+          "roles": [
+            "개발",
+            "검토",
+            "기획"
+          ],
+          "signals": [
+            "산출물 변경",
+            "테스트 증가",
+            "새 쟁점"
+          ],
+          "pass": 14,
+          "total": 15
+        },
+        "missing_values": [],
+        "form": "fallback",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 11,
+          "task_kind": "artifact",
+          "consecutive_steps": 4,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner",
+            "developer"
+          ],
+          "declared_step": null,
+          "test_pass_count": 14,
+          "test_total_count": 15,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 2,
+          "steps_since_test_max": 9,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    },
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 5,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 10,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E1",
+        "text": "최근 5 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15.",
+        "values": {
+          "n": 5,
+          "roles": [
+            "개발",
+            "검토",
+            "기획"
+          ],
+          "signals": [
+            "산출물 변경",
+            "테스트 증가",
+            "새 쟁점"
+          ],
+          "pass": 14,
+          "total": 15
+        },
+        "missing_values": [],
+        "form": "fallback",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 12,
+          "task_kind": "artifact",
+          "consecutive_steps": 5,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer"
+          ],
+          "declared_step": null,
+          "test_pass_count": 14,
+          "test_total_count": 15,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 2,
+          "steps_since_test_max": 10,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    },
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 6,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 10,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E1",
+        "text": "최근 6 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15.",
+        "values": {
+          "n": 6,
+          "roles": [
+            "개발",
+            "검토",
+            "기획"
+          ],
+          "signals": [
+            "산출물 변경",
+            "테스트 증가",
+            "새 쟁점"
+          ],
+          "pass": 14,
+          "total": 15
+        },
+        "missing_values": [],
+        "form": "fallback",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 13,
+          "task_kind": "artifact",
+          "consecutive_steps": 6,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner"
+          ],
+          "declared_step": null,
+          "test_pass_count": 14,
+          "test_total_count": 15,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 2,
+          "steps_since_test_max": 11,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    },
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 7,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 10,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E1",
+        "text": "최근 7 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15.",
+        "values": {
+          "n": 7,
+          "roles": [
+            "개발",
+            "검토",
+            "기획"
+          ],
+          "signals": [
+            "산출물 변경",
+            "테스트 증가",
+            "새 쟁점"
+          ],
+          "pass": 14,
+          "total": 15
+        },
+        "missing_values": [],
+        "form": "fallback",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 14,
+          "task_kind": "artifact",
+          "consecutive_steps": 7,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer"
+          ],
+          "declared_step": null,
+          "test_pass_count": 14,
+          "test_total_count": 15,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 2,
+          "steps_since_test_max": 12,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    },
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 8,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 10,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E1",
+        "text": "최근 8 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15.",
+        "values": {
+          "n": 8,
+          "roles": [
+            "개발",
+            "검토",
+            "기획"
+          ],
+          "signals": [
+            "산출물 변경",
+            "테스트 증가",
+            "새 쟁점"
+          ],
+          "pass": 14,
+          "total": 15
+        },
+        "missing_values": [],
+        "form": "fallback",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 15,
+          "task_kind": "artifact",
+          "consecutive_steps": 8,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer"
+          ],
+          "declared_step": null,
+          "test_pass_count": 14,
+          "test_total_count": 15,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 2,
+          "steps_since_test_max": 13,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    },
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 9,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 10,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E1",
+        "text": "최근 9 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15.",
+        "values": {
+          "n": 9,
+          "roles": [
+            "개발",
+            "검토",
+            "기획"
+          ],
+          "signals": [
+            "산출물 변경",
+            "테스트 증가",
+            "새 쟁점"
+          ],
+          "pass": 14,
+          "total": 15
+        },
+        "missing_values": [],
+        "form": "fallback",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 16,
+          "task_kind": "artifact",
+          "consecutive_steps": 9,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner"
+          ],
+          "declared_step": null,
+          "test_pass_count": 14,
+          "test_total_count": 15,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 2,
+          "steps_since_test_max": 14,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    },
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 10,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 10,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E1",
+        "text": "최근 10 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15.",
+        "values": {
+          "n": 10,
+          "roles": [
+            "개발",
+            "검토",
+            "기획"
+          ],
+          "signals": [
+            "산출물 변경",
+            "테스트 증가",
+            "새 쟁점"
+          ],
+          "pass": 14,
+          "total": 15
+        },
+        "missing_values": [],
+        "form": "fallback",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 17,
+          "task_kind": "artifact",
+          "consecutive_steps": 10,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer"
+          ],
+          "declared_step": null,
+          "test_pass_count": 14,
+          "test_total_count": 15,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 2,
+          "steps_since_test_max": 15,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    },
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 11,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 10,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E1",
+        "text": "최근 11 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15.",
+        "values": {
+          "n": 11,
+          "roles": [
+            "개발",
+            "검토",
+            "기획"
+          ],
+          "signals": [
+            "산출물 변경",
+            "테스트 증가",
+            "새 쟁점"
+          ],
+          "pass": 14,
+          "total": 15
+        },
+        "missing_values": [],
+        "form": "fallback",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 18,
+          "task_kind": "artifact",
+          "consecutive_steps": 11,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer"
+          ],
+          "declared_step": null,
+          "test_pass_count": 14,
+          "test_total_count": 15,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 2,
+          "steps_since_test_max": 16,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    },
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 12,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 10,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E1",
+        "text": "최근 12 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15.",
+        "values": {
+          "n": 12,
+          "roles": [
+            "개발",
+            "검토",
+            "기획"
+          ],
+          "signals": [
+            "산출물 변경",
+            "테스트 증가",
+            "새 쟁점"
+          ],
+          "pass": 14,
+          "total": 15
+        },
+        "missing_values": [],
+        "form": "fallback",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 19,
+          "task_kind": "artifact",
+          "consecutive_steps": 12,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner"
+          ],
+          "declared_step": null,
+          "test_pass_count": 14,
+          "test_total_count": 15,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 2,
+          "steps_since_test_max": 17,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    },
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 13,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 10,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E1",
+        "text": "최근 13 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15.",
+        "values": {
+          "n": 13,
+          "roles": [
+            "개발",
+            "검토",
+            "기획"
+          ],
+          "signals": [
+            "산출물 변경",
+            "테스트 증가",
+            "새 쟁점"
+          ],
+          "pass": 14,
+          "total": 15
+        },
+        "missing_values": [],
+        "form": "fallback",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 20,
+          "task_kind": "artifact",
+          "consecutive_steps": 13,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer"
+          ],
+          "declared_step": null,
+          "test_pass_count": 14,
+          "test_total_count": 15,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 2,
+          "steps_since_test_max": 18,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    },
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 14,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 10,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E1",
+        "text": "최근 14 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15.",
+        "values": {
+          "n": 14,
+          "roles": [
+            "개발",
+            "검토",
+            "기획"
+          ],
+          "signals": [
+            "산출물 변경",
+            "테스트 증가",
+            "새 쟁점"
+          ],
+          "pass": 14,
+          "total": 15
+        },
+        "missing_values": [],
+        "form": "fallback",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 21,
+          "task_kind": "artifact",
+          "consecutive_steps": 14,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer"
+          ],
+          "declared_step": null,
+          "test_pass_count": 14,
+          "test_total_count": 15,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 2,
+          "steps_since_test_max": 19,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    },
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 15,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 10,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E1",
+        "text": "최근 15 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15.",
+        "values": {
+          "n": 15,
+          "roles": [
+            "개발",
+            "검토",
+            "기획"
+          ],
+          "signals": [
+            "산출물 변경",
+            "테스트 증가",
+            "새 쟁점"
+          ],
+          "pass": 14,
+          "total": 15
+        },
+        "missing_values": [],
+        "form": "fallback",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 22,
+          "task_kind": "artifact",
+          "consecutive_steps": 15,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner"
+          ],
+          "declared_step": null,
+          "test_pass_count": 14,
+          "test_total_count": 15,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 2,
+          "steps_since_test_max": 20,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    },
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 16,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 10,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E1",
+        "text": "최근 16 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15.",
+        "values": {
+          "n": 16,
+          "roles": [
+            "개발",
+            "검토",
+            "기획"
+          ],
+          "signals": [
+            "산출물 변경",
+            "테스트 증가",
+            "새 쟁점"
+          ],
+          "pass": 14,
+          "total": 15
+        },
+        "missing_values": [],
+        "form": "fallback",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 23,
+          "task_kind": "artifact",
+          "consecutive_steps": 16,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer"
+          ],
+          "declared_step": null,
+          "test_pass_count": 14,
+          "test_total_count": 15,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 2,
+          "steps_since_test_max": 21,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    },
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 17,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 10,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E1",
+        "text": "최근 17 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15.",
+        "values": {
+          "n": 17,
+          "roles": [
+            "개발",
+            "검토",
+            "기획"
+          ],
+          "signals": [
+            "산출물 변경",
+            "테스트 증가",
+            "새 쟁점"
+          ],
+          "pass": 14,
+          "total": 15
+        },
+        "missing_values": [],
+        "form": "fallback",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 24,
+          "task_kind": "artifact",
+          "consecutive_steps": 17,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer"
+          ],
+          "declared_step": null,
+          "test_pass_count": 14,
+          "test_total_count": 15,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 2,
+          "steps_since_test_max": 22,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    },
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 18,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 10,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E1",
+        "text": "최근 18 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15.",
+        "values": {
+          "n": 18,
+          "roles": [
+            "개발",
+            "검토",
+            "기획"
+          ],
+          "signals": [
+            "산출물 변경",
+            "테스트 증가",
+            "새 쟁점"
+          ],
+          "pass": 14,
+          "total": 15
+        },
+        "missing_values": [],
+        "form": "fallback",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 25,
+          "task_kind": "artifact",
+          "consecutive_steps": 18,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner"
+          ],
+          "declared_step": null,
+          "test_pass_count": 14,
+          "test_total_count": 15,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 2,
+          "steps_since_test_max": 23,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    },
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 19,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 10,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E1",
+        "text": "최근 19 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15.",
+        "values": {
+          "n": 19,
+          "roles": [
+            "개발",
+            "검토",
+            "기획"
+          ],
+          "signals": [
+            "산출물 변경",
+            "테스트 증가",
+            "새 쟁점"
+          ],
+          "pass": 14,
+          "total": 15
+        },
+        "missing_values": [],
+        "form": "fallback",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 26,
+          "task_kind": "artifact",
+          "consecutive_steps": 19,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer"
+          ],
+          "declared_step": null,
+          "test_pass_count": 14,
+          "test_total_count": 15,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 2,
+          "steps_since_test_max": 24,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    },
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 20,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 10,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E1",
+        "text": "최근 20 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 14/15.",
+        "values": {
+          "n": 20,
+          "roles": [
+            "개발",
+            "검토",
+            "기획"
+          ],
+          "signals": [
+            "산출물 변경",
+            "테스트 증가",
+            "새 쟁점"
+          ],
+          "pass": 14,
+          "total": 15
+        },
+        "missing_values": [],
+        "form": "fallback",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 27,
+          "task_kind": "artifact",
+          "consecutive_steps": 20,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer",
+            "planner",
+            "developer",
+            "reviewer"
+          ],
+          "declared_step": null,
+          "test_pass_count": 14,
+          "test_total_count": 15,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 2,
+          "steps_since_test_max": 25,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    }
+  ],
+  "tests_passed_before": 6,
+  "tests_passed_after": 14,
+  "missing_observation_steps": [],
+  "missing_observation_count": 0,
+  "fixture_unchanged": true,
+  "error": "RuntimeError: InternalServerError: 504 Gateway Timeout",
+  "cleanup_errors": [],
+  "actual_outcome": null,
+  "context_buffer_messages": 12,
+  "vocabulary_violation_steps": [],
+  "vocabulary_violations_total": 0,
+  "failed_steps": [
+    {
+      "step_id": 4,
+      "reasons": [
+        "strict_schema_mismatch",
+        "no_final_output"
+      ]
+    },
+    {
+      "step_id": 28,
+      "reasons": [
+        "aborted"
+      ]
+    }
+  ],
+  "task_kind": "artifact",
+  "turn_order": "fixed",
+  "output_contract_version": "output-contract-v2",
+  "registration_sha256": "7dbebabcae3185c3425a1f8c6591f92d372d7608b506ad96546b08b8a7102b59",
+  "approval": null,
+  "gateway_usage": {
+    "usage_version": "gateway-usage-v1",
+    "before": {
+      "read_at": "2026-10-06T13:29:03.518806+00:00",
+      "http_status": 200,
+      "used": 800.3797599999999,
+      "field": "monthly_allocated.used"
+    },
+    "after": {
+      "read_at": "2026-10-06T13:54:35.977327+00:00",
+      "http_status": 200,
+      "used": 908.6964199999999,
+      "field": "monthly_allocated.used"
+    },
+    "exact_only_if_alone": true,
+    "note": "after minus before; it includes any other use of the same key between the two read_at times (parallel sessions, probes, other tools). Compare those times with other sessions.",
+    "status": "measured",
+    "value": 108.31666,
+    "field": "monthly_allocated.used"
+  }
+}

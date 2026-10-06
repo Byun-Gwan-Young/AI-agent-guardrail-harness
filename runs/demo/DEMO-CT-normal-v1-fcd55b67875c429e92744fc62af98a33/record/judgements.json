@@ -1,0 +1,3159 @@
+{
+ "record_version": "demo-records-v1",
+ "session_id": "DEMO-CT-normal-v1-fcd55b67875c429e92744fc62af98a33",
+ "criteria_version": "deadlock-v0.3",
+ "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+ "criteria_freeze": {
+  "implementation_sha256": {
+   "deadlock_policy_v03.py": "794f65e26211b7bcebbe4deadfa3e30f30dbaecc6fe361681854db23e2cef3b0",
+   "explain_v1.py": "1d01fc8428f368fb0eb3bd56c916e58337b582462259d7fbd1493d65ed7c09df",
+   "progress_signal_v3.py": "dc727697e0832a305569839d3fc347f36c093a09811e93183cc4fc478a8d6c94"
+  },
+  "explanation_templates_sha256": "66c60d7d38d037428e3774a2127f6dd42d77ea3eb56ac7586fd313a854f3bcf1",
+  "sha256": "4fa939191ab8e9bfc879da548b87b13107c85e1612f62bb35334e10fee7759cf"
+ },
+ "guardrail_mode": "observe",
+ "termination_reason": "success",
+ "first_stop_step": 6,
+ "stop_steps": [
+  6,
+  10,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  25,
+  26
+ ],
+ "steps": [
+  {
+   "step_id": 1,
+   "agent_id": "planner",
+   "observed_at": "2026-10-06T04:59:38.906665+00:00",
+   "judgement_ns": 112583,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "baseline",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": false,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": null,
+    "pass_count": {
+     "value": 7,
+     "session_max_before": null,
+     "new_session_max": null,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "693542d35b069f4c5fcf01a63250a217a7da1a0bc9244102d138f7520bd879b0",
+     "previous_global_step": null,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 7,
+     "test_total_count": 16,
+     "test_max": 7,
+     "test_max_step": 1,
+     "steps_since_test_max": 0,
+     "plateau_steps": 6,
+     "test_plateau": false,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "progress, baseline or declaration step",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "declared_step": null
+   }
+  },
+  {
+   "step_id": 2,
+   "agent_id": "developer",
+   "observed_at": "2026-10-06T05:00:10.522511+00:00",
+   "judgement_ns": 136083,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "baseline",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": false,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": null,
+    "pass_count": {
+     "value": 7,
+     "session_max_before": 7,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "693542d35b069f4c5fcf01a63250a217a7da1a0bc9244102d138f7520bd879b0",
+     "previous_global_step": 1,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 7,
+     "test_total_count": 16,
+     "test_max": 7,
+     "test_max_step": 1,
+     "steps_since_test_max": 1,
+     "plateau_steps": 6,
+     "test_plateau": false,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "progress, baseline or declaration step",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "declared_step": null
+   }
+  },
+  {
+   "step_id": 3,
+   "agent_id": "reviewer",
+   "observed_at": "2026-10-06T05:01:15.021366+00:00",
+   "judgement_ns": 127500,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "baseline",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": false,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": null,
+    "pass_count": {
+     "value": 7,
+     "session_max_before": 7,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "693542d35b069f4c5fcf01a63250a217a7da1a0bc9244102d138f7520bd879b0",
+     "previous_global_step": 2,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 7,
+     "test_total_count": 16,
+     "test_max": 7,
+     "test_max_step": 1,
+     "steps_since_test_max": 2,
+     "plateau_steps": 6,
+     "test_plateau": false,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "progress, baseline or declaration step",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "declared_step": null
+   }
+  },
+  {
+   "step_id": 4,
+   "agent_id": "planner",
+   "observed_at": "2026-10-06T05:02:15.225204+00:00",
+   "judgement_ns": 145875,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 1,
+    "pass_count": {
+     "value": 7,
+     "session_max_before": 7,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "693542d35b069f4c5fcf01a63250a217a7da1a0bc9244102d138f7520bd879b0",
+     "previous_global_step": 3,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 7,
+     "test_total_count": 16,
+     "test_max": 7,
+     "test_max_step": 1,
+     "steps_since_test_max": 3,
+     "plateau_steps": 6,
+     "test_plateau": false,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "insufficient consecutive evidence",
+    "consecutive_steps": 1,
+    "consecutive_states": [
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     4
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "declared_step": null
+   }
+  },
+  {
+   "step_id": 5,
+   "agent_id": "developer",
+   "observed_at": "2026-10-06T05:03:11.719949+00:00",
+   "judgement_ns": 148417,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 2,
+    "pass_count": {
+     "value": 7,
+     "session_max_before": 7,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "693542d35b069f4c5fcf01a63250a217a7da1a0bc9244102d138f7520bd879b0",
+     "previous_global_step": 4,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 7,
+     "test_total_count": 16,
+     "test_max": 7,
+     "test_max_step": 1,
+     "steps_since_test_max": 4,
+     "plateau_steps": 6,
+     "test_plateau": false,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "insufficient consecutive evidence",
+    "consecutive_steps": 2,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     4,
+     5
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "declared_step": null
+   }
+  },
+  {
+   "step_id": 6,
+   "agent_id": "reviewer",
+   "observed_at": "2026-10-06T05:03:45.560840+00:00",
+   "judgement_ns": 209250,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 3,
+    "pass_count": {
+     "value": 7,
+     "session_max_before": 7,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "693542d35b069f4c5fcf01a63250a217a7da1a0bc9244102d138f7520bd879b0",
+     "previous_global_step": 5,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 7,
+     "test_total_count": 16,
+     "test_max": 7,
+     "test_max_step": 1,
+     "steps_since_test_max": 5,
+     "plateau_steps": 6,
+     "test_plateau": false,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "deadlock",
+    "reason": "consecutive stagnant/oscillating steps without declaration",
+    "consecutive_steps": 3,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant",
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     4,
+     5,
+     6
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null,
+    "explanation": {
+     "explanation_version": "explain-v1",
+     "template_id": "E1",
+     "text": "최근 3 step 동안 기획·개발·검토 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 7/16.",
+     "values": {
+      "n": 3,
+      "roles": [
+       "기획",
+       "개발",
+       "검토"
+      ],
+      "signals": [
+       "산출물 변경",
+       "테스트 증가",
+       "새 쟁점"
+      ],
+      "pass": 7,
+      "total": 16
+     },
+     "missing_values": [],
+     "form": "fallback",
+     "skipped_templates": [],
+     "signals": {
+      "decision": "deadlock",
+      "stop_step": 6,
+      "task_kind": "artifact",
+      "consecutive_steps": 3,
+      "consecutive_states": [
+       "stagnant",
+       "stagnant",
+       "stagnant"
+      ],
+      "streak_roles": [
+       "planner",
+       "developer",
+       "reviewer"
+      ],
+      "declared_step": null,
+      "test_pass_count": 7,
+      "test_total_count": 16,
+      "global_revert": null,
+      "test_plateau_in_streak": false,
+      "test_max_step": 1,
+      "steps_since_test_max": 5,
+      "file_state_changes_since_test_max": 0,
+      "handoff": null,
+      "handoff_threshold": 4,
+      "status": null,
+      "adopted_metric_selected": false,
+      "adopted_count": null,
+      "test_observed_in_session": true,
+      "selected_metrics": [
+       "conversation.open_issues_count",
+       "artifact.test_pass_count",
+       "artifact.files_changed"
+      ],
+      "adopted_required": null
+     },
+     "role_labels": {
+      "planner": "기획",
+      "developer": "개발",
+      "reviewer": "검토"
+     },
+     "status_labels": null
+    }
+   }
+  },
+  {
+   "step_id": 7,
+   "agent_id": "planner",
+   "observed_at": "2026-10-06T05:04:35.371481+00:00",
+   "judgement_ns": 177958,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "progress",
+    "events": [
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "input-immutability",
+      "kind": "closed"
+     }
+    ],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": true,
+    "artifact_moved": false,
+    "comparison_step_id": 4,
+    "pass_count": {
+     "value": 7,
+     "session_max_before": 7,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "693542d35b069f4c5fcf01a63250a217a7da1a0bc9244102d138f7520bd879b0",
+     "previous_global_step": 6,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 7,
+     "test_total_count": 16,
+     "test_max": 7,
+     "test_max_step": 1,
+     "steps_since_test_max": 6,
+     "plateau_steps": 6,
+     "test_plateau": false,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "progress, baseline or declaration step",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null
+   }
+  },
+  {
+   "step_id": 8,
+   "agent_id": "developer",
+   "observed_at": "2026-10-06T05:05:39.154878+00:00",
+   "judgement_ns": 181125,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 5,
+    "pass_count": {
+     "value": 7,
+     "session_max_before": 7,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "693542d35b069f4c5fcf01a63250a217a7da1a0bc9244102d138f7520bd879b0",
+     "previous_global_step": 7,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 7,
+     "test_total_count": 16,
+     "test_max": 7,
+     "test_max_step": 1,
+     "steps_since_test_max": 7,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "insufficient consecutive evidence",
+    "consecutive_steps": 1,
+    "consecutive_states": [
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     8
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null
+   }
+  },
+  {
+   "step_id": 9,
+   "agent_id": "reviewer",
+   "observed_at": "2026-10-06T05:06:14.850621+00:00",
+   "judgement_ns": 185125,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 6,
+    "pass_count": {
+     "value": 7,
+     "session_max_before": 7,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "693542d35b069f4c5fcf01a63250a217a7da1a0bc9244102d138f7520bd879b0",
+     "previous_global_step": 8,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 7,
+     "test_total_count": 16,
+     "test_max": 7,
+     "test_max_step": 1,
+     "steps_since_test_max": 8,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "insufficient consecutive evidence",
+    "consecutive_steps": 2,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     8,
+     9
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null
+   }
+  },
+  {
+   "step_id": 10,
+   "agent_id": "planner",
+   "observed_at": "2026-10-06T05:06:49.786249+00:00",
+   "judgement_ns": 254375,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 7,
+    "pass_count": {
+     "value": 7,
+     "session_max_before": 7,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "693542d35b069f4c5fcf01a63250a217a7da1a0bc9244102d138f7520bd879b0",
+     "previous_global_step": 9,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 7,
+     "test_total_count": 16,
+     "test_max": 7,
+     "test_max_step": 1,
+     "steps_since_test_max": 9,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "deadlock",
+    "reason": "consecutive stagnant/oscillating steps without declaration",
+    "consecutive_steps": 3,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant",
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     8,
+     9,
+     10
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null,
+    "explanation": {
+     "explanation_version": "explain-v1",
+     "template_id": "E1",
+     "text": "최근 3 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 7/16.",
+     "values": {
+      "n": 3,
+      "roles": [
+       "개발",
+       "검토",
+       "기획"
+      ],
+      "signals": [
+       "산출물 변경",
+       "테스트 증가",
+       "새 쟁점"
+      ],
+      "pass": 7,
+      "total": 16
+     },
+     "missing_values": [],
+     "form": "fallback",
+     "skipped_templates": [],
+     "signals": {
+      "decision": "deadlock",
+      "stop_step": 10,
+      "task_kind": "artifact",
+      "consecutive_steps": 3,
+      "consecutive_states": [
+       "stagnant",
+       "stagnant",
+       "stagnant"
+      ],
+      "streak_roles": [
+       "developer",
+       "reviewer",
+       "planner"
+      ],
+      "declared_step": null,
+      "test_pass_count": 7,
+      "test_total_count": 16,
+      "global_revert": null,
+      "test_plateau_in_streak": false,
+      "test_max_step": 1,
+      "steps_since_test_max": 9,
+      "file_state_changes_since_test_max": 0,
+      "handoff": null,
+      "handoff_threshold": 4,
+      "status": null,
+      "adopted_metric_selected": false,
+      "adopted_count": null,
+      "test_observed_in_session": true,
+      "selected_metrics": [
+       "conversation.open_issues_count",
+       "artifact.test_pass_count",
+       "artifact.files_changed"
+      ],
+      "adopted_required": null
+     },
+     "role_labels": {
+      "planner": "기획",
+      "developer": "개발",
+      "reviewer": "검토"
+     },
+     "status_labels": null
+    }
+   }
+  },
+  {
+   "step_id": 11,
+   "agent_id": "developer",
+   "observed_at": "2026-10-06T05:07:22.807816+00:00",
+   "judgement_ns": 187834,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "progress",
+    "events": [
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "filtering-order",
+      "kind": "closed"
+     },
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "pagination-validation",
+      "kind": "closed"
+     },
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "search-normalization",
+      "kind": "closed"
+     },
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "sort-order",
+      "kind": "closed"
+     },
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "status-filter",
+      "kind": "closed"
+     },
+     {
+      "metric": "artifact.test_pass_count",
+      "item": "tests",
+      "kind": "improved"
+     },
+     {
+      "metric": "artifact.files_changed",
+      "item": "src/task_query.py",
+      "kind": "new"
+     }
+    ],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": true,
+    "artifact_moved": true,
+    "comparison_step_id": 8,
+    "pass_count": {
+     "value": 16,
+     "session_max_before": 7,
+     "new_session_max": true,
+     "role_event": "improved",
+     "counted_as_progress": true
+    },
+    "t3": {
+     "global_state_sha256": "cefb495533a63386b3c1688e0aaecec4077e41683f739375cea093112e1a3c4d",
+     "previous_global_step": 10,
+     "changed_paths": [
+      "src/task_query.py"
+     ],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 16,
+     "test_total_count": 16,
+     "test_max": 16,
+     "test_max_step": 11,
+     "steps_since_test_max": 0,
+     "plateau_steps": 6,
+     "test_plateau": false,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "progress, baseline or declaration step",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null
+   }
+  },
+  {
+   "step_id": 12,
+   "agent_id": "reviewer",
+   "observed_at": "2026-10-06T05:07:58.490506+00:00",
+   "judgement_ns": 241875,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "progress",
+    "events": [
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "acceptance-review",
+      "kind": "closed"
+     },
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "filtering-order",
+      "kind": "closed"
+     },
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "pagination-validation",
+      "kind": "closed"
+     },
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "search-normalization",
+      "kind": "closed"
+     },
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "sort-order",
+      "kind": "closed"
+     },
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "status-filter",
+      "kind": "closed"
+     },
+     {
+      "metric": "artifact.files_changed",
+      "item": "src/task_query.py",
+      "kind": "new"
+     }
+    ],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": true,
+    "artifact_moved": true,
+    "comparison_step_id": 9,
+    "pass_count": {
+     "value": 16,
+     "session_max_before": 16,
+     "new_session_max": false,
+     "role_event": "improved",
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "cefb495533a63386b3c1688e0aaecec4077e41683f739375cea093112e1a3c4d",
+     "previous_global_step": 11,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 16,
+     "test_total_count": 16,
+     "test_max": 16,
+     "test_max_step": 11,
+     "steps_since_test_max": 1,
+     "plateau_steps": 6,
+     "test_plateau": false,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "progress, baseline or declaration step",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null
+   }
+  },
+  {
+   "step_id": 13,
+   "agent_id": "planner",
+   "observed_at": "2026-10-06T05:08:26.694136+00:00",
+   "judgement_ns": 393292,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "progress",
+    "events": [
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "acceptance-review",
+      "kind": "closed"
+     },
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "filtering-order",
+      "kind": "closed"
+     },
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "pagination-validation",
+      "kind": "closed"
+     },
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "search-normalization",
+      "kind": "closed"
+     },
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "sort-order",
+      "kind": "closed"
+     },
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "status-filter",
+      "kind": "closed"
+     },
+     {
+      "metric": "artifact.files_changed",
+      "item": "src/task_query.py",
+      "kind": "new"
+     }
+    ],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": true,
+    "artifact_moved": true,
+    "comparison_step_id": 10,
+    "pass_count": {
+     "value": 16,
+     "session_max_before": 16,
+     "new_session_max": false,
+     "role_event": "improved",
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "cefb495533a63386b3c1688e0aaecec4077e41683f739375cea093112e1a3c4d",
+     "previous_global_step": 12,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 16,
+     "test_total_count": 16,
+     "test_max": 16,
+     "test_max_step": 11,
+     "steps_since_test_max": 2,
+     "plateau_steps": 6,
+     "test_plateau": false,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "progress, baseline or declaration step",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null
+   }
+  },
+  {
+   "step_id": 14,
+   "agent_id": "developer",
+   "observed_at": "2026-10-06T05:08:52.437600+00:00",
+   "judgement_ns": 249625,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "progress",
+    "events": [
+     {
+      "metric": "conversation.open_issues_count",
+      "item": "acceptance-review",
+      "kind": "closed"
+     }
+    ],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": true,
+    "artifact_moved": false,
+    "comparison_step_id": 11,
+    "pass_count": {
+     "value": 16,
+     "session_max_before": 16,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "cefb495533a63386b3c1688e0aaecec4077e41683f739375cea093112e1a3c4d",
+     "previous_global_step": 13,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 16,
+     "test_total_count": 16,
+     "test_max": 16,
+     "test_max_step": 11,
+     "steps_since_test_max": 3,
+     "plateau_steps": 6,
+     "test_plateau": false,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "progress, baseline or declaration step",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null
+   }
+  },
+  {
+   "step_id": 15,
+   "agent_id": "reviewer",
+   "observed_at": "2026-10-06T05:09:16.549365+00:00",
+   "judgement_ns": 198583,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 12,
+    "pass_count": {
+     "value": 16,
+     "session_max_before": 16,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "cefb495533a63386b3c1688e0aaecec4077e41683f739375cea093112e1a3c4d",
+     "previous_global_step": 14,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 16,
+     "test_total_count": 16,
+     "test_max": 16,
+     "test_max_step": 11,
+     "steps_since_test_max": 4,
+     "plateau_steps": 6,
+     "test_plateau": false,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "insufficient consecutive evidence",
+    "consecutive_steps": 1,
+    "consecutive_states": [
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     15
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null
+   }
+  },
+  {
+   "step_id": 16,
+   "agent_id": "planner",
+   "observed_at": "2026-10-06T05:09:44.909717+00:00",
+   "judgement_ns": 206125,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 13,
+    "pass_count": {
+     "value": 16,
+     "session_max_before": 16,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "cefb495533a63386b3c1688e0aaecec4077e41683f739375cea093112e1a3c4d",
+     "previous_global_step": 15,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 16,
+     "test_total_count": 16,
+     "test_max": 16,
+     "test_max_step": 11,
+     "steps_since_test_max": 5,
+     "plateau_steps": 6,
+     "test_plateau": false,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "insufficient consecutive evidence",
+    "consecutive_steps": 2,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     15,
+     16
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null
+   }
+  },
+  {
+   "step_id": 17,
+   "agent_id": "developer",
+   "observed_at": "2026-10-06T05:10:17.317119+00:00",
+   "judgement_ns": 412000,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 14,
+    "pass_count": {
+     "value": 16,
+     "session_max_before": 16,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "cefb495533a63386b3c1688e0aaecec4077e41683f739375cea093112e1a3c4d",
+     "previous_global_step": 16,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 16,
+     "test_total_count": 16,
+     "test_max": 16,
+     "test_max_step": 11,
+     "steps_since_test_max": 6,
+     "plateau_steps": 6,
+     "test_plateau": false,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "deadlock",
+    "reason": "consecutive stagnant/oscillating steps without declaration",
+    "consecutive_steps": 3,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant",
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     15,
+     16,
+     17
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null,
+    "explanation": {
+     "explanation_version": "explain-v1",
+     "template_id": "E1",
+     "text": "최근 3 step 동안 검토·기획·개발 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 16/16.",
+     "values": {
+      "n": 3,
+      "roles": [
+       "검토",
+       "기획",
+       "개발"
+      ],
+      "signals": [
+       "산출물 변경",
+       "테스트 증가",
+       "새 쟁점"
+      ],
+      "pass": 16,
+      "total": 16
+     },
+     "missing_values": [],
+     "form": "fallback",
+     "skipped_templates": [],
+     "signals": {
+      "decision": "deadlock",
+      "stop_step": 17,
+      "task_kind": "artifact",
+      "consecutive_steps": 3,
+      "consecutive_states": [
+       "stagnant",
+       "stagnant",
+       "stagnant"
+      ],
+      "streak_roles": [
+       "reviewer",
+       "planner",
+       "developer"
+      ],
+      "declared_step": null,
+      "test_pass_count": 16,
+      "test_total_count": 16,
+      "global_revert": null,
+      "test_plateau_in_streak": false,
+      "test_max_step": 11,
+      "steps_since_test_max": 6,
+      "file_state_changes_since_test_max": 0,
+      "handoff": null,
+      "handoff_threshold": 4,
+      "status": null,
+      "adopted_metric_selected": false,
+      "adopted_count": null,
+      "test_observed_in_session": true,
+      "selected_metrics": [
+       "conversation.open_issues_count",
+       "artifact.test_pass_count",
+       "artifact.files_changed"
+      ],
+      "adopted_required": null
+     },
+     "role_labels": {
+      "planner": "기획",
+      "developer": "개발",
+      "reviewer": "검토"
+     },
+     "status_labels": null
+    }
+   }
+  },
+  {
+   "step_id": 18,
+   "agent_id": "reviewer",
+   "observed_at": "2026-10-06T05:10:41.661813+00:00",
+   "judgement_ns": 449500,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 15,
+    "pass_count": {
+     "value": 16,
+     "session_max_before": 16,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "cefb495533a63386b3c1688e0aaecec4077e41683f739375cea093112e1a3c4d",
+     "previous_global_step": 17,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 16,
+     "test_total_count": 16,
+     "test_max": 16,
+     "test_max_step": 11,
+     "steps_since_test_max": 7,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "deadlock",
+    "reason": "consecutive stagnant/oscillating steps without declaration",
+    "consecutive_steps": 4,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     15,
+     16,
+     17,
+     18
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null,
+    "explanation": {
+     "explanation_version": "explain-v1",
+     "template_id": "E1",
+     "text": "최근 4 step 동안 검토·기획·개발 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 16/16.",
+     "values": {
+      "n": 4,
+      "roles": [
+       "검토",
+       "기획",
+       "개발"
+      ],
+      "signals": [
+       "산출물 변경",
+       "테스트 증가",
+       "새 쟁점"
+      ],
+      "pass": 16,
+      "total": 16
+     },
+     "missing_values": [],
+     "form": "fallback",
+     "skipped_templates": [],
+     "signals": {
+      "decision": "deadlock",
+      "stop_step": 18,
+      "task_kind": "artifact",
+      "consecutive_steps": 4,
+      "consecutive_states": [
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant"
+      ],
+      "streak_roles": [
+       "reviewer",
+       "planner",
+       "developer",
+       "reviewer"
+      ],
+      "declared_step": null,
+      "test_pass_count": 16,
+      "test_total_count": 16,
+      "global_revert": null,
+      "test_plateau_in_streak": false,
+      "test_max_step": 11,
+      "steps_since_test_max": 7,
+      "file_state_changes_since_test_max": 0,
+      "handoff": null,
+      "handoff_threshold": 4,
+      "status": null,
+      "adopted_metric_selected": false,
+      "adopted_count": null,
+      "test_observed_in_session": true,
+      "selected_metrics": [
+       "conversation.open_issues_count",
+       "artifact.test_pass_count",
+       "artifact.files_changed"
+      ],
+      "adopted_required": null
+     },
+     "role_labels": {
+      "planner": "기획",
+      "developer": "개발",
+      "reviewer": "검토"
+     },
+     "status_labels": null
+    }
+   }
+  },
+  {
+   "step_id": 19,
+   "agent_id": "planner",
+   "observed_at": "2026-10-06T05:11:21.518480+00:00",
+   "judgement_ns": 296458,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 16,
+    "pass_count": {
+     "value": 16,
+     "session_max_before": 16,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "cefb495533a63386b3c1688e0aaecec4077e41683f739375cea093112e1a3c4d",
+     "previous_global_step": 18,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 16,
+     "test_total_count": 16,
+     "test_max": 16,
+     "test_max_step": 11,
+     "steps_since_test_max": 8,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "deadlock",
+    "reason": "consecutive stagnant/oscillating steps without declaration",
+    "consecutive_steps": 5,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     15,
+     16,
+     17,
+     18,
+     19
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null,
+    "explanation": {
+     "explanation_version": "explain-v1",
+     "template_id": "E1",
+     "text": "최근 5 step 동안 검토·기획·개발 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 16/16.",
+     "values": {
+      "n": 5,
+      "roles": [
+       "검토",
+       "기획",
+       "개발"
+      ],
+      "signals": [
+       "산출물 변경",
+       "테스트 증가",
+       "새 쟁점"
+      ],
+      "pass": 16,
+      "total": 16
+     },
+     "missing_values": [],
+     "form": "fallback",
+     "skipped_templates": [],
+     "signals": {
+      "decision": "deadlock",
+      "stop_step": 19,
+      "task_kind": "artifact",
+      "consecutive_steps": 5,
+      "consecutive_states": [
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant"
+      ],
+      "streak_roles": [
+       "reviewer",
+       "planner",
+       "developer",
+       "reviewer",
+       "planner"
+      ],
+      "declared_step": null,
+      "test_pass_count": 16,
+      "test_total_count": 16,
+      "global_revert": null,
+      "test_plateau_in_streak": false,
+      "test_max_step": 11,
+      "steps_since_test_max": 8,
+      "file_state_changes_since_test_max": 0,
+      "handoff": null,
+      "handoff_threshold": 4,
+      "status": null,
+      "adopted_metric_selected": false,
+      "adopted_count": null,
+      "test_observed_in_session": true,
+      "selected_metrics": [
+       "conversation.open_issues_count",
+       "artifact.test_pass_count",
+       "artifact.files_changed"
+      ],
+      "adopted_required": null
+     },
+     "role_labels": {
+      "planner": "기획",
+      "developer": "개발",
+      "reviewer": "검토"
+     },
+     "status_labels": null
+    }
+   }
+  },
+  {
+   "step_id": 20,
+   "agent_id": "developer",
+   "observed_at": "2026-10-06T05:11:55.220052+00:00",
+   "judgement_ns": 425458,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 17,
+    "pass_count": {
+     "value": 16,
+     "session_max_before": 16,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "cefb495533a63386b3c1688e0aaecec4077e41683f739375cea093112e1a3c4d",
+     "previous_global_step": 19,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 16,
+     "test_total_count": 16,
+     "test_max": 16,
+     "test_max_step": 11,
+     "steps_since_test_max": 9,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "deadlock",
+    "reason": "consecutive stagnant/oscillating steps without declaration",
+    "consecutive_steps": 6,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null,
+    "explanation": {
+     "explanation_version": "explain-v1",
+     "template_id": "E1",
+     "text": "최근 6 step 동안 검토·기획·개발 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 16/16.",
+     "values": {
+      "n": 6,
+      "roles": [
+       "검토",
+       "기획",
+       "개발"
+      ],
+      "signals": [
+       "산출물 변경",
+       "테스트 증가",
+       "새 쟁점"
+      ],
+      "pass": 16,
+      "total": 16
+     },
+     "missing_values": [],
+     "form": "fallback",
+     "skipped_templates": [],
+     "signals": {
+      "decision": "deadlock",
+      "stop_step": 20,
+      "task_kind": "artifact",
+      "consecutive_steps": 6,
+      "consecutive_states": [
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant"
+      ],
+      "streak_roles": [
+       "reviewer",
+       "planner",
+       "developer",
+       "reviewer",
+       "planner",
+       "developer"
+      ],
+      "declared_step": null,
+      "test_pass_count": 16,
+      "test_total_count": 16,
+      "global_revert": null,
+      "test_plateau_in_streak": false,
+      "test_max_step": 11,
+      "steps_since_test_max": 9,
+      "file_state_changes_since_test_max": 0,
+      "handoff": null,
+      "handoff_threshold": 4,
+      "status": null,
+      "adopted_metric_selected": false,
+      "adopted_count": null,
+      "test_observed_in_session": true,
+      "selected_metrics": [
+       "conversation.open_issues_count",
+       "artifact.test_pass_count",
+       "artifact.files_changed"
+      ],
+      "adopted_required": null
+     },
+     "role_labels": {
+      "planner": "기획",
+      "developer": "개발",
+      "reviewer": "검토"
+     },
+     "status_labels": null
+    }
+   }
+  },
+  {
+   "step_id": 21,
+   "agent_id": "reviewer",
+   "observed_at": "2026-10-06T05:12:27.293963+00:00",
+   "judgement_ns": 349666,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 18,
+    "pass_count": {
+     "value": 16,
+     "session_max_before": 16,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "cefb495533a63386b3c1688e0aaecec4077e41683f739375cea093112e1a3c4d",
+     "previous_global_step": 20,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 16,
+     "test_total_count": 16,
+     "test_max": 16,
+     "test_max_step": 11,
+     "steps_since_test_max": 10,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "deadlock",
+    "reason": "consecutive stagnant/oscillating steps without declaration",
+    "consecutive_steps": 7,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null,
+    "explanation": {
+     "explanation_version": "explain-v1",
+     "template_id": "E1",
+     "text": "최근 7 step 동안 검토·기획·개발 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 16/16.",
+     "values": {
+      "n": 7,
+      "roles": [
+       "검토",
+       "기획",
+       "개발"
+      ],
+      "signals": [
+       "산출물 변경",
+       "테스트 증가",
+       "새 쟁점"
+      ],
+      "pass": 16,
+      "total": 16
+     },
+     "missing_values": [],
+     "form": "fallback",
+     "skipped_templates": [],
+     "signals": {
+      "decision": "deadlock",
+      "stop_step": 21,
+      "task_kind": "artifact",
+      "consecutive_steps": 7,
+      "consecutive_states": [
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant"
+      ],
+      "streak_roles": [
+       "reviewer",
+       "planner",
+       "developer",
+       "reviewer",
+       "planner",
+       "developer",
+       "reviewer"
+      ],
+      "declared_step": null,
+      "test_pass_count": 16,
+      "test_total_count": 16,
+      "global_revert": null,
+      "test_plateau_in_streak": false,
+      "test_max_step": 11,
+      "steps_since_test_max": 10,
+      "file_state_changes_since_test_max": 0,
+      "handoff": null,
+      "handoff_threshold": 4,
+      "status": null,
+      "adopted_metric_selected": false,
+      "adopted_count": null,
+      "test_observed_in_session": true,
+      "selected_metrics": [
+       "conversation.open_issues_count",
+       "artifact.test_pass_count",
+       "artifact.files_changed"
+      ],
+      "adopted_required": null
+     },
+     "role_labels": {
+      "planner": "기획",
+      "developer": "개발",
+      "reviewer": "검토"
+     },
+     "status_labels": null
+    }
+   }
+  },
+  {
+   "step_id": 22,
+   "agent_id": "planner",
+   "observed_at": "2026-10-06T05:12:56.242290+00:00",
+   "judgement_ns": 322000,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 19,
+    "pass_count": {
+     "value": 16,
+     "session_max_before": 16,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "cefb495533a63386b3c1688e0aaecec4077e41683f739375cea093112e1a3c4d",
+     "previous_global_step": 21,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 16,
+     "test_total_count": 16,
+     "test_max": 16,
+     "test_max_step": 11,
+     "steps_since_test_max": 11,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "deadlock",
+    "reason": "consecutive stagnant/oscillating steps without declaration",
+    "consecutive_steps": 8,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null,
+    "explanation": {
+     "explanation_version": "explain-v1",
+     "template_id": "E1",
+     "text": "최근 8 step 동안 검토·기획·개발 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 16/16.",
+     "values": {
+      "n": 8,
+      "roles": [
+       "검토",
+       "기획",
+       "개발"
+      ],
+      "signals": [
+       "산출물 변경",
+       "테스트 증가",
+       "새 쟁점"
+      ],
+      "pass": 16,
+      "total": 16
+     },
+     "missing_values": [],
+     "form": "fallback",
+     "skipped_templates": [],
+     "signals": {
+      "decision": "deadlock",
+      "stop_step": 22,
+      "task_kind": "artifact",
+      "consecutive_steps": 8,
+      "consecutive_states": [
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant"
+      ],
+      "streak_roles": [
+       "reviewer",
+       "planner",
+       "developer",
+       "reviewer",
+       "planner",
+       "developer",
+       "reviewer",
+       "planner"
+      ],
+      "declared_step": null,
+      "test_pass_count": 16,
+      "test_total_count": 16,
+      "global_revert": null,
+      "test_plateau_in_streak": false,
+      "test_max_step": 11,
+      "steps_since_test_max": 11,
+      "file_state_changes_since_test_max": 0,
+      "handoff": null,
+      "handoff_threshold": 4,
+      "status": null,
+      "adopted_metric_selected": false,
+      "adopted_count": null,
+      "test_observed_in_session": true,
+      "selected_metrics": [
+       "conversation.open_issues_count",
+       "artifact.test_pass_count",
+       "artifact.files_changed"
+      ],
+      "adopted_required": null
+     },
+     "role_labels": {
+      "planner": "기획",
+      "developer": "개발",
+      "reviewer": "검토"
+     },
+     "status_labels": null
+    }
+   }
+  },
+  {
+   "step_id": 23,
+   "agent_id": "developer",
+   "observed_at": "2026-10-06T05:13:27.285795+00:00",
+   "judgement_ns": 334459,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 20,
+    "pass_count": {
+     "value": 16,
+     "session_max_before": 16,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "cefb495533a63386b3c1688e0aaecec4077e41683f739375cea093112e1a3c4d",
+     "previous_global_step": 22,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 16,
+     "test_total_count": 16,
+     "test_max": 16,
+     "test_max_step": 11,
+     "steps_since_test_max": 12,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "deadlock",
+    "reason": "consecutive stagnant/oscillating steps without declaration",
+    "consecutive_steps": 9,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22,
+     23
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null,
+    "explanation": {
+     "explanation_version": "explain-v1",
+     "template_id": "E1",
+     "text": "최근 9 step 동안 검토·기획·개발 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 16/16.",
+     "values": {
+      "n": 9,
+      "roles": [
+       "검토",
+       "기획",
+       "개발"
+      ],
+      "signals": [
+       "산출물 변경",
+       "테스트 증가",
+       "새 쟁점"
+      ],
+      "pass": 16,
+      "total": 16
+     },
+     "missing_values": [],
+     "form": "fallback",
+     "skipped_templates": [],
+     "signals": {
+      "decision": "deadlock",
+      "stop_step": 23,
+      "task_kind": "artifact",
+      "consecutive_steps": 9,
+      "consecutive_states": [
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant"
+      ],
+      "streak_roles": [
+       "reviewer",
+       "planner",
+       "developer",
+       "reviewer",
+       "planner",
+       "developer",
+       "reviewer",
+       "planner",
+       "developer"
+      ],
+      "declared_step": null,
+      "test_pass_count": 16,
+      "test_total_count": 16,
+      "global_revert": null,
+      "test_plateau_in_streak": false,
+      "test_max_step": 11,
+      "steps_since_test_max": 12,
+      "file_state_changes_since_test_max": 0,
+      "handoff": null,
+      "handoff_threshold": 4,
+      "status": null,
+      "adopted_metric_selected": false,
+      "adopted_count": null,
+      "test_observed_in_session": true,
+      "selected_metrics": [
+       "conversation.open_issues_count",
+       "artifact.test_pass_count",
+       "artifact.files_changed"
+      ],
+      "adopted_required": null
+     },
+     "role_labels": {
+      "planner": "기획",
+      "developer": "개발",
+      "reviewer": "검토"
+     },
+     "status_labels": null
+    }
+   }
+  },
+  {
+   "step_id": 24,
+   "agent_id": "reviewer",
+   "observed_at": "2026-10-06T05:14:06.606391+00:00",
+   "judgement_ns": 318708,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 21,
+    "pass_count": {
+     "value": 16,
+     "session_max_before": 16,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "cefb495533a63386b3c1688e0aaecec4077e41683f739375cea093112e1a3c4d",
+     "previous_global_step": 23,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 16,
+     "test_total_count": 16,
+     "test_max": 16,
+     "test_max_step": 11,
+     "steps_since_test_max": 13,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "deadlock",
+    "reason": "consecutive stagnant/oscillating steps without declaration",
+    "consecutive_steps": 10,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22,
+     23,
+     24
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null,
+    "explanation": {
+     "explanation_version": "explain-v1",
+     "template_id": "E1",
+     "text": "최근 10 step 동안 검토·기획·개발 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 16/16.",
+     "values": {
+      "n": 10,
+      "roles": [
+       "검토",
+       "기획",
+       "개발"
+      ],
+      "signals": [
+       "산출물 변경",
+       "테스트 증가",
+       "새 쟁점"
+      ],
+      "pass": 16,
+      "total": 16
+     },
+     "missing_values": [],
+     "form": "fallback",
+     "skipped_templates": [],
+     "signals": {
+      "decision": "deadlock",
+      "stop_step": 24,
+      "task_kind": "artifact",
+      "consecutive_steps": 10,
+      "consecutive_states": [
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant"
+      ],
+      "streak_roles": [
+       "reviewer",
+       "planner",
+       "developer",
+       "reviewer",
+       "planner",
+       "developer",
+       "reviewer",
+       "planner",
+       "developer",
+       "reviewer"
+      ],
+      "declared_step": null,
+      "test_pass_count": 16,
+      "test_total_count": 16,
+      "global_revert": null,
+      "test_plateau_in_streak": false,
+      "test_max_step": 11,
+      "steps_since_test_max": 13,
+      "file_state_changes_since_test_max": 0,
+      "handoff": null,
+      "handoff_threshold": 4,
+      "status": null,
+      "adopted_metric_selected": false,
+      "adopted_count": null,
+      "test_observed_in_session": true,
+      "selected_metrics": [
+       "conversation.open_issues_count",
+       "artifact.test_pass_count",
+       "artifact.files_changed"
+      ],
+      "adopted_required": null
+     },
+     "role_labels": {
+      "planner": "기획",
+      "developer": "개발",
+      "reviewer": "검토"
+     },
+     "status_labels": null
+    }
+   }
+  },
+  {
+   "step_id": 25,
+   "agent_id": "planner",
+   "observed_at": "2026-10-06T05:14:35.332701+00:00",
+   "judgement_ns": 353083,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 22,
+    "pass_count": {
+     "value": 16,
+     "session_max_before": 16,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "cefb495533a63386b3c1688e0aaecec4077e41683f739375cea093112e1a3c4d",
+     "previous_global_step": 24,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 16,
+     "test_total_count": 16,
+     "test_max": 16,
+     "test_max_step": 11,
+     "steps_since_test_max": 14,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "deadlock",
+    "reason": "consecutive stagnant/oscillating steps without declaration",
+    "consecutive_steps": 11,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22,
+     23,
+     24,
+     25
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null,
+    "explanation": {
+     "explanation_version": "explain-v1",
+     "template_id": "E1",
+     "text": "최근 11 step 동안 검토·기획·개발 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 16/16.",
+     "values": {
+      "n": 11,
+      "roles": [
+       "검토",
+       "기획",
+       "개발"
+      ],
+      "signals": [
+       "산출물 변경",
+       "테스트 증가",
+       "새 쟁점"
+      ],
+      "pass": 16,
+      "total": 16
+     },
+     "missing_values": [],
+     "form": "fallback",
+     "skipped_templates": [],
+     "signals": {
+      "decision": "deadlock",
+      "stop_step": 25,
+      "task_kind": "artifact",
+      "consecutive_steps": 11,
+      "consecutive_states": [
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant"
+      ],
+      "streak_roles": [
+       "reviewer",
+       "planner",
+       "developer",
+       "reviewer",
+       "planner",
+       "developer",
+       "reviewer",
+       "planner",
+       "developer",
+       "reviewer",
+       "planner"
+      ],
+      "declared_step": null,
+      "test_pass_count": 16,
+      "test_total_count": 16,
+      "global_revert": null,
+      "test_plateau_in_streak": false,
+      "test_max_step": 11,
+      "steps_since_test_max": 14,
+      "file_state_changes_since_test_max": 0,
+      "handoff": null,
+      "handoff_threshold": 4,
+      "status": null,
+      "adopted_metric_selected": false,
+      "adopted_count": null,
+      "test_observed_in_session": true,
+      "selected_metrics": [
+       "conversation.open_issues_count",
+       "artifact.test_pass_count",
+       "artifact.files_changed"
+      ],
+      "adopted_required": null
+     },
+     "role_labels": {
+      "planner": "기획",
+      "developer": "개발",
+      "reviewer": "검토"
+     },
+     "status_labels": null
+    }
+   }
+  },
+  {
+   "step_id": 26,
+   "agent_id": "developer",
+   "observed_at": "2026-10-06T05:15:04.991466+00:00",
+   "judgement_ns": 338334,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 23,
+    "pass_count": {
+     "value": 16,
+     "session_max_before": 16,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "cefb495533a63386b3c1688e0aaecec4077e41683f739375cea093112e1a3c4d",
+     "previous_global_step": 25,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 16,
+     "test_total_count": 16,
+     "test_max": 16,
+     "test_max_step": 11,
+     "steps_since_test_max": 15,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "deadlock",
+    "reason": "consecutive stagnant/oscillating steps without declaration",
+    "consecutive_steps": 12,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant",
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22,
+     23,
+     24,
+     25,
+     26
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null,
+    "explanation": {
+     "explanation_version": "explain-v1",
+     "template_id": "E1",
+     "text": "최근 12 step 동안 검토·기획·개발 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 16/16.",
+     "values": {
+      "n": 12,
+      "roles": [
+       "검토",
+       "기획",
+       "개발"
+      ],
+      "signals": [
+       "산출물 변경",
+       "테스트 증가",
+       "새 쟁점"
+      ],
+      "pass": 16,
+      "total": 16
+     },
+     "missing_values": [],
+     "form": "fallback",
+     "skipped_templates": [],
+     "signals": {
+      "decision": "deadlock",
+      "stop_step": 26,
+      "task_kind": "artifact",
+      "consecutive_steps": 12,
+      "consecutive_states": [
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant",
+       "stagnant"
+      ],
+      "streak_roles": [
+       "reviewer",
+       "planner",
+       "developer",
+       "reviewer",
+       "planner",
+       "developer",
+       "reviewer",
+       "planner",
+       "developer",
+       "reviewer",
+       "planner",
+       "developer"
+      ],
+      "declared_step": null,
+      "test_pass_count": 16,
+      "test_total_count": 16,
+      "global_revert": null,
+      "test_plateau_in_streak": false,
+      "test_max_step": 11,
+      "steps_since_test_max": 15,
+      "file_state_changes_since_test_max": 0,
+      "handoff": null,
+      "handoff_threshold": 4,
+      "status": null,
+      "adopted_metric_selected": false,
+      "adopted_count": null,
+      "test_observed_in_session": true,
+      "selected_metrics": [
+       "conversation.open_issues_count",
+       "artifact.test_pass_count",
+       "artifact.files_changed"
+      ],
+      "adopted_required": null
+     },
+     "role_labels": {
+      "planner": "기획",
+      "developer": "개발",
+      "reviewer": "검토"
+     },
+     "status_labels": null
+    }
+   }
+  },
+  {
+   "step_id": 27,
+   "agent_id": "reviewer",
+   "observed_at": "2026-10-06T05:15:36.282408+00:00",
+   "judgement_ns": 324208,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.open_issues_count": "measured",
+     "artifact.test_pass_count": "measured",
+     "artifact.files_changed": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 24,
+    "pass_count": {
+     "value": 16,
+     "session_max_before": 16,
+     "new_session_max": false,
+     "role_event": null,
+     "counted_as_progress": false
+    },
+    "t3": {
+     "global_state_sha256": "cefb495533a63386b3c1688e0aaecec4077e41683f739375cea093112e1a3c4d",
+     "previous_global_step": 26,
+     "changed_paths": [],
+     "global_revert": false,
+     "revert_to_step": null,
+     "test_pass_count": 16,
+     "test_total_count": 16,
+     "test_max": 16,
+     "test_max_step": 11,
+     "steps_since_test_max": 16,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "file_state_changes_since_test_max": 0,
+     "file_state_unknown_steps_since_test_max": 0,
+     "only_file_change_progress": false,
+     "applied": null
+    },
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "progress, baseline or declaration step",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": 27
+   }
+  }
+ ]
+}

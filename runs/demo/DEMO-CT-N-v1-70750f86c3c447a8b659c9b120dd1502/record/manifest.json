@@ -1,0 +1,320 @@
+{
+ "manifest_version": "session-manifest-v0.7",
+ "session_id": "DEMO-CT-N-v1-70750f86c3c447a8b659c9b120dd1502",
+ "rerun_of": null,
+ "scenario": {
+  "id": "DEMO-CT-N-v1",
+  "hash": "66618a43fcc1f275d8241f60d073d5fcbef6360b64c53603e2fb9c68f3ba0a40"
+ },
+ "code": {
+  "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+  "criteria_version": "deadlock-v0.3",
+  "progress_version": "progress-v3",
+  "metrics_version": "metrics-v1",
+  "git_dirty": false,
+  "git_state_status": "measured"
+ },
+ "condition": {
+  "phase": "demo",
+  "temperature": 0.0,
+  "repeat_index": 1,
+  "max_steps": 30,
+  "max_llm_calls_per_step": 3,
+  "max_tokens": 16384,
+  "context_buffer_messages": 12,
+  "guardrail_mode": "observe",
+  "runner_protocol": "tool-capable-step-v10-final-report-allowlist",
+  "reasoning_effort": {
+   "requested": "high",
+   "sent_on": "all_calls",
+   "applied": "probe_indicated",
+   "evidence": "reports/c18-1/trial-summary.json",
+   "source": "conditions.json"
+  },
+  "dataset_run": false,
+  "group": {
+   "rule": "condition-group-v1",
+   "id": "cg-f50509c825e1",
+   "sha256": "f50509c825e15275a6ce01d9c4c71db8b8c01acda4e96fdfb04cffab266a665e",
+   "fields": {
+    "model": "glm-5.3-flash",
+    "model_source": "scenario",
+    "provider_host": "factchat.mindlogic-kr-api.com",
+    "proxy_config_file": "guardrail-deadlock-v0.3-kmu.yaml",
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "criteria_freeze_sha256": "4fa939191ab8e9bfc879da548b87b13107c85e1612f62bb35334e10fee7759cf",
+    "guardrail_mode": "observe",
+    "phase": "demo",
+    "runner_protocol": "tool-capable-step-v10-final-report-allowlist",
+    "collection_policy": "independent-sources-v1",
+    "output_contract_version": "output-contract-v2",
+    "dialogue_flow": null,
+    "recent_messages_rule": null,
+    "closed_list_check": "after_receipt",
+    "search_settings_sha256": null,
+    "temperature": 0.0,
+    "max_tokens": 16384,
+    "max_steps": 30,
+    "max_llm_calls_per_step": 3,
+    "context_buffer_messages": 12,
+    "reasoning_effort": {
+     "requested": "high",
+     "sent_on": "all_calls"
+    },
+    "requested_seed": null
+   },
+   "missing_fields": [
+    "dialogue_flow",
+    "recent_messages_rule",
+    "requested_seed",
+    "search_settings_sha256"
+   ]
+  },
+  "guardrail_mode_source": "proxy session meta"
+ },
+ "model": {
+  "provider": "factchat.mindlogic-kr-api.com",
+  "name": "glm-5.3-flash",
+  "upstream": {
+   "base_url_host": "factchat.mindlogic-kr-api.com",
+   "base_url": "https://factchat.mindlogic-kr-api.com/v1/gateway",
+   "chat_path": "/chat/completions/",
+   "api_key_env": "KMU_API_KEY",
+   "config_file": "guardrail-deadlock-v0.3-kmu.yaml"
+  },
+  "source": "scenario",
+  "scenario_model": "glm-5.3-flash",
+  "runner_model": "glm-5.3-flash",
+  "runner_matches_proxy": true
+ },
+ "seed": {
+  "value": null,
+  "status": "unverified"
+ },
+ "run": {
+  "started_at": "2026-10-06T05:18:48.751759+00:00",
+  "ended_at": "2026-10-06T05:22:39.884303+00:00",
+  "termination_reason": "success",
+  "steps_reached": 6,
+  "parallel_group": null,
+  "account_label": "C",
+  "batch": {
+   "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+   "item": "DEMO-CT-N-v1:observe:1",
+   "lane": 3,
+   "lanes": 4,
+   "mode": "observe",
+   "plan_id": "demo-main-v1",
+   "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+   "repeat": 1,
+   "rerun_of": null
+  }
+ },
+ "tokens": {
+  "known_prompt": 86721,
+  "known_completion": 9281,
+  "known_total": 96002,
+  "usage_missing_turns": 0,
+  "total": 96002,
+  "total_status": "measured"
+ },
+ "judgement": {
+  "before": {
+   "tests_passed": 7
+  },
+  "after": {
+   "tests_passed": 16,
+   "gate": {
+    "machine_success": true,
+    "test_suite_unchanged": true,
+    "test_suite_id": "sha256:5d3df95aa74fed10e8c3cfc34390d5394e994bef6741960a5804db6f27dfff9b",
+    "pinned_test_suite_id": "sha256:5d3df95aa74fed10e8c3cfc34390d5394e994bef6741960a5804db6f27dfff9b",
+    "reason": "all_passed"
+   }
+  },
+  "normal_session": true,
+  "normal_session_rule": "S-1: all acceptance tests pass and completion declared"
+ },
+ "guardrail": {
+  "virtual_decisions": [
+   {
+    "step_id": 1,
+    "progress": "baseline",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 2,
+    "progress": "baseline",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 3,
+    "progress": "baseline",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 4,
+    "progress": "progress",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 5,
+    "progress": "progress",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 6,
+    "progress": "progress",
+    "criteria": "continue"
+   }
+  ],
+  "first_stop_step": null,
+  "first_stop_explanation": null,
+  "mode": "observe",
+  "block": null,
+  "savings_vs_observe": null
+ },
+ "validity": {
+  "class": "unclassified",
+  "reason": null,
+  "decided_by": null,
+  "evidence": {
+   "isolation_ok": true,
+   "termination_reason": "success",
+   "http_error_codes": [],
+   "http_429_turns": [],
+   "finish_reason_length": 0,
+   "tool_execution_errors": 0,
+   "edit_attempts_outside_writable_paths": 0,
+   "unmeasured_steps": 0
+  }
+ },
+ "notes": [
+  "demo-records-v1"
+ ],
+ "judgement_time": {
+  "status": "measured",
+  "n": 6,
+  "steps_without_value": 0,
+  "p50_ms": 0.173875,
+  "p99_ms": 0.182584,
+  "max_ms": 0.182584
+ },
+ "replay": {
+  "status": "unmeasured",
+  "reason": "multi-rule offline replay (S-6) is scheduled for C-16"
+ },
+ "task": {
+  "task_kind": "artifact",
+  "turn_order": "fixed",
+  "dialogue_flow": null,
+  "output_contract_version": "output-contract-v2",
+  "contract_sha256": null,
+  "allowed_issues_sha256": "434e1ebc382f48bd2788a669aa66afca1129bc987ab08ea4ca3e9241a9098a10",
+  "closed_list_check": {
+   "mode": "after_receipt",
+   "decision": "D-13",
+   "enums_sent_to_provider": false,
+   "basis": "artifact task: issue IDs are checked after receipt; the strict schema carries no enum (output-contract-v2, v3 adds spec_approved only)"
+  },
+  "judge": null,
+  "inputs_dir": null,
+  "tools": {
+   "planner": [
+    "read_file",
+    "write_file",
+    "replace_in_file"
+   ],
+   "developer": [
+    "read_file",
+    "write_file",
+    "replace_in_file",
+    "run_tests"
+   ],
+   "reviewer": [
+    "read_file",
+    "run_tests"
+   ]
+  },
+  "tool_implementations": null,
+  "recent_messages_rule": null,
+  "tool_settings": null,
+  "search": null,
+  "tool_preflight": null
+ },
+ "registration": {
+  "value": {
+   "registration_version": "session-registration-v1",
+   "role_labels": {
+    "planner": "기획",
+    "developer": "개발",
+    "reviewer": "리뷰"
+   },
+   "status_values": [],
+   "terminal_statuses": [],
+   "required_adopted_items": null,
+   "progress_source": "both",
+   "progress_metric": {
+    "conversation": [
+     "open_issues_count"
+    ],
+    "artifact": [
+     "test_pass_count",
+     "files_changed"
+    ]
+   }
+  },
+  "sha256": "98276d795684696230fcd56aab4b08b774bc2b90fe4b947128d846d9e00578de",
+  "sha256_recomputed": "98276d795684696230fcd56aab4b08b774bc2b90fe4b947128d846d9e00578de",
+  "proxy_stored_same": true
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 12.65665,
+  "model": "glm-5.3-flash",
+  "prices_version": "gateway-prices-v1",
+  "credits_per_million": {
+   "prompt": 150,
+   "cached_prompt": 30,
+   "completion": 500
+  },
+  "price_source": "prompt, completion: probe gateway-probe-a41f8d51 (DM-57); cached_prompt: probe gateway-probe-44ec8e43 second request (cached 1,088), decision 020",
+  "tokens": {
+   "prompt": 86721,
+   "cached_prompt": 41600,
+   "completion": 9281,
+   "reasoning": 2130,
+   "turns": 18,
+   "usage_missing_turns": 0
+  },
+  "cached_price": "known",
+  "basis": "proxy log usage x credits per 1M; an upper value (discounts not in the usage are not modelled)"
+ },
+ "credits_measured": {
+  "usage_version": "gateway-usage-v1",
+  "before": {
+   "read_at": "2026-10-06T05:18:48.754393+00:00",
+   "http_status": 200,
+   "used": 566.54339,
+   "field": "monthly_allocated.used"
+  },
+  "after": {
+   "read_at": "2026-10-06T05:22:39.907603+00:00",
+   "http_status": 200,
+   "used": 579.2000400000002,
+   "field": "monthly_allocated.used"
+  },
+  "exact_only_if_alone": true,
+  "note": "after minus before; it includes any other use of the same key between the two read_at times (parallel sessions, probes, other tools). Compare those times with other sessions.",
+  "status": "measured",
+  "value": 12.65665,
+  "field": "monthly_allocated.used"
+ },
+ "vocabulary_violations": {
+  "total": 0,
+  "steps": [],
+  "excluded_from_strict_failure_streak": true
+ },
+ "approval": null
+}

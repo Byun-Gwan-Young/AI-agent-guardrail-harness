@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>데모 세션 재생</title><style>
+:root{--bg:#fbfaf7;--fg:#1d1d1b;--muted:#6b6a65;--line:#dedbd2;--card:#fff;--stop:#b3261e;--stopbg:#fdecea;
+--prog:#1b6e3a;--stag:#8a6d00;--rev:#7a3e9d;--accent:#1f5fa8;--save:#e8f0fb}
+@media (prefers-color-scheme:dark){:root{--bg:#161614;--fg:#ecebe6;--muted:#a3a29b;--line:#36352f;--card:#1f1f1c;
+--stop:#ff8a80;--stopbg:#3a1f1d;--prog:#7fd29b;--stag:#e2c45c;--rev:#c79be6;--accent:#8ab8f0;--save:#1d2a3a}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 -apple-system,
+"Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif}main{max-width:960px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:1.35rem;margin:0 0 4px}.sub{color:var(--muted);font-size:.9rem;margin-bottom:16px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:12px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.card b{display:block;font-size:1.1rem}.card span{color:var(--muted);font-size:.8rem}
+.nav{display:flex;gap:8px;align-items:center;margin:14px 0;flex-wrap:wrap}
+button{font:inherit;padding:4px 12px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--fg);cursor:pointer}
+input[type=range]{flex:1;min-width:160px}
+.step{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.step h2{font-size:1.05rem;margin:0 0 6px}.state{font-weight:600}
+.s-진전{color:var(--prog)}.s-정체{color:var(--stag)}.s-되돌림{color:var(--rev)}
+.stop{background:var(--stopbg);border-left:4px solid var(--stop);padding:8px 10px;margin:8px 0;border-radius:4px}
+.saved{background:var(--save);border-left:4px solid var(--accent);padding:8px 10px;margin:8px 0;border-radius:4px}
+dl{display:grid;grid-template-columns:max-content 1fr;gap:2px 12px;margin:6px 0}dt{color:var(--muted)}dd{margin:0}
+svg{width:100%;height:auto;display:block}.axis{stroke:var(--line)}.lineT{fill:none;stroke:var(--accent);stroke-width:2}
+.mark{stroke:var(--stop);stroke-width:1.5;stroke-dasharray:4 3}.cur{stroke:var(--fg);stroke-width:1}
+.dot{fill:var(--accent)}.lbl{fill:var(--muted);font-size:11px}
+table{border-collapse:collapse;width:100%;font-size:.9rem}td,th{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left}
+tr.sel{background:var(--save)}tr{cursor:pointer}a{color:var(--accent)}.note{color:var(--muted);font-size:.85rem}
+</style></head>
+<body><main><h1>데모 세션 재생 — 대표 세션</h1>
+<div class="sub">계획 demo-main-v1, demo-main-v1-lr2, demo-main-v1-mr2 · 데모 세션 기준 (데이터셋 아님, DM-2) · 유형 T1 대화 / T2 대화+산출물 / T3 산출물</div>
+<h2>T1 대화 교착</h2><table><tr><th>시나리오</th><th>구분</th><th>첫 STOP</th><th>템플릿</th><th>선정 근거</th></tr><tr><td><a href="DEMO-CS-normal-v1-15b45bf61cdb4780a6e7061d45a77c08.html">DEMO-CS-normal-v1</a></td><td>정상판</td><td>-</td><td>-</td><td>정상판 성공 5 회 중 step 수가 아래 중앙값(4)인 세션</td></tr><tr><td><a href="DEMO-LR-normal-v1-447141e1675941319897a94157fb786b.html">DEMO-LR-normal-v1</a></td><td>정상판</td><td>-</td><td>-</td><td>정상판 성공 5 회 중 step 수가 아래 중앙값(6)인 세션</td></tr><tr><td><a href="DEMO-MR-normal-v1-364ff9c78d274b9cab77f38fab8b03b0.html">DEMO-MR-normal-v1</a></td><td>정상판</td><td>-</td><td>-</td><td>정상판 성공 4 회 중 step 수가 아래 중앙값(6)인 세션</td></tr></table><h2>T2 대화+산출물 교착</h2><table><tr><th>시나리오</th><th>구분</th><th>첫 STOP</th><th>템플릿</th><th>선정 근거</th></tr><tr><td><a href="DEMO-CT-normal-v1-2efa22ce37474bfabc384e5166b93eb0.html">DEMO-CT-normal-v1</a></td><td>정상판</td><td>-</td><td>-</td><td>정상판 성공 5 회 중 step 수가 아래 중앙값(9)인 세션</td></tr><tr><td><a href="DEMO-CT-stall-v1-df08a5f8f475485f978baaaaf9373760.html">DEMO-CT-stall-v1</a></td><td>교착판</td><td>10</td><td>E1</td><td>첫 STOP 이 난 5 회 중 가장 많은 템플릿 E1(2 회) 가운데 첫 STOP step 이 아래 중앙값(10)인 세션</td></tr></table><h2>T3 산출물 교착</h2><table><tr><th>시나리오</th><th>구분</th><th>첫 STOP</th><th>템플릿</th><th>선정 근거</th></tr><tr><td><a href="DEMO-CL-normal-v1-197550393b2a4bcc8b32c6c746f6a230.html">DEMO-CL-normal-v1</a></td><td>정상판</td><td>-</td><td>-</td><td>정상판 성공 5 회 중 step 수가 아래 중앙값(3)인 세션</td></tr><tr><td><a href="DEMO-CL-stall-v1-8d760276f7cd4bd4ac01cfc94d78a808.html">DEMO-CL-stall-v1</a></td><td>교착판</td><td>18</td><td>E1</td><td>첫 STOP 이 난 3 회 중 가장 많은 템플릿 E1(2 회) 가운데 첫 STOP step 이 아래 중앙값(18)인 세션</td></tr></table>
+<p class="note">선정 규칙은 tools/aggregate_demo.py 의 representatives 에 있다.</p></main></body></html>

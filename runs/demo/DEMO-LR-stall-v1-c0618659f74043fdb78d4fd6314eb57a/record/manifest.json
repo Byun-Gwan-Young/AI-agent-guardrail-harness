@@ -1,0 +1,392 @@
+{
+ "manifest_version": "session-manifest-v0.7",
+ "session_id": "DEMO-LR-stall-v1-c0618659f74043fdb78d4fd6314eb57a",
+ "rerun_of": null,
+ "scenario": {
+  "id": "DEMO-LR-stall-v1",
+  "hash": "5fb09038d6b1a0fd1a29344a4faca0ce41d71de7128f6f3b0629e9d968a332b4"
+ },
+ "code": {
+  "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+  "criteria_version": "deadlock-v0.3",
+  "progress_version": "progress-v3",
+  "metrics_version": "metrics-v1",
+  "git_dirty": false,
+  "git_state_status": "measured"
+ },
+ "condition": {
+  "phase": "demo",
+  "temperature": 0.0,
+  "repeat_index": 3,
+  "max_steps": 30,
+  "max_llm_calls_per_step": 3,
+  "max_tokens": 16384,
+  "context_buffer_messages": 12,
+  "guardrail_mode": "observe",
+  "runner_protocol": "tool-capable-step-v10-final-report-allowlist",
+  "reasoning_effort": {
+   "requested": "high",
+   "sent_on": "all_calls",
+   "applied": "probe_indicated",
+   "evidence": "reports/c18-1/trial-summary.json",
+   "source": "conditions.json"
+  },
+  "dataset_run": false,
+  "group": {
+   "rule": "condition-group-v1",
+   "id": "cg-880cb785600f",
+   "sha256": "880cb785600faab0fa89a65d52821bf7c502f725cd14bdad2adfc1f9501ebe49",
+   "fields": {
+    "model": "glm-5.3-flash",
+    "model_source": "scenario",
+    "provider_host": "factchat.mindlogic-kr-api.com",
+    "proxy_config_file": "guardrail-deadlock-v0.3-kmu.yaml",
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "criteria_freeze_sha256": "4fa939191ab8e9bfc879da548b87b13107c85e1612f62bb35334e10fee7759cf",
+    "guardrail_mode": "observe",
+    "phase": "demo",
+    "runner_protocol": "tool-capable-step-v10-final-report-allowlist",
+    "collection_policy": "independent-sources-v1",
+    "output_contract_version": "output-contract-v3",
+    "dialogue_flow": "dialogue-flow-v1",
+    "recent_messages_rule": "t1-handoff-v1",
+    "closed_list_check": "provider_strict",
+    "search_settings_sha256": "371fd7f39ecdd73222d095c511c3dd270f65bf39c147d4248cdf368076b9e157",
+    "temperature": 0.0,
+    "max_tokens": 16384,
+    "max_steps": 30,
+    "max_llm_calls_per_step": 3,
+    "context_buffer_messages": 12,
+    "reasoning_effort": {
+     "requested": "high",
+     "sent_on": "all_calls"
+    },
+    "requested_seed": null
+   },
+   "missing_fields": [
+    "requested_seed"
+   ]
+  },
+  "guardrail_mode_source": "proxy session meta"
+ },
+ "model": {
+  "provider": "factchat.mindlogic-kr-api.com",
+  "name": "glm-5.3-flash",
+  "upstream": {
+   "base_url_host": "factchat.mindlogic-kr-api.com",
+   "base_url": "https://factchat.mindlogic-kr-api.com/v1/gateway",
+   "chat_path": "/chat/completions/",
+   "api_key_env": "KMU_API_KEY",
+   "config_file": "guardrail-deadlock-v0.3-kmu.yaml"
+  },
+  "source": "scenario",
+  "scenario_model": "glm-5.3-flash",
+  "runner_model": "glm-5.3-flash",
+  "runner_matches_proxy": true
+ },
+ "seed": {
+  "value": null,
+  "status": "unverified"
+ },
+ "run": {
+  "started_at": "2026-10-06T05:42:30.438209+00:00",
+  "ended_at": "2026-10-06T05:44:42.070583+00:00",
+  "termination_reason": "escalated",
+  "steps_reached": 3,
+  "parallel_group": null,
+  "final_status": "escalated",
+  "escalated_by": "writer",
+  "account_label": "D",
+  "batch": {
+   "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+   "item": "DEMO-LR-stall-v1:observe:3",
+   "lane": 1,
+   "lanes": 1,
+   "mode": "observe",
+   "plan_id": "demo-main-v1-lr2",
+   "plan_sha256": "09cc3ef0a108efc72df62078b111591760405bb5258233fdf471f923cd1cf17c",
+   "repeat": 3,
+   "rerun_of": null
+  }
+ },
+ "tokens": {
+  "known_prompt": 21002,
+  "known_completion": 5404,
+  "known_total": 26406,
+  "usage_missing_turns": 0,
+  "total": 26406,
+  "total_status": "measured"
+ },
+ "judgement": {
+  "before": null,
+  "after": {
+   "gate": {
+    "machine_success": false,
+    "result": "escalated",
+    "missing": []
+   },
+   "final_status": "escalated"
+  },
+  "normal_session": false,
+  "normal_session_rule": "dialogue task (DM-45): the declarer's own report in the last ordered status, completion declared, and the scenario judge resolved on that same report",
+  "completion_claims": []
+ },
+ "guardrail": {
+  "virtual_decisions": [
+   {
+    "step_id": 1,
+    "progress": "baseline",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 2,
+    "progress": "baseline",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 3,
+    "progress": "baseline",
+    "criteria": "continue"
+   }
+  ],
+  "first_stop_step": null,
+  "first_stop_explanation": null,
+  "mode": "observe",
+  "block": null,
+  "savings_vs_observe": null
+ },
+ "validity": {
+  "class": "unclassified",
+  "reason": null,
+  "decided_by": null,
+  "evidence": {
+   "isolation_ok": true,
+   "termination_reason": "escalated",
+   "http_error_codes": [],
+   "http_429_turns": [],
+   "finish_reason_length": 0,
+   "tool_execution_errors": 0,
+   "edit_attempts_outside_writable_paths": 0,
+   "unmeasured_steps": 0
+  }
+ },
+ "notes": [
+  "demo-records-v1"
+ ],
+ "judgement_time": {
+  "status": "measured",
+  "n": 3,
+  "steps_without_value": 0,
+  "p50_ms": 0.223291,
+  "p99_ms": 0.306667,
+  "max_ms": 0.306667
+ },
+ "replay": {
+  "status": "unmeasured",
+  "reason": "multi-rule offline replay (S-6) is scheduled for C-16"
+ },
+ "task": {
+  "task_kind": "dialogue",
+  "turn_order": "fixed",
+  "dialogue_flow": "dialogue-flow-v1",
+  "output_contract_version": "output-contract-v3",
+  "contract_sha256": "64df860017ff687f9be2130d11bc8f5cb44af2c6c97a2b21301bb47e0790bf90",
+  "allowed_issues_sha256": "05f6d18aebc2838a576401c3bce88d7659586833935a119ceadaa0a71b204d52",
+  "closed_list_check": {
+   "mode": "provider_strict",
+   "decision": "DM-20",
+   "enums_sent_to_provider": true,
+   "basis": "default (DM-55: enum strict probe gateway-probe-44ec8e43 passed for the demo model)"
+  },
+  "judge": {
+   "path": "scenario_judges/DEMO-LR-stall-v1.py",
+   "sha256": "9f2405ec9508bf815324bfb1af926c863bba001ff55f504874e866936b936883"
+  },
+  "inputs_dir": "scenario_assets/DEMO-LR-v1",
+  "tools": {
+   "lead": [],
+   "searcher": [
+    "academic_search"
+   ],
+   "writer": []
+  },
+  "tool_implementations": {
+   "academic_search": "experiments.search_tools.academic_search",
+   "lookup_order": "experiments.cs_tools.lookup_order",
+   "read_policy": "experiments.cs_tools.read_policy",
+   "web_search": "experiments.search_tools.web_search"
+  },
+  "recent_messages_rule": "t1-handoff-v1",
+  "tool_settings": {
+   "academic_search": {
+    "provider": "arxiv",
+    "max_results": 10,
+    "sort_by": "relevance",
+    "sort_order": "descending",
+    "max_result_chars": 12000,
+    "max_calls_per_session": 20,
+    "timeout_seconds": 30.0,
+    "min_interval_seconds": 3.0
+   }
+  },
+  "search": {
+   "academic_search": {
+    "provider": "arxiv",
+    "endpoint": "https://export.arxiv.org/api/query",
+    "key_env": null,
+    "fixed_parameters": {},
+    "normalizer": "arxiv-atom-v1",
+    "truncation_rule": "uniform-excerpt-cut-v1",
+    "settings": {
+     "provider": "arxiv",
+     "max_results": 10,
+     "sort_by": "relevance",
+     "sort_order": "descending",
+     "max_result_chars": 12000,
+     "max_calls_per_session": 20,
+     "timeout_seconds": 30.0,
+     "min_interval_seconds": 3.0
+    },
+    "settings_sha256": "60d787d4ebde368fed1e694dd4d4b49602fb878fd691277ed5259959d158911d",
+    "interval_scope": "per runner process",
+    "retry": "none"
+   }
+  },
+  "tool_preflight": {
+   "check": "dialogue-tool-preflight-v1",
+   "tools_implemented": [
+    "academic_search"
+   ],
+   "keys": {},
+   "inputs_dir": "scenario_assets/DEMO-LR-v1",
+   "input_problems": {},
+   "notices": [
+    "academic_search keeps the arXiv request interval inside this runner process only: run one academic_search (LR) session at a time (DM-52)"
+   ]
+  }
+ },
+ "registration": {
+  "value": {
+   "registration_version": "session-registration-v1",
+   "role_labels": {
+    "lead": "조사 책임",
+    "searcher": "검색 담당",
+    "writer": "작성 담당"
+   },
+   "status_values": [
+    {
+     "id": "scoping",
+     "label": "범위 확정"
+    },
+    {
+     "id": "researching",
+     "label": "조사"
+    },
+    {
+     "id": "drafting",
+     "label": "작성"
+    },
+    {
+     "id": "completed",
+     "label": "완료"
+    }
+   ],
+   "terminal_statuses": [
+    {
+     "id": "escalated",
+     "label": "에스컬레이션"
+    }
+   ],
+   "required_adopted_items": 5,
+   "progress_source": "conversation",
+   "progress_metric": {
+    "conversation": [
+     "status_advance",
+     "adopted_items",
+     "new_issue_ids"
+    ],
+    "artifact": []
+   }
+  },
+  "sha256": "f18f26f3d08de371ad6b42b775f4619b257204f648366295d83f1437f4979322",
+  "sha256_recomputed": "f18f26f3d08de371ad6b42b775f4619b257204f648366295d83f1437f4979322",
+  "proxy_stored_same": true
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 5.18414,
+  "model": "glm-5.3-flash",
+  "prices_version": "gateway-prices-v1",
+  "credits_per_million": {
+   "prompt": 150,
+   "cached_prompt": 30,
+   "completion": 500
+  },
+  "price_source": "prompt, completion: probe gateway-probe-a41f8d51 (DM-57); cached_prompt: probe gateway-probe-44ec8e43 second request (cached 1,088), decision 020",
+  "tokens": {
+   "prompt": 21002,
+   "cached_prompt": 5568,
+   "completion": 5404,
+   "reasoning": 1477,
+   "turns": 7,
+   "usage_missing_turns": 0
+  },
+  "cached_price": "known",
+  "basis": "proxy log usage x credits per 1M; an upper value (discounts not in the usage are not modelled)"
+ },
+ "credits_measured": {
+  "usage_version": "gateway-usage-v1",
+  "before": {
+   "read_at": "2026-10-06T05:42:30.440772+00:00",
+   "http_status": 200,
+   "used": 108.26131000000001,
+   "field": "monthly_allocated.used"
+  },
+  "after": {
+   "read_at": "2026-10-06T05:44:42.085150+00:00",
+   "http_status": 200,
+   "used": 113.44545000000002,
+   "field": "monthly_allocated.used"
+  },
+  "exact_only_if_alone": true,
+  "note": "after minus before; it includes any other use of the same key between the two read_at times (parallel sessions, probes, other tools). Compare those times with other sessions.",
+  "status": "measured",
+  "value": 5.18414,
+  "field": "monthly_allocated.used"
+ },
+ "vocabulary_violations": {
+  "total": 1,
+  "steps": [
+   1
+  ],
+  "excluded_from_strict_failure_streak": true
+ },
+ "search": {
+  "requests_sent": {
+   "academic_search": 2
+  },
+  "calls_recorded": 2,
+  "outcomes": {
+   "ok": 2
+  },
+  "responses_stored": 2,
+  "records_file": "search/records.jsonl",
+  "records_sha256": "e79023452df77cc80b1b187c798cee9219a7ab654df876237c983ef719ed4cef"
+ },
+ "routing": {
+  "turn_order": "fixed",
+  "fallbacks": [],
+  "handoff_at_end": {
+   "roles": [
+    "writer",
+    "lead"
+   ],
+   "count": 1,
+   "first_step": 3,
+   "threshold": 4,
+   "at_or_above_threshold": false
+  },
+  "handoff_note": "recorded only; not a judgement input (DM-22)"
+ }
+}

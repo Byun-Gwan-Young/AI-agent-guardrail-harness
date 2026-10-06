@@ -1,0 +1,102 @@
+{
+ "session_id": "DEMO-CT-N-v1-0ffd2671048940f0975fadfa0929a0a5",
+ "scenario_id": "DEMO-CT-N-v1",
+ "termination_reason": "success",
+ "steps": 3,
+ "error": null,
+ "tests_passed": {
+  "before": 7,
+  "after": 16,
+  "max": 16
+ },
+ "first_stop": null,
+ "stop_steps": [],
+ "tokens": {
+  "prompt": 33228,
+  "cached_prompt": 18880,
+  "completion": 5314,
+  "reasoning": 1290,
+  "turns": 9,
+  "usage_missing_turns": 0
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 5.3756,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-06T05:19:35.715881+00:00",
+   "2026-10-06T05:21:46.694553+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 5.3756,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 3,
+  "1": 3,
+  "2": 1,
+  "3": 2
+ },
+ "tool_results": {
+  "executed": 11,
+  "refused_before_approval": 0,
+  "error_results": 0,
+  "error_results_by_tool": {},
+  "error_results_by_summary": {},
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 0,
+  "vocabulary_violations": 0,
+  "by_kind": {},
+  "failed_steps": []
+ },
+ "condition_group": "cg-f50509c825e1",
+ "condition_group_missing_fields": [
+  "dialogue_flow",
+  "recent_messages_rule",
+  "requested_seed",
+  "search_settings_sha256"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [
+   "dialogue_flow",
+   "recent_messages_rule",
+   "search_settings_sha256"
+  ],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": []
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "observe",
+ "session_times": {
+  "started_at": "2026-10-06T05:19:35.713089+00:00",
+  "ended_at": "2026-10-06T05:21:46.682010+00:00"
+ },
+ "account_label": "A",
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-CT-N-v1:observe:5",
+  "lane": 1,
+  "lanes": 4,
+  "mode": "observe",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 5,
+  "rerun_of": null
+ },
+ "key_scan": {
+  "files_scanned": 36,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

@@ -1,0 +1,76 @@
+{
+ "replay_version": "demo-replay-v1",
+ "session_id": "DEMO-MR-stall-v1-5a05895c256849bab98a2de7fce761b2",
+ "scenario_id": "DEMO-MR-stall-v1",
+ "title": "AI 코딩 도구 3 종의 공개 요금·주요 기능 비교표 만들기",
+ "task_kind": "dialogue",
+ "guardrail_mode": "observe",
+ "model": "glm-5.3-flash",
+ "termination_reason": "escalated",
+ "escalated_by": "lead",
+ "steps_reached": 1,
+ "max_steps": 30,
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-MR-stall-v1:observe:1",
+  "lane": 2,
+  "lanes": 4,
+  "mode": "observe",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 1,
+  "rerun_of": null
+ },
+ "role_labels": {
+  "lead": "조사 책임",
+  "searcher": "검색 담당",
+  "writer": "작성 담당"
+ },
+ "first_stop_step": null,
+ "stop_steps": [],
+ "blocked_step": null,
+ "if_stopped": null,
+ "steps": [
+  {
+   "step_id": 1,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "escalated",
+    "status_label": "에스컬레이션",
+    "handoff_to": "lead",
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "pricing",
+     "features",
+     "market-share",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 5124,
+    "cached_prompt": 0,
+    "completion": 2125,
+    "reasoning": 667
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 1.8311,
+   "cumulative_tokens": 7249,
+   "cumulative_credits": 1.8311
+  }
+ ]
+}

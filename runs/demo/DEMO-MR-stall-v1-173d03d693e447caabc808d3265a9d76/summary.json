@@ -1,0 +1,89 @@
+{
+  "session_id": "DEMO-MR-stall-v1-173d03d693e447caabc808d3265a9d76",
+  "steps": 3,
+  "termination_reason": "runner_error",
+  "total_tokens": null,
+  "known_tokens_subtotal": 51077,
+  "criteria_latest": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "unmeasured",
+    "reason": "observation or termination context missing",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 1,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "declared_step": null
+  },
+  "criteria_alerts": [],
+  "missing_observation_steps": [],
+  "missing_observation_count": 0,
+  "error": "RuntimeError: InternalServerError: 502 Bad Gateway",
+  "cleanup_errors": [],
+  "actual_outcome": null,
+  "context_buffer_messages": 12,
+  "task_kind": "dialogue",
+  "turn_order": "fixed",
+  "output_contract_version": "output-contract-v3",
+  "registration_sha256": "fc4b7629ab0331ac029d857748c471d2a7c3d9c79677f3690bc7910757d4b3da",
+  "vocabulary_violation_steps": [
+    1,
+    2
+  ],
+  "vocabulary_violations_total": 2,
+  "failed_steps": [
+    {
+      "step_id": 3,
+      "reasons": [
+        "aborted"
+      ]
+    }
+  ],
+  "final_status": "researching",
+  "escalated_by": null,
+  "completion_gate": {
+    "machine_success": false,
+    "result": "unfinished",
+    "missing": [
+      "deliverable"
+    ]
+  },
+  "completion_claims": [],
+  "recent_messages_rule": "t1-handoff-v1",
+  "route_fallbacks": [],
+  "search": {
+    "requests_sent": {
+      "web_search": 7
+    },
+    "calls_recorded": 7,
+    "outcomes": {
+      "ok": 7
+    },
+    "responses_stored": 7,
+    "records_file": "search/records.jsonl",
+    "records_sha256": "41190422bc940dca15a5bd950e79f2d2f4f2efbc93c9dce61a42b7b721720747"
+  },
+  "gateway_usage": {
+    "usage_version": "gateway-usage-v1",
+    "before": {
+      "read_at": "2026-10-06T05:56:50.891444+00:00",
+      "http_status": 200,
+      "used": 726.2787799999999,
+      "field": "monthly_allocated.used"
+    },
+    "after": {
+      "read_at": "2026-10-06T06:01:52.686591+00:00",
+      "http_status": 200,
+      "used": 736.11162,
+      "field": "monthly_allocated.used"
+    },
+    "exact_only_if_alone": true,
+    "note": "after minus before; it includes any other use of the same key between the two read_at times (parallel sessions, probes, other tools). Compare those times with other sessions.",
+    "status": "measured",
+    "value": 9.83284,
+    "field": "monthly_allocated.used"
+  }
+}

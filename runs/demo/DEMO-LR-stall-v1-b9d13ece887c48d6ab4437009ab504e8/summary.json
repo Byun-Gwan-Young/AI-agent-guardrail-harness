@@ -1,0 +1,87 @@
+{
+  "session_id": "DEMO-LR-stall-v1-b9d13ece887c48d6ab4437009ab504e8",
+  "steps": 3,
+  "termination_reason": "escalated",
+  "total_tokens": 18583,
+  "known_tokens_subtotal": 18583,
+  "criteria_latest": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "progress, baseline or declaration step",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "declared_step": null
+  },
+  "criteria_alerts": [],
+  "missing_observation_steps": [],
+  "missing_observation_count": 0,
+  "error": null,
+  "cleanup_errors": [],
+  "actual_outcome": null,
+  "context_buffer_messages": 12,
+  "task_kind": "dialogue",
+  "turn_order": "fixed",
+  "output_contract_version": "output-contract-v3",
+  "registration_sha256": "f18f26f3d08de371ad6b42b775f4619b257204f648366295d83f1437f4979322",
+  "vocabulary_violation_steps": [
+    1
+  ],
+  "vocabulary_violations_total": 1,
+  "failed_steps": [
+    {
+      "step_id": 2,
+      "reasons": [
+        "tool_execution_error"
+      ]
+    }
+  ],
+  "final_status": "escalated",
+  "escalated_by": "writer",
+  "completion_gate": {
+    "machine_success": false,
+    "result": "escalated",
+    "missing": []
+  },
+  "completion_claims": [],
+  "recent_messages_rule": "t1-handoff-v1",
+  "route_fallbacks": [],
+  "search": {
+    "requests_sent": {
+      "academic_search": 4
+    },
+    "calls_recorded": 4,
+    "outcomes": {
+      "timeout": 3,
+      "http_error": 1
+    },
+    "responses_stored": 0,
+    "records_file": "search/records.jsonl",
+    "records_sha256": "43c37a2009f9cf2078d86644d41645f5ce3fd8344efa0c79a92ce46de1bc3345"
+  },
+  "gateway_usage": {
+    "usage_version": "gateway-usage-v1",
+    "before": {
+      "read_at": "2026-10-06T04:16:46.293782+00:00",
+      "http_status": 200,
+      "used": 36.18273,
+      "field": "monthly_allocated.used"
+    },
+    "after": {
+      "read_at": "2026-10-06T04:19:47.469551+00:00",
+      "http_status": 200,
+      "used": 39.57101999999999,
+      "field": "monthly_allocated.used"
+    },
+    "exact_only_if_alone": true,
+    "note": "after minus before; it includes any other use of the same key between the two read_at times (parallel sessions, probes, other tools). Compare those times with other sessions.",
+    "status": "measured",
+    "value": 3.38829,
+    "field": "monthly_allocated.used"
+  }
+}

@@ -1,0 +1,1882 @@
+{
+ "replay_version": "demo-replay-v1",
+ "session_id": "DEMO-CT-stall-v1-22a0edb6917e421a95f83fa2635d2337",
+ "scenario_id": "DEMO-CT-stall-v1",
+ "title": "업무 조회 기능을 승인된 명세로 기획·구현·검토하기",
+ "task_kind": "artifact",
+ "guardrail_mode": "observe",
+ "model": "glm-5.3-flash",
+ "termination_reason": "max_steps",
+ "escalated_by": null,
+ "steps_reached": 30,
+ "max_steps": 30,
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-CT-stall-v1:observe:2",
+  "lane": 2,
+  "lanes": 4,
+  "mode": "observe",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 2,
+  "rerun_of": null
+ },
+ "role_labels": {
+  "planner": "기획",
+  "developer": "개발",
+  "reviewer": "검토"
+ },
+ "first_stop_step": 10,
+ "stop_steps": [
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  25,
+  26,
+  27,
+  28,
+  29,
+  30
+ ],
+ "blocked_step": null,
+ "if_stopped": {
+  "stop_step": 10,
+  "tokens_after": 582472,
+  "tokens_total": 806681,
+  "token_ratio": 0.7221,
+  "credits_after": 98.54467,
+  "credits_total": 135.79797,
+  "basis": "tokens (prompt + completion) of the steps after the first STOP step: a block-mode proxy refuses the next request after the STOP (DM-7); credits are the token x price estimate"
+ },
+ "steps": [
+  {
+   "step_id": 1,
+   "agent": "planner",
+   "role": "기획",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "input-immutability",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 9639,
+    "cached_prompt": 2496,
+    "completion": 2765,
+    "reasoning": 1866
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 2.52883,
+   "cumulative_tokens": 12404,
+   "cumulative_credits": 2.52883
+  },
+  {
+   "step_id": 2,
+   "agent": "developer",
+   "role": "개발",
+   "step_status": "failed",
+   "failure_reasons": [
+    "write_refused_before_approval"
+   ],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "write_file",
+     "is_error": true
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 10611,
+    "cached_prompt": 2944,
+    "completion": 1326,
+    "reasoning": 495
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 1.90137,
+   "cumulative_tokens": 24341,
+   "cumulative_credits": 4.4302
+  },
+  {
+   "step_id": 3,
+   "agent": "reviewer",
+   "role": "검토",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 10935,
+    "cached_prompt": 4672,
+    "completion": 5382,
+    "reasoning": 4136
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 3.77061,
+   "cumulative_tokens": 40658,
+   "cumulative_credits": 8.20081
+  },
+  {
+   "step_id": 4,
+   "agent": "planner",
+   "role": "기획",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "progress",
+   "state_label": "진전",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 21280,
+    "cached_prompt": 10304,
+    "completion": 2514,
+    "reasoning": 1480
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 3.21252,
+   "cumulative_tokens": 64452,
+   "cumulative_credits": 11.41333
+  },
+  {
+   "step_id": 5,
+   "agent": "developer",
+   "role": "개발",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 20604,
+    "cached_prompt": 11648,
+    "completion": 3344,
+    "reasoning": 1258
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 3.36484,
+   "cumulative_tokens": 88400,
+   "cumulative_credits": 14.77817
+  },
+  {
+   "step_id": 6,
+   "agent": "reviewer",
+   "role": "검토",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "run_tests",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 22905,
+    "cached_prompt": 12416,
+    "completion": 1437,
+    "reasoning": 267
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 2.66433,
+   "cumulative_tokens": 112742,
+   "cumulative_credits": 17.4425
+  },
+  {
+   "step_id": 7,
+   "agent": "planner",
+   "role": "기획",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "replace_in_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [
+    "SPEC.md"
+   ],
+   "state": "progress",
+   "state_label": "진전",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 21930,
+    "cached_prompt": 3392,
+    "completion": 4211,
+    "reasoning": 2879
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 4.98796,
+   "cumulative_tokens": 138883,
+   "cumulative_credits": 22.43046
+  },
+  {
+   "step_id": 8,
+   "agent": "developer",
+   "role": "개발",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 27090,
+    "cached_prompt": 896,
+    "completion": 2720,
+    "reasoning": 426
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.31598,
+   "cumulative_tokens": 168693,
+   "cumulative_credits": 27.74644
+  },
+  {
+   "step_id": 9,
+   "agent": "reviewer",
+   "role": "검토",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "run_tests",
+     "is_error": false
+    },
+    {
+     "tool": "run_tests",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 26130,
+    "cached_prompt": 3200,
+    "completion": 4186,
+    "reasoning": 2948
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.6285,
+   "cumulative_tokens": 199009,
+   "cumulative_credits": 33.37494
+  },
+  {
+   "step_id": 10,
+   "agent": "planner",
+   "role": "기획",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 9 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 23756,
+    "cached_prompt": 3392,
+    "completion": 1444,
+    "reasoning": 146
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 3.87836,
+   "cumulative_tokens": 224209,
+   "cumulative_credits": 37.2533
+  },
+  {
+   "step_id": 11,
+   "agent": "developer",
+   "role": "개발",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 10 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 30296,
+    "cached_prompt": 896,
+    "completion": 3568,
+    "reasoning": 698
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 6.22088,
+   "cumulative_tokens": 258073,
+   "cumulative_credits": 43.47418
+  },
+  {
+   "step_id": 12,
+   "agent": "reviewer",
+   "role": "검토",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "run_tests",
+     "is_error": false
+    },
+    {
+     "tool": "run_tests",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 11 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 27781,
+    "cached_prompt": 3200,
+    "completion": 1255,
+    "reasoning": 60
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 4.41065,
+   "cumulative_tokens": 287109,
+   "cumulative_credits": 47.88483
+  },
+  {
+   "step_id": 13,
+   "agent": "planner",
+   "role": "기획",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 12 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 24899,
+    "cached_prompt": 3392,
+    "completion": 2175,
+    "reasoning": 933
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 4.41531,
+   "cumulative_tokens": 314183,
+   "cumulative_credits": 52.30014
+  },
+  {
+   "step_id": 14,
+   "agent": "developer",
+   "role": "개발",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "run_tests",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 13 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 31196,
+    "cached_prompt": 896,
+    "completion": 2590,
+    "reasoning": 1070
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.86688,
+   "cumulative_tokens": 347969,
+   "cumulative_credits": 58.16702
+  },
+  {
+   "step_id": 15,
+   "agent": "reviewer",
+   "role": "검토",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "run_tests",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 14 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 27218,
+    "cached_prompt": 4672,
+    "completion": 1350,
+    "reasoning": 199
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 4.19706,
+   "cumulative_tokens": 376537,
+   "cumulative_credits": 62.36408
+  },
+  {
+   "step_id": 16,
+   "agent": "planner",
+   "role": "기획",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 15 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 24911,
+    "cached_prompt": 3392,
+    "completion": 1341,
+    "reasoning": 75
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 4.00011,
+   "cumulative_tokens": 402789,
+   "cumulative_credits": 66.36419
+  },
+  {
+   "step_id": 17,
+   "agent": "developer",
+   "role": "개발",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 16 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 28609,
+    "cached_prompt": 896,
+    "completion": 1911,
+    "reasoning": 410
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.13933,
+   "cumulative_tokens": 433309,
+   "cumulative_credits": 71.50352
+  },
+  {
+   "step_id": 18,
+   "agent": "reviewer",
+   "role": "검토",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "run_tests",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 17 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 25513,
+    "cached_prompt": 4672,
+    "completion": 1285,
+    "reasoning": 73
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 3.90881,
+   "cumulative_tokens": 460107,
+   "cumulative_credits": 75.41233
+  },
+  {
+   "step_id": 19,
+   "agent": "planner",
+   "role": "기획",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 18 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 24320,
+    "cached_prompt": 3392,
+    "completion": 1641,
+    "reasoning": 382
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 4.06146,
+   "cumulative_tokens": 486068,
+   "cumulative_credits": 79.47379
+  },
+  {
+   "step_id": 20,
+   "agent": "developer",
+   "role": "개발",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "run_tests",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 19 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 27336,
+    "cached_prompt": 896,
+    "completion": 2282,
+    "reasoning": 830
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.13388,
+   "cumulative_tokens": 515686,
+   "cumulative_credits": 84.60767
+  },
+  {
+   "step_id": 21,
+   "agent": "reviewer",
+   "role": "검토",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "run_tests",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 20 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 25560,
+    "cached_prompt": 4672,
+    "completion": 1431,
+    "reasoning": 216
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 3.98886,
+   "cumulative_tokens": 542677,
+   "cumulative_credits": 88.59653
+  },
+  {
+   "step_id": 22,
+   "agent": "planner",
+   "role": "기획",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 21 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 24547,
+    "cached_prompt": 3392,
+    "completion": 2278,
+    "reasoning": 921
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 4.41401,
+   "cumulative_tokens": 569502,
+   "cumulative_credits": 93.01054
+  },
+  {
+   "step_id": 23,
+   "agent": "developer",
+   "role": "개발",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 22 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 26334,
+    "cached_prompt": 896,
+    "completion": 2421,
+    "reasoning": 483
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.05308,
+   "cumulative_tokens": 598257,
+   "cumulative_credits": 98.06362
+  },
+  {
+   "step_id": 24,
+   "agent": "reviewer",
+   "role": "검토",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 23 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 21052,
+    "cached_prompt": 2368,
+    "completion": 2983,
+    "reasoning": 341
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 4.36514,
+   "cumulative_tokens": 622292,
+   "cumulative_credits": 102.42876
+  },
+  {
+   "step_id": 25,
+   "agent": "planner",
+   "role": "기획",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 24 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 24916,
+    "cached_prompt": 896,
+    "completion": 2248,
+    "reasoning": 880
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 4.75388,
+   "cumulative_tokens": 649456,
+   "cumulative_credits": 107.18264
+  },
+  {
+   "step_id": 26,
+   "agent": "developer",
+   "role": "개발",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "run_tests",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 25 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 27736,
+    "cached_prompt": 896,
+    "completion": 3000,
+    "reasoning": 978
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.55288,
+   "cumulative_tokens": 680192,
+   "cumulative_credits": 112.73552
+  },
+  {
+   "step_id": 27,
+   "agent": "reviewer",
+   "role": "검토",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 26 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 23130,
+    "cached_prompt": 896,
+    "completion": 2687,
+    "reasoning": 45
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 4.70548,
+   "cumulative_tokens": 706009,
+   "cumulative_credits": 117.441
+  },
+  {
+   "step_id": 28,
+   "agent": "planner",
+   "role": "기획",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 27 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 27964,
+    "cached_prompt": 2496,
+    "completion": 6195,
+    "reasoning": 3063
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 6.99258,
+   "cumulative_tokens": 740168,
+   "cumulative_credits": 124.43358
+  },
+  {
+   "step_id": 29,
+   "agent": "developer",
+   "role": "개발",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    },
+    {
+     "tool": "read_file",
+     "is_error": false
+    }
+   ],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 28 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 30838,
+    "cached_prompt": 0,
+    "completion": 2147,
+    "reasoning": 671
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.6992,
+   "cumulative_tokens": 773153,
+   "cumulative_credits": 130.13278
+  },
+  {
+   "step_id": 30,
+   "agent": "reviewer",
+   "role": "검토",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": null,
+    "status_label": null,
+    "handoff_to": null,
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "requirements",
+     "acceptance-review",
+     "status-filter",
+     "search-normalization",
+     "sort-order",
+     "filtering-order",
+     "pagination-validation",
+     "case-sensitive-search"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false,
+    "spec_approved": false
+   },
+   "completion_claim": null,
+   "tools": [],
+   "tests": {
+    "passed": 7,
+    "total": 17
+   },
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "deadlock",
+   "stop": {
+    "template_id": "E3",
+    "text": "step 1 이후 29 step 동안 파일이 1 번 바뀌었지만 통과 테스트는 7/17에서 늘지 않았습니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 30899,
+    "cached_prompt": 2368,
+    "completion": 2629,
+    "reasoning": 74
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.66519,
+   "cumulative_tokens": 806681,
+   "cumulative_credits": 135.79797
+  }
+ ]
+}

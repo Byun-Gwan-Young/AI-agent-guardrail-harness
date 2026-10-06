@@ -1,0 +1,14 @@
+{
+  "intake": [
+    "lookup_order",
+    "read_policy"
+  ],
+  "refund": [
+    "lookup_order",
+    "read_policy"
+  ],
+  "shipping": [
+    "lookup_order",
+    "read_policy"
+  ]
+}

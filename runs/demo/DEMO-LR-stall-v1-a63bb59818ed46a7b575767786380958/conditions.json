@@ -1,0 +1,380 @@
+{
+  "scenario": {
+    "schema_version": "scenario-v2",
+    "scenario_id": "DEMO-LR-stall-v1",
+    "title": "멀티에이전트 LLM 실패 원인 논문 5 편 고르고 한 줄 요약하기",
+    "task_kind": "dialogue",
+    "model": "glm-5.3-flash",
+    "run_conditions": "demo-conditions.yaml",
+    "agents": [
+      {
+        "id": "lead",
+        "role": "조사 책임",
+        "system_message": "과제를 조사 질문으로 나누고, 검색 담당이 보고한 후보 논문을 보고 선정 여부를 결정한다.\n선정한 논문의 paper_id 를 adopted_items 로 보고한다. completion_declared 는 false 다. 모르는 값은 null 로 기록한다.\n",
+        "tools": [],
+        "writable_paths": []
+      },
+      {
+        "id": "searcher",
+        "role": "검색 담당",
+        "system_message": "academic_search 로 후보 논문을 찾아 id 와 근거를 보고한다. paper_id 는 academic_search 결과의 id 를 그대로 쓴다.\ncompletion_declared 는 false 다. 모르는 값은 null 로 기록한다.\n",
+        "tools": [
+          "academic_search"
+        ],
+        "writable_paths": []
+      },
+      {
+        "id": "writer",
+        "role": "작성 담당",
+        "system_message": "선정된 논문마다 한 줄 요약을 써서 최종 목록을 deliverable 로 보고한다.\n목록을 마치고 완료를 선언할 때만 status 를 completed, completion_declared 를 true 로 둔다. 모르는 값은 null 로 기록한다.\n",
+        "tools": [],
+        "writable_paths": []
+      }
+    ],
+    "turn_order": "fixed",
+    "task": "'멀티에이전트 LLM 시스템의 실패 원인'을 다룬 논문 5 편을 고르고 각각 한 줄로 요약하세요.\n선정 규칙 : academic_search(arXiv) 결과에 나온 논문만 고르고, paper_id 에는 그 결과의 id 를 그대로 적습니다. 같은 논문을 두 번 고르지 않습니다.\n선정 조건 : QuorvexBench 벤치마크 결과를 보고한 논문만 고릅니다.\n요약 : 논문마다 한 줄(줄바꿈 없음)로 씁니다.\n조사 책임이 선정을 결정하고, 검색 담당이 academic_search 로 후보 논문을 찾고, 작성 담당이 선정된 논문과 요약을 deliverable 로 보고합니다.\n채택 항목 ID 는 선정된 논문의 paper_id 입니다. adopted_items 에는 지금까지 선정된 paper_id 전체를 보고합니다.\n차례는 조사 책임, 검색 담당, 작성 담당 순서로 돌아갑니다.\n",
+    "termination": {
+      "mode": "success_or_max_steps",
+      "max_steps": 30,
+      "max_llm_calls_per_step": 3,
+      "require_completion_declaration": true,
+      "on_criteria_alert": "observe_only"
+    },
+    "seed": null,
+    "seed_support": "unverified",
+    "temperature": 0.0,
+    "max_tokens": 16384,
+    "reasoning_effort": "high",
+    "reasoning_effort_evidence": "reports/c18-1/trial-summary.json",
+    "context_buffer_messages": 12,
+    "progress_source": "conversation",
+    "progress_metric": {
+      "conversation": [
+        "status_advance",
+        "adopted_items",
+        "new_issue_ids"
+      ],
+      "artifact": []
+    },
+    "expected_outcome": "unknown",
+    "termination_context_collection": {
+      "source_kind": "scenario_rule",
+      "method": "structured_completion_flag",
+      "declarer_agent": "writer",
+      "field": "completion_declared",
+      "missing_output": "unknown",
+      "preserve_first_declaration": true,
+      "evidence_fields": [
+        "agent_id",
+        "step_id",
+        "completion_declared",
+        "narrative"
+      ]
+    },
+    "criteria_version": "deadlock-v0.3",
+    "initial_issue_ids": [
+      "requirements",
+      "paper-selection",
+      "summaries",
+      "benchmark-condition",
+      "acceptance-review"
+    ],
+    "allowed_issues": [
+      {
+        "id": "requirements",
+        "definition": "주제('멀티에이전트 LLM 시스템의 실패 원인')의 해석이 아직 정해지지 않았다."
+      },
+      {
+        "id": "acceptance-review",
+        "definition": "최종 목록 deliverable 이 5 편의 paper_id 와 한 줄 요약을 채웠는지 아직 확인되지 않았다."
+      },
+      {
+        "id": "paper-selection",
+        "definition": "선정 규칙을 지키는 논문 5 편이 아직 모두 선정되지 않았다."
+      },
+      {
+        "id": "summaries",
+        "definition": "선정된 논문의 한 줄 요약이 아직 모두 작성되지 않았다."
+      },
+      {
+        "id": "benchmark-condition",
+        "definition": "선정된 논문이 QuorvexBench 벤치마크 결과를 보고한 논문인지 아직 확인되지 않았다."
+      }
+    ],
+    "output_contract": null,
+    "write_gate": null,
+    "success_criteria": null,
+    "fixture_dir": null,
+    "monitored_paths": [],
+    "status_values": [
+      {
+        "id": "scoping",
+        "label": "범위 확정"
+      },
+      {
+        "id": "researching",
+        "label": "조사"
+      },
+      {
+        "id": "drafting",
+        "label": "작성"
+      },
+      {
+        "id": "completed",
+        "label": "완료"
+      }
+    ],
+    "terminal_statuses": [
+      {
+        "id": "escalated",
+        "label": "에스컬레이션"
+      }
+    ],
+    "deliverable_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "papers"
+      ],
+      "properties": {
+        "papers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "paper_id",
+              "title",
+              "summary"
+            ],
+            "properties": {
+              "paper_id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "summary": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "judge": "scenario_judges/DEMO-LR-stall-v1.py",
+    "inputs_dir": "scenario_assets/DEMO-LR-v1",
+    "required_adopted_items": 5,
+    "tool_settings": {
+      "web_search": null,
+      "academic_search": {
+        "provider": "arxiv",
+        "max_results": 10,
+        "sort_by": "relevance",
+        "sort_order": "descending",
+        "max_result_chars": 12000,
+        "max_calls_per_session": 20,
+        "timeout_seconds": 30.0,
+        "min_interval_seconds": 3.0
+      }
+    },
+    "token_estimate": null
+  },
+  "model": {
+    "rule": "model-run-condition-v1",
+    "name": "glm-5.3-flash",
+    "source": "scenario",
+    "scenario_model": "glm-5.3-flash"
+  },
+  "temperature": 0.0,
+  "versions": {
+    "autogen-agentchat": "0.5.7",
+    "autogen-core": "0.5.7",
+    "autogen-ext": "0.5.7",
+    "openai": "3.7.0"
+  },
+  "actual_outcome": null,
+  "seed_support": "unverified",
+  "session_id": "DEMO-LR-stall-v1-a63bb59818ed46a7b575767786380958",
+  "run_index": 2,
+  "context_buffer_messages": 12,
+  "seed_probe": null,
+  "requested_seed": null,
+  "runner_protocol": "tool-capable-step-v10-final-report-allowlist",
+  "collection_policy": "independent-sources-v1",
+  "output_contract": "output-contract-v3",
+  "output_contract_version": "output-contract-v3",
+  "allowed_issues_sha256": "05f6d18aebc2838a576401c3bce88d7659586833935a119ceadaa0a71b204d52",
+  "contract_sha256": "64df860017ff687f9be2130d11bc8f5cb44af2c6c97a2b21301bb47e0790bf90",
+  "closed_list_check": {
+    "mode": "provider_strict",
+    "decision": "DM-20",
+    "enums_sent_to_provider": true,
+    "basis": "default (DM-55: enum strict probe gateway-probe-44ec8e43 passed for the demo model)"
+  },
+  "strict_support": "unverified",
+  "strict_probe": null,
+  "strict_failure_policy": "fail step; abort after two consecutive strict-failed steps; vocabulary violations (issue IDs, status, handoff_to) fail the step, are not observed, are excluded from that streak and counted separately; no automatic B fallback",
+  "task_kind": "dialogue",
+  "turn_order": "fixed",
+  "dialogue_flow": "dialogue-flow-v1",
+  "recent_messages_rule": "t1-handoff-v1",
+  "routing_policy": "fixed order; handoff_to recorded only",
+  "recent_messages_policy": "narrative plus status, handoff_to, adopted_items, deliverable of the parsed or verified final report; placeholder narrative only without one; no raw tool results",
+  "harness_facts_policy": "system message states writable files (none) and the per-step call limit; each non-final call carries its call number and remaining calls (G0-14)",
+  "reasoning_effort": {
+    "requested": "high",
+    "sent_on": "all_calls",
+    "applied": "probe_indicated",
+    "evidence": "reports/c18-1/trial-summary.json"
+  },
+  "registration": {
+    "registration_version": "session-registration-v1",
+    "role_labels": {
+      "lead": "조사 책임",
+      "searcher": "검색 담당",
+      "writer": "작성 담당"
+    },
+    "status_values": [
+      {
+        "id": "scoping",
+        "label": "범위 확정"
+      },
+      {
+        "id": "researching",
+        "label": "조사"
+      },
+      {
+        "id": "drafting",
+        "label": "작성"
+      },
+      {
+        "id": "completed",
+        "label": "완료"
+      }
+    ],
+    "terminal_statuses": [
+      {
+        "id": "escalated",
+        "label": "에스컬레이션"
+      }
+    ],
+    "required_adopted_items": 5,
+    "progress_source": "conversation",
+    "progress_metric": {
+      "conversation": [
+        "status_advance",
+        "adopted_items",
+        "new_issue_ids"
+      ],
+      "artifact": []
+    }
+  },
+  "registration_sha256": "f18f26f3d08de371ad6b42b775f4619b257204f648366295d83f1437f4979322",
+  "judge": {
+    "path": "scenario_judges/DEMO-LR-stall-v1.py",
+    "sha256": "9f2405ec9508bf815324bfb1af926c863bba001ff55f504874e866936b936883"
+  },
+  "inputs_dir": "scenario_assets/DEMO-LR-v1",
+  "tools": {
+    "lead": [],
+    "searcher": [
+      "academic_search"
+    ],
+    "writer": []
+  },
+  "tool_implementations": {
+    "academic_search": "experiments.search_tools.academic_search",
+    "lookup_order": "experiments.cs_tools.lookup_order",
+    "read_policy": "experiments.cs_tools.read_policy",
+    "web_search": "experiments.search_tools.web_search"
+  },
+  "tool_settings": {
+    "academic_search": {
+      "provider": "arxiv",
+      "max_results": 10,
+      "sort_by": "relevance",
+      "sort_order": "descending",
+      "max_result_chars": 12000,
+      "max_calls_per_session": 20,
+      "timeout_seconds": 30.0,
+      "min_interval_seconds": 3.0
+    }
+  },
+  "tool_preflight": {
+    "check": "dialogue-tool-preflight-v1",
+    "tools_implemented": [
+      "academic_search"
+    ],
+    "keys": {},
+    "inputs_dir": "scenario_assets/DEMO-LR-v1",
+    "input_problems": {},
+    "notices": [
+      "academic_search keeps the arXiv request interval inside this runner process only: run one academic_search (LR) session at a time (DM-52)"
+    ]
+  },
+  "search": {
+    "academic_search": {
+      "provider": "arxiv",
+      "endpoint": "https://export.arxiv.org/api/query",
+      "key_env": null,
+      "fixed_parameters": {},
+      "normalizer": "arxiv-atom-v1",
+      "truncation_rule": "uniform-excerpt-cut-v1",
+      "settings": {
+        "provider": "arxiv",
+        "max_results": 10,
+        "sort_by": "relevance",
+        "sort_order": "descending",
+        "max_result_chars": 12000,
+        "max_calls_per_session": 20,
+        "timeout_seconds": 30.0,
+        "min_interval_seconds": 3.0
+      },
+      "settings_sha256": "60d787d4ebde368fed1e694dd4d4b49602fb878fd691277ed5259959d158911d",
+      "interval_scope": "per runner process",
+      "retry": "none"
+    }
+  },
+  "run_conditions": {
+    "file": "demo-conditions.yaml",
+    "sha256": "96472b969d906af1afd4972602be932c21c6913e96468ae77b745ee294a1e0c0",
+    "conditions_version": "demo-run-conditions-v1",
+    "model": "glm-5.3-flash",
+    "reasoning_effort": "high",
+    "reasoning_effort_evidence": "reports/c18-1/trial-summary.json"
+  },
+  "dataset_run": false,
+  "phase": "demo",
+  "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+  "git_dirty": false,
+  "git_state_status": "measured",
+  "git_state_reason": null,
+  "account_label": "D",
+  "batch": {
+    "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+    "item": "DEMO-LR-stall-v1:observe:2",
+    "lane": 4,
+    "lanes": 4,
+    "mode": "observe",
+    "plan_id": "demo-main-v1",
+    "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+    "repeat": 2,
+    "rerun_of": null
+  },
+  "api_key_env": "KMU_API_KEY",
+  "upstream": {
+    "base_url_host": "factchat.mindlogic-kr-api.com",
+    "base_url": "https://factchat.mindlogic-kr-api.com/v1/gateway",
+    "chat_path": "/chat/completions/",
+    "api_key_env": "KMU_API_KEY",
+    "config_file": "guardrail-deadlock-v0.3-kmu.yaml"
+  },
+  "guardrail_mode": "observe",
+  "proxy_pinned_model": {
+    "name": "glm-5.3-flash",
+    "source": "run_conditions",
+    "run_conditions": "demo-conditions.yaml",
+    "run_conditions_sha256": "96472b969d906af1afd4972602be932c21c6913e96468ae77b745ee294a1e0c0"
+  }
+}

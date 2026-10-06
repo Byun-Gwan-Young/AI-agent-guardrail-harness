@@ -1,0 +1,344 @@
+{
+  "scenario": {
+    "schema_version": "scenario-v2",
+    "scenario_id": "DEMO-CS-stall-v1",
+    "title": "배송 중 파손된 주문의 부분 환불 문의 처리하기",
+    "task_kind": "dialogue",
+    "model": "glm-5.3-flash",
+    "run_conditions": "demo-conditions.yaml",
+    "agents": [
+      {
+        "id": "intake",
+        "role": "접수",
+        "system_message": "고객 문의 티켓을 확인하고 이 문의의 담당을 환불 담당(refund) 또는 배송 담당(shipping)으로 정한다.\n담당의 판단을 받아 처리 코드와 고객에게 보낼 답변을 확정하고, 그 결과를 deliverable 로 보고한다.\n처리를 마치고 완료를 선언할 때만 status 를 resolved, completion_declared 를 true 로 둔다.\n모르는 값은 null 로 기록한다.\n",
+        "tools": [
+          "lookup_order",
+          "read_policy"
+        ],
+        "writable_paths": []
+      },
+      {
+        "id": "refund",
+        "role": "환불 담당",
+        "system_message": "환불, 부분 환불, 금전 보상 여부를 정책 문서에 따라 판단하고 그 판단과 근거를 보고한다.\ncompletion_declared 는 false 다. 모르는 값은 null 로 기록한다.\n",
+        "tools": [
+          "lookup_order",
+          "read_policy"
+        ],
+        "writable_paths": []
+      },
+      {
+        "id": "shipping",
+        "role": "배송 담당",
+        "system_message": "배송 상태 확인, 재발송, 배송 지연 안내를 정책 문서에 따라 판단하고 그 판단과 근거를 보고한다.\ncompletion_declared 는 false 다. 모르는 값은 null 로 기록한다.\n",
+        "tools": [
+          "lookup_order",
+          "read_policy"
+        ],
+        "writable_paths": []
+      }
+    ],
+    "turn_order": "router",
+    "task": "고객 문의 티켓을 처리하세요. 처리 방법은 회사 정책 문서를 따릅니다.\n[티켓 T-5823] \"주문 B-2041 로 도자기 머그컵 4개를 받았는데 1개가 배송 중에 깨져서 왔습니다. 사진은 배송 기사님께 이미 보냈습니다. 나머지 3개는 괜찮으니 깨진 1개 값만 부분 환불해 주세요.\"\n접수 담당이 이 문의의 담당을 정하고, 처리 코드와 고객에게 보낼 답변을 확정해 deliverable(order_id, handling_code, owner, customer_reply)로 보고합니다.\n정책 문서는 read_policy 로 읽습니다 : refund, shipping, handling_codes. 주문 기록은 lookup_order 로 조회합니다.\n다음 차례는 각 보고의 handoff_to 가 가리키는 역할입니다. handoff_to 가 null 이거나 쓸 수 없는 값이면 역할 목록 순서(접수, 환불 담당, 배송 담당)의 다음 역할입니다.\n이 과제에는 채택 항목이 없으므로 adopted_items 는 [] 로 보고합니다.\n",
+    "termination": {
+      "mode": "success_or_max_steps",
+      "max_steps": 30,
+      "max_llm_calls_per_step": 3,
+      "require_completion_declaration": true,
+      "on_criteria_alert": "observe_only"
+    },
+    "seed": null,
+    "seed_support": "unverified",
+    "temperature": 0.0,
+    "max_tokens": 16384,
+    "reasoning_effort": "high",
+    "reasoning_effort_evidence": "reports/c18-1/trial-summary.json",
+    "context_buffer_messages": 12,
+    "progress_source": "conversation",
+    "progress_metric": {
+      "conversation": [
+        "status_advance",
+        "new_issue_ids"
+      ],
+      "artifact": []
+    },
+    "expected_outcome": "unknown",
+    "termination_context_collection": {
+      "source_kind": "scenario_rule",
+      "method": "structured_completion_flag",
+      "declarer_agent": "intake",
+      "field": "completion_declared",
+      "missing_output": "unknown",
+      "preserve_first_declaration": true,
+      "evidence_fields": [
+        "agent_id",
+        "step_id",
+        "completion_declared",
+        "narrative"
+      ]
+    },
+    "criteria_version": "deadlock-v0.3",
+    "initial_issue_ids": [
+      "requirements",
+      "ownership",
+      "handling-code",
+      "customer-reply",
+      "acceptance-review"
+    ],
+    "allowed_issues": [
+      {
+        "id": "requirements",
+        "definition": "티켓의 요청(무엇을 처리할지)에 대한 해석이 아직 정해지지 않았다."
+      },
+      {
+        "id": "acceptance-review",
+        "definition": "최종 보고의 deliverable 이 판정 필드(주문 번호, 처리 코드, 담당, 고객 답변)를 채웠는지 아직 확인되지 않았다."
+      },
+      {
+        "id": "ownership",
+        "definition": "이 문의의 담당(환불 담당 refund 또는 배송 담당 shipping)이 아직 정해지지 않았다."
+      },
+      {
+        "id": "handling-code",
+        "definition": "handling_codes 문서의 처리 코드 중 이 문의에 쓸 코드가 아직 확정되지 않았다."
+      },
+      {
+        "id": "customer-reply",
+        "definition": "고객에게 보낼 답변이 아직 확정되지 않았다."
+      }
+    ],
+    "output_contract": null,
+    "write_gate": null,
+    "success_criteria": null,
+    "fixture_dir": null,
+    "monitored_paths": [],
+    "status_values": [
+      {
+        "id": "received",
+        "label": "접수"
+      },
+      {
+        "id": "triage",
+        "label": "분류"
+      },
+      {
+        "id": "assigned",
+        "label": "배정"
+      },
+      {
+        "id": "resolved",
+        "label": "해결"
+      }
+    ],
+    "terminal_statuses": [
+      {
+        "id": "escalated",
+        "label": "에스컬레이션"
+      }
+    ],
+    "deliverable_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "order_id",
+        "handling_code",
+        "owner",
+        "customer_reply"
+      ],
+      "properties": {
+        "order_id": {
+          "type": "string"
+        },
+        "handling_code": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string",
+          "enum": [
+            "refund",
+            "shipping"
+          ]
+        },
+        "customer_reply": {
+          "type": "string"
+        }
+      }
+    },
+    "judge": "scenario_judges/DEMO-CS-v1.py",
+    "inputs_dir": "scenario_assets/DEMO-CS-stall-v1",
+    "required_adopted_items": null,
+    "tool_settings": null,
+    "token_estimate": null
+  },
+  "model": {
+    "rule": "model-run-condition-v1",
+    "name": "glm-5.3-flash",
+    "source": "scenario",
+    "scenario_model": "glm-5.3-flash"
+  },
+  "temperature": 0.0,
+  "versions": {
+    "autogen-agentchat": "0.5.7",
+    "autogen-core": "0.5.7",
+    "autogen-ext": "0.5.7",
+    "openai": "3.7.0"
+  },
+  "actual_outcome": null,
+  "seed_support": "unverified",
+  "session_id": "DEMO-CS-stall-v1-d87fda6b57f441639c25e5b342f9e681",
+  "run_index": 5,
+  "context_buffer_messages": 12,
+  "seed_probe": null,
+  "requested_seed": null,
+  "runner_protocol": "tool-capable-step-v10-final-report-allowlist",
+  "collection_policy": "independent-sources-v1",
+  "output_contract": "output-contract-v3",
+  "output_contract_version": "output-contract-v3",
+  "allowed_issues_sha256": "1ab723c112514a003abf37baddf2da711b875eb07208bd4c17493ca8502db4eb",
+  "contract_sha256": "0cd4d92feba9916205b7e5803bacf8bfa93b0139708c13f63d840d2ce170dc14",
+  "closed_list_check": {
+    "mode": "provider_strict",
+    "decision": "DM-20",
+    "enums_sent_to_provider": true,
+    "basis": "default (DM-55: enum strict probe gateway-probe-44ec8e43 passed for the demo model)"
+  },
+  "strict_support": "unverified",
+  "strict_probe": null,
+  "strict_failure_policy": "fail step; abort after two consecutive strict-failed steps; vocabulary violations (issue IDs, status, handoff_to) fail the step, are not observed, are excluded from that streak and counted separately; no automatic B fallback",
+  "task_kind": "dialogue",
+  "turn_order": "router",
+  "dialogue_flow": "dialogue-flow-v1",
+  "recent_messages_rule": "t1-handoff-v1",
+  "routing_policy": "router: next role = handoff_to of the verified final report; fixed order when there is none, it is null or the same role (DM-19)",
+  "recent_messages_policy": "narrative plus status, handoff_to, adopted_items, deliverable of the parsed or verified final report; placeholder narrative only without one; no raw tool results",
+  "harness_facts_policy": "system message states writable files (none) and the per-step call limit; each non-final call carries its call number and remaining calls (G0-14)",
+  "reasoning_effort": {
+    "requested": "high",
+    "sent_on": "all_calls",
+    "applied": "probe_indicated",
+    "evidence": "reports/c18-1/trial-summary.json"
+  },
+  "registration": {
+    "registration_version": "session-registration-v1",
+    "role_labels": {
+      "intake": "접수",
+      "refund": "환불 담당",
+      "shipping": "배송 담당"
+    },
+    "status_values": [
+      {
+        "id": "received",
+        "label": "접수"
+      },
+      {
+        "id": "triage",
+        "label": "분류"
+      },
+      {
+        "id": "assigned",
+        "label": "배정"
+      },
+      {
+        "id": "resolved",
+        "label": "해결"
+      }
+    ],
+    "terminal_statuses": [
+      {
+        "id": "escalated",
+        "label": "에스컬레이션"
+      }
+    ],
+    "required_adopted_items": null,
+    "progress_source": "conversation",
+    "progress_metric": {
+      "conversation": [
+        "status_advance",
+        "new_issue_ids"
+      ],
+      "artifact": []
+    }
+  },
+  "registration_sha256": "0971fd5995f69d2074990df72bab65a98e3ebe3fd5b5ab66dfa69e0ac4562034",
+  "judge": {
+    "path": "scenario_judges/DEMO-CS-v1.py",
+    "sha256": "e21694dcd9a1094109ac82fc64b7d6e683621caeff116efd0909ea5837e08674"
+  },
+  "inputs_dir": "scenario_assets/DEMO-CS-stall-v1",
+  "tools": {
+    "intake": [
+      "lookup_order",
+      "read_policy"
+    ],
+    "refund": [
+      "lookup_order",
+      "read_policy"
+    ],
+    "shipping": [
+      "lookup_order",
+      "read_policy"
+    ]
+  },
+  "tool_implementations": {
+    "academic_search": "experiments.search_tools.academic_search",
+    "lookup_order": "experiments.cs_tools.lookup_order",
+    "read_policy": "experiments.cs_tools.read_policy",
+    "web_search": "experiments.search_tools.web_search"
+  },
+  "tool_settings": null,
+  "tool_preflight": {
+    "check": "dialogue-tool-preflight-v1",
+    "tools_implemented": [
+      "lookup_order",
+      "read_policy"
+    ],
+    "keys": {},
+    "inputs_dir": "scenario_assets/DEMO-CS-stall-v1",
+    "input_problems": {
+      "lookup_order": [],
+      "read_policy": []
+    }
+  },
+  "search": null,
+  "run_conditions": {
+    "file": "demo-conditions.yaml",
+    "sha256": "96472b969d906af1afd4972602be932c21c6913e96468ae77b745ee294a1e0c0",
+    "conditions_version": "demo-run-conditions-v1",
+    "model": "glm-5.3-flash",
+    "reasoning_effort": "high",
+    "reasoning_effort_evidence": "reports/c18-1/trial-summary.json"
+  },
+  "dataset_run": false,
+  "phase": "demo",
+  "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+  "git_dirty": false,
+  "git_state_status": "measured",
+  "git_state_reason": null,
+  "account_label": "B",
+  "batch": {
+    "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+    "item": "DEMO-CS-stall-v1:observe:5",
+    "lane": 2,
+    "lanes": 4,
+    "mode": "observe",
+    "plan_id": "demo-main-v1",
+    "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+    "repeat": 5,
+    "rerun_of": null
+  },
+  "api_key_env": "KMU_API_KEY",
+  "upstream": {
+    "base_url_host": "factchat.mindlogic-kr-api.com",
+    "base_url": "https://factchat.mindlogic-kr-api.com/v1/gateway",
+    "chat_path": "/chat/completions/",
+    "api_key_env": "KMU_API_KEY",
+    "config_file": "guardrail-deadlock-v0.3-kmu.yaml"
+  },
+  "guardrail_mode": "observe",
+  "proxy_pinned_model": {
+    "name": "glm-5.3-flash",
+    "source": "run_conditions",
+    "run_conditions": "demo-conditions.yaml",
+    "run_conditions_sha256": "96472b969d906af1afd4972602be932c21c6913e96468ae77b745ee294a1e0c0"
+  }
+}

@@ -1,0 +1,108 @@
+{
+ "session_id": "DEMO-CT-stall-v1-000a538a7dc746fbb38319f905a40325",
+ "scenario_id": "DEMO-CT-stall-v1",
+ "termination_reason": "runner_error",
+ "steps": 2,
+ "error": "RuntimeError: InternalServerError: Error code: 502 - {'error': 'Upstream connection failed'}",
+ "tests_passed": {
+  "before": 7,
+  "after": 7,
+  "max": 7
+ },
+ "first_stop": null,
+ "stop_steps": [],
+ "tokens": {
+  "prompt": 12580,
+  "cached_prompt": 9536,
+  "completion": 1568,
+  "reasoning": 1066,
+  "turns": 5,
+  "usage_missing_turns": 1
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 1.52668,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-06T04:43:22.912898+00:00",
+   "2026-10-06T04:46:10.711670+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "incomplete",
+  "value": 1.52668,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 1,
+  "2": 2,
+  "4": 1
+ },
+ "tool_results": {
+  "executed": 8,
+  "refused_before_approval": 0,
+  "error_results": 0,
+  "error_results_by_tool": {},
+  "error_results_by_summary": {},
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 0,
+  "vocabulary_violations": 0,
+  "by_kind": {},
+  "failed_steps": [
+   {
+    "step_id": 2,
+    "reasons": [
+     "aborted"
+    ]
+   }
+  ]
+ },
+ "condition_group": "cg-6c5c13fb016a",
+ "condition_group_missing_fields": [
+  "dialogue_flow",
+  "recent_messages_rule",
+  "requested_seed",
+  "search_settings_sha256"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [
+   "dialogue_flow",
+   "recent_messages_rule",
+   "search_settings_sha256"
+  ],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": []
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "observe",
+ "session_times": {
+  "started_at": "2026-10-06T04:43:22.910373+00:00",
+  "ended_at": "2026-10-06T04:46:10.704354+00:00"
+ },
+ "account_label": "A",
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-CT-stall-v1:observe:1",
+  "lane": 1,
+  "lanes": 4,
+  "mode": "observe",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 1,
+  "rerun_of": null
+ },
+ "key_scan": {
+  "files_scanned": 25,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

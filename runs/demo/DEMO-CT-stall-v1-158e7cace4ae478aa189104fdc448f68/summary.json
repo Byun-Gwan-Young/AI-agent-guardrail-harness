@@ -1,0 +1,72 @@
+{
+  "session_id": "DEMO-CT-stall-v1-158e7cace4ae478aa189104fdc448f68",
+  "steps": 4,
+  "termination_reason": "runner_error",
+  "total_tokens": null,
+  "known_tokens_subtotal": 40054,
+  "criteria_latest": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "unmeasured",
+    "reason": "observation or termination context missing",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 1,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "declared_step": null
+  },
+  "criteria_alerts": [],
+  "tests_passed_before": 7,
+  "tests_passed_after": 7,
+  "missing_observation_steps": [],
+  "missing_observation_count": 0,
+  "fixture_unchanged": true,
+  "error": "RuntimeError: InternalServerError: Error code: 502 - {'error': 'Upstream connection failed'}",
+  "cleanup_errors": [],
+  "actual_outcome": null,
+  "context_buffer_messages": 12,
+  "vocabulary_violation_steps": [],
+  "vocabulary_violations_total": 0,
+  "failed_steps": [
+    {
+      "step_id": 4,
+      "reasons": [
+        "aborted"
+      ]
+    }
+  ],
+  "task_kind": "artifact",
+  "turn_order": "fixed",
+  "output_contract_version": "output-contract-v3",
+  "registration_sha256": "7dbebabcae3185c3425a1f8c6591f92d372d7608b506ad96546b08b8a7102b59",
+  "approval": {
+    "approved_step": 3,
+    "spec_path": "SPEC.md",
+    "spec_sha256_at_approval": "dceff320b8cc8cf0d687e145e6455b83b21c3a3c56eaefa7718b6c0cca863a40",
+    "refused_writes": 0,
+    "refused_writes_by_step": {}
+  },
+  "gateway_usage": {
+    "usage_version": "gateway-usage-v1",
+    "before": {
+      "read_at": "2026-10-06T05:47:52.654910+00:00",
+      "http_status": 200,
+      "used": 704.1641699999999,
+      "field": "monthly_allocated.used"
+    },
+    "after": {
+      "read_at": "2026-10-06T05:53:46.916979+00:00",
+      "http_status": 200,
+      "used": 711.4926899999999,
+      "field": "monthly_allocated.used"
+    },
+    "exact_only_if_alone": true,
+    "note": "after minus before; it includes any other use of the same key between the two read_at times (parallel sessions, probes, other tools). Compare those times with other sessions.",
+    "status": "measured",
+    "value": 7.32852,
+    "field": "monthly_allocated.used"
+  }
+}

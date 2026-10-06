@@ -1,0 +1,119 @@
+{
+ "session_id": "DEMO-CL-stall-v1-1372b13baf0d4b1eb9d2269849a0716b",
+ "scenario_id": "DEMO-CL-stall-v1",
+ "termination_reason": "runner_error",
+ "steps": 7,
+ "error": "RuntimeError: InternalServerError: 502 Bad Gateway",
+ "tests_passed": {
+  "before": 6,
+  "after": 6,
+  "max": 6
+ },
+ "first_stop": null,
+ "stop_steps": [],
+ "tokens": {
+  "prompt": 84694,
+  "cached_prompt": 28032,
+  "completion": 10522,
+  "reasoning": 4896,
+  "turns": 18,
+  "usage_missing_turns": 1
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 14.60126,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-06T05:57:36.381425+00:00",
+   "2026-10-06T06:03:07.734029+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "incomplete",
+  "value": 14.60126,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 7,
+  "1": 2,
+  "2": 2,
+  "3": 3,
+  "4": 3
+ },
+ "tool_results": {
+  "executed": 27,
+  "refused_before_approval": 0,
+  "error_results": 0,
+  "error_results_by_tool": {},
+  "error_results_by_summary": {},
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 1,
+  "vocabulary_violations": 0,
+  "by_kind": {
+   "strict_schema_mismatch": 1
+  },
+  "failed_steps": [
+   {
+    "step_id": 2,
+    "reasons": [
+     "strict_schema_mismatch",
+     "no_final_output"
+    ]
+   },
+   {
+    "step_id": 7,
+    "reasons": [
+     "aborted"
+    ]
+   }
+  ]
+ },
+ "condition_group": "cg-79fa04a93ef7",
+ "condition_group_missing_fields": [
+  "dialogue_flow",
+  "recent_messages_rule",
+  "requested_seed",
+  "search_settings_sha256"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [
+   "dialogue_flow",
+   "recent_messages_rule",
+   "search_settings_sha256"
+  ],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": []
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "block",
+ "session_times": {
+  "started_at": "2026-10-06T05:57:36.378327+00:00",
+  "ended_at": "2026-10-06T06:03:07.707434+00:00"
+ },
+ "account_label": "C",
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-CL-stall-v1:block:3",
+  "lane": 3,
+  "lanes": 4,
+  "mode": "block",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 3,
+  "rerun_of": null
+ },
+ "key_scan": {
+  "files_scanned": 63,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

@@ -1,0 +1,226 @@
+{
+  "session_id": "DEMO-CT-stall-v1-34b058044ab64663911145fdd72da6a4",
+  "steps": 17,
+  "termination_reason": "guardrail_stop",
+  "total_tokens": 353186,
+  "known_tokens_subtotal": 353186,
+  "criteria_latest": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "termination_failure",
+    "reason": "post-declaration nonprogress beyond grace",
+    "consecutive_steps": 3,
+    "consecutive_states": [
+      "stagnant",
+      "oscillating",
+      "stagnant"
+    ],
+    "consecutive_step_ids": [
+      14,
+      15,
+      16
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": 16,
+    "declared_step": 12,
+    "explanation": {
+      "explanation_version": "explain-v1",
+      "template_id": "E6",
+      "text": "step 12에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 통과 테스트 16/17.",
+      "values": {
+        "d": 12,
+        "n": 3,
+        "pass": 16,
+        "total": 17
+      },
+      "missing_values": [],
+      "form": "full",
+      "skipped_templates": [],
+      "signals": {
+        "decision": "termination_failure",
+        "stop_step": 16,
+        "task_kind": "artifact",
+        "consecutive_steps": 3,
+        "consecutive_states": [
+          "stagnant",
+          "oscillating",
+          "stagnant"
+        ],
+        "streak_roles": [
+          "developer",
+          "reviewer",
+          "planner"
+        ],
+        "declared_step": 12,
+        "test_pass_count": 16,
+        "test_total_count": 17,
+        "global_revert": null,
+        "test_plateau_in_streak": false,
+        "test_max_step": 8,
+        "steps_since_test_max": 8,
+        "file_state_changes_since_test_max": 0,
+        "handoff": null,
+        "handoff_threshold": 4,
+        "status": null,
+        "adopted_metric_selected": false,
+        "adopted_count": null,
+        "test_observed_in_session": true,
+        "selected_metrics": [
+          "conversation.open_issues_count",
+          "artifact.test_pass_count",
+          "artifact.files_changed"
+        ],
+        "adopted_required": null
+      },
+      "role_labels": {
+        "planner": "기획",
+        "developer": "개발",
+        "reviewer": "검토"
+      },
+      "status_labels": null
+    }
+  },
+  "criteria_alerts": [
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "termination_failure",
+      "reason": "post-declaration nonprogress beyond grace",
+      "consecutive_steps": 3,
+      "consecutive_states": [
+        "stagnant",
+        "oscillating",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        14,
+        15,
+        16
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": null,
+      "first_termination_failure_step": 16,
+      "declared_step": 12,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E6",
+        "text": "step 12에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 통과 테스트 16/17.",
+        "values": {
+          "d": 12,
+          "n": 3,
+          "pass": 16,
+          "total": 17
+        },
+        "missing_values": [],
+        "form": "full",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "termination_failure",
+          "stop_step": 16,
+          "task_kind": "artifact",
+          "consecutive_steps": 3,
+          "consecutive_states": [
+            "stagnant",
+            "oscillating",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "developer",
+            "reviewer",
+            "planner"
+          ],
+          "declared_step": 12,
+          "test_pass_count": 16,
+          "test_total_count": 17,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": 8,
+          "steps_since_test_max": 8,
+          "file_state_changes_since_test_max": 0,
+          "handoff": null,
+          "handoff_threshold": 4,
+          "status": null,
+          "adopted_metric_selected": false,
+          "adopted_count": null,
+          "test_observed_in_session": true,
+          "selected_metrics": [
+            "conversation.open_issues_count",
+            "artifact.test_pass_count",
+            "artifact.files_changed"
+          ],
+          "adopted_required": null
+        },
+        "role_labels": {
+          "planner": "기획",
+          "developer": "개발",
+          "reviewer": "검토"
+        },
+        "status_labels": null
+      }
+    }
+  ],
+  "tests_passed_before": 7,
+  "tests_passed_after": 16,
+  "missing_observation_steps": [],
+  "missing_observation_count": 0,
+  "fixture_unchanged": true,
+  "error": null,
+  "cleanup_errors": [],
+  "actual_outcome": null,
+  "context_buffer_messages": 12,
+  "vocabulary_violation_steps": [],
+  "vocabulary_violations_total": 0,
+  "failed_steps": [
+    {
+      "step_id": 7,
+      "reasons": [
+        "tool_execution_error"
+      ]
+    }
+  ],
+  "task_kind": "artifact",
+  "turn_order": "fixed",
+  "output_contract_version": "output-contract-v3",
+  "registration_sha256": "7dbebabcae3185c3425a1f8c6591f92d372d7608b506ad96546b08b8a7102b59",
+  "approval": {
+    "approved_step": 6,
+    "spec_path": "SPEC.md",
+    "spec_sha256_at_approval": "c339de116676355ec15fbc1bea5693fa93281cd416d8091f832513e40df3a9b8",
+    "refused_writes": 0,
+    "refused_writes_by_step": {}
+  },
+  "gateway_usage": {
+    "usage_version": "gateway-usage-v1",
+    "before": {
+      "read_at": "2026-10-06T14:54:34.301777+00:00",
+      "http_status": 200,
+      "used": 1240.0495599999992,
+      "field": "monthly_allocated.used"
+    },
+    "after": {
+      "read_at": "2026-10-06T15:03:33.369686+00:00",
+      "http_status": 200,
+      "used": 1296.8470799999993,
+      "field": "monthly_allocated.used"
+    },
+    "exact_only_if_alone": true,
+    "note": "after minus before; it includes any other use of the same key between the two read_at times (parallel sessions, probes, other tools). Compare those times with other sessions.",
+    "status": "measured",
+    "value": 56.79752,
+    "field": "monthly_allocated.used"
+  },
+  "guardrail_stop": {
+    "message": "step 12에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 통과 테스트 16/17.",
+    "stop_step": 16,
+    "decision": "termination_failure",
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "explanation_version": "explain-v1",
+    "template_id": "E6",
+    "session_id": "DEMO-CT-stall-v1-34b058044ab64663911145fdd72da6a4",
+    "blocked_step": 17
+  }
+}

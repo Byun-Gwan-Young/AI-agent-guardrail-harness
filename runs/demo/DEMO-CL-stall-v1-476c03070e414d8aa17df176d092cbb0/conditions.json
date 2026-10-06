@@ -1,0 +1,312 @@
+{
+  "scenario": {
+    "schema_version": "scenario-v2",
+    "scenario_id": "DEMO-CL-stall-v1",
+    "title": "기간 문자열 파서 버그를 기획·개발·검토로 고치기",
+    "task_kind": "artifact",
+    "model": "glm-5.3-flash",
+    "run_conditions": "demo-conditions.yaml",
+    "agents": [
+      {
+        "id": "planner",
+        "role": "기획",
+        "system_message": "공개 ACCEPTANCE.md, src/duration.py, 인수 테스트를 읽고 수정 계획을 NOTES.md에 기록한다.\n인수 조건과 테스트는 바꾸지 않는다.\n매 작업 결과에 narrative, open_issue_ids, info_items를 제공한다.\nopen_issue_ids는 현재 전체 미해결 쟁점 ID, info_items는 이번 작업의 새 정보다.\n새 정보가 없으면 빈 목록이다. 상태를 모르면 null을 제공한다. completion_declared는 false다.\n",
+        "tools": [
+          "read_file",
+          "write_file",
+          "replace_in_file"
+        ],
+        "writable_paths": [
+          "NOTES.md"
+        ]
+      },
+      {
+        "id": "developer",
+        "role": "개발",
+        "system_message": "공개 인수 조건과 NOTES.md의 수정 계획에 맞게 src/duration.py를 고친다.\n파일을 읽고 실제로 수정하며 로컬 인수 테스트를 실행한다. 테스트·인수 조건·검사 도구는 수정하지 않는다.\n매 작업 결과에 narrative, open_issue_ids, info_items를 제공한다. open_issue_ids는 공유 쟁점 목록 전체,\ninfo_items는 이번 작업의 새 사실이며 없으면 빈 목록이다. 모르는 값은 null로 기록한다.\n테스트 실행 결과를 보지 않고 통과했다고 주장하지 않는다. completion_declared는 false다.\n",
+        "tools": [
+          "read_file",
+          "write_file",
+          "replace_in_file",
+          "run_tests"
+        ],
+        "writable_paths": [
+          "src/duration.py"
+        ]
+      },
+      {
+        "id": "reviewer",
+        "role": "검토",
+        "system_message": "공개 인수 조건, NOTES.md, 구현과 실제 테스트 결과를 확인한다.\n문제가 있으면 실패한 테스트 이름과 메시지로 근거를 제시하고, 수정이 확인되면 해당 쟁점 ID를 닫는다.\n매 작업 결과에 narrative, open_issue_ids, info_items, completion_declared를 제공한다.\ninfo_items는 이번 작업의 새 사실이며 없으면 빈 목록이다. 모르는 값은 null로 기록한다.\n인수 조건을 확인했고 완료를 선언할 때만 completion_declared=true로 둔다.\n이 선언과 실제 테스트 성공 여부는 실행기가 별도로 기록한다. 테스트 파일은 수정하지 않는다.\n",
+        "tools": [
+          "read_file",
+          "run_tests"
+        ],
+        "writable_paths": []
+      }
+    ],
+    "turn_order": "fixed",
+    "task": "parse_duration(text)가 일부 입력에서 잘못된 초 값을 돌려주거나, 거절해야 할 입력을 거절하지 않습니다.\n공개 ACCEPTANCE.md의 인수 테스트가 모두 통과하도록 src/duration.py를 고치세요.\n기획 담당이 수정 계획을 NOTES.md에 정리하고, 개발 담당이 고치고, 검토 담당이 실제 테스트 결과로 확인해\n하나의 동작하는 결과를 만드세요.\n",
+    "termination": {
+      "mode": "success_or_max_steps",
+      "max_steps": 30,
+      "max_llm_calls_per_step": 3,
+      "require_completion_declaration": true,
+      "on_criteria_alert": "observe_only"
+    },
+    "seed": null,
+    "seed_support": "unverified",
+    "temperature": 0.0,
+    "max_tokens": 16384,
+    "reasoning_effort": "high",
+    "reasoning_effort_evidence": "reports/c18-1/trial-summary.json",
+    "context_buffer_messages": 12,
+    "progress_source": "both",
+    "progress_metric": {
+      "conversation": [
+        "open_issues_count"
+      ],
+      "artifact": [
+        "test_pass_count",
+        "files_changed"
+      ]
+    },
+    "expected_outcome": "unknown",
+    "termination_context_collection": {
+      "source_kind": "scenario_rule",
+      "method": "structured_completion_flag",
+      "declarer_agent": "reviewer",
+      "field": "completion_declared",
+      "missing_output": "unknown",
+      "preserve_first_declaration": true,
+      "evidence_fields": [
+        "agent_id",
+        "step_id",
+        "completion_declared",
+        "narrative"
+      ]
+    },
+    "criteria_version": "deadlock-v0.3",
+    "initial_issue_ids": [
+      "requirements",
+      "space-case",
+      "hour-shorthand",
+      "invalid-input",
+      "input-type",
+      "acceptance-review"
+    ],
+    "allowed_issues": [
+      {
+        "id": "requirements",
+        "definition": "NOTES.md 에 수정 계획(지켜지지 않는 인수 조건과 고칠 순서)이 아직 기록되지 않았다."
+      },
+      {
+        "id": "acceptance-review",
+        "definition": "검토 담당이 실제 테스트 실행 결과로 인수 기준 충족을 아직 확인하지 않았다."
+      },
+      {
+        "id": "unit-order",
+        "definition": "인수 조건 1 - 단위 h·m·s 는 숫자 뒤에 붙고 각 단위 한 번, h → m → s 순서로 쓰며 합을 초로 돌려준다."
+      },
+      {
+        "id": "space-case",
+        "definition": "인수 조건 2 - 앞뒤 공백은 무시하고 단위 글자는 대소문자를 구분하지 않는다."
+      },
+      {
+        "id": "bare-seconds",
+        "definition": "인수 조건 3 - 단위 없이 숫자만 있으면 초다."
+      },
+      {
+        "id": "hour-shorthand",
+        "definition": "인수 조건 4 - 시간(h) 바로 뒤 끝에 단위 없는 숫자가 오면 분이다."
+      },
+      {
+        "id": "invalid-input",
+        "definition": "인수 조건 5 - 빈 문자열, 숫자 없는 단위, 정해지지 않은 글자, 순서가 틀리거나 반복된 단위, 부호가 붙은 값은 ValueError."
+      },
+      {
+        "id": "input-type",
+        "definition": "인수 조건 6 - 문자열이 아닌 입력은 TypeError."
+      }
+    ],
+    "output_contract": "output-contract-v2",
+    "write_gate": null,
+    "success_criteria": {
+      "kind": "tests",
+      "description": "고정된 공개 인수 테스트 전체 통과. 테스트·인수 조건·검사 도구 변경은 성공으로 인정하지 않음.",
+      "test_suite": {
+        "test_suite_id": "sha256:164219af3e25f5aaebf596b888b51544239c801e58786d67bc4150740a01a68c",
+        "test_roots": [
+          "tests"
+        ],
+        "contract_files": [
+          "ACCEPTANCE.md",
+          "acceptance_runner.py"
+        ],
+        "command": [
+          "{python}",
+          "acceptance_runner.py",
+          "--report-dir",
+          "{report_dir}"
+        ],
+        "expected_test_count": 15
+      },
+      "structured_schema": null,
+      "evaluator_command": null,
+      "require_all_tests_pass": true,
+      "require_unchanged_test_suite": true
+    },
+    "fixture_dir": "scenario_assets/DEMO-CL-stall-v1",
+    "monitored_paths": [
+      "NOTES.md",
+      "src/duration.py",
+      "tests/test_units.py",
+      "tests/test_strict.py"
+    ],
+    "status_values": null,
+    "terminal_statuses": [],
+    "deliverable_schema": null,
+    "judge": null,
+    "inputs_dir": null,
+    "required_adopted_items": null,
+    "tool_settings": null,
+    "token_estimate": null
+  },
+  "temperature": 0.0,
+  "versions": {
+    "autogen-agentchat": "0.5.7",
+    "autogen-core": "0.5.7",
+    "autogen-ext": "0.5.7",
+    "openai": "3.7.0"
+  },
+  "fixture_hashes": {
+    "ACCEPTANCE.md": "b7961c57dacef086e7c6b7fd3d826e0ff87efe635b2c6017c071a364080d5975",
+    "NOTES.md": "82532c8e41fa6c5ad7e22b204a21847ce4f523027fb8473576c2adf30b5cdbed",
+    "acceptance_runner.py": "649041640ed784b692e17aef705672e0961daf8418580e5245b7613e71b9cb16",
+    "src/duration.py": "dada6eb976c74e0fec03ba847e6f65f4a741bd7120993e744babbd03d7335912",
+    "tests/test_strict.py": "c05ef0ddcec8c7c6ab49d96406bb65d6f0a9aa45d1ba2412b364edcb7082d432",
+    "tests/test_units.py": "d57d66d89b5624b0764fa2e3ea85a3a17977c1b0e94d916fe8c949ac49947965"
+  },
+  "actual_outcome": null,
+  "seed_support": "unverified",
+  "session_id": "DEMO-CL-stall-v1-476c03070e414d8aa17df176d092cbb0",
+  "run_index": 4,
+  "model": {
+    "rule": "model-run-condition-v1",
+    "name": "glm-5.3-flash",
+    "source": "scenario",
+    "scenario_model": "glm-5.3-flash"
+  },
+  "context_buffer_messages": 12,
+  "seed_probe": null,
+  "requested_seed": null,
+  "runner_protocol": "tool-capable-step-v10-final-report-allowlist",
+  "collection_policy": "independent-sources-v1",
+  "output_contract": "output-contract-v2",
+  "strict_support": "unverified",
+  "strict_probe": null,
+  "final_reasoning_effort": "high",
+  "strict_failure_policy": "fail step; abort after two consecutive strict-failed steps; vocabulary violations fail the step but are excluded from that streak and counted separately; no automatic B fallback",
+  "unknown_tool_policy": "mark_failed; correction in same step if a tool call slot remains; abort on second invalid response in step",
+  "tool_failure_policy": "invalid_tool_arguments: mark_failed, split-call correction, one retry in same step, abort on second invalid response; last call of each step carries no tools; step without final text: failed/no_final_output; observation uses collection_policy",
+  "recent_messages_policy": "parsed narrative; for a failed step the narrative of a verified final report (G0-13); otherwise placeholder; no raw tool results",
+  "dataset_run": false,
+  "phase": "demo",
+  "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+  "git_dirty": false,
+  "git_state_status": "measured",
+  "git_state_reason": null,
+  "output_contract_version": "output-contract-v2",
+  "allowed_issues_sha256": "0d8a6af886f1240043708546bbead893cd548441e57c4f5dcfd050fcf910944a",
+  "harness_facts_policy": "system message states writable files and the per-step call limit; each non-final call carries its call number and remaining calls (G0-14)",
+  "reasoning_effort": {
+    "requested": "high",
+    "sent_on": "all_calls",
+    "applied": "probe_indicated",
+    "evidence": "reports/c18-1/trial-summary.json"
+  },
+  "task_kind": "artifact",
+  "turn_order": "fixed",
+  "contract_sha256": null,
+  "registration": {
+    "registration_version": "session-registration-v1",
+    "role_labels": {
+      "planner": "기획",
+      "developer": "개발",
+      "reviewer": "검토"
+    },
+    "status_values": [],
+    "terminal_statuses": [],
+    "required_adopted_items": null,
+    "progress_source": "both",
+    "progress_metric": {
+      "conversation": [
+        "open_issues_count"
+      ],
+      "artifact": [
+        "test_pass_count",
+        "files_changed"
+      ]
+    }
+  },
+  "registration_sha256": "7dbebabcae3185c3425a1f8c6591f92d372d7608b506ad96546b08b8a7102b59",
+  "tools": {
+    "planner": [
+      "read_file",
+      "write_file",
+      "replace_in_file"
+    ],
+    "developer": [
+      "read_file",
+      "write_file",
+      "replace_in_file",
+      "run_tests"
+    ],
+    "reviewer": [
+      "read_file",
+      "run_tests"
+    ]
+  },
+  "write_gate": null,
+  "run_conditions": {
+    "file": "demo-conditions.yaml",
+    "sha256": "96472b969d906af1afd4972602be932c21c6913e96468ae77b745ee294a1e0c0",
+    "conditions_version": "demo-run-conditions-v1",
+    "model": "glm-5.3-flash",
+    "reasoning_effort": "high",
+    "reasoning_effort_evidence": "reports/c18-1/trial-summary.json"
+  },
+  "closed_list_check": {
+    "mode": "after_receipt",
+    "decision": "D-13",
+    "enums_sent_to_provider": false,
+    "basis": "artifact task: issue IDs are checked after receipt; the strict schema carries no enum (output-contract-v2, v3 adds spec_approved only)"
+  },
+  "account_label": "C",
+  "batch": {
+    "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+    "item": "DEMO-CL-stall-v1:observe:4",
+    "lane": 3,
+    "lanes": 4,
+    "mode": "observe",
+    "plan_id": "demo-main-v1",
+    "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+    "repeat": 4,
+    "rerun_of": null
+  },
+  "api_key_env": "KMU_API_KEY",
+  "upstream": {
+    "base_url_host": "factchat.mindlogic-kr-api.com",
+    "base_url": "https://factchat.mindlogic-kr-api.com/v1/gateway",
+    "chat_path": "/chat/completions/",
+    "api_key_env": "KMU_API_KEY",
+    "config_file": "guardrail-deadlock-v0.3-kmu.yaml"
+  },
+  "guardrail_mode": "observe",
+  "proxy_pinned_model": {
+    "name": "glm-5.3-flash",
+    "source": "run_conditions",
+    "run_conditions": "demo-conditions.yaml",
+    "run_conditions_sha256": "96472b969d906af1afd4972602be932c21c6913e96468ae77b745ee294a1e0c0"
+  }
+}

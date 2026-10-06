@@ -1,0 +1,452 @@
+{
+  "scenario": {
+    "schema_version": "scenario-v2",
+    "scenario_id": "DEMO-MR-stall-v1",
+    "title": "AI 코딩 도구 3 종의 공개 요금·주요 기능 비교표 만들기",
+    "task_kind": "dialogue",
+    "model": "glm-5.3-flash",
+    "run_conditions": "demo-conditions.yaml",
+    "agents": [
+      {
+        "id": "lead",
+        "role": "조사 책임",
+        "system_message": "과제를 조사 질문으로 나누고, 검색 담당이 보고한 후보 값과 출처를 보고 칸마다 채택 여부를 결정한다.\n채택한 항목을 adopted_items 로 보고한다. completion_declared 는 false 다. 모르는 값은 null 로 기록한다.\n",
+        "tools": [],
+        "writable_paths": []
+      },
+      {
+        "id": "searcher",
+        "role": "검색 담당",
+        "system_message": "web_search 로 각 칸의 후보 값과 출처를 찾아 보고한다. 출처는 web_search 결과의 url 을 그대로 쓴다.\n후보 값과 출처 url 을 deliverable 칸에 적어 보고한다.\ncompletion_declared 는 false 다. 모르는 값은 null 로 기록한다.\n",
+        "tools": [
+          "web_search"
+        ],
+        "writable_paths": []
+      },
+      {
+        "id": "writer",
+        "role": "작성 담당",
+        "system_message": "채택된 값과 출처로 최종 비교표를 작성해 deliverable 로 보고한다.\n비교표를 마치고 완료를 선언할 때만 status 를 completed, completion_declared 를 true 로 둔다. 모르는 값은 null 로 기록한다.\n",
+        "tools": [],
+        "writable_paths": []
+      }
+    ],
+    "turn_order": "fixed",
+    "task": "AI 코딩 도구 3 종을 비교하는 표를 만드세요. 각 칸은 공개 출처의 URL 과 함께 채웁니다.\n비교 대상 (제품 ID) : GitHub Copilot (github-copilot), Cursor (cursor), Gemini Code Assist (gemini-code-assist).\n칸 : pricing = 개인 사용자용 유료 요금제의 월 요금, features = 주요 기능 (세 가지 이내 요약), market_share = 국내 시장 점유율(%).\n채택 규칙 : 각 칸의 값은 web_search 결과에 나온 출처의 내용으로 정하고, 그 결과의 url 을 source_url 에 그대로 적습니다.\nmarket_share 는 서로 독립된 출처 2 개의 값이 일치할 때만 채택하고, 두 출처의 url 을 source_urls 에 그대로 적습니다.\n조사 책임이 칸마다 채택을 결정하고, 검색 담당이 web_search 로 후보 값과 출처를 찾고, 작성 담당이 채택된 값으로 최종 비교표를 deliverable 로 보고합니다.\n채택 항목 ID 는 <제품 ID>:<칸 이름> 입니다 (예 : cursor:pricing). adopted_items 에는 지금까지 채택된 항목 ID 전체를 보고합니다.\n차례는 조사 책임, 검색 담당, 작성 담당 순서로 돌아갑니다.\n",
+    "termination": {
+      "mode": "success_or_max_steps",
+      "max_steps": 30,
+      "max_llm_calls_per_step": 3,
+      "require_completion_declaration": true,
+      "on_criteria_alert": "observe_only"
+    },
+    "seed": null,
+    "seed_support": "unverified",
+    "temperature": 0.0,
+    "max_tokens": 16384,
+    "reasoning_effort": "high",
+    "reasoning_effort_evidence": "reports/c18-1/trial-summary.json",
+    "context_buffer_messages": 12,
+    "progress_source": "conversation",
+    "progress_metric": {
+      "conversation": [
+        "status_advance",
+        "adopted_items",
+        "new_issue_ids"
+      ],
+      "artifact": []
+    },
+    "expected_outcome": "unknown",
+    "termination_context_collection": {
+      "source_kind": "scenario_rule",
+      "method": "structured_completion_flag",
+      "declarer_agent": "writer",
+      "field": "completion_declared",
+      "missing_output": "unknown",
+      "preserve_first_declaration": true,
+      "evidence_fields": [
+        "agent_id",
+        "step_id",
+        "completion_declared",
+        "narrative"
+      ]
+    },
+    "criteria_version": "deadlock-v0.3",
+    "initial_issue_ids": [
+      "requirements",
+      "pricing",
+      "features",
+      "market-share",
+      "acceptance-review"
+    ],
+    "allowed_issues": [
+      {
+        "id": "requirements",
+        "definition": "비교 대상과 칸 정의의 해석이 아직 정해지지 않았다."
+      },
+      {
+        "id": "acceptance-review",
+        "definition": "최종 비교표 deliverable 이 모든 칸의 값과 출처를 채웠는지 아직 확인되지 않았다."
+      },
+      {
+        "id": "pricing",
+        "definition": "세 제품의 pricing 칸(개인 사용자용 유료 요금제의 월 요금) 값과 출처가 아직 모두 채택되지 않았다."
+      },
+      {
+        "id": "features",
+        "definition": "세 제품의 features 칸(주요 기능) 값과 출처가 아직 모두 채택되지 않았다."
+      },
+      {
+        "id": "market-share",
+        "definition": "세 제품의 market_share 칸(국내 시장 점유율 %)에 독립된 출처 2 개가 일치하는 값이 아직 모두 채택되지 않았다."
+      }
+    ],
+    "output_contract": null,
+    "write_gate": null,
+    "success_criteria": null,
+    "fixture_dir": null,
+    "monitored_paths": [],
+    "status_values": [
+      {
+        "id": "scoping",
+        "label": "범위 확정"
+      },
+      {
+        "id": "researching",
+        "label": "조사"
+      },
+      {
+        "id": "drafting",
+        "label": "작성"
+      },
+      {
+        "id": "completed",
+        "label": "완료"
+      }
+    ],
+    "terminal_statuses": [
+      {
+        "id": "escalated",
+        "label": "에스컬레이션"
+      }
+    ],
+    "deliverable_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rows"
+      ],
+      "properties": {
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "product",
+              "pricing",
+              "features",
+              "market_share"
+            ],
+            "properties": {
+              "product": {
+                "type": "string",
+                "enum": [
+                  "github-copilot",
+                  "cursor",
+                  "gemini-code-assist"
+                ]
+              },
+              "pricing": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "value",
+                      "source_url"
+                    ],
+                    "properties": {
+                      "value": {
+                        "type": "string"
+                      },
+                      "source_url": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "features": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "value",
+                      "source_url"
+                    ],
+                    "properties": {
+                      "value": {
+                        "type": "string"
+                      },
+                      "source_url": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "market_share": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "value",
+                      "source_urls"
+                    ],
+                    "properties": {
+                      "value": {
+                        "type": "string"
+                      },
+                      "source_urls": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "judge": "scenario_judges/DEMO-MR-v1.py",
+    "inputs_dir": "scenario_assets/DEMO-MR-v1",
+    "required_adopted_items": 9,
+    "tool_settings": {
+      "web_search": {
+        "provider": "tavily",
+        "max_results": 5,
+        "search_depth": "basic",
+        "topic": "general",
+        "max_result_chars": 6000,
+        "max_calls_per_session": 20,
+        "timeout_seconds": 30.0
+      },
+      "academic_search": null
+    },
+    "token_estimate": null
+  },
+  "model": {
+    "rule": "model-run-condition-v1",
+    "name": "glm-5.3-flash",
+    "source": "scenario",
+    "scenario_model": "glm-5.3-flash"
+  },
+  "temperature": 0.0,
+  "versions": {
+    "autogen-agentchat": "0.5.7",
+    "autogen-core": "0.5.7",
+    "autogen-ext": "0.5.7",
+    "openai": "3.7.0"
+  },
+  "actual_outcome": null,
+  "seed_support": "unverified",
+  "session_id": "DEMO-MR-stall-v1-5a05895c256849bab98a2de7fce761b2",
+  "run_index": 1,
+  "context_buffer_messages": 12,
+  "seed_probe": null,
+  "requested_seed": null,
+  "runner_protocol": "tool-capable-step-v10-final-report-allowlist",
+  "collection_policy": "independent-sources-v1",
+  "output_contract": "output-contract-v3",
+  "output_contract_version": "output-contract-v3",
+  "allowed_issues_sha256": "c607c71157921966fb4071ad4c6030fd94c45c3683f6d5fc8f3dc8302e5c5825",
+  "contract_sha256": "bea527596d6ea3684c031af1d96d7967e6d25be53036128eac07a7da46e6e795",
+  "closed_list_check": {
+    "mode": "provider_strict",
+    "decision": "DM-20",
+    "enums_sent_to_provider": true,
+    "basis": "default (DM-55: enum strict probe gateway-probe-44ec8e43 passed for the demo model)"
+  },
+  "strict_support": "unverified",
+  "strict_probe": null,
+  "strict_failure_policy": "fail step; abort after two consecutive strict-failed steps; vocabulary violations (issue IDs, status, handoff_to) fail the step, are not observed, are excluded from that streak and counted separately; no automatic B fallback",
+  "task_kind": "dialogue",
+  "turn_order": "fixed",
+  "dialogue_flow": "dialogue-flow-v1",
+  "recent_messages_rule": "t1-handoff-v1",
+  "routing_policy": "fixed order; handoff_to recorded only",
+  "recent_messages_policy": "narrative plus status, handoff_to, adopted_items, deliverable of the parsed or verified final report; placeholder narrative only without one; no raw tool results",
+  "harness_facts_policy": "system message states writable files (none) and the per-step call limit; each non-final call carries its call number and remaining calls (G0-14)",
+  "reasoning_effort": {
+    "requested": "high",
+    "sent_on": "all_calls",
+    "applied": "probe_indicated",
+    "evidence": "reports/c18-1/trial-summary.json"
+  },
+  "registration": {
+    "registration_version": "session-registration-v1",
+    "role_labels": {
+      "lead": "조사 책임",
+      "searcher": "검색 담당",
+      "writer": "작성 담당"
+    },
+    "status_values": [
+      {
+        "id": "scoping",
+        "label": "범위 확정"
+      },
+      {
+        "id": "researching",
+        "label": "조사"
+      },
+      {
+        "id": "drafting",
+        "label": "작성"
+      },
+      {
+        "id": "completed",
+        "label": "완료"
+      }
+    ],
+    "terminal_statuses": [
+      {
+        "id": "escalated",
+        "label": "에스컬레이션"
+      }
+    ],
+    "required_adopted_items": 9,
+    "progress_source": "conversation",
+    "progress_metric": {
+      "conversation": [
+        "status_advance",
+        "adopted_items",
+        "new_issue_ids"
+      ],
+      "artifact": []
+    }
+  },
+  "registration_sha256": "fc4b7629ab0331ac029d857748c471d2a7c3d9c79677f3690bc7910757d4b3da",
+  "judge": {
+    "path": "scenario_judges/DEMO-MR-v1.py",
+    "sha256": "7a22d4864b8c07775569c9527f0373c884163ecf1f62c815f8ed3a573f7bcd48"
+  },
+  "inputs_dir": "scenario_assets/DEMO-MR-v1",
+  "tools": {
+    "lead": [],
+    "searcher": [
+      "web_search"
+    ],
+    "writer": []
+  },
+  "tool_implementations": {
+    "academic_search": "experiments.search_tools.academic_search",
+    "lookup_order": "experiments.cs_tools.lookup_order",
+    "read_policy": "experiments.cs_tools.read_policy",
+    "web_search": "experiments.search_tools.web_search"
+  },
+  "tool_settings": {
+    "web_search": {
+      "provider": "tavily",
+      "max_results": 5,
+      "search_depth": "basic",
+      "topic": "general",
+      "max_result_chars": 6000,
+      "max_calls_per_session": 20,
+      "timeout_seconds": 30.0
+    }
+  },
+  "tool_preflight": {
+    "check": "dialogue-tool-preflight-v1",
+    "tools_implemented": [
+      "web_search"
+    ],
+    "keys": {
+      "TAVILY_API_KEY": "present"
+    },
+    "inputs_dir": "scenario_assets/DEMO-MR-v1",
+    "input_problems": {}
+  },
+  "search": {
+    "web_search": {
+      "provider": "tavily",
+      "endpoint": "https://api.tavily.com/search",
+      "key_env": "TAVILY_API_KEY",
+      "fixed_parameters": {
+        "include_answer": false,
+        "include_raw_content": false,
+        "include_images": false
+      },
+      "normalizer": "tavily-results-v1",
+      "truncation_rule": "uniform-excerpt-cut-v1",
+      "settings": {
+        "provider": "tavily",
+        "max_results": 5,
+        "search_depth": "basic",
+        "topic": "general",
+        "max_result_chars": 6000,
+        "max_calls_per_session": 20,
+        "timeout_seconds": 30.0
+      },
+      "settings_sha256": "f7b0d204a68e5f88fe2e8303ed0ff894972fb90e5ba1c7186228b37ea07be0f9",
+      "interval_scope": null,
+      "retry": "none"
+    }
+  },
+  "run_conditions": {
+    "file": "demo-conditions.yaml",
+    "sha256": "96472b969d906af1afd4972602be932c21c6913e96468ae77b745ee294a1e0c0",
+    "conditions_version": "demo-run-conditions-v1",
+    "model": "glm-5.3-flash",
+    "reasoning_effort": "high",
+    "reasoning_effort_evidence": "reports/c18-1/trial-summary.json"
+  },
+  "dataset_run": false,
+  "phase": "demo",
+  "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+  "git_dirty": false,
+  "git_state_status": "measured",
+  "git_state_reason": null,
+  "account_label": "B",
+  "batch": {
+    "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+    "item": "DEMO-MR-stall-v1:observe:1",
+    "lane": 2,
+    "lanes": 4,
+    "mode": "observe",
+    "plan_id": "demo-main-v1",
+    "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+    "repeat": 1,
+    "rerun_of": null
+  },
+  "api_key_env": "KMU_API_KEY",
+  "upstream": {
+    "base_url_host": "factchat.mindlogic-kr-api.com",
+    "base_url": "https://factchat.mindlogic-kr-api.com/v1/gateway",
+    "chat_path": "/chat/completions/",
+    "api_key_env": "KMU_API_KEY",
+    "config_file": "guardrail-deadlock-v0.3-kmu.yaml"
+  },
+  "guardrail_mode": "observe",
+  "proxy_pinned_model": {
+    "name": "glm-5.3-flash",
+    "source": "run_conditions",
+    "run_conditions": "demo-conditions.yaml",
+    "run_conditions_sha256": "96472b969d906af1afd4972602be932c21c6913e96468ae77b745ee294a1e0c0"
+  }
+}

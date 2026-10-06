@@ -1,0 +1,103 @@
+{
+ "session_id": "DEMO-CL-normal-v1-ed9df513bae340ad97ae94b8184b1b39",
+ "scenario_id": "DEMO-CL-normal-v1",
+ "termination_reason": "success",
+ "steps": 12,
+ "error": null,
+ "tests_passed": {
+  "before": 6,
+  "after": 15,
+  "max": 15
+ },
+ "first_stop": null,
+ "stop_steps": [],
+ "tokens": {
+  "prompt": 190951,
+  "cached_prompt": 46336,
+  "completion": 26681,
+  "reasoning": 14901,
+  "turns": 35,
+  "usage_missing_turns": 0
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 36.42283,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-06T03:52:07.207197+00:00",
+   "2026-10-06T04:03:09.916878+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 36.42283,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 14,
+  "1": 10,
+  "2": 9,
+  "3": 1,
+  "5": 1
+ },
+ "tool_results": {
+  "executed": 36,
+  "refused_before_approval": 0,
+  "error_results": 0,
+  "error_results_by_tool": {},
+  "error_results_by_summary": {},
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 0,
+  "vocabulary_violations": 0,
+  "by_kind": {},
+  "failed_steps": []
+ },
+ "condition_group": "cg-f50509c825e1",
+ "condition_group_missing_fields": [
+  "dialogue_flow",
+  "recent_messages_rule",
+  "requested_seed",
+  "search_settings_sha256"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [
+   "dialogue_flow",
+   "recent_messages_rule",
+   "search_settings_sha256"
+  ],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": []
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "observe",
+ "session_times": {
+  "started_at": "2026-10-06T03:52:07.204572+00:00",
+  "ended_at": "2026-10-06T04:03:09.868200+00:00"
+ },
+ "account_label": "B",
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-CL-normal-v1:observe:2",
+  "lane": 2,
+  "lanes": 4,
+  "mode": "observe",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 2,
+  "rerun_of": null
+ },
+ "key_scan": {
+  "files_scanned": 91,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

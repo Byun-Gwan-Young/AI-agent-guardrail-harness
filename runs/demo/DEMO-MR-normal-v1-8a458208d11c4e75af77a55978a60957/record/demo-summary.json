@@ -1,0 +1,101 @@
+{
+ "session_id": "DEMO-MR-normal-v1-8a458208d11c4e75af77a55978a60957",
+ "scenario_id": "DEMO-MR-normal-v1",
+ "termination_reason": "runner_error",
+ "steps": 3,
+ "error": "RuntimeError: InternalServerError: 502 Bad Gateway",
+ "tests_passed": {
+  "before": null,
+  "after": null,
+  "max": null
+ },
+ "first_stop": null,
+ "stop_steps": [],
+ "tokens": {
+  "prompt": 29558,
+  "cached_prompt": 7296,
+  "completion": 2403,
+  "reasoning": 959,
+  "turns": 6,
+  "usage_missing_turns": 1
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 4.75968,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-06T05:31:21.417919+00:00",
+   "2026-10-06T05:33:11.417442+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "incomplete",
+  "value": 4.75968,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 3,
+  "2": 1,
+  "6": 1
+ },
+ "tool_results": {
+  "executed": 8,
+  "refused_before_approval": 0,
+  "error_results": 0,
+  "error_results_by_tool": {},
+  "error_results_by_summary": {},
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 0,
+  "vocabulary_violations": 0,
+  "by_kind": {},
+  "failed_steps": [
+   {
+    "step_id": 3,
+    "reasons": [
+     "aborted"
+    ]
+   }
+  ]
+ },
+ "condition_group": "cg-eef67a007285",
+ "condition_group_missing_fields": [
+  "requested_seed"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": []
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "observe",
+ "session_times": {
+  "started_at": "2026-10-06T05:31:21.415213+00:00",
+  "ended_at": "2026-10-06T05:33:11.402305+00:00"
+ },
+ "account_label": "A",
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-MR-normal-v1:observe:5",
+  "lane": 1,
+  "lanes": 4,
+  "mode": "observe",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 5,
+  "rerun_of": null
+ },
+ "key_scan": {
+  "files_scanned": 23,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

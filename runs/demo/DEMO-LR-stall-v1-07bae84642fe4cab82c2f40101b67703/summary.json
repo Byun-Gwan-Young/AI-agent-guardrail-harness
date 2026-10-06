@@ -1,0 +1,280 @@
+{
+  "session_id": "DEMO-LR-stall-v1-07bae84642fe4cab82c2f40101b67703",
+  "steps": 7,
+  "termination_reason": "guardrail_stop",
+  "total_tokens": 48871,
+  "known_tokens_subtotal": 48871,
+  "criteria_latest": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "deadlock",
+    "reason": "consecutive stagnant/oscillating steps without declaration",
+    "consecutive_steps": 3,
+    "consecutive_states": [
+      "stagnant",
+      "stagnant",
+      "stagnant"
+    ],
+    "consecutive_step_ids": [
+      4,
+      5,
+      6
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": 6,
+    "first_termination_failure_step": null,
+    "declared_step": null,
+    "explanation": {
+      "explanation_version": "explain-v1",
+      "template_id": "E5",
+      "text": "최근 3 step 동안 채택 항목이 0/5에서 늘지 않았고 처리 상태는 '조사'입니다.",
+      "values": {
+        "n": 3,
+        "adopted": 0,
+        "required": 5,
+        "status": "조사"
+      },
+      "missing_values": [],
+      "form": "full",
+      "skipped_templates": [],
+      "signals": {
+        "decision": "deadlock",
+        "stop_step": 6,
+        "task_kind": "dialogue",
+        "consecutive_steps": 3,
+        "consecutive_states": [
+          "stagnant",
+          "stagnant",
+          "stagnant"
+        ],
+        "streak_roles": [
+          "lead",
+          "searcher",
+          "writer"
+        ],
+        "declared_step": null,
+        "test_pass_count": null,
+        "test_total_count": null,
+        "global_revert": null,
+        "test_plateau_in_streak": false,
+        "test_max_step": null,
+        "steps_since_test_max": null,
+        "file_state_changes_since_test_max": null,
+        "handoff": {
+          "roles": [
+            "writer",
+            "lead"
+          ],
+          "count": 1,
+          "first_step": 6,
+          "threshold": 4,
+          "at_or_above_threshold": false
+        },
+        "handoff_threshold": 4,
+        "status": "researching",
+        "adopted_metric_selected": true,
+        "adopted_count": 0,
+        "test_observed_in_session": false,
+        "selected_metrics": [
+          "conversation.status_advance",
+          "conversation.adopted_items",
+          "conversation.new_issue_ids"
+        ],
+        "adopted_required": 5
+      },
+      "role_labels": {
+        "lead": "조사 책임",
+        "searcher": "검색 담당",
+        "writer": "작성 담당"
+      },
+      "status_labels": {
+        "scoping": "범위 확정",
+        "researching": "조사",
+        "drafting": "작성",
+        "completed": "완료",
+        "escalated": "에스컬레이션"
+      }
+    }
+  },
+  "criteria_alerts": [
+    {
+      "criteria_version": "deadlock-v0.3",
+      "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+      "decision": "deadlock",
+      "reason": "consecutive stagnant/oscillating steps without declaration",
+      "consecutive_steps": 3,
+      "consecutive_states": [
+        "stagnant",
+        "stagnant",
+        "stagnant"
+      ],
+      "consecutive_step_ids": [
+        4,
+        5,
+        6
+      ],
+      "unmeasured_steps": 0,
+      "needs_observation_review": false,
+      "first_deadlock_step": 6,
+      "first_termination_failure_step": null,
+      "declared_step": null,
+      "explanation": {
+        "explanation_version": "explain-v1",
+        "template_id": "E5",
+        "text": "최근 3 step 동안 채택 항목이 0/5에서 늘지 않았고 처리 상태는 '조사'입니다.",
+        "values": {
+          "n": 3,
+          "adopted": 0,
+          "required": 5,
+          "status": "조사"
+        },
+        "missing_values": [],
+        "form": "full",
+        "skipped_templates": [],
+        "signals": {
+          "decision": "deadlock",
+          "stop_step": 6,
+          "task_kind": "dialogue",
+          "consecutive_steps": 3,
+          "consecutive_states": [
+            "stagnant",
+            "stagnant",
+            "stagnant"
+          ],
+          "streak_roles": [
+            "lead",
+            "searcher",
+            "writer"
+          ],
+          "declared_step": null,
+          "test_pass_count": null,
+          "test_total_count": null,
+          "global_revert": null,
+          "test_plateau_in_streak": false,
+          "test_max_step": null,
+          "steps_since_test_max": null,
+          "file_state_changes_since_test_max": null,
+          "handoff": {
+            "roles": [
+              "writer",
+              "lead"
+            ],
+            "count": 1,
+            "first_step": 6,
+            "threshold": 4,
+            "at_or_above_threshold": false
+          },
+          "handoff_threshold": 4,
+          "status": "researching",
+          "adopted_metric_selected": true,
+          "adopted_count": 0,
+          "test_observed_in_session": false,
+          "selected_metrics": [
+            "conversation.status_advance",
+            "conversation.adopted_items",
+            "conversation.new_issue_ids"
+          ],
+          "adopted_required": 5
+        },
+        "role_labels": {
+          "lead": "조사 책임",
+          "searcher": "검색 담당",
+          "writer": "작성 담당"
+        },
+        "status_labels": {
+          "scoping": "범위 확정",
+          "researching": "조사",
+          "drafting": "작성",
+          "completed": "완료",
+          "escalated": "에스컬레이션"
+        }
+      }
+    }
+  ],
+  "missing_observation_steps": [],
+  "missing_observation_count": 0,
+  "error": null,
+  "cleanup_errors": [],
+  "actual_outcome": null,
+  "context_buffer_messages": 12,
+  "task_kind": "dialogue",
+  "turn_order": "fixed",
+  "output_contract_version": "output-contract-v3",
+  "registration_sha256": "f18f26f3d08de371ad6b42b775f4619b257204f648366295d83f1437f4979322",
+  "vocabulary_violation_steps": [
+    1,
+    4
+  ],
+  "vocabulary_violations_total": 2,
+  "failed_steps": [
+    {
+      "step_id": 2,
+      "reasons": [
+        "tool_execution_error"
+      ]
+    },
+    {
+      "step_id": 5,
+      "reasons": [
+        "tool_execution_error"
+      ]
+    }
+  ],
+  "final_status": "researching",
+  "escalated_by": null,
+  "completion_gate": {
+    "machine_success": false,
+    "result": "unfinished",
+    "missing": [
+      "deliverable"
+    ]
+  },
+  "completion_claims": [],
+  "recent_messages_rule": "t1-handoff-v1",
+  "route_fallbacks": [],
+  "search": {
+    "requests_sent": {
+      "academic_search": 5
+    },
+    "calls_recorded": 5,
+    "outcomes": {
+      "timeout": 2,
+      "http_error": 3
+    },
+    "responses_stored": 0,
+    "records_file": "search/records.jsonl",
+    "records_sha256": "30f1ffcd45fe4aacec78ffd56c7b37161bc95dc1fb7c97001723cffc20698656"
+  },
+  "gateway_usage": {
+    "usage_version": "gateway-usage-v1",
+    "before": {
+      "read_at": "2026-10-06T04:20:30.349317+00:00",
+      "http_status": 200,
+      "used": 40.941869999999994,
+      "field": "monthly_allocated.used"
+    },
+    "after": {
+      "read_at": "2026-10-06T04:25:04.043425+00:00",
+      "http_status": 200,
+      "used": 49.18203999999999,
+      "field": "monthly_allocated.used"
+    },
+    "exact_only_if_alone": true,
+    "note": "after minus before; it includes any other use of the same key between the two read_at times (parallel sessions, probes, other tools). Compare those times with other sessions.",
+    "status": "measured",
+    "value": 8.24017,
+    "field": "monthly_allocated.used"
+  },
+  "guardrail_stop": {
+    "message": "최근 3 step 동안 채택 항목이 0/5에서 늘지 않았고 처리 상태는 '조사'입니다.",
+    "stop_step": 6,
+    "decision": "deadlock",
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "explanation_version": "explain-v1",
+    "template_id": "E5",
+    "session_id": "DEMO-LR-stall-v1-07bae84642fe4cab82c2f40101b67703",
+    "blocked_step": 7
+  }
+}

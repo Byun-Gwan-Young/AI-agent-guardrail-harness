@@ -1,0 +1,102 @@
+{
+ "session_id": "DEMO-MR-normal-v1-d69416ae013c4c69858f746a8bdc7a58",
+ "scenario_id": "DEMO-MR-normal-v1",
+ "termination_reason": "success",
+ "steps": 9,
+ "error": null,
+ "tests_passed": {
+  "before": null,
+  "after": null,
+  "max": null
+ },
+ "first_stop": {
+  "step_id": 9,
+  "criteria_version": "deadlock-v0.3",
+  "decision": "termination_failure",
+  "reason": "post-declaration nonprogress beyond grace",
+  "template_id": "E6",
+  "text": "step 6에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+ },
+ "stop_steps": [
+  9
+ ],
+ "tokens": {
+  "prompt": 180742,
+  "cached_prompt": 40192,
+  "completion": 23871,
+  "reasoning": 6062,
+  "turns": 20,
+  "usage_missing_turns": 0
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 34.22376,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-06T15:19:11.479868+00:00",
+   "2026-10-06T15:26:32.198782+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 34.22376,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 18,
+  "6": 2
+ },
+ "tool_results": {
+  "executed": 12,
+  "refused_before_approval": 0,
+  "error_results": 0,
+  "error_results_by_tool": {},
+  "error_results_by_summary": {},
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 0,
+  "vocabulary_violations": 0,
+  "by_kind": {},
+  "failed_steps": []
+ },
+ "condition_group": "cg-eef67a007285",
+ "condition_group_missing_fields": [
+  "requested_seed"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": []
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "observe",
+ "session_times": {
+  "started_at": "2026-10-06T15:19:11.474357+00:00",
+  "ended_at": "2026-10-06T15:26:32.145056+00:00"
+ },
+ "account_label": "B",
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-MR-normal-v1:observe:3",
+  "lane": 1,
+  "lanes": 1,
+  "mode": "observe",
+  "plan_id": "demo-main-v1-mr2",
+  "plan_sha256": "e45d2ca0ca5dcde60578a7456024dd6334a1783e2a4e0872ade3b57367714699",
+  "repeat": 3,
+  "rerun_of": null
+ },
+ "key_scan": {
+  "files_scanned": 39,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

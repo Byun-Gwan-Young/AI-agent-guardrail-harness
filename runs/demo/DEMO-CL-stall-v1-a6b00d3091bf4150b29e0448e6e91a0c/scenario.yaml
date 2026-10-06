@@ -1,0 +1,151 @@
+# DEMO-CL (C-18-1, DM-59). T3 산출물 교착 데모의 정상판·교착판 짝 : scenarios/DEMO-CL-normal-v1.yaml, scenarios/DEMO-CL-stall-v1.yaml.
+# 데모 세션 (DM-2) : --phase demo 로만 실행, 로그 runs/demo/, 데이터셋 아님. 설계 : docs/design/demo-scenarios.md 6 절.
+# 모델·추론 강도는 run_conditions (demo-conditions.yaml, DM-57) 에서 온다. 산출물 과제 계약 v2, write_gate 없음 (DM-37).
+# 정상판과 교착판의 차이 (DM-5, 한 변수) : 시나리오 ID, fixture 폴더, 그 결과인 test_suite_id, 그리고
+# tests/test_strict.py 의 test_rejects_malformed_hour_suffix 입력 한 건 (정상판 "1h30x", 교착판 "1h30") 뿐이다.
+# 정답 경로 : tests/fixtures/demo_cl/reference_duration.py 로 인수 테스트 15/15 통과 (tests/test_c18_1_part2.py). 에이전트가 읽을 수 없는 경로.
+# 허용 쟁점 (D-14) : ACCEPTANCE.md 기능 조건 1 항목 = ID 1 개 + 과정 쟁점 requirements·acceptance-review.
+#   requirements      — NOTES.md:3-5 (기획 담당이 기록할 수정 계획)
+#   acceptance-review — ACCEPTANCE.md:14 (실제 테스트 결과로 인수 기준 확인)
+#   unit-order        — ACCEPTANCE.md:6-7 (조건 1)
+#   space-case        — ACCEPTANCE.md:8 (조건 2)
+#   bare-seconds      — ACCEPTANCE.md:9 (조건 3)
+#   hour-shorthand    — ACCEPTANCE.md:10 (조건 4)
+#   invalid-input     — ACCEPTANCE.md:11 (조건 5)
+#   input-type        — ACCEPTANCE.md:12 (조건 6)
+# initial_issue_ids : 과정 쟁점 둘 + 실행 전 인수 판정에서 실패 테스트가 있는 조건 (조건 2·4·5·6, preflight 출력 reports/c18-1/).
+schema_version: scenario-v2
+scenario_id: DEMO-CL-stall-v1
+title: 기간 문자열 파서 버그를 기획·개발·검토로 고치기
+task_kind: artifact
+run_conditions: demo-conditions.yaml
+agents:
+- id: planner
+  role: 기획
+  writable_paths:
+  - NOTES.md
+  system_message: |
+    공개 ACCEPTANCE.md, src/duration.py, 인수 테스트를 읽고 수정 계획을 NOTES.md에 기록한다.
+    인수 조건과 테스트는 바꾸지 않는다.
+    매 작업 결과에 narrative, open_issue_ids, info_items를 제공한다.
+    open_issue_ids는 현재 전체 미해결 쟁점 ID, info_items는 이번 작업의 새 정보다.
+    새 정보가 없으면 빈 목록이다. 상태를 모르면 null을 제공한다. completion_declared는 false다.
+  tools:
+  - read_file
+  - write_file
+  - replace_in_file
+- id: developer
+  role: 개발
+  writable_paths:
+  - src/duration.py
+  system_message: |
+    공개 인수 조건과 NOTES.md의 수정 계획에 맞게 src/duration.py를 고친다.
+    파일을 읽고 실제로 수정하며 로컬 인수 테스트를 실행한다. 테스트·인수 조건·검사 도구는 수정하지 않는다.
+    매 작업 결과에 narrative, open_issue_ids, info_items를 제공한다. open_issue_ids는 공유 쟁점 목록 전체,
+    info_items는 이번 작업의 새 사실이며 없으면 빈 목록이다. 모르는 값은 null로 기록한다.
+    테스트 실행 결과를 보지 않고 통과했다고 주장하지 않는다. completion_declared는 false다.
+  tools:
+  - read_file
+  - write_file
+  - replace_in_file
+  - run_tests
+- id: reviewer
+  role: 검토
+  writable_paths: []
+  system_message: |
+    공개 인수 조건, NOTES.md, 구현과 실제 테스트 결과를 확인한다.
+    문제가 있으면 실패한 테스트 이름과 메시지로 근거를 제시하고, 수정이 확인되면 해당 쟁점 ID를 닫는다.
+    매 작업 결과에 narrative, open_issue_ids, info_items, completion_declared를 제공한다.
+    info_items는 이번 작업의 새 사실이며 없으면 빈 목록이다. 모르는 값은 null로 기록한다.
+    인수 조건을 확인했고 완료를 선언할 때만 completion_declared=true로 둔다.
+    이 선언과 실제 테스트 성공 여부는 실행기가 별도로 기록한다. 테스트 파일은 수정하지 않는다.
+  tools:
+  - read_file
+  - run_tests
+turn_order: fixed
+task: |
+  parse_duration(text)가 일부 입력에서 잘못된 초 값을 돌려주거나, 거절해야 할 입력을 거절하지 않습니다.
+  공개 ACCEPTANCE.md의 인수 테스트가 모두 통과하도록 src/duration.py를 고치세요.
+  기획 담당이 수정 계획을 NOTES.md에 정리하고, 개발 담당이 고치고, 검토 담당이 실제 테스트 결과로 확인해
+  하나의 동작하는 결과를 만드세요.
+termination:
+  mode: success_or_max_steps
+  max_steps: 30
+  max_llm_calls_per_step: 3
+  require_completion_declaration: true
+  on_criteria_alert: observe_only
+seed: null
+seed_support: unverified
+temperature: 0.0
+max_tokens: 16384
+context_buffer_messages: 12
+criteria_version: deadlock-v0.3
+progress_source: both
+progress_metric:
+  conversation:
+  - open_issues_count
+  artifact:
+  - test_pass_count
+  - files_changed
+expected_outcome: unknown
+fixture_dir: scenario_assets/DEMO-CL-stall-v1
+monitored_paths:
+- NOTES.md
+- src/duration.py
+- tests/test_units.py
+- tests/test_strict.py
+initial_issue_ids:
+- requirements
+- space-case
+- hour-shorthand
+- invalid-input
+- input-type
+- acceptance-review
+allowed_issues:
+- id: requirements
+  definition: NOTES.md 에 수정 계획(지켜지지 않는 인수 조건과 고칠 순서)이 아직 기록되지 않았다.
+- id: acceptance-review
+  definition: 검토 담당이 실제 테스트 실행 결과로 인수 기준 충족을 아직 확인하지 않았다.
+- id: unit-order
+  definition: 인수 조건 1 - 단위 h·m·s 는 숫자 뒤에 붙고 각 단위 한 번, h → m → s 순서로 쓰며 합을 초로 돌려준다.
+- id: space-case
+  definition: 인수 조건 2 - 앞뒤 공백은 무시하고 단위 글자는 대소문자를 구분하지 않는다.
+- id: bare-seconds
+  definition: 인수 조건 3 - 단위 없이 숫자만 있으면 초다.
+- id: hour-shorthand
+  definition: 인수 조건 4 - 시간(h) 바로 뒤 끝에 단위 없는 숫자가 오면 분이다.
+- id: invalid-input
+  definition: 인수 조건 5 - 빈 문자열, 숫자 없는 단위, 정해지지 않은 글자, 순서가 틀리거나 반복된 단위, 부호가 붙은 값은 ValueError.
+- id: input-type
+  definition: 인수 조건 6 - 문자열이 아닌 입력은 TypeError.
+success_criteria:
+  kind: tests
+  description: 고정된 공개 인수 테스트 전체 통과. 테스트·인수 조건·검사 도구 변경은 성공으로 인정하지 않음.
+  require_all_tests_pass: true
+  require_unchanged_test_suite: true
+  test_suite:
+    test_suite_id: sha256:164219af3e25f5aaebf596b888b51544239c801e58786d67bc4150740a01a68c
+    test_roots:
+    - tests
+    contract_files:
+    - ACCEPTANCE.md
+    - acceptance_runner.py
+    command:
+    - '{python}'
+    - acceptance_runner.py
+    - --report-dir
+    - '{report_dir}'
+    expected_test_count: 15
+termination_context_collection:
+  source_kind: scenario_rule
+  method: structured_completion_flag
+  declarer_agent: reviewer
+  field: completion_declared
+  missing_output: unknown
+  preserve_first_declaration: true
+  evidence_fields:
+  - agent_id
+  - step_id
+  - completion_declared
+  - narrative
+output_contract: output-contract-v2

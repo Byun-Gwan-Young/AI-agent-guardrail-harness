@@ -1,0 +1,179 @@
+{
+ "session_id": "DEMO-CL-stall-v1-476c03070e414d8aa17df176d092cbb0",
+ "scenario_id": "DEMO-CL-stall-v1",
+ "termination_reason": "max_steps",
+ "steps": 30,
+ "error": null,
+ "tests_passed": {
+  "before": 6,
+  "after": 14,
+  "max": 14
+ },
+ "first_stop": null,
+ "stop_steps": [],
+ "tokens": {
+  "prompt": 566510,
+  "cached_prompt": 91584,
+  "completion": 62035,
+  "reasoning": 22510,
+  "turns": 76,
+  "usage_missing_turns": 0
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 105.00392,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-06T04:23:09.838014+00:00",
+   "2026-10-06T04:43:44.526276+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 105.00392,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 45,
+  "1": 12,
+  "2": 17,
+  "3": 1,
+  "4": 1
+ },
+ "tool_results": {
+  "executed": 53,
+  "refused_before_approval": 0,
+  "error_results": 1,
+  "error_results_by_tool": {
+   "replace_in_file": 1
+  },
+  "error_results_by_summary": {
+   "Role is not authorized to edit this file": 1
+  },
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 9,
+  "vocabulary_violations": 0,
+  "by_kind": {
+   "strict_schema_mismatch": 9
+  },
+  "failed_steps": [
+   {
+    "step_id": 4,
+    "reasons": [
+     "tool_execution_error"
+    ]
+   },
+   {
+    "step_id": 6,
+    "reasons": [
+     "strict_schema_mismatch",
+     "no_final_output"
+    ]
+   },
+   {
+    "step_id": 9,
+    "reasons": [
+     "strict_schema_mismatch",
+     "no_final_output"
+    ]
+   },
+   {
+    "step_id": 12,
+    "reasons": [
+     "strict_schema_mismatch",
+     "no_final_output"
+    ]
+   },
+   {
+    "step_id": 15,
+    "reasons": [
+     "strict_schema_mismatch",
+     "no_final_output"
+    ]
+   },
+   {
+    "step_id": 18,
+    "reasons": [
+     "strict_schema_mismatch",
+     "no_final_output"
+    ]
+   },
+   {
+    "step_id": 21,
+    "reasons": [
+     "strict_schema_mismatch",
+     "no_final_output"
+    ]
+   },
+   {
+    "step_id": 24,
+    "reasons": [
+     "strict_schema_mismatch",
+     "no_final_output"
+    ]
+   },
+   {
+    "step_id": 27,
+    "reasons": [
+     "strict_schema_mismatch",
+     "no_final_output"
+    ]
+   },
+   {
+    "step_id": 30,
+    "reasons": [
+     "strict_schema_mismatch",
+     "no_final_output"
+    ]
+   }
+  ]
+ },
+ "condition_group": "cg-f50509c825e1",
+ "condition_group_missing_fields": [
+  "dialogue_flow",
+  "recent_messages_rule",
+  "requested_seed",
+  "search_settings_sha256"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [
+   "dialogue_flow",
+   "recent_messages_rule",
+   "search_settings_sha256"
+  ],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": []
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "observe",
+ "session_times": {
+  "started_at": "2026-10-06T04:23:09.835474+00:00",
+  "ended_at": "2026-10-06T04:43:44.409342+00:00"
+ },
+ "account_label": "C",
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-CL-stall-v1:observe:4",
+  "lane": 3,
+  "lanes": 4,
+  "mode": "observe",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 4,
+  "rerun_of": null
+ },
+ "key_scan": {
+  "files_scanned": 181,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

@@ -1,0 +1,512 @@
+{
+ "manifest_version": "session-manifest-v0.7",
+ "session_id": "DEMO-CT-normal-v1-fcd55b67875c429e92744fc62af98a33",
+ "rerun_of": null,
+ "scenario": {
+  "id": "DEMO-CT-normal-v1",
+  "hash": "8a58629811c2a94d3b10d3b0e62e855afa492e5fbc6630c461830fed6fced61b"
+ },
+ "code": {
+  "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+  "criteria_version": "deadlock-v0.3",
+  "progress_version": "progress-v3",
+  "metrics_version": "metrics-v1",
+  "git_dirty": false,
+  "git_state_status": "measured"
+ },
+ "condition": {
+  "phase": "demo",
+  "temperature": 0.0,
+  "repeat_index": 5,
+  "max_steps": 30,
+  "max_llm_calls_per_step": 3,
+  "max_tokens": 16384,
+  "context_buffer_messages": 12,
+  "guardrail_mode": "observe",
+  "runner_protocol": "tool-capable-step-v10-final-report-allowlist",
+  "reasoning_effort": {
+   "requested": "high",
+   "sent_on": "all_calls",
+   "applied": "probe_indicated",
+   "evidence": "reports/c18-1/trial-summary.json",
+   "source": "conditions.json"
+  },
+  "dataset_run": false,
+  "group": {
+   "rule": "condition-group-v1",
+   "id": "cg-6c5c13fb016a",
+   "sha256": "6c5c13fb016a735eff50fc91255a5f3b13e9a69e3f97cbf4d84bf9f6e01943be",
+   "fields": {
+    "model": "glm-5.3-flash",
+    "model_source": "scenario",
+    "provider_host": "factchat.mindlogic-kr-api.com",
+    "proxy_config_file": "guardrail-deadlock-v0.3-kmu.yaml",
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "criteria_freeze_sha256": "4fa939191ab8e9bfc879da548b87b13107c85e1612f62bb35334e10fee7759cf",
+    "guardrail_mode": "observe",
+    "phase": "demo",
+    "runner_protocol": "tool-capable-step-v10-final-report-allowlist",
+    "collection_policy": "independent-sources-v1",
+    "output_contract_version": "output-contract-v3",
+    "dialogue_flow": null,
+    "recent_messages_rule": null,
+    "closed_list_check": "after_receipt",
+    "search_settings_sha256": null,
+    "temperature": 0.0,
+    "max_tokens": 16384,
+    "max_steps": 30,
+    "max_llm_calls_per_step": 3,
+    "context_buffer_messages": 12,
+    "reasoning_effort": {
+     "requested": "high",
+     "sent_on": "all_calls"
+    },
+    "requested_seed": null
+   },
+   "missing_fields": [
+    "dialogue_flow",
+    "recent_messages_rule",
+    "requested_seed",
+    "search_settings_sha256"
+   ]
+  },
+  "guardrail_mode_source": "proxy session meta"
+ },
+ "model": {
+  "provider": "factchat.mindlogic-kr-api.com",
+  "name": "glm-5.3-flash",
+  "upstream": {
+   "base_url_host": "factchat.mindlogic-kr-api.com",
+   "base_url": "https://factchat.mindlogic-kr-api.com/v1/gateway",
+   "chat_path": "/chat/completions/",
+   "api_key_env": "KMU_API_KEY",
+   "config_file": "guardrail-deadlock-v0.3-kmu.yaml"
+  },
+  "source": "scenario",
+  "scenario_model": "glm-5.3-flash",
+  "runner_model": "glm-5.3-flash",
+  "runner_matches_proxy": true
+ },
+ "seed": {
+  "value": null,
+  "status": "unverified"
+ },
+ "run": {
+  "started_at": "2026-10-06T04:58:56.371104+00:00",
+  "ended_at": "2026-10-06T05:15:36.382380+00:00",
+  "termination_reason": "success",
+  "steps_reached": 27,
+  "parallel_group": null,
+  "account_label": "C",
+  "batch": {
+   "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+   "item": "DEMO-CT-normal-v1:observe:5",
+   "lane": 3,
+   "lanes": 4,
+   "mode": "observe",
+   "plan_id": "demo-main-v1",
+   "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+   "repeat": 5,
+   "rerun_of": null
+  }
+ },
+ "tokens": {
+  "known_prompt": 550292,
+  "known_completion": 49842,
+  "known_total": 600134,
+  "usage_missing_turns": 0,
+  "total": 600134,
+  "total_status": "measured"
+ },
+ "judgement": {
+  "before": {
+   "tests_passed": 7
+  },
+  "after": {
+   "tests_passed": 16,
+   "gate": {
+    "machine_success": true,
+    "test_suite_unchanged": true,
+    "test_suite_id": "sha256:3932e7f861a4332fc36719b1fb069492981cf8b3376a9c2ca39204d86dcff2b4",
+    "pinned_test_suite_id": "sha256:3932e7f861a4332fc36719b1fb069492981cf8b3376a9c2ca39204d86dcff2b4",
+    "reason": "all_passed"
+   }
+  },
+  "normal_session": true,
+  "normal_session_rule": "S-1: all acceptance tests pass and completion declared"
+ },
+ "guardrail": {
+  "virtual_decisions": [
+   {
+    "step_id": 1,
+    "progress": "baseline",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 2,
+    "progress": "baseline",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 3,
+    "progress": "baseline",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 4,
+    "progress": "stagnant",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 5,
+    "progress": "stagnant",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 6,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 7,
+    "progress": "progress",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 8,
+    "progress": "stagnant",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 9,
+    "progress": "stagnant",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 10,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 11,
+    "progress": "progress",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 12,
+    "progress": "progress",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 13,
+    "progress": "progress",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 14,
+    "progress": "progress",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 15,
+    "progress": "stagnant",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 16,
+    "progress": "stagnant",
+    "criteria": "continue"
+   },
+   {
+    "step_id": 17,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 18,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 19,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 20,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 21,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 22,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 23,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 24,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 25,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 26,
+    "progress": "stagnant",
+    "criteria": "deadlock"
+   },
+   {
+    "step_id": 27,
+    "progress": "stagnant",
+    "criteria": "continue"
+   }
+  ],
+  "first_stop_step": 6,
+  "first_stop_explanation": {
+   "step_id": 6,
+   "explanation_version": "explain-v1",
+   "template_id": "E1",
+   "text": "최근 3 step 동안 기획·개발·검토 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 7/16.",
+   "values": {
+    "n": 3,
+    "roles": [
+     "기획",
+     "개발",
+     "검토"
+    ],
+    "signals": [
+     "산출물 변경",
+     "테스트 증가",
+     "새 쟁점"
+    ],
+    "pass": 7,
+    "total": 16
+   },
+   "missing_values": [],
+   "form": "fallback",
+   "skipped_templates": [],
+   "signals": {
+    "decision": "deadlock",
+    "stop_step": 6,
+    "task_kind": "artifact",
+    "consecutive_steps": 3,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant",
+     "stagnant"
+    ],
+    "streak_roles": [
+     "planner",
+     "developer",
+     "reviewer"
+    ],
+    "declared_step": null,
+    "test_pass_count": 7,
+    "test_total_count": 16,
+    "global_revert": null,
+    "test_plateau_in_streak": false,
+    "test_max_step": 1,
+    "steps_since_test_max": 5,
+    "file_state_changes_since_test_max": 0,
+    "handoff": null,
+    "handoff_threshold": 4,
+    "status": null,
+    "adopted_metric_selected": false,
+    "adopted_count": null,
+    "test_observed_in_session": true,
+    "selected_metrics": [
+     "conversation.open_issues_count",
+     "artifact.test_pass_count",
+     "artifact.files_changed"
+    ],
+    "adopted_required": null
+   },
+   "role_labels": {
+    "planner": "기획",
+    "developer": "개발",
+    "reviewer": "검토"
+   },
+   "status_labels": null
+  },
+  "mode": "observe",
+  "block": null,
+  "savings_vs_observe": null
+ },
+ "validity": {
+  "class": "unclassified",
+  "reason": null,
+  "decided_by": null,
+  "evidence": {
+   "isolation_ok": true,
+   "termination_reason": "success",
+   "http_error_codes": [],
+   "http_429_turns": [],
+   "finish_reason_length": 0,
+   "tool_execution_errors": 3,
+   "edit_attempts_outside_writable_paths": 1,
+   "unmeasured_steps": 0
+  }
+ },
+ "notes": [
+  "demo-records-v1"
+ ],
+ "judgement_time": {
+  "status": "measured",
+  "n": 27,
+  "steps_without_value": 0,
+  "p50_ms": 0.249625,
+  "p99_ms": 0.4495,
+  "max_ms": 0.4495
+ },
+ "replay": {
+  "status": "unmeasured",
+  "reason": "multi-rule offline replay (S-6) is scheduled for C-16"
+ },
+ "task": {
+  "task_kind": "artifact",
+  "turn_order": "fixed",
+  "dialogue_flow": null,
+  "output_contract_version": "output-contract-v3",
+  "contract_sha256": "5ae03ccc3fb031ec96a63b245d4b3eee6f327fc688fd5180092e09ee34f0812d",
+  "allowed_issues_sha256": "cc4f01385ba581d0f0b9eba51466f03cb7faa15b17bf19ea6e61ea1c691b2ca5",
+  "closed_list_check": {
+   "mode": "after_receipt",
+   "decision": "D-13",
+   "enums_sent_to_provider": false,
+   "basis": "artifact task: issue IDs are checked after receipt; the strict schema carries no enum (output-contract-v2, v3 adds spec_approved only)"
+  },
+  "judge": null,
+  "inputs_dir": null,
+  "tools": {
+   "planner": [
+    "read_file",
+    "write_file",
+    "replace_in_file"
+   ],
+   "developer": [
+    "read_file",
+    "write_file",
+    "replace_in_file",
+    "run_tests"
+   ],
+   "reviewer": [
+    "read_file",
+    "run_tests"
+   ]
+  },
+  "tool_implementations": null,
+  "recent_messages_rule": null,
+  "tool_settings": null,
+  "search": null,
+  "tool_preflight": null
+ },
+ "registration": {
+  "value": {
+   "registration_version": "session-registration-v1",
+   "role_labels": {
+    "planner": "기획",
+    "developer": "개발",
+    "reviewer": "검토"
+   },
+   "status_values": [],
+   "terminal_statuses": [],
+   "required_adopted_items": null,
+   "progress_source": "both",
+   "progress_metric": {
+    "conversation": [
+     "open_issues_count"
+    ],
+    "artifact": [
+     "test_pass_count",
+     "files_changed"
+    ]
+   }
+  },
+  "sha256": "7dbebabcae3185c3425a1f8c6591f92d372d7608b506ad96546b08b8a7102b59",
+  "sha256_recomputed": "7dbebabcae3185c3425a1f8c6591f92d372d7608b506ad96546b08b8a7102b59",
+  "proxy_stored_same": true
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 98.80176,
+  "model": "glm-5.3-flash",
+  "prices_version": "gateway-prices-v1",
+  "credits_per_million": {
+   "prompt": 150,
+   "cached_prompt": 30,
+   "completion": 500
+  },
+  "price_source": "prompt, completion: probe gateway-probe-a41f8d51 (DM-57); cached_prompt: probe gateway-probe-44ec8e43 second request (cached 1,088), decision 020",
+  "tokens": {
+   "prompt": 550292,
+   "cached_prompt": 72192,
+   "completion": 49842,
+   "reasoning": 8331,
+   "turns": 69,
+   "usage_missing_turns": 0
+  },
+  "cached_price": "known",
+  "basis": "proxy log usage x credits per 1M; an upper value (discounts not in the usage are not modelled)"
+ },
+ "credits_measured": {
+  "usage_version": "gateway-usage-v1",
+  "before": {
+   "read_at": "2026-10-06T04:58:56.373656+00:00",
+   "http_status": 200,
+   "used": 464.93254999999994,
+   "field": "monthly_allocated.used"
+  },
+  "after": {
+   "read_at": "2026-10-06T05:15:36.495545+00:00",
+   "http_status": 200,
+   "used": 563.73431,
+   "field": "monthly_allocated.used"
+  },
+  "exact_only_if_alone": true,
+  "note": "after minus before; it includes any other use of the same key between the two read_at times (parallel sessions, probes, other tools). Compare those times with other sessions.",
+  "status": "measured",
+  "value": 98.80176,
+  "field": "monthly_allocated.used"
+ },
+ "vocabulary_violations": {
+  "total": 0,
+  "steps": [],
+  "excluded_from_strict_failure_streak": true
+ },
+ "approval": {
+  "rule_version": "write-gate-v1",
+  "gate": {
+   "role": "developer",
+   "requires": "spec_approved",
+   "set_by": "reviewer",
+   "spec_path": "SPEC.md"
+  },
+  "notice_sha256": "e7f4569da9a40887ce8131b5d50074a6eb5bd1b6dce891297ed55f6939ae2db4",
+  "refusal_sha256": "9f7acb771a34e4c495ec3a82073ca57a2b3f21467158c7b1d74220cebbd91824",
+  "approved_step": 9,
+  "spec_path": "SPEC.md",
+  "spec_sha256_at_approval": "dceff320b8cc8cf0d687e145e6455b83b21c3a3c56eaefa7718b6c0cca863a40",
+  "refused_writes": 2,
+  "refused_writes_by_step": {
+   "5": 1,
+   "8": 1
+  },
+  "refused_writes_excluded_from": [
+   "strict_failure_streak",
+   "runner_error"
+  ]
+ }
+}

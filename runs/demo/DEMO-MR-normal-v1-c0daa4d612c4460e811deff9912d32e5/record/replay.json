@@ -1,0 +1,322 @@
+{
+ "replay_version": "demo-replay-v1",
+ "session_id": "DEMO-MR-normal-v1-c0daa4d612c4460e811deff9912d32e5",
+ "scenario_id": "DEMO-MR-normal-v1",
+ "title": "AI 코딩 도구 3 종의 공개 요금·주요 기능 비교표 만들기",
+ "task_kind": "dialogue",
+ "guardrail_mode": "observe",
+ "model": "glm-5.3-flash",
+ "termination_reason": "success",
+ "escalated_by": null,
+ "steps_reached": 6,
+ "max_steps": 30,
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-MR-normal-v1:observe:5",
+  "lane": 1,
+  "lanes": 4,
+  "mode": "observe",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 5,
+  "rerun_of": "DEMO-MR-normal-v1-8a458208d11c4e75af77a55978a60957"
+ },
+ "role_labels": {
+  "lead": "조사 책임",
+  "searcher": "검색 담당",
+  "writer": "작성 담당"
+ },
+ "first_stop_step": 6,
+ "stop_steps": [
+  6
+ ],
+ "blocked_step": null,
+ "if_stopped": {
+  "stop_step": 6,
+  "tokens_after": 0,
+  "tokens_total": 111816,
+  "token_ratio": 0.0,
+  "credits_after": 0,
+  "credits_total": 21.29332,
+  "basis": "tokens (prompt + completion) of the steps after the first STOP step: a block-mode proxy refuses the next request after the STOP (DM-7); credits are the token x price estimate"
+ },
+ "steps": [
+  {
+   "step_id": 1,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "researching",
+    "status_label": "조사",
+    "handoff_to": "lead",
+    "adopted_items": 0,
+    "open_issue_ids": [
+     "pricing",
+     "features",
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 4056,
+    "cached_prompt": 0,
+    "completion": 1535,
+    "reasoning": 492
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 1.3759,
+   "cumulative_tokens": 5591,
+   "cumulative_credits": 1.3759
+  },
+  {
+   "step_id": 2,
+   "agent": "searcher",
+   "role": "검색 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "drafting",
+    "status_label": "작성",
+    "handoff_to": "writer",
+    "adopted_items": 6,
+    "open_issue_ids": [
+     "acceptance-review"
+    ],
+    "deliverable_reported": false,
+    "completion_declared": false
+   },
+   "completion_claim": null,
+   "tools": [
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    },
+    {
+     "tool": "web_search",
+     "is_error": false
+    }
+   ],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 24481,
+    "cached_prompt": 0,
+    "completion": 4781,
+    "reasoning": 1747
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 6.06265,
+   "cumulative_tokens": 34853,
+   "cumulative_credits": 7.43855
+  },
+  {
+   "step_id": 3,
+   "agent": "writer",
+   "role": "작성 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": "lead",
+    "adopted_items": 6,
+    "open_issue_ids": [],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "baseline",
+   "state_label": "기준",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 6525,
+    "cached_prompt": 1600,
+    "completion": 2983,
+    "reasoning": 887
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 2.27825,
+   "cumulative_tokens": 44361,
+   "cumulative_credits": 9.7168
+  },
+  {
+   "step_id": 4,
+   "agent": "lead",
+   "role": "조사 책임",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer",
+     "judge_unfinished"
+    ],
+    "missing": [
+     "github-copilot:pricing:source_not_in_search_results",
+     "github-copilot:features:source_not_in_search_results",
+     "cursor:pricing:source_not_in_search_results",
+     "cursor:features:source_not_in_search_results"
+    ]
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 10987,
+    "cached_prompt": 1600,
+    "completion": 3725,
+    "reasoning": 1219
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 3.31855,
+   "cumulative_tokens": 59073,
+   "cumulative_credits": 13.03535
+  },
+  {
+   "step_id": 5,
+   "agent": "searcher",
+   "role": "검색 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": false,
+    "reasons": [
+     "not_declarer"
+    ],
+    "missing": []
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "continue",
+   "stop": null,
+   "blocked": false,
+   "tokens": {
+    "prompt": 32156,
+    "cached_prompt": 11904,
+    "completion": 3407,
+    "reasoning": 383
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 5.09842,
+   "cumulative_tokens": 94636,
+   "cumulative_credits": 18.13377
+  },
+  {
+   "step_id": 6,
+   "agent": "writer",
+   "role": "작성 담당",
+   "step_status": "completed",
+   "failure_reasons": [],
+   "report": {
+    "status": "completed",
+    "status_label": "완료",
+    "handoff_to": null,
+    "adopted_items": 6,
+    "open_issue_ids": [],
+    "deliverable_reported": true,
+    "completion_declared": true
+   },
+   "completion_claim": {
+    "accepted": true,
+    "reasons": [],
+    "missing": []
+   },
+   "tools": [],
+   "tests": null,
+   "changed_paths": [],
+   "state": "stagnant",
+   "state_label": "정체",
+   "decision": "termination_failure",
+   "stop": {
+    "template_id": "E6",
+    "text": "step 3에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다."
+   },
+   "blocked": false,
+   "tokens": {
+    "prompt": 14967,
+    "cached_prompt": 1600,
+    "completion": 2213,
+    "reasoning": 97
+   },
+   "usage_missing_turns": 0,
+   "credits_estimated": 3.15955,
+   "cumulative_tokens": 111816,
+   "cumulative_credits": 21.29332
+  }
+ ]
+}

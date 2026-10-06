@@ -1,0 +1,127 @@
+{
+ "session_id": "DEMO-CT-stall-v1-46ea7790a8a84124a440fcdb89b8dffb",
+ "scenario_id": "DEMO-CT-stall-v1",
+ "termination_reason": "guardrail_stop",
+ "steps": 15,
+ "error": null,
+ "tests_passed": {
+  "before": 7,
+  "after": 16,
+  "max": 16
+ },
+ "first_stop": {
+  "step_id": 14,
+  "criteria_version": "deadlock-v0.3",
+  "decision": "termination_failure",
+  "reason": "post-declaration nonprogress beyond grace",
+  "template_id": "E6",
+  "text": "step 9에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 통과 테스트 16/17."
+ },
+ "stop_steps": [
+  14
+ ],
+ "tokens": {
+  "prompt": 285799,
+  "cached_prompt": 79232,
+  "completion": 44004,
+  "reasoning": 17950,
+  "turns": 38,
+  "usage_missing_turns": 0
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 55.36401,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-06T13:45:17.187092+00:00",
+   "2026-10-06T13:58:29.926201+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 55.36401,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 21,
+  "1": 9,
+  "2": 7
+ },
+ "tool_results": {
+  "executed": 23,
+  "refused_before_approval": 1,
+  "error_results": 1,
+  "error_results_by_tool": {
+   "write_file": 1
+  },
+  "error_results_by_summary": {
+   "Role is not authorized to edit this file": 1
+  },
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 0,
+  "vocabulary_violations": 0,
+  "by_kind": {},
+  "failed_steps": [
+   {
+    "step_id": 5,
+    "reasons": [
+     "write_refused_before_approval"
+    ]
+   },
+   {
+    "step_id": 7,
+    "reasons": [
+     "tool_execution_error"
+    ]
+   }
+  ]
+ },
+ "condition_group": "cg-25cb10bb77a1",
+ "condition_group_missing_fields": [
+  "dialogue_flow",
+  "recent_messages_rule",
+  "requested_seed",
+  "search_settings_sha256"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [
+   "dialogue_flow",
+   "recent_messages_rule",
+   "search_settings_sha256"
+  ],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": []
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "block",
+ "session_times": {
+  "started_at": "2026-10-06T13:45:17.184519+00:00",
+  "ended_at": "2026-10-06T13:58:29.860376+00:00"
+ },
+ "account_label": "B",
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-CT-stall-v1:block:2",
+  "lane": 2,
+  "lanes": 4,
+  "mode": "block",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 2,
+  "rerun_of": "DEMO-CT-stall-v1-b3ae99543df54d159c9cab9b00c072a1"
+ },
+ "key_scan": {
+  "files_scanned": 91,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

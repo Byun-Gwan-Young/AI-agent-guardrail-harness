@@ -1,0 +1,105 @@
+{
+ "session_id": "DEMO-MR-stall-v1-82564d3c1e534d5aa98dd5dc6e0dbd54",
+ "scenario_id": "DEMO-MR-stall-v1",
+ "termination_reason": "escalated",
+ "steps": 4,
+ "error": null,
+ "tests_passed": {
+  "before": null,
+  "after": null,
+  "max": null
+ },
+ "first_stop": null,
+ "stop_steps": [],
+ "tokens": {
+  "prompt": 24467,
+  "cached_prompt": 8512,
+  "completion": 3783,
+  "reasoning": 1171,
+  "turns": 9,
+  "usage_missing_turns": 0
+ },
+ "credits_measured": {
+  "status": "measured",
+  "value": 4.54011,
+  "field": "monthly_allocated.used",
+  "reason": null,
+  "exact_only_if_alone": true,
+  "read_at": [
+   "2026-10-06T14:00:37.001261+00:00",
+   "2026-10-06T14:02:09.231844+00:00"
+  ]
+ },
+ "credits_estimated": {
+  "status": "computed",
+  "value": 4.54011,
+  "cached_price": "known"
+ },
+ "tool_calls_per_response": {
+  "0": 7,
+  "1": 1,
+  "4": 1
+ },
+ "tool_results": {
+  "executed": 5,
+  "refused_before_approval": 0,
+  "error_results": 5,
+  "error_results_by_tool": {
+   "web_search": 5
+  },
+  "error_results_by_summary": {
+   "web_search failed: HTTP 401 from Tavily. Unauthorized: missing or invalid API key. No results.": 5
+  },
+  "invalid_tool_calls": 0
+ },
+ "strict_output": {
+  "format_failures": 0,
+  "vocabulary_violations": 0,
+  "by_kind": {},
+  "failed_steps": [
+   {
+    "step_id": 2,
+    "reasons": [
+     "tool_execution_error"
+    ]
+   }
+  ]
+ },
+ "condition_group": "cg-7da0a5a24738",
+ "condition_group_missing_fields": [
+  "requested_seed"
+ ],
+ "condition_group_missing_by_class": {
+  "not_applicable": [],
+  "recorded_null": [
+   "requested_seed"
+  ],
+  "missing": []
+ },
+ "model": "glm-5.3-flash",
+ "reasoning_effort": "high",
+ "phase": "demo",
+ "guardrail_mode": "block",
+ "session_times": {
+  "started_at": "2026-10-06T14:00:36.998690+00:00",
+  "ended_at": "2026-10-06T14:02:09.218130+00:00"
+ },
+ "account_label": "C",
+ "batch": {
+  "final_freeze_sha256": "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776",
+  "item": "DEMO-MR-stall-v1:block:3",
+  "lane": 3,
+  "lanes": 4,
+  "mode": "block",
+  "plan_id": "demo-main-v1",
+  "plan_sha256": "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357",
+  "repeat": 3,
+  "rerun_of": null
+ },
+ "key_scan": {
+  "files_scanned": 17,
+  "key_values_checked": [],
+  "hits": {},
+  "clean": true
+ }
+}

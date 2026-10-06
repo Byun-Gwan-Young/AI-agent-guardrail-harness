@@ -1,0 +1,450 @@
+{
+ "record_version": "demo-records-v1",
+ "session_id": "DEMO-MR-normal-v1-c0daa4d612c4460e811deff9912d32e5",
+ "criteria_version": "deadlock-v0.3",
+ "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+ "criteria_freeze": {
+  "implementation_sha256": {
+   "deadlock_policy_v03.py": "794f65e26211b7bcebbe4deadfa3e30f30dbaecc6fe361681854db23e2cef3b0",
+   "explain_v1.py": "1d01fc8428f368fb0eb3bd56c916e58337b582462259d7fbd1493d65ed7c09df",
+   "progress_signal_v3.py": "dc727697e0832a305569839d3fc347f36c093a09811e93183cc4fc478a8d6c94"
+  },
+  "explanation_templates_sha256": "66c60d7d38d037428e3774a2127f6dd42d77ea3eb56ac7586fd313a854f3bcf1",
+  "sha256": "4fa939191ab8e9bfc879da548b87b13107c85e1612f62bb35334e10fee7759cf"
+ },
+ "guardrail_mode": "observe",
+ "termination_reason": "success",
+ "first_stop_step": 6,
+ "stop_steps": [
+  6
+ ],
+ "steps": [
+  {
+   "step_id": 1,
+   "agent_id": "lead",
+   "observed_at": "2026-10-06T14:49:32.494288+00:00",
+   "judgement_ns": 230750,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.status_advance": "measured",
+     "conversation.adopted_items": "measured",
+     "conversation.new_issue_ids": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "baseline",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": false,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": null,
+    "pass_count": null,
+    "t3": null,
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "progress, baseline or declaration step",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "declared_step": null
+   }
+  },
+  {
+   "step_id": 2,
+   "agent_id": "searcher",
+   "observed_at": "2026-10-06T14:51:17.885437+00:00",
+   "judgement_ns": 173625,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.status_advance": "measured",
+     "conversation.adopted_items": "measured",
+     "conversation.new_issue_ids": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "baseline",
+    "events": [
+     {
+      "metric": "conversation.status_advance",
+      "item": "drafting",
+      "kind": "new"
+     },
+     {
+      "metric": "conversation.adopted_items",
+      "item": "cursor:features",
+      "kind": "new"
+     },
+     {
+      "metric": "conversation.adopted_items",
+      "item": "cursor:pricing",
+      "kind": "new"
+     },
+     {
+      "metric": "conversation.adopted_items",
+      "item": "gemini-code-assist:features",
+      "kind": "new"
+     },
+     {
+      "metric": "conversation.adopted_items",
+      "item": "gemini-code-assist:pricing",
+      "kind": "new"
+     },
+     {
+      "metric": "conversation.adopted_items",
+      "item": "github-copilot:features",
+      "kind": "new"
+     },
+     {
+      "metric": "conversation.adopted_items",
+      "item": "github-copilot:pricing",
+      "kind": "new"
+     }
+    ],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": true,
+    "artifact_moved": false,
+    "comparison_step_id": null,
+    "pass_count": null,
+    "t3": null,
+    "handoff": {
+     "roles": [
+      "searcher",
+      "writer"
+     ],
+     "count": 1,
+     "first_step": 2,
+     "threshold": 4,
+     "at_or_above_threshold": false
+    }
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "progress, baseline or declaration step",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "declared_step": null
+   }
+  },
+  {
+   "step_id": 3,
+   "agent_id": "writer",
+   "observed_at": "2026-10-06T14:52:04.772905+00:00",
+   "judgement_ns": 303916,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.status_advance": "measured",
+     "conversation.adopted_items": "measured",
+     "conversation.new_issue_ids": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "baseline",
+    "events": [
+     {
+      "metric": "conversation.status_advance",
+      "item": "completed",
+      "kind": "new"
+     }
+    ],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": true,
+    "artifact_moved": false,
+    "comparison_step_id": null,
+    "pass_count": null,
+    "t3": null,
+    "handoff": {
+     "roles": [
+      "writer",
+      "lead"
+     ],
+     "count": 1,
+     "first_step": 3,
+     "threshold": 4,
+     "at_or_above_threshold": false
+    }
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "progress, baseline or declaration step",
+    "consecutive_steps": 0,
+    "consecutive_states": [],
+    "consecutive_step_ids": [],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "declared_step": 3
+   }
+  },
+  {
+   "step_id": 4,
+   "agent_id": "lead",
+   "observed_at": "2026-10-06T14:53:11.364875+00:00",
+   "judgement_ns": 148000,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.status_advance": "measured",
+     "conversation.adopted_items": "measured",
+     "conversation.new_issue_ids": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 1,
+    "pass_count": null,
+    "t3": null,
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "post-declaration grace",
+    "consecutive_steps": 1,
+    "consecutive_states": [
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     4
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "declared_step": 3
+   }
+  },
+  {
+   "step_id": 5,
+   "agent_id": "searcher",
+   "observed_at": "2026-10-06T14:54:00.843317+00:00",
+   "judgement_ns": 252083,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.status_advance": "measured",
+     "conversation.adopted_items": "measured",
+     "conversation.new_issue_ids": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 2,
+    "pass_count": null,
+    "t3": null,
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "continue",
+    "reason": "post-declaration grace",
+    "consecutive_steps": 2,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     4,
+     5
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": null,
+    "declared_step": 3
+   }
+  },
+  {
+   "step_id": 6,
+   "agent_id": "writer",
+   "observed_at": "2026-10-06T14:54:32.451677+00:00",
+   "judgement_ns": 363709,
+   "collection": {
+    "final_output_status": "valid",
+    "final_output_reason": null,
+    "measurement_status": "observed",
+    "metric_status": {
+     "conversation.status_advance": "measured",
+     "conversation.adopted_items": "measured",
+     "conversation.new_issue_ids": "measured"
+    }
+   },
+   "progress": {
+    "version": "progress-v3",
+    "state": "stagnant",
+    "events": [],
+    "flags": {
+     "oscillation": [],
+     "reopen": [],
+     "revert": [],
+     "test_plateau": false
+    },
+    "coverage_complete": true,
+    "conversation_moved": false,
+    "artifact_moved": false,
+    "comparison_step_id": 3,
+    "pass_count": null,
+    "t3": null,
+    "handoff": null
+   },
+   "criteria": {
+    "criteria_version": "deadlock-v0.3",
+    "criteria_sha256": "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50",
+    "decision": "termination_failure",
+    "reason": "post-declaration nonprogress beyond grace",
+    "consecutive_steps": 3,
+    "consecutive_states": [
+     "stagnant",
+     "stagnant",
+     "stagnant"
+    ],
+    "consecutive_step_ids": [
+     4,
+     5,
+     6
+    ],
+    "unmeasured_steps": 0,
+    "needs_observation_review": false,
+    "first_deadlock_step": null,
+    "first_termination_failure_step": 6,
+    "declared_step": 3,
+    "explanation": {
+     "explanation_version": "explain-v1",
+     "template_id": "E6",
+     "text": "step 3에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다.",
+     "values": {
+      "d": 3,
+      "n": 3,
+      "status": "완료"
+     },
+     "missing_values": [],
+     "form": "full",
+     "skipped_templates": [],
+     "signals": {
+      "decision": "termination_failure",
+      "stop_step": 6,
+      "task_kind": "dialogue",
+      "consecutive_steps": 3,
+      "consecutive_states": [
+       "stagnant",
+       "stagnant",
+       "stagnant"
+      ],
+      "streak_roles": [
+       "lead",
+       "searcher",
+       "writer"
+      ],
+      "declared_step": 3,
+      "test_pass_count": null,
+      "test_total_count": null,
+      "global_revert": null,
+      "test_plateau_in_streak": false,
+      "test_max_step": null,
+      "steps_since_test_max": null,
+      "file_state_changes_since_test_max": null,
+      "handoff": null,
+      "handoff_threshold": 4,
+      "status": "completed",
+      "adopted_metric_selected": true,
+      "adopted_count": 6,
+      "test_observed_in_session": false,
+      "selected_metrics": [
+       "conversation.status_advance",
+       "conversation.adopted_items",
+       "conversation.new_issue_ids"
+      ],
+      "adopted_required": 6
+     },
+     "role_labels": {
+      "lead": "조사 책임",
+      "searcher": "검색 담당",
+      "writer": "작성 담당"
+     },
+     "status_labels": {
+      "scoping": "범위 확정",
+      "researching": "조사",
+      "drafting": "작성",
+      "completed": "완료",
+      "escalated": "에스컬레이션"
+     }
+    }
+   }
+  }
+ ]
+}

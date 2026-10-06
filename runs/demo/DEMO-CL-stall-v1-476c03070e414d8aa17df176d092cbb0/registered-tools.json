@@ -1,0 +1,17 @@
+{
+  "planner": [
+    "read_file",
+    "write_file",
+    "replace_in_file"
+  ],
+  "developer": [
+    "read_file",
+    "write_file",
+    "replace_in_file",
+    "run_tests"
+  ],
+  "reviewer": [
+    "read_file",
+    "run_tests"
+  ]
+}
