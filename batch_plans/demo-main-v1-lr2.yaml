@@ -1,0 +1,12 @@
+# C-19 본 실행 LR 보충 계획 : batch_plans/demo-main-v1.yaml 의 LR 항목 13 개 (관측 LR-normal 5 + LR-stall 5, 차단 LR-stall 3).
+# 저장소 밖에 둔다 (본 실행 중 작업 트리를 바꾸지 않기 위해). 시나리오 경로는 저장소 기준으로 읽힌다.
+# 실행 : tools/run_batch.py run --plan ~/demo-lr2/demo-main-v1-lr2.yaml --lane 1 --lanes 1
+# 최종 동결 (DM-33) : requires_final_freeze 이므로 tools/final_freeze.py check 가 통과할 때만 세션을 시작한다.
+plan_version: demo-batch-plan-v1
+plan_id: demo-main-v1-lr2
+requires_final_freeze: true
+description: 데모 본 실행 — LR 보충 관측 10 + 차단 3 (DM-78)
+items:
+- {scenario: scenarios/DEMO-LR-normal-v1.yaml, mode: observe, repeats: [1, 2, 3, 4, 5], one_at_a_time: true}
+- {scenario: scenarios/DEMO-LR-stall-v1.yaml, mode: observe, repeats: [1, 2, 3, 4, 5], one_at_a_time: true}
+- {scenario: scenarios/DEMO-LR-stall-v1.yaml, mode: block, repeats: [1, 2, 3], one_at_a_time: true}

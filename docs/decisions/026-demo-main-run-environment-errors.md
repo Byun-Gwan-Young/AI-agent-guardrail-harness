@@ -42,6 +42,18 @@
 - arXiv 검색 41 회 : 429 26, 시간 초과 12, 200 3 (결과 0 개). 종료 : `escalated` 12, `guardrail_stop` 1
 - 검색 시도 없이 끝난 세션 2 개 : `a8e1e322…` (LR 정상판 관측 5, lead 가 검색 없이 `escalated` = 모델 행동, DM-78 ③ 에 따로 적음), `569ceba4…` (LR 교착판 차단 2)
 
+## LR 보충 실행 (DM-78 ④, `demo-main-v1-lr2`)
+
+계획 파일 `~/demo-lr2/demo-main-v1-lr2.yaml` 을 같은 바이트로 `batch_plans/demo-main-v1-lr2.yaml` 에 넣었다. sha256 `09cc3ef0a108…` = 레인 기록 모든 줄의 `plan_sha256`. `load_plan` 이 받고 (13 항목 = 본 실행 계획의 LR 항목 그대로, `requires_final_freeze: true`), 최종 동결 `check` 는 이 파일을 넣은 뒤에도 통과한다 (동결 범위는 본 실행 계획만). 레인 1 개, 계정 D, 커밋 `e3341e5`.
+
+| 시나리오 · 모드 | 세션 | 종료 | 검색 (200 / 429 / 시간 초과) |
+|---|---|---|---|
+| LR 정상판 관측 | 5 | success 5 (반복 1~5 : 3·3·6·6·6 step) | 22 / 0 / 0 |
+| LR 교착판 관측 | 5 | `escalated` 5 | 8 / 0 / 0 (검색 없이 끝난 세션 2 : `53b21638…`, `6e073f21…`) |
+| LR 교착판 차단 | 3 | `escalated` 2, `user_interrupted` 1 | 3 / 0 / 0 (검색 없이 끝난 세션 2 : `7c6a57c5…`, `445ab1ba…`) |
+
+검색 33 회 모두 200 → arXiv 회복 확인. 정상판이 낮은 크레딧으로 연달아 `escalated` 하는 DM-78 ④ 의 멈춤 조건은 나오지 않았다.
+
 ## 결정 (DM-78, DM-79)
 
 1. **프록시 업스트림 읽기 시간 제한 600 초** (`proxy.py` `UPSTREAM_TIMEOUT = httpx.Timeout(120, read=600)`). 연결·쓰기·풀은 120 초 그대로. 600 초를 넘기면 지금처럼 프록시가 만든 502. `proxy.py` 는 최종 동결 62 파일 밖이라 동결은 그대로이고 (`final_freeze.py check` 통과), 판정 규칙·조건군은 바뀌지 않는다. 적용은 모든 레인이 끝난 뒤 프록시 재기동부터 (그 전 재기동은 진행 중 세션을 끊는다)
