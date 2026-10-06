@@ -1,0 +1,125 @@
+{
+ "account_corrections_version": "demo-account-corrections-v1",
+ "plan_id": "demo-main-v1",
+ "git_commit": "163b7236a7b22e4f0e61b22e661df190bc1e3518",
+ "lane_accounts": {
+  "1": "C",
+  "2": "A",
+  "3": "B"
+ },
+ "source": "PM 진술 (DM-81 ②, 10/7) — 키는 기록에 없음",
+ "sessions": [
+  {
+   "session_id": "DEMO-CL-normal-v1-51aef935db294a64bdf2fbec9ca91e8a",
+   "item": "DEMO-CL-normal-v1:observe:1",
+   "lane": 1,
+   "rerun_of": "DEMO-CL-normal-v1-c1ff4dc412b94511be238ae8775d68c8",
+   "label": "A",
+   "actual": "C"
+  },
+  {
+   "session_id": "DEMO-CL-stall-v1-3f94b2979b0b4273b4b7c61a62cf933b",
+   "item": "DEMO-CL-stall-v1:block:3",
+   "lane": 3,
+   "rerun_of": "DEMO-CL-stall-v1-1372b13baf0d4b1eb9d2269849a0716b",
+   "label": "C",
+   "actual": "B"
+  },
+  {
+   "session_id": "DEMO-CL-stall-v1-d4ba1c9f7928415ab4dca7704aa792fa",
+   "item": "DEMO-CL-stall-v1:observe:2",
+   "lane": 1,
+   "rerun_of": "DEMO-CL-stall-v1-0cd6385b25794e96866bcc18a25cc702",
+   "label": "A",
+   "actual": "C"
+  },
+  {
+   "session_id": "DEMO-CS-stall-v1-0246cb21ee4c4a1894ef49f226467cfc",
+   "item": "DEMO-CS-stall-v1:block:3",
+   "lane": 3,
+   "rerun_of": null,
+   "label": "C",
+   "actual": "B"
+  },
+  {
+   "session_id": "DEMO-CT-stall-v1-0d834a8243ff46589cf462d0e0008758",
+   "item": "DEMO-CT-stall-v1:observe:5",
+   "lane": 2,
+   "rerun_of": "DEMO-CT-stall-v1-18b69568fc63473cbe59097b52e0386a",
+   "label": "B",
+   "actual": "A"
+  },
+  {
+   "session_id": "DEMO-CT-stall-v1-1b7bd9638b544c25ba0495e145b6fa13",
+   "item": "DEMO-CT-stall-v1:observe:3",
+   "lane": 3,
+   "rerun_of": "DEMO-CT-stall-v1-7634c328e20a4936aa6e42ee72163251",
+   "label": "C",
+   "actual": "B"
+  },
+  {
+   "session_id": "DEMO-CT-stall-v1-34b058044ab64663911145fdd72da6a4",
+   "item": "DEMO-CT-stall-v1:block:1",
+   "lane": 1,
+   "rerun_of": "DEMO-CT-stall-v1-158e7cace4ae478aa189104fdc448f68",
+   "label": "A",
+   "actual": "C"
+  },
+  {
+   "session_id": "DEMO-CT-stall-v1-46ea7790a8a84124a440fcdb89b8dffb",
+   "item": "DEMO-CT-stall-v1:block:2",
+   "lane": 2,
+   "rerun_of": "DEMO-CT-stall-v1-b3ae99543df54d159c9cab9b00c072a1",
+   "label": "B",
+   "actual": "A"
+  },
+  {
+   "session_id": "DEMO-CT-stall-v1-79fdaab15c9c478eb90bca10a2dba524",
+   "item": "DEMO-CT-stall-v1:observe:4",
+   "lane": 1,
+   "rerun_of": "DEMO-CT-stall-v1-eba5a575219e4f07b22948f057723c83",
+   "label": "A",
+   "actual": "C"
+  },
+  {
+   "session_id": "DEMO-CT-stall-v1-b12151a11ca14792871b5dc6e3618eab",
+   "item": "DEMO-CT-stall-v1:block:3",
+   "lane": 3,
+   "rerun_of": "DEMO-CT-stall-v1-bf36c7d96b10472680da030ef2faf015",
+   "label": "C",
+   "actual": "B"
+  },
+  {
+   "session_id": "DEMO-CT-stall-v1-df08a5f8f475485f978baaaaf9373760",
+   "item": "DEMO-CT-stall-v1:observe:1",
+   "lane": 1,
+   "rerun_of": "DEMO-CT-stall-v1-000a538a7dc746fbb38319f905a40325",
+   "label": "A",
+   "actual": "C"
+  },
+  {
+   "session_id": "DEMO-MR-normal-v1-c0daa4d612c4460e811deff9912d32e5",
+   "item": "DEMO-MR-normal-v1:observe:5",
+   "lane": 1,
+   "rerun_of": "DEMO-MR-normal-v1-8a458208d11c4e75af77a55978a60957",
+   "label": "A",
+   "actual": "C"
+  },
+  {
+   "session_id": "DEMO-MR-stall-v1-54ca8a0703434b7fb51e0a1bb3d8db2d",
+   "item": "DEMO-MR-stall-v1:block:1",
+   "lane": 1,
+   "rerun_of": "DEMO-MR-stall-v1-173d03d693e447caabc808d3265a9d76",
+   "label": "A",
+   "actual": "C"
+  },
+  {
+   "session_id": "DEMO-MR-stall-v1-82564d3c1e534d5aa98dd5dc6e0dbd54",
+   "item": "DEMO-MR-stall-v1:block:3",
+   "lane": 3,
+   "rerun_of": null,
+   "label": "C",
+   "actual": "B"
+  }
+ ]
+}

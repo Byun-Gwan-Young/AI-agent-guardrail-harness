@@ -18,6 +18,9 @@ counted as such, so the per-scenario denominators are valid sessions. Sessions o
 name (a list older than the records) are listed there too. With more than one plan or with a list, git_commits gives the
 number of counted sessions per commit, overall and per plan (plans may run at different commits, DM-79 ④). One plan
 without a list gives the same output as before.
+With --account-corrections (C-18-8, DM-81 ②: tools/demo_account_corrections.py output) accounts_corrected gives the
+per-account credit totals with the stated accounts applied, next to accounts (the labels, unchanged). Without it the
+output is as before.
 
 Termination classes (DM-18, DM-46, DM-48): success; stalled = not finished (max_steps, or guardrail_stop in block
 mode); escalated (by escalated_by); other (runner_error, strict_output_failures, ...).
@@ -314,7 +317,28 @@ def commit_counts(rows, commits):
             'by_plan': by_key({plan: by_key(counts) for plan, counts in by_plan.items()})}
 
 
-def aggregate(plans, *, freeze=None, sessions=(), runs_root=DEMO_RUNS, exclusion_list=None):
+def account_totals(rows, account_of):
+    accounts = {}
+    for row in rows:
+        entry = accounts.setdefault(account_of(row) or '(없음)', {'sessions': 0, 'credits_measured': 0.0})
+        entry['sessions'] += 1
+        entry['credits_measured'] = round(entry['credits_measured'] + (row['credits_measured'] or 0), 5)
+    return accounts
+
+
+def corrected_accounts(rows, corrections):
+    """Per-account totals with a demo-account-corrections-v1 file applied (the labels stay in accounts)."""
+    if corrections.get('account_corrections_version') != 'demo-account-corrections-v1':
+        raise ValueError('--account-corrections takes a demo-account-corrections-v1 file '
+                         '(tools/demo_account_corrections.py)')
+    actual = {s['session_id']: s['actual'] for s in corrections.get('sessions') or []}
+    counted = [r for r in rows if r['session_id'] in actual]
+    return {'source': corrections.get('source'), 'sessions_in_file': len(actual), 'sessions_counted': len(counted),
+            'sessions_relabelled': sum(1 for r in counted if r['account_label'] != actual[r['session_id']]),
+            'accounts': account_totals(rows, lambda r: actual.get(r['session_id'], r['account_label']))}
+
+
+def aggregate(plans, *, freeze=None, sessions=(), runs_root=DEMO_RUNS, exclusion_list=None, account_corrections=None):
     folders = select(runs_root, set(plans), set(sessions))
     rows = [session_row(f) for f in folders]
     listed = None
@@ -324,11 +348,7 @@ def aggregate(plans, *, freeze=None, sessions=(), runs_root=DEMO_RUNS, exclusion
     scenario_ids = sorted({r['scenario_id'] for r in kept})
     tables = [scenario_table(kept, s) for s in scenario_ids]
     types = [type_summary(kept, t) for t in ('T1', 'T2', 'T3') if any(r['task_type'] == t for r in kept)]
-    accounts = {}
-    for row in kept:
-        entry = accounts.setdefault(row['account_label'] or '(없음)', {'sessions': 0, 'credits_measured': 0.0})
-        entry['sessions'] += 1
-        entry['credits_measured'] = round(entry['credits_measured'] + (row['credits_measured'] or 0), 5)
+    accounts = account_totals(kept, lambda r: r['account_label'])
     observe = [r for r in kept if r['mode'] == 'observe']
     detected = [r for r in observe if r['variant'] == 'stall' and r['class'] == 'stalled' and r['first_stop_step']]
     headline = {'scope': SCOPE,
@@ -353,6 +373,8 @@ def aggregate(plans, *, freeze=None, sessions=(), runs_root=DEMO_RUNS, exclusion
               'session_rows': kept}
     if listed is not None:
         result['exclusion_list'] = listed
+    if account_corrections is not None:
+        result['accounts_corrected'] = corrected_accounts(kept, account_corrections)
     if listed is not None or len(set(plans)) > 1:
         commits = {f.name: (load(f / 'conditions.json').get('git_commit')) for f in folders}
         result['git_commits'] = commit_counts(kept, commits)
@@ -400,6 +422,13 @@ def markdown(result):
     lines += [f"| {r['scenario_id']} | {r['role']} | {r['session_id']} | {r['reason']} |" for r in result['representatives']]
     lines += ['', '## 계정별 실측 크레딧', '']
     lines += [f"- {k} : {v['sessions']} 세션, {v['credits_measured']}" for k, v in sorted(result['accounts'].items())]
+    corrected = result.get('accounts_corrected')
+    if corrected is not None:
+        lines += ['', f"## 계정별 실측 크레딧 — 보정 표 적용 ({corrected['source']})", '',
+                  f"- 보정 표 세션 {corrected['sessions_in_file']} 개 중 집계에 든 {corrected['sessions_counted']} 개, "
+                  f"그중 계정이 이름표와 다른 {corrected['sessions_relabelled']} 개를 실제 계정으로 셈"]
+        lines += [f"- {k} : {v['sessions']} 세션, {v['credits_measured']}"
+                  for k, v in sorted(corrected['accounts'].items())]
     if result['excluded']:
         lines += ['', '## 제외한 세션', '']
         lines += [f"- {r['session_id']} : {'; '.join(r['excluded_because'])}" for r in result['excluded']]
@@ -439,6 +468,8 @@ def main():
     parser.add_argument('--session', action='append', default=[], help='a session folder name to include as well')
     parser.add_argument('--final-freeze-sha256')
     parser.add_argument('--exclusions', type=Path, help='a demo-exclusions-v1 or -v2 file (tools/demo_exclusions.py)')
+    parser.add_argument('--account-corrections', type=Path,
+                        help='a demo-account-corrections-v1 file (tools/demo_account_corrections.py)')
     parser.add_argument('--runs-root', type=Path, default=DEMO_RUNS)
     parser.add_argument('--output-json', type=Path)
     parser.add_argument('--output-md', type=Path)
@@ -446,8 +477,10 @@ def main():
     if not args.plan and not args.session:
         parser.error('name --plan or --session')
     listing = json.loads(args.exclusions.read_text(encoding='utf-8')) if args.exclusions else None
+    corrections = (json.loads(args.account_corrections.read_text(encoding='utf-8'))
+                   if args.account_corrections else None)
     result = aggregate(args.plan, freeze=args.final_freeze_sha256, sessions=args.session, runs_root=args.runs_root,
-                       exclusion_list=listing)
+                       exclusion_list=listing, account_corrections=corrections)
     text = json.dumps(result, ensure_ascii=False, indent=1) + '\n'
     for path, content in ((args.output_json, text), (args.output_md, markdown(result))):
         if path is not None:
