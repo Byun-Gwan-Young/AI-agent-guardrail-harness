@@ -309,10 +309,10 @@ def main():
         output.write_text(page(replay, summary), encoding='utf-8')
     else:
         aggregate = load(args.aggregate)
-        pages = {p.stem: p.name for p in args.pages.glob('*.html') if p.name != args.output.name}
+        named = {p.stem: p.name for p in args.pages.glob('*.html') if p.name != args.output.name}
         output = args.output
         output.parent.mkdir(parents=True, exist_ok=True)
-        output.write_text(index_page(aggregate, pages), encoding='utf-8')
+        output.write_text(index_page(aggregate, named), encoding='utf-8')
     print(output)
     return 0
 
