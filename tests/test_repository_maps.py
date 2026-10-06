@@ -1,8 +1,8 @@
-"""C-19-5 part 2 : the repository map READMEs name only paths that exist (offline, read-only).
+"""C-19-5 parts 2-3 : the repository map READMEs name only paths that exist (offline, read-only).
 
 Checked in each map : relative markdown links (resolved from the README's folder), inline code spans that start with a
-top-level tracked entry (resolved from the repository root; `*` is a glob that must match), and the mermaid blocks'
-basic shape (diagram type, balanced brackets and quotes, subgraph/end).
+top-level tracked entry (resolved from the repository root; `*` is a glob that must match), the folder tree of the root
+README, and the mermaid blocks' basic shape (diagram type, balanced brackets and quotes, subgraph/end).
 Paths that are local-only by .gitignore (docs/handoff/, logs/demo/, runs/demo-batches/, raw session files) are skipped.
 """
 import re
@@ -11,12 +11,13 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-MAPS = ('scenarios/README.md', 'reports/README.md', 'tools/README.md', 'docs/README.md',
+MAPS = ('README.md', 'scenarios/README.md', 'reports/README.md', 'tools/README.md', 'docs/README.md',
         'batch_plans/README.md')
 LOCAL_ONLY = ('docs/handoff/', 'logs/demo/', 'runs/demo-batches/', 'runs/demo/<')
 FENCE = re.compile(r'^```(\w*)\n(.*?)^```', re.M | re.S)
 LINK = re.compile(r'\]\(([^)\s]+)\)')
 CODE = re.compile(r'`([^`\n]+)`')
+TREE_LINE = re.compile(r'^((?:│   |    )*)(?:├── |└── )(\S+)')
 
 
 def tracked_top_level():
@@ -67,6 +68,38 @@ class RepositoryMapTest(unittest.TestCase):
                     continue
                 with self.subTest(map=name, path=span):
                     self.assertTrue(exists(span), f'{name}: {span}')
+
+    def tree(self):
+        blocks = [body for lang, body in FENCE.findall(self.text('README.md'))
+                  if lang == 'text' and body.startswith('AI-agent-guardrail-harness/')]
+        self.assertEqual(len(blocks), 1)
+        return blocks[0]
+
+    def test_root_tree_entries_exist(self):
+        stack, checked = [], 0
+        for line in self.tree().splitlines()[1:]:
+            match = TREE_LINE.match(line)
+            if not match:
+                continue
+            depth = len(match.group(1)) // 4
+            name = match.group(2)
+            stack[depth:] = [name.rstrip('/')]
+            path = '/'.join(stack)
+            if (path + '/').startswith(LOCAL_ONLY):
+                continue
+            with self.subTest(entry=path):
+                self.assertTrue(exists(path), f'tree entry {path}')
+                if name.endswith('/') and '*' not in path:
+                    self.assertTrue((ROOT / path).is_dir(), f'tree entry {path} is not a folder')
+            checked += 1
+        self.assertGreater(checked, 30)
+
+    def test_root_tree_lists_every_tracked_top_level_entry(self):
+        listed = {m.group(2).rstrip('/') for m in map(TREE_LINE.match, self.tree().splitlines()) if m and not m.group(1)}
+        self.assertEqual(sorted(self.tops - listed), [])
+
+    def test_no_html_comment_left_in_root_readme(self):
+        self.assertNotIn('<!--', self.text('README.md'))
 
     def test_mermaid_blocks(self):
         for name in MAPS:
