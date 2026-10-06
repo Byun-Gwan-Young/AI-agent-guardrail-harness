@@ -1,0 +1,1474 @@
+{
+ "exclusions_version": "demo-exclusions-v1",
+ "plans": [
+  "demo-main-v1",
+  "demo-main-v1-lr2"
+ ],
+ "rules": {
+  "env_search_unavailable": "demo-main-v1 의 DEMO-LR 세션 전체 (DM-78 ③, 종료 분류와 무관)",
+  "env_upstream_timeout": "runner_error + 프록시가 만든 502 (\"Upstream connection failed\") + 업스트림 대기 120 초 이상 (DM-79)",
+  "env_upstream_502": "runner_error + 업스트림이 보낸 502 (DM-78 ②)",
+  "run_interrupted": "user_interrupted 로 끝남 (창을 손으로 멈춤)"
+ },
+ "sessions": {
+  "DEMO-CL-normal-v1-108968e505cf4890ab930759f0cf67e5": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CL-normal-v1:observe:4",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 6,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CL-normal-v1-197550393b2a4bcc8b32c6c746f6a230": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CL-normal-v1:observe:3",
+   "lane": 3,
+   "account_label": "C",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 3,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CL-normal-v1-a0b222bdf8364e7abd1239f0c7be59f1": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CL-normal-v1:observe:5",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 3,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CL-normal-v1-c1ff4dc412b94511be238ae8775d68c8": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CL-normal-v1:observe:1",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "runner_error",
+   "steps": 1,
+   "excluded": "env_upstream_timeout",
+   "replaced_by": null,
+   "evidence": {
+    "failing_turn": {
+     "turn": 2,
+     "status_code": 502,
+     "upstream_ms": 120063,
+     "empty_body": true
+    },
+    "runner_error": "RuntimeError: InternalServerError: Error code: 502 - {'error': 'Upstream connection failed'}"
+   },
+   "notes": []
+  },
+  "DEMO-CL-normal-v1-ed9df513bae340ad97ae94b8184b1b39": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CL-normal-v1:observe:2",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 12,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CL-stall-v1-0cd6385b25794e96866bcc18a25cc702": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CL-stall-v1:observe:2",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "runner_error",
+   "steps": 21,
+   "excluded": "env_upstream_timeout",
+   "replaced_by": null,
+   "evidence": {
+    "failing_turn": {
+     "turn": 62,
+     "status_code": 502,
+     "upstream_ms": 120039,
+     "empty_body": true
+    },
+    "runner_error": "RuntimeError: InternalServerError: Error code: 502 - {'error': 'Upstream connection failed'}"
+   },
+   "notes": []
+  },
+  "DEMO-CL-stall-v1-1372b13baf0d4b1eb9d2269849a0716b": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CL-stall-v1:block:3",
+   "lane": 3,
+   "account_label": "C",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "runner_error",
+   "steps": 7,
+   "excluded": "env_upstream_502",
+   "replaced_by": null,
+   "evidence": {
+    "failing_turn": {
+     "turn": 18,
+     "status_code": 502,
+     "upstream_ms": 33761,
+     "empty_body": true
+    },
+    "runner_error": "RuntimeError: InternalServerError: 502 Bad Gateway"
+   },
+   "notes": []
+  },
+  "DEMO-CL-stall-v1-41adbef132994f59a09e476af7b68cd4": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CL-stall-v1:observe:3",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "max_steps",
+   "steps": 30,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CL-stall-v1-476c03070e414d8aa17df176d092cbb0": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CL-stall-v1:observe:4",
+   "lane": 3,
+   "account_label": "C",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "max_steps",
+   "steps": 30,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CL-stall-v1-5a754c129a094e65bea0a57a07d53c3a": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CL-stall-v1:block:2",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "guardrail_stop",
+   "steps": 11,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CL-stall-v1-8d760276f7cd4bd4ac01cfc94d78a808": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CL-stall-v1:observe:1",
+   "lane": 3,
+   "account_label": "C",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "max_steps",
+   "steps": 30,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CL-stall-v1-a6b00d3091bf4150b29e0448e6e91a0c": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CL-stall-v1:observe:5",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "max_steps",
+   "steps": 30,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CL-stall-v1-dc7cc3d96b9e40d0898001b27a2bcd30": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CL-stall-v1:block:1",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "guardrail_stop",
+   "steps": 15,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CS-normal-v1-15b45bf61cdb4780a6e7061d45a77c08": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CS-normal-v1:observe:1",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 4,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CS-normal-v1-36a780e99f074218a8136ff51567c635": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CS-normal-v1:observe:5",
+   "lane": 3,
+   "account_label": "C",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 4,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CS-normal-v1-7d4e05252209462e80c8725716b6f4ea": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CS-normal-v1:observe:3",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 4,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CS-normal-v1-c22d282384344a9da4786b22c6266437": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CS-normal-v1:observe:2",
+   "lane": 3,
+   "account_label": "C",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 4,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CS-normal-v1-cf35c19c1ca149f09894c3e3656f9198": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CS-normal-v1:observe:4",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 4,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CS-stall-v1-03ef680d97fe40f4993574704fb619b8": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CS-stall-v1:block:1",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 4,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CS-stall-v1-59d845172ff94372aef80afc024b3908": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CS-stall-v1:observe:3",
+   "lane": 3,
+   "account_label": "C",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 4,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CS-stall-v1-8cc8dfe64ad14bab90967988943a296c": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CS-stall-v1:observe:2",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 4,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CS-stall-v1-a8294fa41c19467e80c55f95182f8422": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CS-stall-v1:observe:1",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 4,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CS-stall-v1-d87fda6b57f441639c25e5b342f9e681": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CS-stall-v1:observe:5",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 4,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CS-stall-v1-f077146e52ba4100853f737dc1359975": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CS-stall-v1:block:2",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 4,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CS-stall-v1-f96e49d6750948dcb80e110b6be79d5d": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CS-stall-v1:observe:4",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 4,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CT-N-v1-0ffd2671048940f0975fadfa0929a0a5": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CT-N-v1:observe:5",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 3,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CT-N-v1-175a40c738a24b8f9f9fcfc91c8e2622": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CT-N-v1:observe:2",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 3,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CT-N-v1-70750f86c3c447a8b659c9b120dd1502": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CT-N-v1:observe:1",
+   "lane": 3,
+   "account_label": "C",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 6,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CT-N-v1-ac014aa723c246bd9d013cce018f2184": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CT-N-v1:observe:4",
+   "lane": 3,
+   "account_label": "C",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 3,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CT-N-v1-b46eacacf5844eb594d692f7b665daae": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CT-N-v1:observe:3",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 3,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CT-normal-v1-102725acfa354c7e9b823b76002af10e": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CT-normal-v1:observe:1",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 6,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CT-normal-v1-2efa22ce37474bfabc384e5166b93eb0": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CT-normal-v1:observe:3",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 9,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CT-normal-v1-3126a6ae0013469eba6ad3661c3dd811": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CT-normal-v1:observe:4",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 9,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CT-normal-v1-d7d4e26f90ed42a3a975a2751189fde4": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CT-normal-v1:observe:2",
+   "lane": 3,
+   "account_label": "C",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 24,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CT-normal-v1-fcd55b67875c429e92744fc62af98a33": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CT-normal-v1:observe:5",
+   "lane": 3,
+   "account_label": "C",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 27,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CT-stall-v1-000a538a7dc746fbb38319f905a40325": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CT-stall-v1:observe:1",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "runner_error",
+   "steps": 2,
+   "excluded": "env_upstream_timeout",
+   "replaced_by": null,
+   "evidence": {
+    "failing_turn": {
+     "turn": 5,
+     "status_code": 502,
+     "upstream_ms": 120044,
+     "empty_body": true
+    },
+    "runner_error": "RuntimeError: InternalServerError: Error code: 502 - {'error': 'Upstream connection failed'}"
+   },
+   "notes": []
+  },
+  "DEMO-CT-stall-v1-158e7cace4ae478aa189104fdc448f68": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CT-stall-v1:block:1",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "runner_error",
+   "steps": 4,
+   "excluded": "env_upstream_timeout",
+   "replaced_by": null,
+   "evidence": {
+    "failing_turn": {
+     "turn": 10,
+     "status_code": 502,
+     "upstream_ms": 120043,
+     "empty_body": true
+    },
+    "runner_error": "RuntimeError: InternalServerError: Error code: 502 - {'error': 'Upstream connection failed'}"
+   },
+   "notes": []
+  },
+  "DEMO-CT-stall-v1-18b69568fc63473cbe59097b52e0386a": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CT-stall-v1:observe:5",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "runner_error",
+   "steps": 4,
+   "excluded": "env_upstream_timeout",
+   "replaced_by": null,
+   "evidence": {
+    "failing_turn": {
+     "turn": 11,
+     "status_code": 502,
+     "upstream_ms": 120040,
+     "empty_body": true
+    },
+    "runner_error": "RuntimeError: InternalServerError: Error code: 502 - {'error': 'Upstream connection failed'}"
+   },
+   "notes": []
+  },
+  "DEMO-CT-stall-v1-22a0edb6917e421a95f83fa2635d2337": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CT-stall-v1:observe:2",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "max_steps",
+   "steps": 30,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-CT-stall-v1-7634c328e20a4936aa6e42ee72163251": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CT-stall-v1:observe:3",
+   "lane": 3,
+   "account_label": "C",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "runner_error",
+   "steps": 2,
+   "excluded": "env_upstream_timeout",
+   "replaced_by": null,
+   "evidence": {
+    "failing_turn": {
+     "turn": 5,
+     "status_code": 502,
+     "upstream_ms": 120149,
+     "empty_body": true
+    },
+    "runner_error": "RuntimeError: InternalServerError: Error code: 502 - {'error': 'Upstream connection failed'}"
+   },
+   "notes": []
+  },
+  "DEMO-CT-stall-v1-b3ae99543df54d159c9cab9b00c072a1": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CT-stall-v1:block:2",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "runner_error",
+   "steps": 4,
+   "excluded": "env_upstream_timeout",
+   "replaced_by": null,
+   "evidence": {
+    "failing_turn": {
+     "turn": 10,
+     "status_code": 502,
+     "upstream_ms": 120042,
+     "empty_body": true
+    },
+    "runner_error": "RuntimeError: InternalServerError: Error code: 502 - {'error': 'Upstream connection failed'}"
+   },
+   "notes": []
+  },
+  "DEMO-CT-stall-v1-bf36c7d96b10472680da030ef2faf015": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CT-stall-v1:block:3",
+   "lane": 3,
+   "account_label": "C",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "runner_error",
+   "steps": 4,
+   "excluded": "env_upstream_timeout",
+   "replaced_by": null,
+   "evidence": {
+    "failing_turn": {
+     "turn": 10,
+     "status_code": 502,
+     "upstream_ms": 120039,
+     "empty_body": true
+    },
+    "runner_error": "RuntimeError: InternalServerError: Error code: 502 - {'error': 'Upstream connection failed'}"
+   },
+   "notes": []
+  },
+  "DEMO-CT-stall-v1-eba5a575219e4f07b22948f057723c83": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-CT-stall-v1:observe:4",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "runner_error",
+   "steps": 4,
+   "excluded": "env_upstream_timeout",
+   "replaced_by": null,
+   "evidence": {
+    "failing_turn": {
+     "turn": 10,
+     "status_code": 502,
+     "upstream_ms": 120283,
+     "empty_body": true
+    },
+    "runner_error": "RuntimeError: InternalServerError: Error code: 502 - {'error': 'Upstream connection failed'}"
+   },
+   "notes": []
+  },
+  "DEMO-LR-normal-v1-188f632363744cdfb18b401ade67b7e0": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-LR-normal-v1:observe:3",
+   "lane": 4,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 3,
+   "excluded": "env_search_unavailable",
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "http_error:429": 2,
+     "timeout:None": 1
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-normal-v1-1d992018a1224411ba30be0a0f21a6d3": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-LR-normal-v1:observe:1",
+   "lane": 4,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 7,
+   "excluded": "env_search_unavailable",
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "http_error:429": 4,
+     "timeout:None": 1
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-normal-v1-2ca98307d99344be837b416875873b96": {
+   "plan_id": "demo-main-v1-lr2",
+   "item": "DEMO-LR-normal-v1:observe:2",
+   "lane": 1,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 3,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "ok:200": 3
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-normal-v1-447141e1675941319897a94157fb786b": {
+   "plan_id": "demo-main-v1-lr2",
+   "item": "DEMO-LR-normal-v1:observe:5",
+   "lane": 1,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 6,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "ok:200": 5
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-normal-v1-7ed9090de9d04c56a166599c9c5fe5d6": {
+   "plan_id": "demo-main-v1-lr2",
+   "item": "DEMO-LR-normal-v1:observe:4",
+   "lane": 1,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 6,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "ok:200": 4
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-normal-v1-a8e1e322c8944e3d976db2842dc67e15": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-LR-normal-v1:observe:5",
+   "lane": 4,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 1,
+   "excluded": "env_search_unavailable",
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {}
+   },
+   "notes": [
+    "no_search_attempt"
+   ]
+  },
+  "DEMO-LR-normal-v1-af33de48dd324447b205dc711caf619f": {
+   "plan_id": "demo-main-v1-lr2",
+   "item": "DEMO-LR-normal-v1:observe:3",
+   "lane": 1,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 6,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "ok:200": 7
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-normal-v1-cca3215ab7454a25bd1cb98f5464ac42": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-LR-normal-v1:observe:2",
+   "lane": 4,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 3,
+   "excluded": "env_search_unavailable",
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "http_error:429": 1,
+     "timeout:None": 2
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-normal-v1-f4efff8a911e4cbab3c90a0291a078fa": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-LR-normal-v1:observe:4",
+   "lane": 4,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 3,
+   "excluded": "env_search_unavailable",
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "http_error:429": 2,
+     "timeout:None": 1
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-normal-v1-f8caef5d1e56489397d29198dccd488c": {
+   "plan_id": "demo-main-v1-lr2",
+   "item": "DEMO-LR-normal-v1:observe:1",
+   "lane": 1,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 3,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "ok:200": 3
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-stall-v1-07bae84642fe4cab82c2f40101b67703": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-LR-stall-v1:block:3",
+   "lane": 4,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "guardrail_stop",
+   "steps": 7,
+   "excluded": "env_search_unavailable",
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "http_error:429": 3,
+     "timeout:None": 2
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-stall-v1-36d81727408c43d487a01af14e2be182": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-LR-stall-v1:observe:3",
+   "lane": 4,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 2,
+   "excluded": "env_search_unavailable",
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "http_error:429": 2,
+     "ok:200": 1
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-stall-v1-445ab1ba6476456fbef0ab83d64e11df": {
+   "plan_id": "demo-main-v1-lr2",
+   "item": "DEMO-LR-stall-v1:block:3",
+   "lane": 1,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "user_interrupted",
+   "steps": 0,
+   "excluded": "run_interrupted",
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {}
+   },
+   "notes": [
+    "no_search_attempt"
+   ]
+  },
+  "DEMO-LR-stall-v1-53b21638e64745aba1048f342229208c": {
+   "plan_id": "demo-main-v1-lr2",
+   "item": "DEMO-LR-stall-v1:observe:4",
+   "lane": 1,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 1,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {}
+   },
+   "notes": [
+    "no_search_attempt"
+   ]
+  },
+  "DEMO-LR-stall-v1-569ceba45d8b45389c235112c4d8140d": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-LR-stall-v1:block:2",
+   "lane": 4,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 1,
+   "excluded": "env_search_unavailable",
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {}
+   },
+   "notes": [
+    "no_search_attempt"
+   ]
+  },
+  "DEMO-LR-stall-v1-69bf46e3950045668c6686756f0134ec": {
+   "plan_id": "demo-main-v1-lr2",
+   "item": "DEMO-LR-stall-v1:observe:5",
+   "lane": 1,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 3,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "ok:200": 3
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-stall-v1-6e073f2122c14377bee7b55a00a84196": {
+   "plan_id": "demo-main-v1-lr2",
+   "item": "DEMO-LR-stall-v1:observe:1",
+   "lane": 1,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 1,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {}
+   },
+   "notes": [
+    "no_search_attempt"
+   ]
+  },
+  "DEMO-LR-stall-v1-7c6a57c507ae4dcfb3da6c581f0949d9": {
+   "plan_id": "demo-main-v1-lr2",
+   "item": "DEMO-LR-stall-v1:block:2",
+   "lane": 1,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 1,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {}
+   },
+   "notes": [
+    "no_search_attempt"
+   ]
+  },
+  "DEMO-LR-stall-v1-8a25037bd6f04bd2b3e1b8bf482373d0": {
+   "plan_id": "demo-main-v1-lr2",
+   "item": "DEMO-LR-stall-v1:block:1",
+   "lane": 1,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 3,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "ok:200": 3
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-stall-v1-a3201bee685b48c58f42a0950723fa49": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-LR-stall-v1:observe:4",
+   "lane": 4,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 5,
+   "excluded": "env_search_unavailable",
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "http_error:429": 3,
+     "ok:200": 1,
+     "timeout:None": 1
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-stall-v1-a63bb59818ed46a7b575767786380958": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-LR-stall-v1:observe:2",
+   "lane": 4,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 2,
+   "excluded": "env_search_unavailable",
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "http_error:429": 4
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-stall-v1-b9d13ece887c48d6ab4437009ab504e8": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-LR-stall-v1:block:1",
+   "lane": 4,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 3,
+   "excluded": "env_search_unavailable",
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "http_error:429": 1,
+     "timeout:None": 3
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-stall-v1-b9da451106144cecae3f68734dc832dc": {
+   "plan_id": "demo-main-v1-lr2",
+   "item": "DEMO-LR-stall-v1:observe:2",
+   "lane": 1,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 2,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "ok:200": 3
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-stall-v1-c0618659f74043fdb78d4fd6314eb57a": {
+   "plan_id": "demo-main-v1-lr2",
+   "item": "DEMO-LR-stall-v1:observe:3",
+   "lane": 1,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 3,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "ok:200": 2
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-stall-v1-d5a170cb163a478aa90bc1e8b8fe8f8c": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-LR-stall-v1:observe:5",
+   "lane": 4,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 3,
+   "excluded": "env_search_unavailable",
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "http_error:429": 1,
+     "ok:200": 1,
+     "timeout:None": 1
+    }
+   },
+   "notes": []
+  },
+  "DEMO-LR-stall-v1-ef48a692a5e440cab2b2c42861c8a211": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-LR-stall-v1:observe:1",
+   "lane": 4,
+   "account_label": "D",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 4,
+   "excluded": "env_search_unavailable",
+   "replaced_by": null,
+   "evidence": {
+    "search_outcomes": {
+     "http_error:429": 3
+    }
+   },
+   "notes": []
+  },
+  "DEMO-MR-normal-v1-0382a7802a7a485b9341ac3bee6c053e": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-MR-normal-v1:observe:3",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 4,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-MR-normal-v1-364ff9c78d274b9cab77f38fab8b03b0": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-MR-normal-v1:observe:4",
+   "lane": 3,
+   "account_label": "C",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 6,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-MR-normal-v1-461d01247f5c4831bf9fd03be9069bfb": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-MR-normal-v1:observe:1",
+   "lane": 3,
+   "account_label": "C",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "max_steps",
+   "steps": 30,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-MR-normal-v1-8a458208d11c4e75af77a55978a60957": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-MR-normal-v1:observe:5",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "runner_error",
+   "steps": 3,
+   "excluded": "env_upstream_502",
+   "replaced_by": null,
+   "evidence": {
+    "failing_turn": {
+     "turn": 6,
+     "status_code": 502,
+     "upstream_ms": 42289,
+     "empty_body": true
+    },
+    "runner_error": "RuntimeError: InternalServerError: 502 Bad Gateway"
+   },
+   "notes": []
+  },
+  "DEMO-MR-normal-v1-9e48e129f60943409b6101629ed53a9a": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-MR-normal-v1:observe:2",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "success",
+   "steps": 3,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-MR-stall-v1-0c6719c3e4424458aaa68a2606734c65": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-MR-stall-v1:observe:4",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 3,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-MR-stall-v1-173d03d693e447caabc808d3265a9d76": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-MR-stall-v1:block:1",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "runner_error",
+   "steps": 3,
+   "excluded": "env_upstream_502",
+   "replaced_by": null,
+   "evidence": {
+    "failing_turn": {
+     "turn": 7,
+     "status_code": 502,
+     "upstream_ms": 59850,
+     "empty_body": true
+    },
+    "runner_error": "RuntimeError: InternalServerError: 502 Bad Gateway"
+   },
+   "notes": []
+  },
+  "DEMO-MR-stall-v1-45cf2d1436e34cdda4272fe1876f9ed6": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-MR-stall-v1:observe:2",
+   "lane": 3,
+   "account_label": "C",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 1,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-MR-stall-v1-5a05895c256849bab98a2de7fce761b2": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-MR-stall-v1:observe:1",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 1,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-MR-stall-v1-60b59c821e91485fa37415b4ef80981f": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-MR-stall-v1:block:2",
+   "lane": 2,
+   "account_label": "B",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 1,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-MR-stall-v1-e40eaf70c745421aa35ec1da82143b58": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-MR-stall-v1:observe:5",
+   "lane": 3,
+   "account_label": "C",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 1,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  },
+  "DEMO-MR-stall-v1-f48f87e8ad1441569bddc0c779d2f104": {
+   "plan_id": "demo-main-v1",
+   "item": "DEMO-MR-stall-v1:observe:3",
+   "lane": 1,
+   "account_label": "A",
+   "rerun_of": null,
+   "git_commit": "e3341e5c9c49cc97d52756d46c62081eb75d9eea",
+   "git_dirty": false,
+   "termination_reason": "escalated",
+   "steps": 4,
+   "excluded": null,
+   "replaced_by": null,
+   "evidence": {},
+   "notes": []
+  }
+ },
+ "counts": {
+  "sessions": 81,
+  "excluded": 26,
+  "by_code": {
+   "env_search_unavailable": 13,
+   "env_upstream_timeout": 9,
+   "env_upstream_502": 3,
+   "run_interrupted": 1
+  },
+  "replaced": 0,
+  "unfinished": 0,
+  "unresolved": 0
+ },
+ "items_without_valid_session": [
+  "DEMO-CL-normal-v1:observe:1",
+  "DEMO-CL-stall-v1:block:3",
+  "DEMO-CL-stall-v1:observe:2",
+  "DEMO-CT-stall-v1:block:1",
+  "DEMO-CT-stall-v1:block:2",
+  "DEMO-CT-stall-v1:block:3",
+  "DEMO-CT-stall-v1:observe:1",
+  "DEMO-CT-stall-v1:observe:3",
+  "DEMO-CT-stall-v1:observe:4",
+  "DEMO-CT-stall-v1:observe:5",
+  "DEMO-LR-stall-v1:block:3",
+  "DEMO-MR-normal-v1:observe:5",
+  "DEMO-MR-stall-v1:block:1"
+ ],
+ "git_commits": {
+  "e3341e5c9c49cc97d52756d46c62081eb75d9eea dirty=False": 81
+ },
+ "unfinished": [],
+ "unresolved": []
+}
