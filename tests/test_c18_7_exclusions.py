@@ -67,8 +67,11 @@ class ExclusionTests(unittest.TestCase):
         self.assertEqual(result['sessions']['LR-main']['evidence']['search_outcomes'],
                          {'http_error:429': 1, 'timeout:None': 1})
         self.assertEqual(result['sessions']['LR-main-nosearch']['notes'], ['no_search_attempt'])
-        self.assertEqual(result['counts']['by_code'], {'env_search_unavailable': 2, 'env_upstream_timeout': 1,
+        self.assertEqual(result['counts']['by_code'], {'env_search_unavailable': 2, 'env_search_key_invalid': 0,
+                                                       'incomplete_after_retry': 0, 'env_upstream_timeout': 1,
                                                        'env_upstream_502': 1, 'run_interrupted': 1})
+        # C-18-8: the supplement session of the same item replaces the main-run one.
+        self.assertEqual(result['sessions']['LR-main']['replaced_by'], 'LR-supplement')
         # The supplement's LR item stands in for the excluded main-run one; the others have no valid session yet.
         self.assertEqual(result['items_without_valid_session'],
                          ['DEMO-CT-stall-v1:observe:1', 'DEMO-LR-normal-v1:observe:5', 'DEMO-LR-stall-v1:block:3',
@@ -91,8 +94,10 @@ class ExclusionTests(unittest.TestCase):
         self.session('second', 'DEMO-CT-stall-v1:observe:1', reason='runner_error', error=PROXY_502, rerun_of=failed,
                      turns=[{'turn': 1, 'status_code': 502, 'upstream_ms': 600020, 'response_body': {}}])
         result = self.build()
+        # C-18-8 (DM-81 ③): the second failure is incomplete_after_retry, its 502 rule kept as the cause.
         self.assertEqual([result['sessions'][s]['excluded'] for s in ('first', 'second')],
-                         ['env_upstream_timeout', 'env_upstream_timeout'])
+                         ['env_upstream_timeout', 'incomplete_after_retry'])
+        self.assertEqual(result['sessions']['second']['evidence']['cause'], {'code': 'env_upstream_timeout', 'why': None})
         self.assertEqual(result['items_without_valid_session'], ['DEMO-CT-stall-v1:observe:1'])
 
     def test_unmatched_runner_error_is_unresolved_not_excluded(self):

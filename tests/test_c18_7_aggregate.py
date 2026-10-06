@@ -90,7 +90,10 @@ class WithList(unittest.TestCase):
                                                              'demo-main-v1-lr2': {OLD: 1}}})
         self.assertEqual(result['excluded'], [])
         text = aggregate_demo.markdown(result)
-        self.assertIn('뺀 세션 1 개 (사유별 : env_upstream_timeout 1), 그중 재실행으로 대체 1 개', text)
+        self.assertIn('뺀 세션 1 개 (사유별 : env_upstream_timeout 1), 그중 재실행·보충 세션으로 대체 1 개', text)
+        v1 = aggregate_demo.markdown(aggregate_demo.aggregate(
+            plans, runs_root=self.runs, exclusion_list={**listing, 'exclusions_version': 'demo-exclusions-v1'}))
+        self.assertIn('그중 재실행으로 대체 1 개', v1)
         self.assertIn('- 커밋별 세션 : demo-main-v1 aaaaaaa 1, bbbbbbb 1; demo-main-v1-lr2 aaaaaaa 1', text)
 
     def test_a_list_older_than_the_records_says_so(self):

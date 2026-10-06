@@ -12,7 +12,7 @@ is left out of the tables and listed under excluded when
 - --final-freeze-sha256 is given and its batch.final_freeze_sha256 differs (main plan, DM-33), or
 - its condition group (condition-group-v1) is not the group most sessions of the same scenario and mode have.
 Without --final-freeze-sha256 (trial plans) no freeze is checked and the output says so.
-With --exclusions (C-18-7, DM-78: tools/demo_exclusions.py output) a session the list marks excluded is left out first and
+With --exclusions (C-18-7, DM-78, C-18-8: tools/demo_exclusions.py output, v1 or v2) a session the list marks excluded is left out first and
 counted by its reason code under exclusion_list; a rerun that replaces one is an ordinary session of its plan and is
 counted as such, so the per-scenario denominators are valid sessions. Sessions of the selected plans the list does not
 name (a list older than the records) are listed there too. With more than one plan or with a list, git_commits gives the
@@ -44,6 +44,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 DEMO_RUNS = ROOT / 'runs' / 'demo'
 VERSION = 'demo-aggregate-v1'
+EXCLUSION_VERSIONS = ('demo-exclusions-v1', 'demo-exclusions-v2')
 TASK_TYPES = {'DEMO-CS': 'T1', 'DEMO-MR': 'T1', 'DEMO-LR': 'T1', 'DEMO-CT': 'T2', 'DEMO-CT-N': 'T2', 'DEMO-CL': 'T3'}
 TYPE_LABELS = {'T1': 'T1 대화 교착', 'T2': 'T2 대화+산출물 교착', 'T3': 'T3 산출물 교착'}
 STALLED = ('max_steps', 'guardrail_stop')
@@ -280,9 +281,10 @@ def type_summary(rows, task_type):
 
 
 def listed_exclusions(rows, listing):
-    """(rows the list leaves in, summary of what it took out). listing is a demo-exclusions-v1 document."""
-    if listing.get('exclusions_version') != 'demo-exclusions-v1':
-        raise ValueError('--exclusions takes a demo-exclusions-v1 file (tools/demo_exclusions.py)')
+    """(rows the list leaves in, summary of what it took out). listing is a demo-exclusions-v1 or -v2 document (v2,
+    C-18-8: more reason codes, and supplement sessions as replacements)."""
+    if listing.get('exclusions_version') not in EXCLUSION_VERSIONS:
+        raise ValueError('--exclusions takes a demo-exclusions-v1 or -v2 file (tools/demo_exclusions.py)')
     named = listing.get('sessions') or {}
     marked = {k: v for k, v in named.items() if v.get('excluded')}
     out = [r for r in rows if r['session_id'] in marked]
@@ -410,8 +412,9 @@ def listed_lines(result):
     listed = result.get('exclusion_list')
     if listed is not None:
         codes = ', '.join(f'{k} {v}' for k, v in listed['by_code'].items()) or '0'
+        by = '재실행으로' if listed['exclusions_version'] == 'demo-exclusions-v1' else '재실행·보충 세션으로'
         lines.append(f"- 제외·대체 목록 ({listed['exclusions_version']}) 으로 뺀 세션 {len(listed['sessions'])} 개 "
-                     f"(사유별 : {codes}), 그중 재실행으로 대체 {listed['replaced']} 개. 분모는 유효 세션 수")
+                     f"(사유별 : {codes}), 그중 {by} 대체 {listed['replaced']} 개. 분모는 유효 세션 수")
         if listed['items_without_valid_session']:
             lines.append(f"- 유효 세션이 없는 항목 {len(listed['items_without_valid_session'])} 개 : "
                          + ', '.join(listed['items_without_valid_session']))
@@ -435,7 +438,7 @@ def main():
     parser.add_argument('--plan', action='append', default=[])
     parser.add_argument('--session', action='append', default=[], help='a session folder name to include as well')
     parser.add_argument('--final-freeze-sha256')
-    parser.add_argument('--exclusions', type=Path, help='a demo-exclusions-v1 file (tools/demo_exclusions.py)')
+    parser.add_argument('--exclusions', type=Path, help='a demo-exclusions-v1 or -v2 file (tools/demo_exclusions.py)')
     parser.add_argument('--runs-root', type=Path, default=DEMO_RUNS)
     parser.add_argument('--output-json', type=Path)
     parser.add_argument('--output-md', type=Path)
