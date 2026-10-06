@@ -1,0 +1,15 @@
+# C-19 본 실행 MR 보충 계획 : 창 2 에서 TAVILY_API_KEY 가 잘못된 값으로 설정되어 웹 검색이 전부 HTTP 401 로 막힌 MR 세션 3 개.
+#   DEMO-MR-normal-v1-0382a780 (observe:3, 검색 4 회 모두 401)
+#   DEMO-MR-stall-v1-0c6719c3  (observe:4, 검색 5 회 모두 401)
+#   DEMO-MR-stall-v1-82564d3c  (block:3,   검색 5 회 모두 401)
+# 저장소 밖에 둔다 (본 실행 중 작업 트리를 바꾸지 않기 위해). 시나리오 경로는 저장소 기준으로 읽힌다.
+# 실행 : tools/run_batch.py run --plan ~/demo-mr2/demo-main-v1-mr2.yaml --lane 1 --lanes 1 --account-label B
+# 최종 동결 (DM-33) : requires_final_freeze 이므로 tools/final_freeze.py check 가 통과할 때만 세션을 시작한다.
+plan_version: demo-batch-plan-v1
+plan_id: demo-main-v1-mr2
+requires_final_freeze: true
+description: MR 보충 (DM-81)
+items:
+- {scenario: scenarios/DEMO-MR-normal-v1.yaml, mode: observe, repeats: [3]}
+- {scenario: scenarios/DEMO-MR-stall-v1.yaml, mode: observe, repeats: [4]}
+- {scenario: scenarios/DEMO-MR-stall-v1.yaml, mode: block, repeats: [3]}
