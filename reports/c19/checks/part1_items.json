@@ -1,0 +1,968 @@
+{
+ "false_positive_detail": [
+  {
+   "session": "DEMO-CT-normal-v1-d7d4e26f90ed42a3a975a2751189fde4",
+   "scenario": "DEMO-CT-normal-v1",
+   "class": "success",
+   "steps": 24,
+   "first_stop": 7,
+   "template": "E1",
+   "text": "최근 3 step 동안 개발·검토·기획 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 7/16.",
+   "success_step": 24,
+   "block_would_cut_before_success": true,
+   "steps_after_stop_until_end": 17,
+   "if_stopped_token_ratio": 0.7775,
+   "window": [
+    5,
+    6,
+    7
+   ],
+   "window_facts": [
+    {
+     "step": 5,
+     "role": "개발",
+     "tests": {
+      "passed": 7,
+      "total": 16
+     },
+     "changed_paths": [],
+     "state": "stagnant",
+     "spec_approved": false,
+     "open_issues": 7,
+     "status": null,
+     "adopted": 0,
+     "completion_declared": false,
+     "tools": {
+      "write_file!": 1,
+      "run_tests": 1
+     },
+     "step_status": "failed",
+     "failure_reasons": [
+      "write_refused_before_approval"
+     ]
+    },
+    {
+     "step": 6,
+     "role": "검토",
+     "tests": {
+      "passed": 7,
+      "total": 16
+     },
+     "changed_paths": [],
+     "state": "stagnant",
+     "spec_approved": null,
+     "open_issues": 7,
+     "status": null,
+     "adopted": 0,
+     "completion_declared": false,
+     "tools": {
+      "read_file": 3
+     },
+     "step_status": "completed",
+     "failure_reasons": []
+    },
+    {
+     "step": 7,
+     "role": "기획",
+     "tests": {
+      "passed": 7,
+      "total": 16
+     },
+     "changed_paths": [],
+     "state": "stagnant",
+     "spec_approved": true,
+     "open_issues": 6,
+     "status": null,
+     "adopted": 0,
+     "completion_declared": false,
+     "tools": {},
+     "step_status": "completed",
+     "failure_reasons": []
+    }
+   ],
+   "ct_first_spec_approved_step": 4,
+   "ct_steps_with_file_change": [
+    14
+   ],
+   "ct_first_step_all_tests": 14
+  },
+  {
+   "session": "DEMO-CT-normal-v1-fcd55b67875c429e92744fc62af98a33",
+   "scenario": "DEMO-CT-normal-v1",
+   "class": "success",
+   "steps": 27,
+   "first_stop": 6,
+   "template": "E1",
+   "text": "최근 3 step 동안 기획·개발·검토 모두 산출물 변경·테스트 증가·새 쟁점이 없습니다. 통과 테스트 7/16.",
+   "success_step": 27,
+   "block_would_cut_before_success": true,
+   "steps_after_stop_until_end": 21,
+   "if_stopped_token_ratio": 0.8386,
+   "window": [
+    4,
+    5,
+    6
+   ],
+   "window_facts": [
+    {
+     "step": 4,
+     "role": "기획",
+     "tests": {
+      "passed": 7,
+      "total": 16
+     },
+     "changed_paths": [],
+     "state": "stagnant",
+     "spec_approved": null,
+     "open_issues": 7,
+     "status": null,
+     "adopted": 0,
+     "completion_declared": false,
+     "tools": {
+      "read_file": 2
+     },
+     "step_status": "completed",
+     "failure_reasons": []
+    },
+    {
+     "step": 5,
+     "role": "개발",
+     "tests": {
+      "passed": 7,
+      "total": 16
+     },
+     "changed_paths": [],
+     "state": "stagnant",
+     "spec_approved": null,
+     "open_issues": 6,
+     "status": null,
+     "adopted": 0,
+     "completion_declared": false,
+     "tools": {
+      "replace_in_file!": 1
+     },
+     "step_status": "failed",
+     "failure_reasons": [
+      "write_refused_before_approval"
+     ]
+    },
+    {
+     "step": 6,
+     "role": "검토",
+     "tests": {
+      "passed": 7,
+      "total": 16
+     },
+     "changed_paths": [],
+     "state": "stagnant",
+     "spec_approved": false,
+     "open_issues": 6,
+     "status": null,
+     "adopted": 0,
+     "completion_declared": false,
+     "tools": {
+      "read_file": 2
+     },
+     "step_status": "completed",
+     "failure_reasons": []
+    }
+   ],
+   "ct_first_spec_approved_step": 7,
+   "ct_steps_with_file_change": [
+    11
+   ],
+   "ct_first_step_all_tests": 11
+  },
+  {
+   "session": "DEMO-MR-normal-v1-461d01247f5c4831bf9fd03be9069bfb",
+   "scenario": "DEMO-MR-normal-v1",
+   "class": "stalled",
+   "steps": 30,
+   "first_stop": 9,
+   "template": "E6",
+   "text": "step 6에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다.",
+   "success_step": null,
+   "block_would_cut_before_success": false,
+   "steps_after_stop_until_end": 21,
+   "if_stopped_token_ratio": 0.7802,
+   "window": [
+    7,
+    8,
+    9
+   ],
+   "window_facts": [
+    {
+     "step": 7,
+     "role": "조사 책임",
+     "tests": null,
+     "changed_paths": [],
+     "state": "stagnant",
+     "spec_approved": null,
+     "open_issues": 0,
+     "status": "completed",
+     "adopted": 6,
+     "completion_declared": true,
+     "tools": {},
+     "step_status": "completed",
+     "failure_reasons": []
+    },
+    {
+     "step": 8,
+     "role": "검색 담당",
+     "tests": null,
+     "changed_paths": [],
+     "state": "stagnant",
+     "spec_approved": null,
+     "open_issues": 0,
+     "status": "completed",
+     "adopted": 6,
+     "completion_declared": true,
+     "tools": {},
+     "step_status": "completed",
+     "failure_reasons": []
+    },
+    {
+     "step": 9,
+     "role": "작성 담당",
+     "tests": null,
+     "changed_paths": [],
+     "state": "stagnant",
+     "spec_approved": null,
+     "open_issues": 0,
+     "status": "completed",
+     "adopted": 6,
+     "completion_declared": true,
+     "tools": {},
+     "step_status": "completed",
+     "failure_reasons": []
+    }
+   ]
+  },
+  {
+   "session": "DEMO-MR-normal-v1-c0daa4d612c4460e811deff9912d32e5",
+   "scenario": "DEMO-MR-normal-v1",
+   "class": "success",
+   "steps": 6,
+   "first_stop": 6,
+   "template": "E6",
+   "text": "step 3에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다.",
+   "success_step": 6,
+   "block_would_cut_before_success": false,
+   "steps_after_stop_until_end": 0,
+   "if_stopped_token_ratio": 0.0,
+   "window": [
+    4,
+    5,
+    6
+   ],
+   "window_facts": [
+    {
+     "step": 4,
+     "role": "조사 책임",
+     "tests": null,
+     "changed_paths": [],
+     "state": "stagnant",
+     "spec_approved": null,
+     "open_issues": 0,
+     "status": "completed",
+     "adopted": 6,
+     "completion_declared": true,
+     "tools": {},
+     "step_status": "completed",
+     "failure_reasons": []
+    },
+    {
+     "step": 5,
+     "role": "검색 담당",
+     "tests": null,
+     "changed_paths": [],
+     "state": "stagnant",
+     "spec_approved": null,
+     "open_issues": 0,
+     "status": "completed",
+     "adopted": 6,
+     "completion_declared": true,
+     "tools": {},
+     "step_status": "completed",
+     "failure_reasons": []
+    },
+    {
+     "step": 6,
+     "role": "작성 담당",
+     "tests": null,
+     "changed_paths": [],
+     "state": "stagnant",
+     "spec_approved": null,
+     "open_issues": 0,
+     "status": "completed",
+     "adopted": 6,
+     "completion_declared": true,
+     "tools": {},
+     "step_status": "completed",
+     "failure_reasons": []
+    }
+   ]
+  },
+  {
+   "session": "DEMO-MR-normal-v1-d69416ae013c4c69858f746a8bdc7a58",
+   "scenario": "DEMO-MR-normal-v1",
+   "class": "success",
+   "steps": 9,
+   "first_stop": 9,
+   "template": "E6",
+   "text": "step 6에 완료가 선언됐지만 이후 3 step 동안 진전이 없습니다. 처리 상태는 '완료'입니다.",
+   "success_step": 9,
+   "block_would_cut_before_success": false,
+   "steps_after_stop_until_end": 0,
+   "if_stopped_token_ratio": 0.0,
+   "window": [
+    7,
+    8,
+    9
+   ],
+   "window_facts": [
+    {
+     "step": 7,
+     "role": "조사 책임",
+     "tests": null,
+     "changed_paths": [],
+     "state": "stagnant",
+     "spec_approved": null,
+     "open_issues": 0,
+     "status": "completed",
+     "adopted": 6,
+     "completion_declared": true,
+     "tools": {},
+     "step_status": "completed",
+     "failure_reasons": []
+    },
+    {
+     "step": 8,
+     "role": "검색 담당",
+     "tests": null,
+     "changed_paths": [],
+     "state": "stagnant",
+     "spec_approved": null,
+     "open_issues": 0,
+     "status": "completed",
+     "adopted": 6,
+     "completion_declared": true,
+     "tools": {},
+     "step_status": "completed",
+     "failure_reasons": []
+    },
+    {
+     "step": 9,
+     "role": "작성 담당",
+     "tests": null,
+     "changed_paths": [],
+     "state": "stagnant",
+     "spec_approved": null,
+     "open_issues": 0,
+     "status": "completed",
+     "adopted": 6,
+     "completion_declared": true,
+     "tools": {},
+     "step_status": "completed",
+     "failure_reasons": []
+    }
+   ]
+  }
+ ],
+ "fp_summary": {
+  "normal_runs_with_stop": 5,
+  "false_positive_runs (success or escalated)": 4,
+  "of_which_block_would_cut_before_success": 2,
+  "max_steps_runs_with_stop": 1
+ },
+ "ct_normal_runs": [
+  {
+   "session": "102725ac",
+   "steps": 6,
+   "first_stop": null,
+   "first_spec_approved": 3,
+   "file_change_steps": [
+    5
+   ],
+   "write_refusals": 1
+  },
+  {
+   "session": "2efa22ce",
+   "steps": 9,
+   "first_stop": null,
+   "first_spec_approved": 4,
+   "file_change_steps": [
+    8
+   ],
+   "write_refusals": 2
+  },
+  {
+   "session": "3126a6ae",
+   "steps": 9,
+   "first_stop": null,
+   "first_spec_approved": 4,
+   "file_change_steps": [
+    8
+   ],
+   "write_refusals": 2
+  },
+  {
+   "session": "d7d4e26f",
+   "steps": 24,
+   "first_stop": 7,
+   "first_spec_approved": 4,
+   "file_change_steps": [
+    14
+   ],
+   "write_refusals": 4
+  },
+  {
+   "session": "fcd55b67",
+   "steps": 27,
+   "first_stop": 6,
+   "first_spec_approved": 7,
+   "file_change_steps": [
+    11
+   ],
+   "write_refusals": 2
+  }
+ ],
+ "misses": [
+  {
+   "session": "DEMO-CL-stall-v1-476c03070e414d8aa17df176d092cbb0",
+   "steps": 30,
+   "stall_start": 6,
+   "failed_step_reasons": {
+    "tool_execution_error": 1,
+    "strict_schema_mismatch": 9,
+    "no_final_output": 9
+   },
+   "state_counts": {
+    "baseline": 3,
+    "progress": 4,
+    "stagnant": 15,
+    "unmeasured": 8
+   },
+   "measurement_counts": {
+    "observed": 21,
+    "partial": 9
+   },
+   "decision_counts": {
+    "continue": 21,
+    "unmeasured": 9
+   },
+   "state_sequence": "BBBPPPPSUSSUSSUSSUSSUSSUSSUSSU",
+   "last_12": [
+    {
+     "step": 19,
+     "agent": "planner",
+     "state": "stagnant",
+     "events": [],
+     "conv_moved": false,
+     "art_moved": false,
+     "measurement": "observed",
+     "final_output": "valid",
+     "tests": 14,
+     "test_max": 14,
+     "changed_paths": [],
+     "revert": false,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "decision": "continue",
+     "consecutive_states": [
+      "stagnant"
+     ],
+     "unmeasured_steps": 0
+    },
+    {
+     "step": 20,
+     "agent": "developer",
+     "state": "stagnant",
+     "events": [],
+     "conv_moved": false,
+     "art_moved": false,
+     "measurement": "observed",
+     "final_output": "valid",
+     "tests": 14,
+     "test_max": 14,
+     "changed_paths": [],
+     "revert": false,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "decision": "continue",
+     "consecutive_states": [
+      "stagnant",
+      "stagnant"
+     ],
+     "unmeasured_steps": 0
+    },
+    {
+     "step": 21,
+     "agent": "reviewer",
+     "state": "unmeasured",
+     "events": [],
+     "conv_moved": false,
+     "art_moved": false,
+     "measurement": "partial",
+     "final_output": "invalid",
+     "tests": 14,
+     "test_max": 14,
+     "changed_paths": [],
+     "revert": false,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "decision": "unmeasured",
+     "consecutive_states": [],
+     "unmeasured_steps": 1
+    },
+    {
+     "step": 22,
+     "agent": "planner",
+     "state": "stagnant",
+     "events": [],
+     "conv_moved": false,
+     "art_moved": false,
+     "measurement": "observed",
+     "final_output": "valid",
+     "tests": 14,
+     "test_max": 14,
+     "changed_paths": [],
+     "revert": false,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "decision": "continue",
+     "consecutive_states": [
+      "stagnant"
+     ],
+     "unmeasured_steps": 0
+    },
+    {
+     "step": 23,
+     "agent": "developer",
+     "state": "stagnant",
+     "events": [],
+     "conv_moved": false,
+     "art_moved": false,
+     "measurement": "observed",
+     "final_output": "valid",
+     "tests": 14,
+     "test_max": 14,
+     "changed_paths": [],
+     "revert": false,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "decision": "continue",
+     "consecutive_states": [
+      "stagnant",
+      "stagnant"
+     ],
+     "unmeasured_steps": 0
+    },
+    {
+     "step": 24,
+     "agent": "reviewer",
+     "state": "unmeasured",
+     "events": [],
+     "conv_moved": false,
+     "art_moved": false,
+     "measurement": "partial",
+     "final_output": "invalid",
+     "tests": 14,
+     "test_max": 14,
+     "changed_paths": [],
+     "revert": false,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "decision": "unmeasured",
+     "consecutive_states": [],
+     "unmeasured_steps": 1
+    },
+    {
+     "step": 25,
+     "agent": "planner",
+     "state": "stagnant",
+     "events": [],
+     "conv_moved": false,
+     "art_moved": false,
+     "measurement": "observed",
+     "final_output": "valid",
+     "tests": 14,
+     "test_max": 14,
+     "changed_paths": [],
+     "revert": false,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "decision": "continue",
+     "consecutive_states": [
+      "stagnant"
+     ],
+     "unmeasured_steps": 0
+    },
+    {
+     "step": 26,
+     "agent": "developer",
+     "state": "stagnant",
+     "events": [],
+     "conv_moved": false,
+     "art_moved": false,
+     "measurement": "observed",
+     "final_output": "valid",
+     "tests": 14,
+     "test_max": 14,
+     "changed_paths": [],
+     "revert": false,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "decision": "continue",
+     "consecutive_states": [
+      "stagnant",
+      "stagnant"
+     ],
+     "unmeasured_steps": 0
+    },
+    {
+     "step": 27,
+     "agent": "reviewer",
+     "state": "unmeasured",
+     "events": [],
+     "conv_moved": false,
+     "art_moved": false,
+     "measurement": "partial",
+     "final_output": "invalid",
+     "tests": 14,
+     "test_max": 14,
+     "changed_paths": [],
+     "revert": false,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "decision": "unmeasured",
+     "consecutive_states": [],
+     "unmeasured_steps": 1
+    },
+    {
+     "step": 28,
+     "agent": "planner",
+     "state": "stagnant",
+     "events": [],
+     "conv_moved": false,
+     "art_moved": false,
+     "measurement": "observed",
+     "final_output": "valid",
+     "tests": 14,
+     "test_max": 14,
+     "changed_paths": [],
+     "revert": false,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "decision": "continue",
+     "consecutive_states": [
+      "stagnant"
+     ],
+     "unmeasured_steps": 0
+    },
+    {
+     "step": 29,
+     "agent": "developer",
+     "state": "stagnant",
+     "events": [],
+     "conv_moved": false,
+     "art_moved": false,
+     "measurement": "observed",
+     "final_output": "valid",
+     "tests": 14,
+     "test_max": 14,
+     "changed_paths": [],
+     "revert": false,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "decision": "continue",
+     "consecutive_states": [
+      "stagnant",
+      "stagnant"
+     ],
+     "unmeasured_steps": 0
+    },
+    {
+     "step": 30,
+     "agent": "reviewer",
+     "state": "unmeasured",
+     "events": [],
+     "conv_moved": false,
+     "art_moved": false,
+     "measurement": "partial",
+     "final_output": "invalid",
+     "tests": 14,
+     "test_max": 14,
+     "changed_paths": [],
+     "revert": false,
+     "plateau_steps": 6,
+     "test_plateau": true,
+     "decision": "unmeasured",
+     "consecutive_states": [],
+     "unmeasured_steps": 1
+    }
+   ]
+  }
+ ],
+ "delays": [
+  {
+   "session": "41adbef1",
+   "scenario": "DEMO-CL-stall-v1",
+   "first_stop": 19,
+   "stall_start": 15,
+   "delay": 4,
+   "late_progress": false,
+   "change_steps_after_first_stop": []
+  },
+  {
+   "session": "8d760276",
+   "scenario": "DEMO-CL-stall-v1",
+   "first_stop": 18,
+   "stall_start": 23,
+   "delay": -5,
+   "late_progress": true,
+   "change_steps_after_first_stop": [
+    {
+     "step": 22,
+     "tests": 14,
+     "state_changed": true,
+     "tests_changed": false
+    }
+   ]
+  },
+  {
+   "session": "a6b00d30",
+   "scenario": "DEMO-CL-stall-v1",
+   "first_stop": 14,
+   "stall_start": 26,
+   "delay": -12,
+   "late_progress": true,
+   "change_steps_after_first_stop": [
+    {
+     "step": 22,
+     "tests": 14,
+     "state_changed": true,
+     "tests_changed": false
+    },
+    {
+     "step": 25,
+     "tests": 14,
+     "state_changed": true,
+     "tests_changed": false
+    }
+   ]
+  },
+  {
+   "session": "0d834a82",
+   "scenario": "DEMO-CT-stall-v1",
+   "first_stop": 14,
+   "stall_start": 9,
+   "delay": 5,
+   "late_progress": false,
+   "change_steps_after_first_stop": []
+  },
+  {
+   "session": "1b7bd963",
+   "scenario": "DEMO-CT-stall-v1",
+   "first_stop": 14,
+   "stall_start": 9,
+   "delay": 5,
+   "late_progress": false,
+   "change_steps_after_first_stop": []
+  },
+  {
+   "session": "22a0edb6",
+   "scenario": "DEMO-CT-stall-v1",
+   "first_stop": 10,
+   "stall_start": 8,
+   "delay": 2,
+   "late_progress": false,
+   "change_steps_after_first_stop": []
+  },
+  {
+   "session": "79fdaab1",
+   "scenario": "DEMO-CT-stall-v1",
+   "first_stop": 12,
+   "stall_start": 26,
+   "delay": -14,
+   "late_progress": true,
+   "change_steps_after_first_stop": [
+    {
+     "step": 25,
+     "tests": 7,
+     "state_changed": true,
+     "tests_changed": false
+    }
+   ]
+  },
+  {
+   "session": "df08a5f8",
+   "scenario": "DEMO-CT-stall-v1",
+   "first_stop": 10,
+   "stall_start": 14,
+   "delay": -4,
+   "late_progress": true,
+   "change_steps_after_first_stop": [
+    {
+     "step": 13,
+     "tests": 16,
+     "state_changed": true,
+     "tests_changed": false
+    }
+   ]
+  }
+ ],
+ "block": [
+  {
+   "scenario": "DEMO-CL-stall-v1",
+   "runs": 3,
+   "ends": {
+    "guardrail_stop": 3
+   },
+   "block_runs_with_stop": 3,
+   "stop_steps": [
+    11,
+    10,
+    14
+   ],
+   "token_saving": 0.667,
+   "credit_saving": 0.6694,
+   "observe_if_stopped_ratio_mean": 0.50033,
+   "mean_tokens_block": 234924.0,
+   "mean_tokens_observe": 705545.0
+  },
+  {
+   "scenario": "DEMO-CS-stall-v1",
+   "runs": 3,
+   "ends": {
+    "success": 3
+   },
+   "block_runs_with_stop": 0,
+   "stop_steps": [
+    null,
+    null,
+    null
+   ],
+   "token_saving": -0.0502,
+   "credit_saving": -0.1571,
+   "observe_if_stopped_ratio_mean": null,
+   "mean_tokens_block": 45279.33333,
+   "mean_tokens_observe": 43114.8
+  },
+  {
+   "scenario": "DEMO-CT-stall-v1",
+   "runs": 2,
+   "ends": {
+    "guardrail_stop": 2
+   },
+   "block_runs_with_stop": 2,
+   "stop_steps": [
+    16,
+    14
+   ],
+   "token_saving": 0.5896,
+   "credit_saving": 0.6085,
+   "observe_if_stopped_ratio_mean": 0.67204,
+   "mean_tokens_block": 341494.5,
+   "mean_tokens_observe": 832120.6
+  },
+  {
+   "scenario": "DEMO-LR-stall-v1",
+   "runs": 2,
+   "ends": {
+    "escalated": 2
+   },
+   "block_runs_with_stop": 0,
+   "stop_steps": [
+    null,
+    null
+   ],
+   "token_saving": 0.1837,
+   "credit_saving": 0.2715,
+   "observe_if_stopped_ratio_mean": null,
+   "mean_tokens_block": 13710.0,
+   "mean_tokens_observe": 16794.4
+  },
+  {
+   "scenario": "DEMO-MR-stall-v1",
+   "runs": 3,
+   "ends": {
+    "escalated": 3
+   },
+   "block_runs_with_stop": 0,
+   "stop_steps": [
+    null,
+    null,
+    null
+   ],
+   "token_saving": -0.5202,
+   "credit_saving": -0.4805,
+   "observe_if_stopped_ratio_mean": null,
+   "mean_tokens_block": 24225.33333,
+   "mean_tokens_observe": 15936.0
+  }
+ ],
+ "credits_by_lane": {
+  "demo-main-v1 lane 1/4": {
+   "sessions": 18,
+   "measured": 666.33309,
+   "estimated": 651.22348
+  },
+  "demo-main-v1 lane 2/4": {
+   "sessions": 17,
+   "measured": 624.79842,
+   "estimated": 614.33316
+  },
+  "demo-main-v1 lane 3/4": {
+   "sessions": 17,
+   "measured": 797.63478,
+   "estimated": 788.89444
+  },
+  "demo-main-v1-lr2 lane 1/1": {
+   "sessions": 12,
+   "measured": 74.65997,
+   "estimated": 74.65997
+  },
+  "demo-main-v1-mr2 lane 1/1": {
+   "sessions": 3,
+   "measured": 46.26087,
+   "estimated": 46.26087
+  }
+ },
+ "credits_counted": {
+  "measured": 2209.68713,
+  "estimated_token_x_price": 2175.37192,
+  "sessions_measured_ne_estimated": 8
+ },
+ "escalated_by_scenario_mode": {
+  "DEMO-LR-stall-v1:block": {
+   "lead": 1,
+   "writer": 1
+  },
+  "DEMO-LR-stall-v1:observe": {
+   "lead": 2,
+   "writer": 2,
+   "searcher": 1
+  },
+  "DEMO-MR-stall-v1:block": {
+   "lead": 3
+  },
+  "DEMO-MR-stall-v1:observe": {
+   "lead": 5
+  }
+ },
+ "escalated_runs_with_stop": 0,
+ "failed_step_reasons_all": {
+  "tool_execution_error": 15,
+  "strict_schema_mismatch": 15,
+  "no_final_output": 15,
+  "write_refused_before_approval": 17
+ },
+ "vocab_steps_in_first_stop_windows": 0,
+ "judgement_ms": {
+  "n": 613,
+  "p50": 0.192875,
+  "p99": 0.412334,
+  "max": 0.451625
+ }
+}

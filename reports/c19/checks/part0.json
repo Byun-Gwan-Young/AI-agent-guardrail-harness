@@ -1,0 +1,2263 @@
+{
+ "summary": {
+  "plan_items": 70,
+  "lane_last_event": {
+   "demo-main-v1/lane-1-of-4.jsonl": "lane_finished",
+   "demo-main-v1/lane-2-of-4.jsonl": "lane_finished",
+   "demo-main-v1/lane-3-of-4.jsonl": "lane_finished",
+   "demo-main-v1/lane-4-of-4.jsonl": "lane_finished",
+   "demo-main-v1-lr2/lane-1-of-1.jsonl": "lane_finished",
+   "demo-main-v1-mr2/lane-1-of-1.jsonl": "lane_finished"
+  },
+  "session_folders": 98,
+  "by_plan": {
+   "demo-main-v1": 82,
+   "demo-main-v1-lr2": 13,
+   "demo-main-v1-mr2": 3
+  },
+  "git": {
+   "e3341e5 dirty=False": 81,
+   "163b723 dirty=False": 17
+  },
+  "git_by_plan": {
+   "demo-main-v1": {
+    "e3341e5": 68,
+    "163b723": 14
+   },
+   "demo-main-v1-lr2": {
+    "e3341e5": 13
+   },
+   "demo-main-v1-mr2": {
+    "163b723": 3
+   }
+  },
+  "distinct_model": {
+   "glm-5.3-flash": 98
+  },
+  "distinct_proxy_model": {
+   "glm-5.3-flash": 98
+  },
+  "distinct_reasoning": {
+   "high": 98
+  },
+  "distinct_run_conditions_sha256": {
+   "96472b969d906af1afd4972602be932c21c6913e96468ae77b745ee294a1e0c0": 98
+  },
+  "distinct_final_freeze": {
+   "5f3d0c7ce4c564d0c28bdc98b95476c74eff51a75597315e4c568d34d9b33776": 98
+  },
+  "distinct_criteria_version": {
+   "deadlock-v0.3": 98
+  },
+  "distinct_criteria_freeze": {
+   "4fa939191ab8e9bfc879da548b87b13107c85e1612f62bb35334e10fee7759cf": 97,
+   "None": 1
+  },
+  "distinct_criteria_sha256": {
+   "a93cc2d638ed046d928778eb541cf8cc436353d6b2e103ed600cb963bee0ed50": 97,
+   "None": 1
+  },
+  "distinct_upstream_config": {
+   "guardrail-deadlock-v0.3-kmu.yaml": 74,
+   "guardrail-deadlock-v0.3-kmu-block.yaml": 24
+  },
+  "guardrail_mode_vs_batch_mode": {
+   "observe->observe": 74,
+   "block->block": 24
+  },
+  "plan_sha256_by_plan": {
+   "demo-main-v1": [
+    "d12faf74553a5a2338f09b69207519f2ec5951d29180ffcc548946bb16b22357"
+   ],
+   "demo-main-v1-lr2": [
+    "09cc3ef0a108efc72df62078b111591760405bb5258233fdf471f923cd1cf17c"
+   ],
+   "demo-main-v1-mr2": [
+    "e45d2ca0ca5dcde60578a7456024dd6334a1783e2a4e0872ade3b57367714699"
+   ]
+  },
+  "condition_groups_per_scenario_mode": {
+   "DEMO-CL-normal-v1:observe": {
+    "cg-f50509c825e1": 6
+   },
+   "DEMO-CL-stall-v1:block": {
+    "cg-79fa04a93ef7": 4
+   },
+   "DEMO-CL-stall-v1:observe": {
+    "cg-f50509c825e1": 6
+   },
+   "DEMO-CS-normal-v1:observe": {
+    "cg-10a2d89b5543": 5
+   },
+   "DEMO-CS-stall-v1:block": {
+    "cg-a4e4ef7f8bdb": 3
+   },
+   "DEMO-CS-stall-v1:observe": {
+    "cg-10a2d89b5543": 5
+   },
+   "DEMO-CT-N-v1:observe": {
+    "cg-f50509c825e1": 5
+   },
+   "DEMO-CT-normal-v1:observe": {
+    "cg-6c5c13fb016a": 5
+   },
+   "DEMO-CT-stall-v1:block": {
+    "cg-25cb10bb77a1": 6
+   },
+   "DEMO-CT-stall-v1:observe": {
+    "cg-6c5c13fb016a": 9
+   },
+   "DEMO-LR-normal-v1:observe": {
+    "cg-880cb785600f": 10
+   },
+   "DEMO-LR-stall-v1:block": {
+    "cg-0547e44d72c0": 5
+   },
+   "DEMO-LR-stall-v1:observe": {
+    "cg-880cb785600f": 10
+   },
+   "DEMO-MR-normal-v1:observe": {
+    "cg-eef67a007285": 7
+   },
+   "DEMO-MR-stall-v1:block": {
+    "cg-7da0a5a24738": 5
+   },
+   "DEMO-MR-stall-v1:observe": {
+    "cg-eef67a007285": 6
+   }
+  },
+  "distinct_condition_groups": 10,
+  "folders_not_in_lane_log": [
+   "DEMO-LR-stall-v1-445ab1ba6476456fbef0ab83d64e11df"
+  ],
+  "lane_sessions_without_folder": [],
+  "lane_vs_folder_termination_mismatch": [],
+  "lane_key_scan": {
+   "clean=True checked=KMU_API_KEY,TAVILY_API_KEY": 72,
+   "clean=True checked=KMU_API_KEY": 25
+  },
+  "record_key_scan": {
+   "True": 97,
+   "None": 1
+  },
+  "unrecorded_sessions": [
+   "DEMO-LR-stall-v1-445ab1ba6476456fbef0ab83d64e11df"
+  ],
+  "items_missing_from_exclusion_items": [],
+  "item_states": {
+   "valid": 67,
+   "no_valid_session": 3
+  },
+  "items_with_more_than_one_try": {
+   "DEMO-CL-normal-v1:observe:1": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "51aef935",
+      "plan": "main",
+      "end": "success",
+      "steps": 3,
+      "rerun_of": "c1ff4dc4",
+      "commit": "163b723",
+      "excluded": null,
+      "replaced_by": null
+     },
+     {
+      "session": "c1ff4dc4",
+      "plan": "main",
+      "end": "runner_error",
+      "steps": 1,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_upstream_timeout",
+      "replaced_by": "51aef935"
+     }
+    ]
+   },
+   "DEMO-CL-stall-v1:observe:2": {
+    "state": "no_valid_session",
+    "tries": [
+     {
+      "session": "0cd6385b",
+      "plan": "main",
+      "end": "runner_error",
+      "steps": 21,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_upstream_timeout",
+      "replaced_by": "d4ba1c9f"
+     },
+     {
+      "session": "d4ba1c9f",
+      "plan": "main",
+      "end": "runner_error",
+      "steps": 28,
+      "rerun_of": "0cd6385b",
+      "commit": "163b723",
+      "excluded": "incomplete_after_retry",
+      "replaced_by": null
+     }
+    ]
+   },
+   "DEMO-CT-stall-v1:observe:1": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "000a538a",
+      "plan": "main",
+      "end": "runner_error",
+      "steps": 2,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_upstream_timeout",
+      "replaced_by": "df08a5f8"
+     },
+     {
+      "session": "df08a5f8",
+      "plan": "main",
+      "end": "max_steps",
+      "steps": 30,
+      "rerun_of": "000a538a",
+      "commit": "163b723",
+      "excluded": null,
+      "replaced_by": null
+     }
+    ]
+   },
+   "DEMO-CT-stall-v1:observe:3": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "1b7bd963",
+      "plan": "main",
+      "end": "max_steps",
+      "steps": 30,
+      "rerun_of": "7634c328",
+      "commit": "163b723",
+      "excluded": null,
+      "replaced_by": null
+     },
+     {
+      "session": "7634c328",
+      "plan": "main",
+      "end": "runner_error",
+      "steps": 2,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_upstream_timeout",
+      "replaced_by": "1b7bd963"
+     }
+    ]
+   },
+   "DEMO-CT-stall-v1:observe:4": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "79fdaab1",
+      "plan": "main",
+      "end": "max_steps",
+      "steps": 30,
+      "rerun_of": "eba5a575",
+      "commit": "163b723",
+      "excluded": null,
+      "replaced_by": null
+     },
+     {
+      "session": "eba5a575",
+      "plan": "main",
+      "end": "runner_error",
+      "steps": 4,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_upstream_timeout",
+      "replaced_by": "79fdaab1"
+     }
+    ]
+   },
+   "DEMO-CT-stall-v1:observe:5": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "0d834a82",
+      "plan": "main",
+      "end": "max_steps",
+      "steps": 30,
+      "rerun_of": "18b69568",
+      "commit": "163b723",
+      "excluded": null,
+      "replaced_by": null
+     },
+     {
+      "session": "18b69568",
+      "plan": "main",
+      "end": "runner_error",
+      "steps": 4,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_upstream_timeout",
+      "replaced_by": "0d834a82"
+     }
+    ]
+   },
+   "DEMO-MR-normal-v1:observe:3": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "0382a780",
+      "plan": "main",
+      "end": "escalated",
+      "steps": 4,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_search_key_invalid",
+      "replaced_by": "d69416ae"
+     },
+     {
+      "session": "d69416ae",
+      "plan": "main-mr2",
+      "end": "success",
+      "steps": 9,
+      "rerun_of": null,
+      "commit": "163b723",
+      "excluded": null,
+      "replaced_by": null
+     }
+    ]
+   },
+   "DEMO-MR-normal-v1:observe:5": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "8a458208",
+      "plan": "main",
+      "end": "runner_error",
+      "steps": 3,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_upstream_502",
+      "replaced_by": "c0daa4d6"
+     },
+     {
+      "session": "c0daa4d6",
+      "plan": "main",
+      "end": "success",
+      "steps": 6,
+      "rerun_of": "8a458208",
+      "commit": "163b723",
+      "excluded": null,
+      "replaced_by": null
+     }
+    ]
+   },
+   "DEMO-MR-stall-v1:observe:4": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "0c6719c3",
+      "plan": "main",
+      "end": "escalated",
+      "steps": 3,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_search_key_invalid",
+      "replaced_by": "7cee4bcb"
+     },
+     {
+      "session": "7cee4bcb",
+      "plan": "main-mr2",
+      "end": "escalated",
+      "steps": 1,
+      "rerun_of": null,
+      "commit": "163b723",
+      "excluded": null,
+      "replaced_by": null
+     }
+    ]
+   },
+   "DEMO-CL-stall-v1:block:3": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "1372b13b",
+      "plan": "main",
+      "end": "runner_error",
+      "steps": 7,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_upstream_502",
+      "replaced_by": "3f94b297"
+     },
+     {
+      "session": "3f94b297",
+      "plan": "main",
+      "end": "guardrail_stop",
+      "steps": 12,
+      "rerun_of": "1372b13b",
+      "commit": "163b723",
+      "excluded": null,
+      "replaced_by": null
+     }
+    ]
+   },
+   "DEMO-CT-stall-v1:block:1": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "158e7cac",
+      "plan": "main",
+      "end": "runner_error",
+      "steps": 4,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_upstream_timeout",
+      "replaced_by": "34b05804"
+     },
+     {
+      "session": "34b05804",
+      "plan": "main",
+      "end": "guardrail_stop",
+      "steps": 17,
+      "rerun_of": "158e7cac",
+      "commit": "163b723",
+      "excluded": null,
+      "replaced_by": null
+     }
+    ]
+   },
+   "DEMO-CT-stall-v1:block:2": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "46ea7790",
+      "plan": "main",
+      "end": "guardrail_stop",
+      "steps": 15,
+      "rerun_of": "b3ae9954",
+      "commit": "163b723",
+      "excluded": null,
+      "replaced_by": null
+     },
+     {
+      "session": "b3ae9954",
+      "plan": "main",
+      "end": "runner_error",
+      "steps": 4,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_upstream_timeout",
+      "replaced_by": "46ea7790"
+     }
+    ]
+   },
+   "DEMO-CT-stall-v1:block:3": {
+    "state": "no_valid_session",
+    "tries": [
+     {
+      "session": "b12151a1",
+      "plan": "main",
+      "end": "runner_error",
+      "steps": 2,
+      "rerun_of": "bf36c7d9",
+      "commit": "163b723",
+      "excluded": "incomplete_after_retry",
+      "replaced_by": null
+     },
+     {
+      "session": "bf36c7d9",
+      "plan": "main",
+      "end": "runner_error",
+      "steps": 4,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_upstream_timeout",
+      "replaced_by": "b12151a1"
+     }
+    ]
+   },
+   "DEMO-MR-stall-v1:block:1": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "173d03d6",
+      "plan": "main",
+      "end": "runner_error",
+      "steps": 3,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_upstream_502",
+      "replaced_by": "54ca8a07"
+     },
+     {
+      "session": "54ca8a07",
+      "plan": "main",
+      "end": "escalated",
+      "steps": 1,
+      "rerun_of": "173d03d6",
+      "commit": "163b723",
+      "excluded": null,
+      "replaced_by": null
+     }
+    ]
+   },
+   "DEMO-MR-stall-v1:block:3": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "82564d3c",
+      "plan": "main",
+      "end": "escalated",
+      "steps": 4,
+      "rerun_of": null,
+      "commit": "163b723",
+      "excluded": "env_search_key_invalid",
+      "replaced_by": "abb47045"
+     },
+     {
+      "session": "abb47045",
+      "plan": "main-mr2",
+      "end": "escalated",
+      "steps": 4,
+      "rerun_of": null,
+      "commit": "163b723",
+      "excluded": null,
+      "replaced_by": null
+     }
+    ]
+   },
+   "DEMO-LR-normal-v1:observe:1": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "1d992018",
+      "plan": "main",
+      "end": "escalated",
+      "steps": 7,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_search_unavailable",
+      "replaced_by": "f8caef5d"
+     },
+     {
+      "session": "f8caef5d",
+      "plan": "main-lr2",
+      "end": "success",
+      "steps": 3,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": null,
+      "replaced_by": null
+     }
+    ]
+   },
+   "DEMO-LR-normal-v1:observe:2": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "2ca98307",
+      "plan": "main-lr2",
+      "end": "success",
+      "steps": 3,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": null,
+      "replaced_by": null
+     },
+     {
+      "session": "cca3215a",
+      "plan": "main",
+      "end": "escalated",
+      "steps": 3,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_search_unavailable",
+      "replaced_by": "2ca98307"
+     }
+    ]
+   },
+   "DEMO-LR-normal-v1:observe:3": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "188f6323",
+      "plan": "main",
+      "end": "escalated",
+      "steps": 3,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_search_unavailable",
+      "replaced_by": "af33de48"
+     },
+     {
+      "session": "af33de48",
+      "plan": "main-lr2",
+      "end": "success",
+      "steps": 6,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": null,
+      "replaced_by": null
+     }
+    ]
+   },
+   "DEMO-LR-normal-v1:observe:4": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "7ed9090d",
+      "plan": "main-lr2",
+      "end": "success",
+      "steps": 6,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": null,
+      "replaced_by": null
+     },
+     {
+      "session": "f4efff8a",
+      "plan": "main",
+      "end": "escalated",
+      "steps": 3,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_search_unavailable",
+      "replaced_by": "7ed9090d"
+     }
+    ]
+   },
+   "DEMO-LR-normal-v1:observe:5": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "447141e1",
+      "plan": "main-lr2",
+      "end": "success",
+      "steps": 6,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": null,
+      "replaced_by": null
+     },
+     {
+      "session": "a8e1e322",
+      "plan": "main",
+      "end": "escalated",
+      "steps": 1,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_search_unavailable",
+      "replaced_by": "447141e1"
+     }
+    ]
+   },
+   "DEMO-LR-stall-v1:observe:1": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "6e073f21",
+      "plan": "main-lr2",
+      "end": "escalated",
+      "steps": 1,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": null,
+      "replaced_by": null
+     },
+     {
+      "session": "ef48a692",
+      "plan": "main",
+      "end": "escalated",
+      "steps": 4,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_search_unavailable",
+      "replaced_by": "6e073f21"
+     }
+    ]
+   },
+   "DEMO-LR-stall-v1:observe:2": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "a63bb598",
+      "plan": "main",
+      "end": "escalated",
+      "steps": 2,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_search_unavailable",
+      "replaced_by": "b9da4511"
+     },
+     {
+      "session": "b9da4511",
+      "plan": "main-lr2",
+      "end": "escalated",
+      "steps": 2,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": null,
+      "replaced_by": null
+     }
+    ]
+   },
+   "DEMO-LR-stall-v1:observe:3": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "36d81727",
+      "plan": "main",
+      "end": "escalated",
+      "steps": 2,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_search_unavailable",
+      "replaced_by": "c0618659"
+     },
+     {
+      "session": "c0618659",
+      "plan": "main-lr2",
+      "end": "escalated",
+      "steps": 3,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": null,
+      "replaced_by": null
+     }
+    ]
+   },
+   "DEMO-LR-stall-v1:observe:4": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "53b21638",
+      "plan": "main-lr2",
+      "end": "escalated",
+      "steps": 1,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": null,
+      "replaced_by": null
+     },
+     {
+      "session": "a3201bee",
+      "plan": "main",
+      "end": "escalated",
+      "steps": 5,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_search_unavailable",
+      "replaced_by": "53b21638"
+     }
+    ]
+   },
+   "DEMO-LR-stall-v1:observe:5": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "69bf46e3",
+      "plan": "main-lr2",
+      "end": "escalated",
+      "steps": 3,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": null,
+      "replaced_by": null
+     },
+     {
+      "session": "d5a170cb",
+      "plan": "main",
+      "end": "escalated",
+      "steps": 3,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_search_unavailable",
+      "replaced_by": "69bf46e3"
+     }
+    ]
+   },
+   "DEMO-LR-stall-v1:block:1": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "8a25037b",
+      "plan": "main-lr2",
+      "end": "escalated",
+      "steps": 3,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": null,
+      "replaced_by": null
+     },
+     {
+      "session": "b9d13ece",
+      "plan": "main",
+      "end": "escalated",
+      "steps": 3,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_search_unavailable",
+      "replaced_by": "8a25037b"
+     }
+    ]
+   },
+   "DEMO-LR-stall-v1:block:2": {
+    "state": "valid",
+    "tries": [
+     {
+      "session": "569ceba4",
+      "plan": "main",
+      "end": "escalated",
+      "steps": 1,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_search_unavailable",
+      "replaced_by": "7c6a57c5"
+     },
+     {
+      "session": "7c6a57c5",
+      "plan": "main-lr2",
+      "end": "escalated",
+      "steps": 1,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": null,
+      "replaced_by": null
+     }
+    ]
+   },
+   "DEMO-LR-stall-v1:block:3": {
+    "state": "no_valid_session",
+    "tries": [
+     {
+      "session": "07bae846",
+      "plan": "main",
+      "end": "guardrail_stop",
+      "steps": 7,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_search_unavailable",
+      "replaced_by": "445ab1ba"
+     },
+     {
+      "session": "445ab1ba",
+      "plan": "main-lr2",
+      "end": "user_interrupted",
+      "steps": 0,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "run_interrupted",
+      "replaced_by": null
+     }
+    ]
+   }
+  },
+  "items_without_valid": {
+   "DEMO-CL-stall-v1:observe:2": {
+    "state": "no_valid_session",
+    "tries": [
+     {
+      "session": "0cd6385b",
+      "plan": "main",
+      "end": "runner_error",
+      "steps": 21,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_upstream_timeout",
+      "replaced_by": "d4ba1c9f"
+     },
+     {
+      "session": "d4ba1c9f",
+      "plan": "main",
+      "end": "runner_error",
+      "steps": 28,
+      "rerun_of": "0cd6385b",
+      "commit": "163b723",
+      "excluded": "incomplete_after_retry",
+      "replaced_by": null
+     }
+    ]
+   },
+   "DEMO-CT-stall-v1:block:3": {
+    "state": "no_valid_session",
+    "tries": [
+     {
+      "session": "b12151a1",
+      "plan": "main",
+      "end": "runner_error",
+      "steps": 2,
+      "rerun_of": "bf36c7d9",
+      "commit": "163b723",
+      "excluded": "incomplete_after_retry",
+      "replaced_by": null
+     },
+     {
+      "session": "bf36c7d9",
+      "plan": "main",
+      "end": "runner_error",
+      "steps": 4,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_upstream_timeout",
+      "replaced_by": "b12151a1"
+     }
+    ]
+   },
+   "DEMO-LR-stall-v1:block:3": {
+    "state": "no_valid_session",
+    "tries": [
+     {
+      "session": "07bae846",
+      "plan": "main",
+      "end": "guardrail_stop",
+      "steps": 7,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "env_search_unavailable",
+      "replaced_by": "445ab1ba"
+     },
+     {
+      "session": "445ab1ba",
+      "plan": "main-lr2",
+      "end": "user_interrupted",
+      "steps": 0,
+      "rerun_of": null,
+      "commit": "e3341e5",
+      "excluded": "run_interrupted",
+      "replaced_by": null
+     }
+    ]
+   }
+  }
+ },
+ "per_item": {
+  "DEMO-CL-normal-v1:observe:1": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "51aef935",
+     "plan": "main",
+     "end": "success",
+     "steps": 3,
+     "rerun_of": "c1ff4dc4",
+     "commit": "163b723",
+     "excluded": null,
+     "replaced_by": null
+    },
+    {
+     "session": "c1ff4dc4",
+     "plan": "main",
+     "end": "runner_error",
+     "steps": 1,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_upstream_timeout",
+     "replaced_by": "51aef935"
+    }
+   ]
+  },
+  "DEMO-CL-normal-v1:observe:2": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "ed9df513",
+     "plan": "main",
+     "end": "success",
+     "steps": 12,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CL-normal-v1:observe:3": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "19755039",
+     "plan": "main",
+     "end": "success",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CL-normal-v1:observe:4": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "108968e5",
+     "plan": "main",
+     "end": "success",
+     "steps": 6,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CL-normal-v1:observe:5": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "a0b222bd",
+     "plan": "main",
+     "end": "success",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CL-stall-v1:observe:1": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "8d760276",
+     "plan": "main",
+     "end": "max_steps",
+     "steps": 30,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CL-stall-v1:observe:2": {
+   "state": "no_valid_session",
+   "tries": [
+    {
+     "session": "0cd6385b",
+     "plan": "main",
+     "end": "runner_error",
+     "steps": 21,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_upstream_timeout",
+     "replaced_by": "d4ba1c9f"
+    },
+    {
+     "session": "d4ba1c9f",
+     "plan": "main",
+     "end": "runner_error",
+     "steps": 28,
+     "rerun_of": "0cd6385b",
+     "commit": "163b723",
+     "excluded": "incomplete_after_retry",
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CL-stall-v1:observe:3": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "41adbef1",
+     "plan": "main",
+     "end": "max_steps",
+     "steps": 30,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CL-stall-v1:observe:4": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "476c0307",
+     "plan": "main",
+     "end": "max_steps",
+     "steps": 30,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CL-stall-v1:observe:5": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "a6b00d30",
+     "plan": "main",
+     "end": "max_steps",
+     "steps": 30,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CT-normal-v1:observe:1": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "102725ac",
+     "plan": "main",
+     "end": "success",
+     "steps": 6,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CT-normal-v1:observe:2": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "d7d4e26f",
+     "plan": "main",
+     "end": "success",
+     "steps": 24,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CT-normal-v1:observe:3": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "2efa22ce",
+     "plan": "main",
+     "end": "success",
+     "steps": 9,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CT-normal-v1:observe:4": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "3126a6ae",
+     "plan": "main",
+     "end": "success",
+     "steps": 9,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CT-normal-v1:observe:5": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "fcd55b67",
+     "plan": "main",
+     "end": "success",
+     "steps": 27,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CT-stall-v1:observe:1": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "000a538a",
+     "plan": "main",
+     "end": "runner_error",
+     "steps": 2,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_upstream_timeout",
+     "replaced_by": "df08a5f8"
+    },
+    {
+     "session": "df08a5f8",
+     "plan": "main",
+     "end": "max_steps",
+     "steps": 30,
+     "rerun_of": "000a538a",
+     "commit": "163b723",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CT-stall-v1:observe:2": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "22a0edb6",
+     "plan": "main",
+     "end": "max_steps",
+     "steps": 30,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CT-stall-v1:observe:3": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "1b7bd963",
+     "plan": "main",
+     "end": "max_steps",
+     "steps": 30,
+     "rerun_of": "7634c328",
+     "commit": "163b723",
+     "excluded": null,
+     "replaced_by": null
+    },
+    {
+     "session": "7634c328",
+     "plan": "main",
+     "end": "runner_error",
+     "steps": 2,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_upstream_timeout",
+     "replaced_by": "1b7bd963"
+    }
+   ]
+  },
+  "DEMO-CT-stall-v1:observe:4": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "79fdaab1",
+     "plan": "main",
+     "end": "max_steps",
+     "steps": 30,
+     "rerun_of": "eba5a575",
+     "commit": "163b723",
+     "excluded": null,
+     "replaced_by": null
+    },
+    {
+     "session": "eba5a575",
+     "plan": "main",
+     "end": "runner_error",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_upstream_timeout",
+     "replaced_by": "79fdaab1"
+    }
+   ]
+  },
+  "DEMO-CT-stall-v1:observe:5": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "0d834a82",
+     "plan": "main",
+     "end": "max_steps",
+     "steps": 30,
+     "rerun_of": "18b69568",
+     "commit": "163b723",
+     "excluded": null,
+     "replaced_by": null
+    },
+    {
+     "session": "18b69568",
+     "plan": "main",
+     "end": "runner_error",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_upstream_timeout",
+     "replaced_by": "0d834a82"
+    }
+   ]
+  },
+  "DEMO-CT-N-v1:observe:1": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "70750f86",
+     "plan": "main",
+     "end": "success",
+     "steps": 6,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CT-N-v1:observe:2": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "175a40c7",
+     "plan": "main",
+     "end": "success",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CT-N-v1:observe:3": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "b46eacac",
+     "plan": "main",
+     "end": "success",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CT-N-v1:observe:4": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "ac014aa7",
+     "plan": "main",
+     "end": "success",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CT-N-v1:observe:5": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "0ffd2671",
+     "plan": "main",
+     "end": "success",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CS-normal-v1:observe:1": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "15b45bf6",
+     "plan": "main",
+     "end": "success",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CS-normal-v1:observe:2": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "c22d2823",
+     "plan": "main",
+     "end": "success",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CS-normal-v1:observe:3": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "7d4e0525",
+     "plan": "main",
+     "end": "success",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CS-normal-v1:observe:4": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "cf35c19c",
+     "plan": "main",
+     "end": "success",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CS-normal-v1:observe:5": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "36a780e9",
+     "plan": "main",
+     "end": "success",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CS-stall-v1:observe:1": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "a8294fa4",
+     "plan": "main",
+     "end": "success",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CS-stall-v1:observe:2": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "8cc8dfe6",
+     "plan": "main",
+     "end": "success",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CS-stall-v1:observe:3": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "59d84517",
+     "plan": "main",
+     "end": "success",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CS-stall-v1:observe:4": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "f96e49d6",
+     "plan": "main",
+     "end": "success",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CS-stall-v1:observe:5": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "d87fda6b",
+     "plan": "main",
+     "end": "success",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-MR-normal-v1:observe:1": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "461d0124",
+     "plan": "main",
+     "end": "max_steps",
+     "steps": 30,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-MR-normal-v1:observe:2": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "9e48e129",
+     "plan": "main",
+     "end": "success",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-MR-normal-v1:observe:3": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "0382a780",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_search_key_invalid",
+     "replaced_by": "d69416ae"
+    },
+    {
+     "session": "d69416ae",
+     "plan": "main-mr2",
+     "end": "success",
+     "steps": 9,
+     "rerun_of": null,
+     "commit": "163b723",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-MR-normal-v1:observe:4": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "364ff9c7",
+     "plan": "main",
+     "end": "success",
+     "steps": 6,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-MR-normal-v1:observe:5": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "8a458208",
+     "plan": "main",
+     "end": "runner_error",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_upstream_502",
+     "replaced_by": "c0daa4d6"
+    },
+    {
+     "session": "c0daa4d6",
+     "plan": "main",
+     "end": "success",
+     "steps": 6,
+     "rerun_of": "8a458208",
+     "commit": "163b723",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-MR-stall-v1:observe:1": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "5a05895c",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 1,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-MR-stall-v1:observe:2": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "45cf2d14",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 1,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-MR-stall-v1:observe:3": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "f48f87e8",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-MR-stall-v1:observe:4": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "0c6719c3",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_search_key_invalid",
+     "replaced_by": "7cee4bcb"
+    },
+    {
+     "session": "7cee4bcb",
+     "plan": "main-mr2",
+     "end": "escalated",
+     "steps": 1,
+     "rerun_of": null,
+     "commit": "163b723",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-MR-stall-v1:observe:5": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "e40eaf70",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 1,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CL-stall-v1:block:1": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "dc7cc3d9",
+     "plan": "main",
+     "end": "guardrail_stop",
+     "steps": 15,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CL-stall-v1:block:2": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "5a754c12",
+     "plan": "main",
+     "end": "guardrail_stop",
+     "steps": 11,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CL-stall-v1:block:3": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "1372b13b",
+     "plan": "main",
+     "end": "runner_error",
+     "steps": 7,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_upstream_502",
+     "replaced_by": "3f94b297"
+    },
+    {
+     "session": "3f94b297",
+     "plan": "main",
+     "end": "guardrail_stop",
+     "steps": 12,
+     "rerun_of": "1372b13b",
+     "commit": "163b723",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CT-stall-v1:block:1": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "158e7cac",
+     "plan": "main",
+     "end": "runner_error",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_upstream_timeout",
+     "replaced_by": "34b05804"
+    },
+    {
+     "session": "34b05804",
+     "plan": "main",
+     "end": "guardrail_stop",
+     "steps": 17,
+     "rerun_of": "158e7cac",
+     "commit": "163b723",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CT-stall-v1:block:2": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "46ea7790",
+     "plan": "main",
+     "end": "guardrail_stop",
+     "steps": 15,
+     "rerun_of": "b3ae9954",
+     "commit": "163b723",
+     "excluded": null,
+     "replaced_by": null
+    },
+    {
+     "session": "b3ae9954",
+     "plan": "main",
+     "end": "runner_error",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_upstream_timeout",
+     "replaced_by": "46ea7790"
+    }
+   ]
+  },
+  "DEMO-CT-stall-v1:block:3": {
+   "state": "no_valid_session",
+   "tries": [
+    {
+     "session": "b12151a1",
+     "plan": "main",
+     "end": "runner_error",
+     "steps": 2,
+     "rerun_of": "bf36c7d9",
+     "commit": "163b723",
+     "excluded": "incomplete_after_retry",
+     "replaced_by": null
+    },
+    {
+     "session": "bf36c7d9",
+     "plan": "main",
+     "end": "runner_error",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_upstream_timeout",
+     "replaced_by": "b12151a1"
+    }
+   ]
+  },
+  "DEMO-CS-stall-v1:block:1": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "03ef680d",
+     "plan": "main",
+     "end": "success",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CS-stall-v1:block:2": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "f077146e",
+     "plan": "main",
+     "end": "success",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-CS-stall-v1:block:3": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "0246cb21",
+     "plan": "main",
+     "end": "success",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "163b723",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-MR-stall-v1:block:1": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "173d03d6",
+     "plan": "main",
+     "end": "runner_error",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_upstream_502",
+     "replaced_by": "54ca8a07"
+    },
+    {
+     "session": "54ca8a07",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 1,
+     "rerun_of": "173d03d6",
+     "commit": "163b723",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-MR-stall-v1:block:2": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "60b59c82",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 1,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-MR-stall-v1:block:3": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "82564d3c",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "163b723",
+     "excluded": "env_search_key_invalid",
+     "replaced_by": "abb47045"
+    },
+    {
+     "session": "abb47045",
+     "plan": "main-mr2",
+     "end": "escalated",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "163b723",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-LR-normal-v1:observe:1": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "1d992018",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 7,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_search_unavailable",
+     "replaced_by": "f8caef5d"
+    },
+    {
+     "session": "f8caef5d",
+     "plan": "main-lr2",
+     "end": "success",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-LR-normal-v1:observe:2": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "2ca98307",
+     "plan": "main-lr2",
+     "end": "success",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    },
+    {
+     "session": "cca3215a",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_search_unavailable",
+     "replaced_by": "2ca98307"
+    }
+   ]
+  },
+  "DEMO-LR-normal-v1:observe:3": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "188f6323",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_search_unavailable",
+     "replaced_by": "af33de48"
+    },
+    {
+     "session": "af33de48",
+     "plan": "main-lr2",
+     "end": "success",
+     "steps": 6,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-LR-normal-v1:observe:4": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "7ed9090d",
+     "plan": "main-lr2",
+     "end": "success",
+     "steps": 6,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    },
+    {
+     "session": "f4efff8a",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_search_unavailable",
+     "replaced_by": "7ed9090d"
+    }
+   ]
+  },
+  "DEMO-LR-normal-v1:observe:5": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "447141e1",
+     "plan": "main-lr2",
+     "end": "success",
+     "steps": 6,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    },
+    {
+     "session": "a8e1e322",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 1,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_search_unavailable",
+     "replaced_by": "447141e1"
+    }
+   ]
+  },
+  "DEMO-LR-stall-v1:observe:1": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "6e073f21",
+     "plan": "main-lr2",
+     "end": "escalated",
+     "steps": 1,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    },
+    {
+     "session": "ef48a692",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 4,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_search_unavailable",
+     "replaced_by": "6e073f21"
+    }
+   ]
+  },
+  "DEMO-LR-stall-v1:observe:2": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "a63bb598",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 2,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_search_unavailable",
+     "replaced_by": "b9da4511"
+    },
+    {
+     "session": "b9da4511",
+     "plan": "main-lr2",
+     "end": "escalated",
+     "steps": 2,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-LR-stall-v1:observe:3": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "36d81727",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 2,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_search_unavailable",
+     "replaced_by": "c0618659"
+    },
+    {
+     "session": "c0618659",
+     "plan": "main-lr2",
+     "end": "escalated",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-LR-stall-v1:observe:4": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "53b21638",
+     "plan": "main-lr2",
+     "end": "escalated",
+     "steps": 1,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    },
+    {
+     "session": "a3201bee",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 5,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_search_unavailable",
+     "replaced_by": "53b21638"
+    }
+   ]
+  },
+  "DEMO-LR-stall-v1:observe:5": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "69bf46e3",
+     "plan": "main-lr2",
+     "end": "escalated",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    },
+    {
+     "session": "d5a170cb",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_search_unavailable",
+     "replaced_by": "69bf46e3"
+    }
+   ]
+  },
+  "DEMO-LR-stall-v1:block:1": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "8a25037b",
+     "plan": "main-lr2",
+     "end": "escalated",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    },
+    {
+     "session": "b9d13ece",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 3,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_search_unavailable",
+     "replaced_by": "8a25037b"
+    }
+   ]
+  },
+  "DEMO-LR-stall-v1:block:2": {
+   "state": "valid",
+   "tries": [
+    {
+     "session": "569ceba4",
+     "plan": "main",
+     "end": "escalated",
+     "steps": 1,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_search_unavailable",
+     "replaced_by": "7c6a57c5"
+    },
+    {
+     "session": "7c6a57c5",
+     "plan": "main-lr2",
+     "end": "escalated",
+     "steps": 1,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": null,
+     "replaced_by": null
+    }
+   ]
+  },
+  "DEMO-LR-stall-v1:block:3": {
+   "state": "no_valid_session",
+   "tries": [
+    {
+     "session": "07bae846",
+     "plan": "main",
+     "end": "guardrail_stop",
+     "steps": 7,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "env_search_unavailable",
+     "replaced_by": "445ab1ba"
+    },
+    {
+     "session": "445ab1ba",
+     "plan": "main-lr2",
+     "end": "user_interrupted",
+     "steps": 0,
+     "rerun_of": null,
+     "commit": "e3341e5",
+     "excluded": "run_interrupted",
+     "replaced_by": null
+    }
+   ]
+  }
+ }
+}

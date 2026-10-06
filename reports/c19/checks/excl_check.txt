@@ -1,0 +1,44 @@
+{
+ "sessions": 98,
+ "excluded": 31,
+ "by_code": {
+  "env_upstream_timeout": 9,
+  "env_upstream_502": 3,
+  "incomplete_after_retry": 2,
+  "env_search_unavailable": 13,
+  "run_interrupted": 1,
+  "env_search_key_invalid": 3
+ },
+ "mismatches_vs_list": []
+}
+env_upstream_timeout DEMO-CL-normal-v1:observe:1 c1ff4dc4 runner_error 1 acct A rerun_of None fail {'status': 502, 'wait_s': 120, 'empty_body': True, 'turn': 2, 'proxy_made': True} search -
+env_upstream_timeout DEMO-CL-stall-v1:observe:2 0cd6385b runner_error 21 acct A rerun_of None fail {'status': 502, 'wait_s': 120, 'empty_body': True, 'turn': 62, 'proxy_made': True} search -
+env_upstream_502 DEMO-CL-stall-v1:block:3 1372b13b runner_error 7 acct C rerun_of None fail {'status': 502, 'wait_s': 34, 'empty_body': True, 'turn': 18, 'proxy_made': False} search -
+incomplete_after_retry DEMO-CL-stall-v1:observe:2 d4ba1c9f runner_error 28 acct A rerun_of 0cd6385b fail {'status': 504, 'wait_s': 300, 'empty_body': True, 'turn': 76, 'proxy_made': False} search -
+env_upstream_timeout DEMO-CT-stall-v1:observe:1 000a538a runner_error 2 acct A rerun_of None fail {'status': 502, 'wait_s': 120, 'empty_body': True, 'turn': 5, 'proxy_made': True} search -
+env_upstream_timeout DEMO-CT-stall-v1:block:1 158e7cac runner_error 4 acct A rerun_of None fail {'status': 502, 'wait_s': 120, 'empty_body': True, 'turn': 10, 'proxy_made': True} search -
+env_upstream_timeout DEMO-CT-stall-v1:observe:5 18b69568 runner_error 4 acct B rerun_of None fail {'status': 502, 'wait_s': 120, 'empty_body': True, 'turn': 11, 'proxy_made': True} search -
+env_upstream_timeout DEMO-CT-stall-v1:observe:3 7634c328 runner_error 2 acct C rerun_of None fail {'status': 502, 'wait_s': 120, 'empty_body': True, 'turn': 5, 'proxy_made': True} search -
+incomplete_after_retry DEMO-CT-stall-v1:block:3 b12151a1 runner_error 2 acct C rerun_of bf36c7d9 fail {'status': 504, 'wait_s': 300, 'empty_body': True, 'turn': 5, 'proxy_made': False} search -
+env_upstream_timeout DEMO-CT-stall-v1:block:2 b3ae9954 runner_error 4 acct B rerun_of None fail {'status': 502, 'wait_s': 120, 'empty_body': True, 'turn': 10, 'proxy_made': True} search -
+env_upstream_timeout DEMO-CT-stall-v1:block:3 bf36c7d9 runner_error 4 acct C rerun_of None fail {'status': 502, 'wait_s': 120, 'empty_body': True, 'turn': 10, 'proxy_made': True} search -
+env_upstream_timeout DEMO-CT-stall-v1:observe:4 eba5a575 runner_error 4 acct A rerun_of None fail {'status': 502, 'wait_s': 120, 'empty_body': True, 'turn': 10, 'proxy_made': True} search -
+env_search_unavailable DEMO-LR-normal-v1:observe:3 188f6323 escalated 3 acct D rerun_of None fail None search {429: 2, None: 1}
+env_search_unavailable DEMO-LR-normal-v1:observe:1 1d992018 escalated 7 acct D rerun_of None fail None search {None: 1, 429: 4}
+env_search_unavailable DEMO-LR-normal-v1:observe:5 a8e1e322 escalated 1 acct D rerun_of None fail None search -
+env_search_unavailable DEMO-LR-normal-v1:observe:2 cca3215a escalated 3 acct D rerun_of None fail None search {None: 2, 429: 1}
+env_search_unavailable DEMO-LR-normal-v1:observe:4 f4efff8a escalated 3 acct D rerun_of None fail None search {429: 2, None: 1}
+env_search_unavailable DEMO-LR-stall-v1:block:3 07bae846 guardrail_stop 7 acct D rerun_of None fail None search {None: 2, 429: 3}
+env_search_unavailable DEMO-LR-stall-v1:observe:3 36d81727 escalated 2 acct D rerun_of None fail None search {429: 2, 200: 1}
+run_interrupted DEMO-LR-stall-v1:block:3 445ab1ba user_interrupted 0 acct D rerun_of None fail None search -
+env_search_unavailable DEMO-LR-stall-v1:block:2 569ceba4 escalated 1 acct D rerun_of None fail None search -
+env_search_unavailable DEMO-LR-stall-v1:observe:4 a3201bee escalated 5 acct D rerun_of None fail None search {429: 3, 200: 1, None: 1}
+env_search_unavailable DEMO-LR-stall-v1:observe:2 a63bb598 escalated 2 acct D rerun_of None fail None search {429: 4}
+env_search_unavailable DEMO-LR-stall-v1:block:1 b9d13ece escalated 3 acct D rerun_of None fail None search {None: 3, 429: 1}
+env_search_unavailable DEMO-LR-stall-v1:observe:5 d5a170cb escalated 3 acct D rerun_of None fail None search {None: 1, 429: 1, 200: 1}
+env_search_unavailable DEMO-LR-stall-v1:observe:1 ef48a692 escalated 4 acct D rerun_of None fail None search {429: 3}
+env_search_key_invalid DEMO-MR-normal-v1:observe:3 0382a780 escalated 4 acct B rerun_of None fail None search {401: 4}
+env_upstream_502 DEMO-MR-normal-v1:observe:5 8a458208 runner_error 3 acct A rerun_of None fail {'status': 502, 'wait_s': 42, 'empty_body': True, 'turn': 6, 'proxy_made': False} search {200: 8}
+env_search_key_invalid DEMO-MR-stall-v1:observe:4 0c6719c3 escalated 3 acct B rerun_of None fail None search {401: 5}
+env_upstream_502 DEMO-MR-stall-v1:block:1 173d03d6 runner_error 3 acct A rerun_of None fail {'status': 502, 'wait_s': 60, 'empty_body': True, 'turn': 7, 'proxy_made': False} search {200: 7}
+env_search_key_invalid DEMO-MR-stall-v1:block:3 82564d3c escalated 4 acct C rerun_of None fail None search {401: 5}

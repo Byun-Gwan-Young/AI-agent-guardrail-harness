@@ -1,0 +1,188 @@
+[
+ {
+  "session": "DEMO-MR-normal-v1-c0daa4d612c4460e811deff9912d32e5",
+  "type": "T1",
+  "mode": "observe",
+  "recomputed": {
+   "class": "success",
+   "steps": 6,
+   "first_stop": 6,
+   "credits_estimated": 21.29332,
+   "tokens": 111816,
+   "if_stopped_ratio": 0.0
+  },
+  "aggregate": {
+   "class": "success",
+   "steps": 6,
+   "first_stop": 6,
+   "credits_estimated": 21.29332,
+   "tokens": 111816,
+   "if_stopped_ratio": 0.0
+  },
+  "credits_measured_aggregate": 19.70477,
+  "turns_not_in_a_step": 0,
+  "match": {
+   "class": true,
+   "steps": true,
+   "first_stop": true,
+   "credits_estimated": true,
+   "tokens": true,
+   "if_stopped_ratio": true
+  }
+ },
+ {
+  "session": "DEMO-MR-normal-v1-461d01247f5c4831bf9fd03be9069bfb",
+  "type": "T1",
+  "mode": "observe",
+  "recomputed": {
+   "class": "stalled",
+   "steps": 30,
+   "first_stop": 9,
+   "credits_estimated": 130.418,
+   "tokens": 791358,
+   "if_stopped_ratio": 0.7802
+  },
+  "aggregate": {
+   "class": "stalled",
+   "steps": 30,
+   "first_stop": 9,
+   "credits_estimated": 130.418,
+   "tokens": 791358,
+   "if_stopped_ratio": 0.7802
+  },
+  "credits_measured_aggregate": 130.418,
+  "turns_not_in_a_step": 0,
+  "match": {
+   "class": true,
+   "steps": true,
+   "first_stop": true,
+   "credits_estimated": true,
+   "tokens": true,
+   "if_stopped_ratio": true
+  }
+ },
+ {
+  "session": "DEMO-CT-normal-v1-fcd55b67875c429e92744fc62af98a33",
+  "type": "T2",
+  "mode": "observe",
+  "recomputed": {
+   "class": "success",
+   "steps": 27,
+   "first_stop": 6,
+   "credits_estimated": 98.80176,
+   "tokens": 600134,
+   "if_stopped_ratio": 0.8386
+  },
+  "aggregate": {
+   "class": "success",
+   "steps": 27,
+   "first_stop": 6,
+   "credits_estimated": 98.80176,
+   "tokens": 600134,
+   "if_stopped_ratio": 0.8386
+  },
+  "credits_measured_aggregate": 98.80176,
+  "turns_not_in_a_step": 0,
+  "match": {
+   "class": true,
+   "steps": true,
+   "first_stop": true,
+   "credits_estimated": true,
+   "tokens": true,
+   "if_stopped_ratio": true
+  }
+ },
+ {
+  "session": "DEMO-CT-stall-v1-df08a5f8f475485f978baaaaf9373760",
+  "type": "T2",
+  "mode": "observe",
+  "recomputed": {
+   "class": "stalled",
+   "steps": 30,
+   "first_stop": 10,
+   "credits_estimated": 142.85361,
+   "tokens": 808140,
+   "if_stopped_ratio": 0.7325
+  },
+  "aggregate": {
+   "class": "stalled",
+   "steps": 30,
+   "first_stop": 10,
+   "credits_estimated": 142.85361,
+   "tokens": 808140,
+   "if_stopped_ratio": 0.7325
+  },
+  "credits_measured_aggregate": 149.91631,
+  "turns_not_in_a_step": 0,
+  "match": {
+   "class": true,
+   "steps": true,
+   "first_stop": true,
+   "credits_estimated": true,
+   "tokens": true,
+   "if_stopped_ratio": true
+  }
+ },
+ {
+  "session": "DEMO-CL-stall-v1-a6b00d3091bf4150b29e0448e6e91a0c",
+  "type": "T3",
+  "mode": "observe",
+  "recomputed": {
+   "class": "stalled",
+   "steps": 30,
+   "first_stop": 14,
+   "credits_estimated": 116.68365,
+   "tokens": 719957,
+   "if_stopped_ratio": 0.599
+  },
+  "aggregate": {
+   "class": "stalled",
+   "steps": 30,
+   "first_stop": 14,
+   "credits_estimated": 116.68365,
+   "tokens": 719957,
+   "if_stopped_ratio": 0.599
+  },
+  "credits_measured_aggregate": 118.63455,
+  "turns_not_in_a_step": 0,
+  "match": {
+   "class": true,
+   "steps": true,
+   "first_stop": true,
+   "credits_estimated": true,
+   "tokens": true,
+   "if_stopped_ratio": true
+  }
+ },
+ {
+  "session": "DEMO-CL-stall-v1-476c03070e414d8aa17df176d092cbb0",
+  "type": "T3",
+  "mode": "observe",
+  "recomputed": {
+   "class": "stalled",
+   "steps": 30,
+   "first_stop": null,
+   "credits_estimated": 105.00392,
+   "tokens": 628545,
+   "if_stopped_ratio": null
+  },
+  "aggregate": {
+   "class": "stalled",
+   "steps": 30,
+   "first_stop": null,
+   "credits_estimated": 105.00392,
+   "tokens": 628545,
+   "if_stopped_ratio": null
+  },
+  "credits_measured_aggregate": 105.00392,
+  "turns_not_in_a_step": 0,
+  "match": {
+   "class": true,
+   "steps": true,
+   "first_stop": true,
+   "credits_estimated": true,
+   "tokens": true,
+   "if_stopped_ratio": true
+  }
+ }
+]
