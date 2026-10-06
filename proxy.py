@@ -33,6 +33,9 @@ DEMO_PHASE = "demo"
 ROOT = Path(__file__).resolve().parent
 # DM-2, DM-34 for proxy logs (C-17-4): a demo-condition proxy logs only under logs/demo/ and nothing else does.
 DEMO_LOG_ROOT = ROOT / "logs" / "demo"
+# DM-79 (C-18-7): replies are not streamed, so a whole generation must arrive within the read limit. Read waits up to
+# 600 s; connect, write and pool stay at the earlier 120 s. A read past 600 s still becomes the proxy's 502.
+UPSTREAM_TIMEOUT = httpx.Timeout(120, read=600)
 
 
 def demo_condition(config):
@@ -255,7 +258,7 @@ def create_app(log_dir=None, transport=None, sleep=asyncio.sleep, repository=Non
             upstream_ms, retry_wait_ms = 0.0, 0.0
             retry_delays_ms = []
             try:
-                async with httpx.AsyncClient(timeout=120, transport=transport) as client:
+                async with httpx.AsyncClient(timeout=UPSTREAM_TIMEOUT, transport=transport) as client:
                     for attempt in range(7):  # Initial attempt + at most six retries.
                         call_started = clock()
                         try:
