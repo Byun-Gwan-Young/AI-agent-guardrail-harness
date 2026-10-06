@@ -4,6 +4,7 @@ record/judgements.json, record/replay.json). No raw log is read, no model text i
 dataset (DM-2): every number is "데모 세션 기준".
 
   aggregate_demo.py --plan demo-main-v1 --final-freeze-sha256 <sha256 of docs/criteria/demo-final-freeze.json>
+                    [--plan demo-main-v1-lr2 --exclusions reports/c18-7/exclusions.json]
                     [--output-json <file>] [--output-md <file>]
 
 Sessions: every runs/demo/<id> whose conditions.json batch.plan_id is one of --plan, and any --session named. A session
@@ -11,6 +12,12 @@ is left out of the tables and listed under excluded when
 - --final-freeze-sha256 is given and its batch.final_freeze_sha256 differs (main plan, DM-33), or
 - its condition group (condition-group-v1) is not the group most sessions of the same scenario and mode have.
 Without --final-freeze-sha256 (trial plans) no freeze is checked and the output says so.
+With --exclusions (C-18-7, DM-78: tools/demo_exclusions.py output) a session the list marks excluded is left out first and
+counted by its reason code under exclusion_list; a rerun that replaces one is an ordinary session of its plan and is
+counted as such, so the per-scenario denominators are valid sessions. Sessions of the selected plans the list does not
+name (a list older than the records) are listed there too. With more than one plan or with a list, git_commits gives the
+number of counted sessions per commit, overall and per plan (plans may run at different commits, DM-79 ④). One plan
+without a list gives the same output as before.
 
 Termination classes (DM-18, DM-46, DM-48): success; stalled = not finished (max_steps, or guardrail_stop in block
 mode); escalated (by escalated_by); other (runner_error, strict_output_failures, ...).
@@ -272,8 +279,45 @@ def type_summary(rows, task_type):
                                                          if r['if_stopped']])}
 
 
-def aggregate(plans, *, freeze=None, sessions=(), runs_root=DEMO_RUNS):
-    rows = [session_row(f) for f in select(runs_root, set(plans), set(sessions))]
+def listed_exclusions(rows, listing):
+    """(rows the list leaves in, summary of what it took out). listing is a demo-exclusions-v1 document."""
+    if listing.get('exclusions_version') != 'demo-exclusions-v1':
+        raise ValueError('--exclusions takes a demo-exclusions-v1 file (tools/demo_exclusions.py)')
+    named = listing.get('sessions') or {}
+    marked = {k: v for k, v in named.items() if v.get('excluded')}
+    out = [r for r in rows if r['session_id'] in marked]
+    summary = {'exclusions_version': listing['exclusions_version'], 'plans': listing.get('plans'),
+               'by_code': dict(sorted(Counter(marked[r['session_id']]['excluded'] for r in out).items())),
+               'sessions': [{'session_id': r['session_id'], 'scenario_id': r['scenario_id'], 'mode': r['mode'],
+                             'repeat': r['repeat'], 'plan_id': r['plan_id'],
+                             'code': marked[r['session_id']]['excluded'],
+                             'replaced_by': marked[r['session_id']].get('replaced_by')} for r in out],
+               'replaced': sum(1 for r in out if marked[r['session_id']].get('replaced_by')),
+               'sessions_not_in_list': sorted(r['session_id'] for r in rows if r['session_id'] not in named),
+               'items_without_valid_session': listing.get('items_without_valid_session') or [],
+               'unresolved': listing.get('unresolved') or [], 'unfinished': listing.get('unfinished') or []}
+    return [r for r in rows if r['session_id'] not in marked], summary
+
+
+def by_key(mapping):
+    return dict(sorted(mapping.items(), key=lambda kv: str(kv[0])))
+
+
+def commit_counts(rows, commits):
+    by_plan = {}
+    for row in rows:
+        plan = by_plan.setdefault(row['plan_id'], Counter())
+        plan[commits.get(row['session_id'])] += 1
+    return {'all': by_key(sum(by_plan.values(), Counter())),
+            'by_plan': by_key({plan: by_key(counts) for plan, counts in by_plan.items()})}
+
+
+def aggregate(plans, *, freeze=None, sessions=(), runs_root=DEMO_RUNS, exclusion_list=None):
+    folders = select(runs_root, set(plans), set(sessions))
+    rows = [session_row(f) for f in folders]
+    listed = None
+    if exclusion_list is not None:
+        rows, listed = listed_exclusions(rows, exclusion_list)
     kept, excluded = exclusions(rows, freeze)
     scenario_ids = sorted({r['scenario_id'] for r in kept})
     tables = [scenario_table(kept, s) for s in scenario_ids]
@@ -299,18 +343,25 @@ def aggregate(plans, *, freeze=None, sessions=(), runs_root=DEMO_RUNS):
                 'if_stopped_token_ratio_mean_detected': mean([r['if_stopped']['token_ratio'] for r in detected
                                                              if r['if_stopped']]),
                 'credits_measured_total': round(sum(r['credits_measured'] or 0 for r in kept), 5)}
-    return {'aggregate_version': VERSION, 'scope': SCOPE, 'plans': sorted(plans), 'named_sessions': sorted(sessions),
-            'final_freeze_sha256': freeze,
-            'freeze_check': 'applied' if freeze else 'not applied (no --final-freeze-sha256: trial plans)',
-            'sessions': len(kept), 'excluded': excluded, 'headline': headline, 'types': types,
-            'scenarios': tables, 'accounts': accounts, 'representatives': representatives(kept, tables),
-            'session_rows': kept}
+    result = {'aggregate_version': VERSION, 'scope': SCOPE, 'plans': sorted(plans), 'named_sessions': sorted(sessions),
+              'final_freeze_sha256': freeze,
+              'freeze_check': 'applied' if freeze else 'not applied (no --final-freeze-sha256: trial plans)',
+              'sessions': len(kept), 'excluded': excluded, 'headline': headline, 'types': types,
+              'scenarios': tables, 'accounts': accounts, 'representatives': representatives(kept, tables),
+              'session_rows': kept}
+    if listed is not None:
+        result['exclusion_list'] = listed
+    if listed is not None or len(set(plans)) > 1:
+        commits = {f.name: (load(f / 'conditions.json').get('git_commit')) for f in folders}
+        result['git_commits'] = commit_counts(kept, commits)
+    return result
 
 
 def markdown(result):
     h = result['headline']
     lines = [f"# 데모 집계 — {', '.join(result['plans'])}", '', f"- 범위 : {result['scope']}",
              f"- 세션 {result['sessions']} 개, 제외 {len(result['excluded'])} 개, 최종 동결 검사 : {result['freeze_check']}",
+             *listed_lines(result),
              f"- 정상판 STOP : {h['normal_runs_with_stop']} / {h['normal_runs']} 회, 그중 성공·에스컬레이션 세션의 STOP (오탐) "
              f"{h['normal_false_positive_runs']} 회",
              f"- 교착판 : 미완료 {h['stall_runs_stalled']} / {h['stall_runs']} 회, 그중 STOP {h['stall_runs_detected']} 회, "
@@ -353,6 +404,28 @@ def markdown(result):
     return '\n'.join(lines) + '\n'
 
 
+def listed_lines(result):
+    """Header lines for the exclusion list and the commits (none for one plan without a list)."""
+    lines = []
+    listed = result.get('exclusion_list')
+    if listed is not None:
+        codes = ', '.join(f'{k} {v}' for k, v in listed['by_code'].items()) or '0'
+        lines.append(f"- 제외·대체 목록 ({listed['exclusions_version']}) 으로 뺀 세션 {len(listed['sessions'])} 개 "
+                     f"(사유별 : {codes}), 그중 재실행으로 대체 {listed['replaced']} 개. 분모는 유효 세션 수")
+        if listed['items_without_valid_session']:
+            lines.append(f"- 유효 세션이 없는 항목 {len(listed['items_without_valid_session'])} 개 : "
+                         + ', '.join(listed['items_without_valid_session']))
+        if listed['sessions_not_in_list']:
+            lines.append(f"- 목록에 없는 세션 {len(listed['sessions_not_in_list'])} 개 (목록을 다시 만들 것) : "
+                         + ', '.join(listed['sessions_not_in_list']))
+    commits = result.get('git_commits')
+    if commits is not None:
+        lines.append('- 커밋별 세션 : ' + '; '.join(
+            f"{plan} " + ', '.join(f'{str(c)[:7]} {n}' for c, n in counts.items())
+            for plan, counts in commits['by_plan'].items()))
+    return lines
+
+
 def fmt_ratio(value):
     return '—' if value is None else f'{100 * value:.1f}%'
 
@@ -362,13 +435,16 @@ def main():
     parser.add_argument('--plan', action='append', default=[])
     parser.add_argument('--session', action='append', default=[], help='a session folder name to include as well')
     parser.add_argument('--final-freeze-sha256')
+    parser.add_argument('--exclusions', type=Path, help='a demo-exclusions-v1 file (tools/demo_exclusions.py)')
     parser.add_argument('--runs-root', type=Path, default=DEMO_RUNS)
     parser.add_argument('--output-json', type=Path)
     parser.add_argument('--output-md', type=Path)
     args = parser.parse_args()
     if not args.plan and not args.session:
         parser.error('name --plan or --session')
-    result = aggregate(args.plan, freeze=args.final_freeze_sha256, sessions=args.session, runs_root=args.runs_root)
+    listing = json.loads(args.exclusions.read_text(encoding='utf-8')) if args.exclusions else None
+    result = aggregate(args.plan, freeze=args.final_freeze_sha256, sessions=args.session, runs_root=args.runs_root,
+                       exclusion_list=listing)
     text = json.dumps(result, ensure_ascii=False, indent=1) + '\n'
     for path, content in ((args.output_json, text), (args.output_md, markdown(result))):
         if path is not None:
