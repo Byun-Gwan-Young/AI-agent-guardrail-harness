@@ -1,0 +1,10 @@
+# C-19-4 발표용 실시간 실행 계획 (DM-77 ④, DM-88 ③) : CT 교착판 차단 1 (주) + CL 교착판 차단 1 (대비), 레인 2 개 동시.
+# 본 실행(demo-main-v1)과 다른 계획 ID 라 본 실행 집계와 섞이지 않는다. 최종 동결 조건 그대로 돈다 (requires_final_freeze).
+# 실행·예상 시간·크레딧은 명령서 reports/c19-4/pm-commands.md 에 있다.
+plan_version: demo-batch-plan-v1
+plan_id: demo-live-v1
+requires_final_freeze: true
+description: 발표용 실시간 실행 — CT 교착판 차단 1 + CL 교착판 차단 1
+items:
+- {scenario: scenarios/DEMO-CT-stall-v1.yaml, mode: block, repeats: [1]}
+- {scenario: scenarios/DEMO-CL-stall-v1.yaml, mode: block, repeats: [1]}
