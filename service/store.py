@@ -114,6 +114,11 @@ class Store:
         if self.dialect == 'postgres':
             conn.close()
 
+    def close(self):
+        """PostgreSQL connections are per call; the SQLite stand-in keeps one connection until this."""
+        if self.dialect == 'sqlite':
+            self.connect().close()
+
     # -- writing (loader only) ------------------------------------------------------------------------------------
     def apply_schema(self):
         conn = self.connect()
