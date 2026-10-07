@@ -22,7 +22,8 @@
 | [`demo_account_corrections.py`](demo_account_corrections.py) | 재실행 창이 바뀐 세션의 계정 이름표 보정 파일 (DM-81 ②) | `reports/c18-8/pm-commands.md` 참고 |
 | [`aggregate_demo.py`](aggregate_demo.py) | 계획별 세션을 시나리오·유형·전체로 집계 (JSON + 마크다운) | `reports/c18-8/pm-commands.md` 5 절 (`--plan` 3 개 + `--exclusions` + `--account-corrections`) |
 | [`replay_demo.py`](replay_demo.py) | 세션 재생 기록(`replay.json`)과 정적 재생 페이지·목록 | `venv/bin/python -B tools/replay_demo.py pages reports/c19/aggregate-main.json --output-dir reports/c19/replay` |
-| [`demo_ui.py`](demo_ui.py) | 데모 화면 (정적 HTML 하나 : 대시보드·세션·비교·통계·시스템 구조·사용 가이드) | `venv/bin/python -B tools/demo_ui.py build --aggregate reports/c19/aggregate-main.json --output reports/c19-3/demo.html` |
+| [`demo_ui.py`](demo_ui.py) | 데모 화면 (정적 HTML 하나 : 대시보드·세션·비교·통계·시스템 구조·사용 가이드·실시간 모니터) | `venv/bin/python -B tools/demo_ui.py build --aggregate reports/c19/aggregate-main.json --output reports/c19-3/demo.html` |
+| [`demo_live.py`](demo_live.py) | 실시간 모니터 : 진행 중 데모 세션의 기록 파일을 읽기만 하는 로컬 서버 (127.0.0.1:8010, 구조화 값만) | `venv/bin/python -B tools/demo_live.py serve` |
 | [`summarize_demo_session.py`](summarize_demo_session.py) | 데모 세션 폴더 하나의 짧은 요약 (PM 이 붙여 넣는 용도) | `venv/bin/python -B tools/summarize_demo_session.py runs/demo/<세션 ID>` |
 | [`rejudge_dialogue.py`](rejudge_dialogue.py) | 대화 과제(T1) 세션의 판정 함수 결과를 저장된 기록으로 다시 계산 | `venv/bin/python -B tools/rejudge_dialogue.py runs/demo/<세션 ID>` |
 | [`recompute_v03.py`](recompute_v03.py) | 기존 세션을 `deadlock-v0.3` + `explain-v1` 로 다시 판정 | `venv/bin/python -B tools/recompute_v03.py --output /tmp/v03.json` |

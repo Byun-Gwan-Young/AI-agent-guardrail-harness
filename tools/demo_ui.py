@@ -12,7 +12,10 @@ script and data inline and makes no request; it opens with a double click.
 
 A trial aggregate (plan IDs demo-trial-*) gets the "시험 세션 — 본 실행 결과 아님" band and source line; a main aggregate
 (demo-main-*) gets the main source line. Features that do not exist (project sign-up, guardrail keys, warn mode, false
-positive report, live monitor, policy and integration settings) are shown disabled with "구현 전" (DM-76 ④⑤).
+positive report, policy and integration settings) are shown disabled with "구현 전" (DM-76 ④⑤).
+
+The "실시간 모니터" menu (C-19-4) works only when tools/demo_live.py serves this page (page(..., live=True) adds the
+polling script); the file opened with a double click has no request code and says the live server is off.
 Offline; no model call.
 """
 import argparse
@@ -42,7 +45,6 @@ PLANNED = (
     ('key', '가드레일 키 발급', '프로젝트별 가드레일 키. 지금은 세션 헤더 하나만 받는다.'),
     ('warn', '경고 모드', 'STOP 을 알리기만 하고 요청은 그대로 보내는 모드. 지금은 관측·차단(데모 한정)만 있다.'),
     ('report', '오탐 신고', '사용자가 STOP 을 오탐으로 표시하는 버튼. 지금은 오탐을 기록으로만 센다.'),
-    ('live', '실시간 모니터', '진행 중 세션을 step 마다 보는 화면 (C-19-4 에서 붙인다). 지금은 기록 재생만.'),
     ('policy', '정책 설정', '판정 규칙·파라미터를 화면에서 고르는 기능. 지금은 동결된 설정 파일 하나 (deadlock-v0.3).'),
     ('integration', '연동 설정', '에이전트 프레임워크 연동 마법사. 지금은 base_url 과 세션 헤더를 직접 바꾼다.'),
 )
@@ -90,6 +92,17 @@ def korean_names(root):
     return names
 
 
+def issue_definitions(root, scenario_ids):
+    """scenario ID -> {issue ID: one-line definition} from the scenario's allowed_issues (the agents' closed list)."""
+    out = {}
+    for scenario_id in sorted(set(scenario_ids)):
+        path = Path(root) / 'scenarios' / f'{scenario_id}.yaml'
+        if path.is_file():
+            allowed = yaml.safe_load(path.read_text(encoding='utf-8')).get('allowed_issues') or []
+            out[scenario_id] = {i['id']: i.get('definition') for i in allowed if isinstance(i, dict) and i.get('id')}
+    return out
+
+
 def plan_items(root, plan_id):
     for path in sorted((Path(root) / 'batch_plans').glob('*.yaml')):
         plan = yaml.safe_load(path.read_text(encoding='utf-8'))
@@ -114,7 +127,8 @@ def slim_step(step, role_labels):
     tools = step.get('tools') or []
     tokens = step.get('tokens') or {}
     return {
-        'n': step['step_id'], 'role': step.get('role'), 'state': step.get('state'), 'label': step.get('state_label'),
+        'n': step['step_id'], 'agent': step.get('agent'), 'role': step.get('role'), 'state': step.get('state'),
+        'label': step.get('state_label'),
         'stop': None if not step.get('stop') else {'t': step['stop'].get('template_id'), 'text': step['stop'].get('text')},
         'blocked': bool(step.get('blocked')), 'status': step.get('step_status'),
         'fail': step.get('failure_reasons') or [],
@@ -123,11 +137,12 @@ def slim_step(step, role_labels):
             'status': report.get('status_label') or report.get('status'),
             'handoff': role_labels.get(report.get('handoff_to'), report.get('handoff_to')),
             'adopted': report.get('adopted_items'), 'issues': len(report.get('open_issue_ids') or []),
+            'issue_ids': list(report.get('open_issue_ids') or []),
             'spec': report.get('spec_approved'), 'declared': bool(report.get('completion_declared')),
             'deliverable': bool(report.get('deliverable_reported'))},
         'claim': None if claim is None else bool(claim.get('accepted')),
         'tools': len(tools), 'tool_errors': sum(1 for t in tools if t.get('is_error')),
-        'changed': len(step.get('changed_paths') or []),
+        'changed': len(step.get('changed_paths') or []), 'paths': list(step.get('changed_paths') or []),
         'tok': (tokens.get('prompt') or 0) + (tokens.get('completion') or 0),
         'cum': step.get('cumulative_tokens'), 'cumc': step.get('cumulative_credits'),
     }
@@ -350,6 +365,8 @@ def collect(aggregate, *, runs_root, root=ROOT):
         'pairs': {task: pair_lines(root, task) for task in TASKS},
         'system': proxy_facts(root), 'example': example_observation(stall_rep, runs_root, root),
         'guide_session': stall_rep['id'] if stall_rep else None,
+        'issue_defs': issue_definitions(root, [s['scenario'] for s in sessions] + [
+            f'{t}-{v}-v1' for t in TASKS for v in ('normal', 'stall')] + ['DEMO-CT-N-v1']),
         'task_names': TASK_NAMES, 'planned': [{'id': i, 'name': n, 'plan': p} for i, n, p in PLANNED],
     }
 
@@ -407,6 +424,15 @@ code,pre{font-family:ui-monospace,Menlo,monospace;font-size:12px}pre{max-height:
 .gray{color:#9a9488}.diffline{font-family:ui-monospace,Menlo,monospace;font-size:13px;padding:2px 6px;border-radius:4px;margin:2px 0}
 .dl-plus{background:#e6f2e8}.dl-minus{background:#f6e3e3}
 .guide{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;align-items:center;margin-bottom:12px}
+.guide>*{min-width:0}.guide pre{max-width:100%;overflow-x:auto}
+.detail{border-top:1px solid var(--line);margin-top:8px;padding-top:8px}.detail h4{margin:0 0 4px;font-size:13px}
+.detail .basis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.detail .basis>div{background:#faf7f1;border:1px solid var(--line);border-radius:8px;padding:6px 8px;min-width:0}
+.chip{display:inline-block;border-radius:8px;padding:0 6px;margin:1px 2px;font-size:12px;font-family:ui-monospace,Menlo,monospace}
+.chip-minus{background:#f6e3e3}.chip-plus{background:#e6f2e8}.chip-same{background:#efe9de}
+.caution{color:var(--muted);font-size:12px;margin-top:6px}.none{color:#9a9488}
+.c-live{background:repeating-linear-gradient(90deg,#fff,#fff 4px,#e9e2d4 4px,#e9e2d4 8px)!important;border:1px dashed var(--navy)}
+.livebadge{display:inline-flex;align-items:center;gap:6px;background:#7a1f1f;color:#fff;border-radius:10px;padding:0 10px;font-size:12px}
+.livebadge i{width:8px;height:8px;border-radius:50%;background:#ff8a80;display:inline-block}
 .gnum{font-size:44px;font-weight:800;color:#cfc5b3;line-height:1}.gtitle{font-size:17px;font-weight:700;margin:4px 0}
 .planned{border:2px dashed #c9bfae;border-radius:12px;padding:12px;color:var(--muted);background:#faf7f1}
 .planned .tag{display:inline-block;background:#e9e2d4;color:#6d675d;border-radius:8px;padding:0 8px;font-size:12px;margin-bottom:6px}
@@ -431,7 +457,7 @@ function result(s){if(s.class==='success')return s.first_stop&&s.variant==='norm
  if(s.class==='stalled')return s.mode==='block'?'교착 (차단으로 끝)':'교착 ('+esc(s.termination)+')';
  if(s.class==='escalated')return '에스컬레이션'+(s.escalated_by_label?' ('+esc(s.escalated_by_label)+')':'');return '기타 ('+esc(s.termination)+')';}
 /* ---------- navigation ---------- */
-const PAGES=['dashboard','session','compare','stats','system','guide'];
+const PAGES=['dashboard','session','compare','stats','system','guide','live'];
 function go(p,arg){if(!PAGES.includes(p))p='dashboard';PAGES.forEach(x=>{$('#pg-'+x).classList.toggle('hide',x!==p);const b=$('#nav-'+x);if(b)b.classList.toggle('on',x===p)});
  if(p==='session'&&arg)openSession(arg);if(location.hash!=='#'+p)history.replaceState(null,'','#'+p);window.scrollTo(0,0);}
 document.querySelectorAll('nav button[data-page]').forEach(b=>b.onclick=()=>go(b.dataset.page));
@@ -464,7 +490,9 @@ function dashboard(){const H=D.headline,c=H.observe_classes;
  $('#recent').innerHTML=rows.map(s=>'<tr data-id="'+s.id+'"><td><code>'+s.short+'</code></td><td>'+scName(s)+' <span class="muted">'+s.type+'</span></td><td>'+s.steps+'</td><td>'+(s.tokens||0).toLocaleString()+'</td><td>'+pill(s)+'</td><td>'+result(s)+'</td></tr>').join('');
  $('#recent-n').textContent=rows.length+' 세션';
  document.querySelectorAll('#recent tr').forEach(r=>r.onclick=()=>go('session',r.dataset.id));
- const stops=D.sessions.filter(s=>s.first_stop&&s.stop_text);
+ /* stall-version STOPs first, then the normal-version false positives; by first STOP step inside each group */
+ const stops=D.sessions.filter(s=>s.first_stop&&s.stop_text).map((s,k)=>[s,k])
+  .sort((a,b)=>((a[0].variant==='normal')-(b[0].variant==='normal'))||(a[0].first_stop-b[0].first_stop)||(a[1]-b[1])).map(x=>x[0]);
  $('#alerts').innerHTML=stops.map(s=>'<div class="alert"><b>교착 의심 — '+esc(s.task_name)+' '+VAR[s.variant]+(s.class==='success'?' <span class="muted">(성공 세션 · 오탐)</span>':'')+'</b>step '+s.first_stop+' · '+esc(s.template)+' · '+(s.mode==='block'?'차단':'관측')+'<div>'+esc(s.stop_text)+'</div><button data-id="'+s.id+'">세션 보기</button></div>').join('');
  document.querySelectorAll('#alerts button').forEach(b=>b.onclick=()=>go('session',b.dataset.id));}
 ['#f-type','#f-var','#f-mode'].forEach(id=>$(id).onchange=dashboard);
@@ -489,13 +517,33 @@ function renderSession(){const s=S;if(!s)return;
  $('#s-alert').innerHTML=s.first_stop?'<div class="alert"><b>교착 의심 — '+esc(s.task_name)+' '+VAR[s.variant]+' · step '+s.first_stop+' ('+esc(s.template)+')</b>'+esc(s.stop_text)+'</div>':'<div class="card muted">이 세션에는 STOP 이 없다.</div>';
  $('#s-head').innerHTML='<b>'+esc(s.name||s.scenario)+'</b><div class="muted">'+esc(s.title)+' · 세션 '+esc(s.id)+' · '+(s.mode==='block'?'차단 (block)':'관측 (observe)')+' · 결과 '+result(s)+' · '+s.steps+' / '+(s.max_steps||'-')+' step · 토큰 '+(s.tokens||0).toLocaleString()+' · 크레딧 '+(s.credits??'—')+'</div>';
  timeline(s,$('#s-tl'),cur,k=>{cur=k;renderSession();});$('#s-legend').innerHTML=legend(s);
- const r=s.step_rows.find(x=>x.n===cur);let h='';
- if(r){h='<h3 style="margin:0">step '+r.n+' · '+esc(r.role)+' <span class="muted">판정 : '+esc(r.label||'-')+'</span></h3>';
-  if(r.stop)h+='<div class="stopbox"><b>STOP ('+esc(r.stop.t)+')</b> '+esc(r.stop.text)+'</div>';
-  if(r.blocked)h+='<div class="blockbox"><b>403 차단</b> STOP 뒤 이 step 의 요청을 프록시가 업스트림에 보내지 않고 돌려보냈다.</div>';
-  if(s.mode!=='block'&&s.if_stopped&&r.n===s.first_stop)h+='<div class="card">여기서 멈췄다면 뒤의 '+s.if_stopped.tokens_after.toLocaleString()+' 토큰 ('+pct(s.if_stopped.ratio)+')을 쓰지 않았다.</div>';
-  h+='<dl>'+facts(r).map(([a,b])=>'<dt>'+esc(a)+'</dt><dd>'+esc(b)+'</dd>').join('')+'<dt>누적 토큰</dt><dd>'+(r.cum||0).toLocaleString()+(r.cumc!==null?' · '+r.cumc+' 크레딧 (추정)':'')+'</dd></dl>';}
- $('#s-step').innerHTML=h;$('#s-chart').innerHTML=chart(s);$('#s-pos').textContent='step '+cur+' / '+s.step_rows.length;}
+ $('#s-step').innerHTML=stepHtml(s,s.step_rows.find(x=>x.n===cur));$('#s-chart').innerHTML=chart(s);$('#s-pos').textContent='step '+cur+' / '+s.step_rows.length;}
+function stepHtml(s,r){if(!r)return '';
+ let h='<h3 style="margin:0">step '+r.n+' · '+esc(r.role)+' <span class="muted">판정 : '+esc(r.label||'-')+'</span></h3>';
+ if(r.stop)h+='<div class="stopbox"><b>STOP ('+esc(r.stop.t)+')</b> '+esc(r.stop.text)+'</div>';
+ if(r.blocked)h+='<div class="blockbox"><b>403 차단</b> STOP 뒤 이 step 의 요청을 프록시가 업스트림에 보내지 않고 돌려보냈다.</div>';
+ if(s.mode!=='block'&&s.if_stopped&&r.n===s.first_stop)h+='<div class="card">여기서 멈췄다면 뒤의 '+s.if_stopped.tokens_after.toLocaleString()+' 토큰 ('+pct(s.if_stopped.ratio)+')을 쓰지 않았다.</div>';
+ h+='<dl>'+facts(r).map(([a,b])=>'<dt>'+esc(a)+'</dt><dd>'+esc(b)+'</dd>').join('')+'<dt>누적 토큰</dt><dd>'+(r.cum||0).toLocaleString()+(r.cumc!==null&&r.cumc!==undefined?' · '+r.cumc+' 크레딧 (추정)':'')+'</dd></dl>';
+ return h+detailPanel(s,r);}
+/* ---------- step detail (DM-87) : replay.json values only; a value the record lacks is "관측값 없음", never 0 ---------- */
+const NONE='<span class="none">관측값 없음</span>';
+function chips(list,cls,s){return list.length?list.map(id=>{const d=(D.issue_defs[s.scenario]||{})[id];return '<span class="chip '+cls+'" title="'+esc(d||'')+'">'+esc(id)+'</span>'}).join(''):'<span class="none">없음</span>';}
+function prevSame(s,r){const i=s.step_rows.findIndex(x=>x.n===r.n);for(let k=i-1;k>=0;k--){const p=s.step_rows[k];if(p.agent===r.agent)return p;}return null;}
+function detailPanel(s,r){let h='<div class="detail"><h4>step 상세</h4>';
+ const p=prevSame(s,r);
+ h+='<div><b>미해결 쟁점</b> <span class="muted">— 같은 역할의 이전 step 대비</span><div>';
+ if(!r.report)h+=NONE+' <span class="muted">(이 step 에 검증된 최종 보고가 없다)</span>';
+ else if(!p)h+='<span class="muted">비교 기준 없음 — 이 역할의 첫 step</span> · 지금 목록 '+chips(r.report.issue_ids,'chip-same',s);
+ else if(!p.report)h+='<span class="muted">비교 기준 step '+p.n+' 에 검증된 보고가 없음</span> · 지금 목록 '+chips(r.report.issue_ids,'chip-same',s);
+ else{const a=p.report.issue_ids,b=r.report.issue_ids;
+  h+='<span class="muted">step '+p.n+' → step '+r.n+'</span><dl><dt>빠짐</dt><dd>'+chips(a.filter(x=>!b.includes(x)),'chip-minus',s)+'</dd><dt>추가</dt><dd>'+chips(b.filter(x=>!a.includes(x)),'chip-plus',s)+'</dd><dt>지금 목록</dt><dd>'+chips(b,'chip-same',s)+'</dd></dl>';}
+ h+='</div></div><div style="margin-top:6px"><b>파일 변화</b><div class="basis">';
+ if(s.type==='T1')h+='<div><b>직전 step 대비</b><div>'+NONE+' <span class="muted">(파일 산출물이 없는 대화 과제)</span></div></div><div><b>판정 입력 (같은 역할 이전 step 대비)</b><div>'+NONE+'</div></div>';
+ else{const first=s.step_rows.findIndex(x=>x.n===r.n)===0;
+  h+='<div><b>직전 step 대비</b><div>'+(first?'<span class="muted">비교 기준 없음 (첫 step)</span>':(r.tests===null?NONE+' <span class="muted">(이 step 의 인수 판정 기록 없음)</span>':(r.paths.length?r.paths.map(x=>'<code>'+esc(x)+'</code>').join(', '):'바뀐 파일 없음')))+'</div></div>';
+  h+='<div><b>판정 입력 (같은 역할 이전 step 대비)</b><div>'+NONE+' <span class="muted">(재생 기록에 이 기준의 파일 목록이 없다)</span></div></div>';}
+ h+='</div></div><div class="caution">목록에서 빠졌다는 사실만으로 해결이 증명되지는 않습니다.<br>교착 판정은 자동 규칙의 결과입니다.</div></div>';
+ return h;}
 function stop(){if(timer){clearInterval(timer);timer=null;$('#s-play').textContent='▶ 자동 재생';}}
 $('#s-prev').onclick=()=>{stop();cur=Math.max(1,cur-1);renderSession()};$('#s-next').onclick=()=>{stop();cur=Math.min(S.step_rows.length,cur+1);renderSession()};
 $('#s-tostop').onclick=()=>{stop();if(S.first_stop){cur=S.first_stop;renderSession()}};
@@ -570,7 +618,41 @@ def flow_svg(system):
 </svg>"""
 
 
-def page(data, root=ROOT):
+LIVE_SCRIPT = r"""
+/* ---------- live monitor (only in the page tools/demo_live.py serves; a file has none of this) ---------- */
+const LIVE_POLL_MS=2500;let LV=null,lvCur=null,lvFollow=true,lvBusy=false;
+const LVS={running:'진행 중',ended:'끝'};
+async function lvGet(u){const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
+function lvTime(iso){return iso?new Date(iso).toLocaleTimeString('ko-KR',{hour12:false}):'—';}
+function lvState(s){const l=s.live;if(l.status==='ended')return '끝 · '+result(s);
+ const idle=l.idle_seconds>=600?' <span class="muted">('+Math.round(l.idle_seconds/60)+' 분 변화 없음)</span>':'';
+ return '진행 중 · step '+(l.in_progress?l.in_progress.step:s.steps+1)+' 진행'+idle;}
+function lvList(L){$('#lv-list').innerHTML=L.sessions.map(s=>'<tr data-id="'+s.id+'" class="'+(s.id===(LV&&LV.id)?'sel':'')+'"><td><code>'+s.short+'</code></td><td>'+esc(s.task_name)+' · '+VAR[s.variant]+'</td><td>'+(s.mode==='block'?'차단':'관측')+'</td><td>'+(s.live.lane?esc(s.live.lane+'/'+s.live.lanes):'—')+(s.account?' · '+esc(s.account):'')+'</td><td>'+s.steps+' / '+(s.max_steps||'-')+'</td><td>'+(s.first_stop?'<span class="pill p-stop">STOP · step '+s.first_stop+'</span>':(s.blocked_step?'<span class="pill p-block">403 · step '+s.blocked_step+'</span>':'—'))+'</td><td>'+lvState(s)+'</td></tr>').join('')||'<tr><td colspan="7" class="muted">세션 폴더가 없다</td></tr>';
+ document.querySelectorAll('#lv-list tr[data-id]').forEach(r=>r.onclick=()=>{lvCur=null;lvFollow=true;lvOpen(r.dataset.id);});}
+function lvRender(){const s=LV;if(!s){$('#lv-detail').classList.add('hide');return}$('#lv-detail').classList.remove('hide');
+ $('#lv-alert').innerHTML=s.first_stop?'<div class="alert"><b>교착 의심 — '+esc(s.task_name)+' '+VAR[s.variant]+' · step '+s.first_stop+' ('+esc(s.template)+')'+(s.mode==='block'?' · 차단':'')+'</b>'+esc(s.stop_text)+'</div>':'<div class="card muted">아직 STOP 이 없다.</div>';
+ $('#lv-head').innerHTML='<b>'+esc(s.name||s.scenario)+'</b><div class="muted">세션 '+esc(s.id)+' · '+(s.mode==='block'?'차단 (block)':'관측 (observe)')+' · '+lvState(s)+' · 토큰 '+(s.tokens||0).toLocaleString()+(s.credits!==null?' · '+s.credits+' 크레딧 (추정)':'')+' · 마지막 변화 '+lvTime(s.live.updated_at)+'</div>';
+ timeline(s,$('#lv-tl'),lvFollow?null:lvCur,k=>{if(s.step_rows.some(x=>x.n===k)){lvCur=k;lvFollow=false;lvRender();}});
+ const ip=s.live.in_progress;if(ip){const d=$('#lv-tl').querySelector('div[data-k="'+ip.step+'"]');if(d){d.classList.add('c-live');d.textContent=ip.blocked_requests?'403':'…';d.title='step '+ip.step+' 진행 중 · LLM 호출 '+ip.llm_calls+' 회';}}
+ $('#lv-legend').innerHTML=legend(s)+(ip?'<div class="legend"><span><i class="c-live"></i>진행 중 step</span></div>':'');
+ const r=lvFollow?s.step_rows[s.step_rows.length-1]:s.step_rows.find(x=>x.n===lvCur);
+ $('#lv-step').innerHTML=r?stepHtml(s,r):'<span class="muted">아직 끝난 step 이 없다.</span>';
+ $('#lv-follow').disabled=lvFollow;}
+async function lvOpen(id){const X=await lvGet('/api/live/sessions/'+encodeURIComponent(id));LV=X.session;lvRender();}
+async function lvTick(){if($('#pg-live').classList.contains('hide')||lvBusy)return;lvBusy=true;
+ try{const L=await lvGet('/api/live/sessions');lvList(L);
+  const want=(LV&&L.sessions.some(s=>s.id===LV.id))?LV.id:((L.sessions.find(s=>s.live.status==='running')||L.sessions[0]||{}).id);
+  if(want)await lvOpen(want);$('#lv-updated').textContent='마지막 갱신 '+lvTime(L.now);$('#lv-err').classList.add('hide');}
+ catch(e){$('#lv-err').textContent='실시간 서버 응답 없음 ('+e.message+'). 기록 재생(세션 메뉴)을 쓰세요.';$('#lv-err').classList.remove('hide');}
+ finally{lvBusy=false;}}
+$('#lv-off').classList.add('hide');$('#lv-on').classList.remove('hide');
+$('#lv-follow').onclick=()=>{lvFollow=true;lvCur=null;lvRender();};
+document.querySelectorAll('nav button[data-page]').forEach(b=>b.addEventListener('click',()=>setTimeout(lvTick,0)));
+setInterval(lvTick,LIVE_POLL_MS);lvTick();
+"""
+
+
+def page(data, root=ROOT, live=False):
     trial = data['kind'] != 'main'
     planned_nav = ''.join(
         f'<button data-planned="{p["id"]}" disabled title="구현 전">{html.escape(p["name"])} <span class="badge">구현 전</span></button>'
@@ -606,6 +688,7 @@ def page(data, root=ROOT):
 <button id="nav-stats" data-page="stats">통계</button>
 <button id="nav-system" data-page="system">시스템 구조</button>
 <button id="nav-guide" data-page="guide">사용 가이드</button>
+<button id="nav-live" data-page="live">실시간 모니터</button>
 <div class="sep"></div>{planned_nav}
 </nav>
 <div class="proj">프로젝트 : 캡스톤 데모</div></aside>
@@ -679,11 +762,30 @@ headers  = {{"{html.escape(sysd['session_header'])}": session_id}}</pre></div></
 <div style="margin-top:8px">{planned_box('report', '<button disabled data-planned="report">오탐 신고</button>')}</div><div style="margin-top:8px">{planned_box('warn')}</div></div></div>
 </section>
 
-<div class="foot" id="source">데이터 출처 : {html.escape(data['source'])} · {html.escape(data.get('scope') or '')} · 화면 {UI_VERSION}</div>
+<section class="page hide" id="pg-live">
+<div id="lv-off" class="card"><b>실시간 서버가 꺼져 있습니다. 기록 재생을 쓰세요.</b>
+<div class="muted" style="margin-top:6px">이 화면은 파일로 열려 있어 진행 중 세션을 읽지 않는다 (요청 코드가 없다). 실시간 보기는 읽기 전용 로컬 서버로 연다 : <code>venv/bin/python -B tools/demo_live.py serve</code> → <code>http://127.0.0.1:8010/#live</code></div>
+<div style="margin-top:8px"><button class="btn" onclick="go('session')">기록 재생 (세션)으로</button></div></div>
+<div id="lv-on" class="hide" style="display:flex;flex-direction:column;gap:12px">
+<div class="controls"><span class="livebadge"><i></i>실시간</span><span class="muted" id="lv-updated">마지막 갱신 —</span><span class="muted">· 2.5 초마다 기록 파일을 다시 읽는다</span></div>
+<div id="lv-err" class="alert hide"></div>
+<div class="card"><b>최근에 바뀐 세션</b> <span class="muted">— 세션 폴더의 기록 파일이 바뀐 순서</span>
+<div class="scroll" style="max-height:220px"><table><thead><tr><th>세션</th><th>시나리오</th><th>모드</th><th>레인·계정</th><th>step</th><th>판정</th><th>상태</th></tr></thead><tbody id="lv-list"></tbody></table></div></div>
+<div id="lv-detail" class="hide" style="display:flex;flex-direction:column;gap:12px">
+<div id="lv-alert"></div>
+<div class="card"><div id="lv-head"></div><div class="tl" id="lv-tl"></div><div id="lv-legend"></div>
+<div class="controls" style="margin-top:6px"><button id="lv-follow" class="btn">최신 step 따라가기</button><span class="muted">칸을 누르면 그 step 을 본다</span></div></div>
+<div class="card" id="lv-step"></div>
+<div class="muted" style="font-size:12px">세션이 쓰는 기록 파일(실행기의 steps.json, 프록시 세션 로그)을 읽기만 한다. 구조화 값만 보이고 모델의 서술·추론은 넣지 않았다. 판정 상태·STOP 원인 문장은 프록시 판정 기록이다.</div>
+</div></div>
+</section>
+
+<div class="foot" id="source">데이터 출처 : {html.escape(data['source'])} · {html.escape(data.get('scope') or '')} · 화면 {UI_VERSION}{' · 실시간 모니터 (127.0.0.1)' if live else ''}</div>
 </main></div>
 <script type="application/json" id="demo-data">{payload}</script>
 <script>{SCRIPT}
 document.getElementById('g-ex').textContent=D.example?compact(D.example.body):'';</script>
+{('<script>' + LIVE_SCRIPT + '</script>') if live else ''}
 </body></html>
 """
 

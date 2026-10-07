@@ -52,10 +52,9 @@ def report_facts(report, status_labels):
     return facts
 
 
-def extract(folder):
-    folder = Path(folder)
-    conditions, steps, summary = load(folder / 'conditions.json'), load(folder / 'steps.json'), load(folder / 'summary.json')
-    log = load(folder / 'session.json')
+def replay_rows(conditions, steps, log):
+    """(role labels, model, per-step rows with cumulative tokens/credits) from the runner's conditions and steps and
+    the proxy session log. extract() below and the live monitor (tools/demo_live.py, C-19-4) share it."""
     registration = conditions.get('registration') or {}
     labels = registration.get('role_labels') or {}
     status_labels = {s['id']: s['label'] for s in registration.get('status_values') or []}
@@ -104,6 +103,14 @@ def extract(folder):
         else:
             cumulative_credits = None
         row['cumulative_credits'] = cumulative_credits
+    return labels, model, rows
+
+
+def extract(folder):
+    folder = Path(folder)
+    conditions, steps, summary = load(folder / 'conditions.json'), load(folder / 'steps.json'), load(folder / 'summary.json')
+    log = load(folder / 'session.json')
+    labels, model, rows = replay_rows(conditions, steps, log)
     stops = [r['step_id'] for r in rows if r['stop']]
     first = stops[0] if stops else None
     total_tokens = rows[-1]['cumulative_tokens'] if rows else 0

@@ -113,14 +113,16 @@ class DemoUiTest(unittest.TestCase):
         self.assertEqual(demo_ui.data_kind(['demo-main-v1', 'demo-trial-c18-2']), 'mixed')
 
     def test_planned_features_disabled_and_marked(self):
-        for pid in ('project', 'key', 'warn', 'report', 'live', 'policy', 'integration'):
+        # C-19-4 : the live monitor is no longer a planned feature (its menu is a page; see test_demo_live).
+        self.assertNotIn('live', {p['id'] for p in self.data['planned']})
+        for pid in ('project', 'key', 'warn', 'report', 'policy', 'integration'):
             tags = re.findall(r'<button[^>]*data-planned="%s"[^>]*>' % pid, self.html)
             boxes = re.findall(r'data-planned-box="%s"' % pid, self.html)
             self.assertTrue(tags or boxes, pid)
             for tag in tags:
                 self.assertIn('disabled', tag, pid)
         name_of = {p['id']: p['name'] for p in self.data['planned']}
-        for pid in ('live', 'policy', 'integration'):
+        for pid in ('policy', 'integration'):
             self.assertRegex(self.html, r'data-planned="%s" disabled title="구현 전">%s <span class="badge">구현 전'
                              % (pid, re.escape(name_of[pid])))
         self.assertNotRegex(self.html, r'<button(?![^>]*disabled)[^>]*data-planned=')
@@ -141,6 +143,25 @@ class DemoUiTest(unittest.TestCase):
         self.assertTrue(all(l['where'] == '과제 문장' for l in pairs['DEMO-MR']['lines']))
         self.assertTrue(any('QuorvexBench' in l['line'] for l in pairs['DEMO-LR']['lines']))
         self.assertEqual([l['where'] for l in pairs['DEMO-CT']['lines']], ['ACCEPTANCE.md'])
+
+    def test_step_detail_panel_values_come_from_replay(self):
+        # DM-87 / DM-88 ② (가) : issue lists per step, changed paths, the two cautions, "관측값 없음" instead of 0.
+        for text in ('목록에서 빠졌다는 사실만으로 해결이 증명되지는 않습니다.', '교착 판정은 자동 규칙의 결과입니다.',
+                     '판정 입력 (같은 역할 이전 step 대비)', '직전 step 대비', '관측값 없음'):
+            self.assertIn(text, self.html)
+        session = next(s for s in self.data['sessions'] if s['task'] == 'DEMO-CT' and s['step_rows'])
+        replay = demo_ui.load(ROOT / 'runs' / 'demo' / session['id'] / 'record' / 'replay.json')
+        for row, step in zip(session['step_rows'], replay['steps']):
+            self.assertEqual(row['agent'], step['agent'])
+            self.assertEqual(row['paths'], step['changed_paths'])
+            if step['report'] is not None:
+                self.assertEqual(row['report']['issue_ids'], step['report']['open_issue_ids'])
+        defs = self.data['issue_defs']['DEMO-CT-stall-v1']
+        self.assertTrue(defs['requirements'].startswith('SPEC.md 의 기획 결정'))
+
+    def test_guide_box_scrolls_and_alerts_put_stall_stops_first(self):
+        self.assertIn('.guide>*{min-width:0}.guide pre{max-width:100%;overflow-x:auto}', self.html)
+        self.assertIn("((a[0].variant==='normal')-(b[0].variant==='normal'))||(a[0].first_stop-b[0].first_stop)", self.html)
 
     def test_build_writes_one_file(self):
         with tempfile.TemporaryDirectory() as tmp:
