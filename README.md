@@ -208,6 +208,7 @@ AI-agent-guardrail-harness/
 │   ├── aggregate_demo.py                    데모 집계
 │   ├── replay_demo.py                       세션 재생 페이지
 │   └── run_offline_tests.py                 전체 오프라인 테스트
+├── service/                               데모 기록 DB 적재 · 읽기 전용 조회 API (로컬) — service/README.md
 ├── tests/                                 오프라인 테스트 (외부 호출 없음)
 │   ├── fixtures/                            테스트 고정 자료 (정답 구현 · 보호 파일 해시 등)
 │   └── test_*.py                            테스트 모듈
@@ -318,6 +319,12 @@ unset KMU_API_KEY
 client = OpenAI(base_url="http://127.0.0.1:8000/v1", api_key=...,
                 default_headers={"X-Guardrail-Session": session_id})
 ```
+
+---
+
+## 데모 기록 DB · 조회 API (로컬)
+
+커밋된 데모 기록(집계 · 제외 목록 · 세션 요약 · 매니페스트 · 판정 기록 · `replay.json`)을 PostgreSQL 데이터베이스 `guardrail_demo` 에 넣고, 읽기 전용 API(`127.0.0.1:8020`, GET 만)로 조회합니다. 발표 숫자는 넣은 행에서 SQL 로 다시 세어 최종 보고서와 같은지 확인합니다. 프록시는 바꾸지 않았고 인증이 없어 로컬에서만 엽니다. 테이블 · API · 명령은 [`service/README.md`](service/README.md), PM 명령은 [`reports/c19-6/pm-commands.md`](reports/c19-6/pm-commands.md) 에 있습니다.
 
 ---
 
