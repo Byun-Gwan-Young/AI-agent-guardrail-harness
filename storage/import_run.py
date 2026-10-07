@@ -1,517 +1,371 @@
-import json
-import sys
-from pathlib import Path
+"""실제 raw run을 최종 PostgreSQL 스키마에 저장한다."""
 
-from storage.db import get_connection
+import argparse
 
-
-# 프로젝트 루트
-project_root = Path(__file__).resolve().parent.parent
-
-# 실행할 run 폴더 이름을 명령어에서 받음
-if len(sys.argv) < 2:
-    print("사용법: python -m storage.import_run <run_folder_name>")
-    sys.exit(1)
-
-run_name = sys.argv[1]
-
-# 실험 결과 폴더
-run_dir = project_root / "runs" / run_name
-
-# 입력한 run 폴더가 실제로 존재하는지 확인
-if not run_dir.exists():
-    raise FileNotFoundError(f"run 폴더를 찾을 수 없습니다: {run_dir}")
-
-summary_path = run_dir / "summary.json"
-session_path = run_dir / "session.json"
-conditions_path = run_dir / "conditions.json"
-
-
-# JSON 읽기
-with open(summary_path, "r", encoding="utf-8") as f:
-    summary = json.load(f)
-
-with open(session_path, "r", encoding="utf-8") as f:
-    session_data = json.load(f)
-
-with open(conditions_path, "r", encoding="utf-8") as f:
-    conditions_data = json.load(f)
-
-
-# 필요한 값 가져오기
-session_id = summary["session_id"]
-scenario_key = session_data["meta"]["scenario_id"]
-scenario_revision = conditions_data["scenario"]["scenario_revision"]
-
-
-# summary.json과 session.json이 같은 실행인지 확인
-session_json_id = session_data.get("session_id")
-
-if session_json_id != session_id:
-    raise ValueError(
-        f"session_id가 서로 다릅니다: "
-        f"summary={session_id}, session={session_json_id}"
-    )
-
-
-status = session_data["status"]
-outcome = summary["actual_outcome"]
-termination_reason = summary["termination_reason"]
-total_tokens = summary["total_tokens"]
-
-criteria_latest = summary.get("criteria_latest") or {}
-
-stop_candidates = [
-    criteria_latest.get("first_deadlock_step"),
-    criteria_latest.get("first_termination_failure_step"),
-]
-
-first_stop_step = min(
-    (step for step in stop_candidates if step is not None),
-    default=None,
-)
-
-started_at = session_data["meta"]["started_at"]
-ended_at = session_data["meta"]["ended_at"]
-
-
-# 실행 당시 설정 저장
-session_meta = session_data.get("meta") or {}
-scenario_config = conditions_data.get("scenario") or {}
-
-execution_config = {
-    "temperature": session_meta.get("temperature"),
-    "criteria_version": session_meta.get("criteria_version"),
-    "criteria_parameters": session_meta.get("criteria_parameters"),
-    "criteria_sha256": session_meta.get("criteria_sha256"),
-    "model": scenario_config.get("model"),
-    "max_tokens": scenario_config.get("max_tokens"),
-    "scenario_revision": scenario_revision,
-    "runner_protocol": conditions_data.get("runner_protocol"),
-    "collection_policy": conditions_data.get("collection_policy"),
-}
-
-# PostgreSQL 연결
-conn = get_connection()
-cursor = conn.cursor()
-
-
-# 실제 실행 당시 scenario revision과 정확히 일치하는 DB scenario 찾기
-cursor.execute(
-    """
-    SELECT id
-    FROM scenarios
-    WHERE scenario_key = %s
-      AND scenario_revision = %s;
-    """,
-    (scenario_key, scenario_revision),
-)
-
-rows = cursor.fetchall()
-
-if len(rows) == 0:
-    raise ValueError(
-        f"시나리오를 찾을 수 없습니다: "
-        f"{scenario_key} revision {scenario_revision}"
-    )
-
-if len(rows) > 1:
-    raise ValueError(
-        f"같은 시나리오가 여러 개 있습니다: "
-        f"{scenario_key} revision {scenario_revision}"
-    )
-
-scenario_id = rows[0][0]
-
-
-# -------------------------------------------------
-# 1. sessions 저장
-# -------------------------------------------------
-
-cursor.execute(
-    """
-    INSERT INTO sessions (
-        id,
-        scenario_id,
-        status,
-        outcome,
-        termination_reason,
-        total_tokens,
-        first_stop_step,
-        started_at,
-        ended_at,
-        execution_config
-    )
-    VALUES (
-        %s, %s, %s, %s, %s,
-        %s, %s, %s, %s, %s::JSONB
-    )
-    ON CONFLICT (id)
-    DO UPDATE SET
-        status = EXCLUDED.status,
-        outcome = EXCLUDED.outcome,
-        termination_reason = EXCLUDED.termination_reason,
-        total_tokens = EXCLUDED.total_tokens,
-        first_stop_step = EXCLUDED.first_stop_step,
-        started_at = EXCLUDED.started_at,
-        ended_at = EXCLUDED.ended_at,
-        execution_config = EXCLUDED.execution_config;
-    """,
-    (
-        session_id,
-        scenario_id,
-        status,
-        outcome,
-        termination_reason,
-        total_tokens,
-        first_stop_step,
-        started_at,
-        ended_at,
-        json.dumps(execution_config),
-    ),
+from storage.db import get_connection, get_project_id
+from storage.import_utils import (
+    build_execution_config,
+    build_session_data,
+    count_tool_calls,
+    dumps_json,
+    first_stop_step,
+    load_json,
+    observation_input,
+    require_files,
+    resolve_run_dir,
+    scenario_payload,
+    token_usage,
+    upsert_scenario,
+    verify_project,
 )
 
 
-# -------------------------------------------------
-# 2. observations + judgements 저장
-# -------------------------------------------------
+def load_persisted_observations(run_dir, session_data):
+    """session.json의 observation 목록과 실제 ack.json을 서로 검증해 읽는다."""
+    expected = session_data.get("observations") or []
+    expected_steps = {
+        item.get("step_id") for item in expected if item.get("step_id") is not None
+    }
 
-observations_dir = run_dir / "observations"
-
-# 1.ack.json, 2.ack.json ... 숫자 순서로 정렬
-ack_files = sorted(
-    observations_dir.glob("*.ack.json"),
-    key=lambda path: int(path.name.split(".")[0]),
-)
-
-
-# session.json의 관측 수와 실제 ack.json 수가 같은지 확인
-expected_observations = session_data.get("observations") or []
-
-if len(ack_files) != len(expected_observations):
-    raise ValueError(
-        f"observation 파일이 누락되었습니다: "
-        f"예상 {len(expected_observations)}개, "
-        f"ack.json {len(ack_files)}개"
-    )
-
-
-
-# 예상 step 번호와 실제 ack.json의 step 번호가 같은지 확인
-expected_steps = {
-    observation["step_id"]
-    for observation in expected_observations
-}
-
-ack_steps = {
-    int(path.name.split(".")[0])
-    for path in ack_files
-}
-
-if expected_steps != ack_steps:
-    raise ValueError(
-        f"observation step이 일치하지 않습니다: "
-        f"예상={sorted(expected_steps)}, "
-        f"ack={sorted(ack_steps)}"
-    )
-
-
-
-
-
-for ack_path in ack_files:
-
-    with open(ack_path, "r", encoding="utf-8") as f:
-        ack_data = json.load(f)
-
-    observation = ack_data["observation"]
-
-    step = observation["step_id"]
-    role = observation["agent_id"]
-
-    # artifact가 없는 시나리오도 안전하게 처리
-    artifact = observation.get("artifact") or {}
-    progress = observation.get("progress") or {}
-
-    tests_passed = artifact.get("test_pass_count")
-    tests_total = artifact.get("test_total_count")
-
-    progress_state = progress.get("state", "unmeasured")
-    progress_version = progress.get("version")
-
-    # metrics가 없는 경우도 안전하게 처리
-    metrics = progress.get("metrics") or {}
-
-    # 파일 변경 여부 확인
-    files_changed_metric = metrics.get(
-        "artifact.files_changed"
-    )
-
-    if (
-        files_changed_metric is not None
-        and files_changed_metric.get("status") == "measured"
-    ):
-        artifact_changed = bool(files_changed_metric.get("value"))
-    else:
-        artifact_changed = None
-
-
-    # 현재 JSON에는 "새로 생긴 issue"가 따로 없으므로 NULL
-    new_issue_ids = None
-
-
-    # observation 원본 전체를 JSONB로 저장
-    observation_data = observation
-
-
-    # progress를 측정할 수 없었던 경우
-    unmeasured_reason = None
-
-    if progress_state == "unmeasured":
-        unmeasured_reason = progress.get(
-            "reason",
-            "progress could not be measured"
+    observations_dir = run_dir / "observations"
+    ack_files = []
+    if observations_dir.is_dir():
+        ack_files = sorted(
+            observations_dir.glob("*.ack.json"),
+            key=lambda path: int(path.name.split(".")[0]),
         )
 
+    if expected and not ack_files:
+        raise ValueError(
+            "session.json에는 observation이 있지만 ack.json이 없습니다. "
+            "원본 누락 여부를 먼저 확인하세요."
+        )
 
-    # -------------------------------------------------
-    # observations 저장
-    # -------------------------------------------------
+    if len(ack_files) != len(expected):
+        raise ValueError(
+            f"observation 수가 일치하지 않습니다: "
+            f"session.json={len(expected)}, ack.json={len(ack_files)}"
+        )
 
+    loaded = []
+    for path in ack_files:
+        ack = load_json(path)
+        if ack.get("persisted") is not True:
+            raise ValueError(f"persisted=true가 아닌 ack입니다: {path.name}")
+
+        observation = ack.get("observation")
+        if not isinstance(observation, dict):
+            raise ValueError(f"observation 객체가 없습니다: {path.name}")
+
+        file_step = int(path.name.split(".")[0])
+        if observation.get("step_id") != file_step:
+            raise ValueError(
+                f"ack 파일명과 step_id가 다릅니다: {path.name}, "
+                f"step_id={observation.get('step_id')}"
+            )
+        loaded.append(observation)
+
+    actual_steps = {item.get("step_id") for item in loaded}
+    if expected_steps != actual_steps:
+        raise ValueError(
+            f"observation step이 일치하지 않습니다: "
+            f"session.json={sorted(expected_steps)}, ack={sorted(actual_steps)}"
+        )
+
+    return loaded
+
+
+def session_values(summary, session_data, conditions_data, scenario, observations):
+    """여러 raw 파일의 값을 sessions 한 행 형태로 정리한다."""
+    meta = session_data.get("meta") or {}
+    status = session_data.get("status")
+    if status == "done":
+        status = "ended"
+
+    return {
+        "status": status or ("ended" if meta.get("ended_at") else "active"),
+        "termination_reason": summary.get("termination_reason") or meta.get("termination_reason"),
+        "phase": conditions_data.get("phase"),
+        "guardrail_mode": conditions_data.get("guardrail_mode") or meta.get("guardrail_mode"),
+        "model": conditions_data.get("model") or scenario.get("model") or meta.get("model"),
+        "steps_reached": summary.get("steps") or len(observations),
+        # 알려진 부분합을 전체 토큰으로 둔갑시키지 않는다.
+        "total_tokens": summary.get("total_tokens"),
+        "first_stop_step": first_stop_step(observations, summary),
+        "started_at": meta.get("started_at"),
+        "ended_at": meta.get("ended_at"),
+        "execution_config": build_execution_config(session_data, conditions_data, scenario),
+        "session_data": build_session_data(summary, conditions_data, "raw-run"),
+    }
+
+
+def upsert_session(cursor, session_id, scenario_id, values):
     cursor.execute(
         """
-        INSERT INTO observations (
-            session_id,
-            step,
-            role,
-            artifact_changed,
-            tests_passed,
-            tests_total,
-            new_issue_ids,
-            progress_state,
-            observation_data,
-            unmeasured_reason,
-            progress_version
+        INSERT INTO sessions (
+            id, scenario_id, status, termination_reason, phase, guardrail_mode,
+            model, steps_reached, total_tokens, first_stop_step,
+            started_at, ended_at, execution_config, session_data
         )
         VALUES (
-            %s, %s, %s, %s, %s,
-            %s, %s, %s, %s::JSONB, %s, %s
+            %s, %s, %s, %s, %s, %s, %s,
+            %s, %s, %s, %s, %s, %s::jsonb, %s::jsonb
         )
-        ON CONFLICT (session_id, step)
+        ON CONFLICT (id)
         DO UPDATE SET
-            role = EXCLUDED.role,
-            artifact_changed = EXCLUDED.artifact_changed,
-            tests_passed = EXCLUDED.tests_passed,
-            tests_total = EXCLUDED.tests_total,
-            new_issue_ids = EXCLUDED.new_issue_ids,
-            progress_state = EXCLUDED.progress_state,
-            observation_data = EXCLUDED.observation_data,
-            unmeasured_reason = EXCLUDED.unmeasured_reason,
-            progress_version = EXCLUDED.progress_version;
+            scenario_id = EXCLUDED.scenario_id,
+            status = EXCLUDED.status,
+            termination_reason = EXCLUDED.termination_reason,
+            phase = EXCLUDED.phase,
+            guardrail_mode = EXCLUDED.guardrail_mode,
+            model = EXCLUDED.model,
+            steps_reached = EXCLUDED.steps_reached,
+            total_tokens = EXCLUDED.total_tokens,
+            first_stop_step = EXCLUDED.first_stop_step,
+            started_at = EXCLUDED.started_at,
+            ended_at = EXCLUDED.ended_at,
+            execution_config = EXCLUDED.execution_config,
+            session_data = EXCLUDED.session_data;
         """,
         (
             session_id,
-            step,
-            role,
-            artifact_changed,
-            tests_passed,
-            tests_total,
-            new_issue_ids,
-            progress_state,
-            json.dumps(observation_data),
-            unmeasured_reason,
-            progress_version,
+            scenario_id,
+            values["status"],
+            values["termination_reason"],
+            values["phase"],
+            values["guardrail_mode"],
+            values["model"],
+            values["steps_reached"],
+            values["total_tokens"],
+            values["first_stop_step"],
+            values["started_at"],
+            values["ended_at"],
+            dumps_json(values["execution_config"]),
+            dumps_json(values["session_data"]),
         ),
     )
 
 
-    # -------------------------------------------------
-    # judgements 저장
-    # -------------------------------------------------
+def upsert_observation(cursor, session_id, observation):
+    """계산 결과를 제외한 observation 입력만 저장한다."""
+    cursor.execute(
+        """
+        INSERT INTO observations (
+            session_id, step, agent_id, observed_at, observation_data
+        )
+        VALUES (%s, %s, %s, %s, %s::jsonb)
+        ON CONFLICT (session_id, step)
+        DO UPDATE SET
+            agent_id = EXCLUDED.agent_id,
+            observed_at = EXCLUDED.observed_at,
+            observation_data = EXCLUDED.observation_data;
+        """,
+        (
+            session_id,
+            observation["step_id"],
+            observation.get("agent_id"),
+            observation.get("observed_at"),
+            dumps_json(observation_input(observation)),
+        ),
+    )
 
-    criteria = observation["criteria"]
 
-    decision = criteria["decision"]
-    rule_id = criteria["criteria_version"]
-    stagnant_run = criteria.get("consecutive_steps")
-    reason = criteria.get("reason")
+def upsert_judgement(cursor, session_id, observation):
+    """progress + criteria 계산 결과를 judgements에 저장한다."""
+    criteria = observation.get("criteria") or {}
+    progress = observation.get("progress") or {}
 
-    # 현재 ack.json에는 판정 시간(ns)이 없으므로 NULL
-    judgement_ns = None
+    decision = criteria.get("decision")
+    rule_id = criteria.get("criteria_version")
+    if not decision or not rule_id:
+        return False
 
+    result_data = {
+        "collection": observation.get("collection"),
+        "progress": progress,
+        "criteria": criteria,
+    }
 
     cursor.execute(
         """
         INSERT INTO judgements (
-            session_id,
-            step,
-            decision,
-            rule_id,
-            stagnant_run,
-            reason,
-            judgement_ns
+            session_id, step, agent_id, observed_at,
+            decision, rule_id, rule_hash,
+            progress_state, progress_version,
+            stagnant_run, reason, judgement_ns, result_data
         )
         VALUES (
-            %s, %s, %s, %s, %s, %s, %s
+            %s, %s, %s, %s,
+            %s, %s, %s,
+            %s, %s,
+            %s, %s, %s, %s::jsonb
         )
         ON CONFLICT (session_id, step, rule_id)
         DO UPDATE SET
+            agent_id = EXCLUDED.agent_id,
+            observed_at = EXCLUDED.observed_at,
             decision = EXCLUDED.decision,
+            rule_hash = EXCLUDED.rule_hash,
+            progress_state = EXCLUDED.progress_state,
+            progress_version = EXCLUDED.progress_version,
             stagnant_run = EXCLUDED.stagnant_run,
             reason = EXCLUDED.reason,
-            judgement_ns = EXCLUDED.judgement_ns;
+            judgement_ns = EXCLUDED.judgement_ns,
+            result_data = EXCLUDED.result_data;
         """,
         (
             session_id,
-            step,
+            observation["step_id"],
+            observation.get("agent_id"),
+            observation.get("observed_at"),
             decision,
             rule_id,
-            stagnant_run,
-            reason,
-            judgement_ns,
+            criteria.get("criteria_sha256"),
+            progress.get("state"),
+            progress.get("version"),
+            criteria.get("consecutive_steps"),
+            criteria.get("reason"),
+            observation.get("judgement_ns"),
+            dumps_json(result_data),
         ),
     )
+    return True
 
 
-# -------------------------------------------------
-# 3. llm_calls 저장
-# -------------------------------------------------
-
-# LLM turn 번호 -> step / role 연결표 만들기
-turn_map = {}
-
-for ack_path in ack_files:
-
-    with open(ack_path, "r", encoding="utf-8") as f:
-        ack_data = json.load(f)
-
-    observation = ack_data["observation"]
-
-    step = observation["step_id"]
-    role = observation["agent_id"]
-
-    for turn_number in observation.get("llm_turns", []):
-
-        # 같은 LLM turn이 여러 step에 중복 연결되는지 확인
-        if turn_number in turn_map:
-            raise ValueError(
-                f"LLM turn {turn_number}이 여러 step에 중복 연결되어 있습니다."
-            )
-
-        turn_map[turn_number] = {
-            "step": step,
-            "role": role,
-        }
-
-
-# session.json의 모든 LLM 호출
-turns = session_data["turns"]
-
-
-for turn_data in turns:
-
-    call_index = turn_data["turn"]
-
-    mapping = turn_map.get(call_index)
-
-    if mapping is None:
-        raise ValueError(
-            f"LLM turn {call_index}을 연결할 observation step을 찾을 수 없습니다."
-        )
-
-    step = mapping["step"]
-    role = mapping["role"]
-
-
-    # 토큰 정보
-    response_body = turn_data.get("response_body") or {}
-    usage = response_body.get("usage") or {}
-
-    prompt_tokens = usage.get("prompt_tokens")
-    completion_tokens = usage.get("completion_tokens")
-
-    completion_details = usage.get("completion_tokens_details") or {}
-    reasoning_tokens = completion_details.get("reasoning_tokens")
-
-
-    # tool_calls 실제 내용 가져오기
-    choices = response_body.get("choices")
-
-    # 오류 응답 등으로 확인할 수 없는 경우 SQL NULL
-    tool_calls = None
-
-    # 정상적인 LLM 응답이 존재하는 경우
-    if choices:
-        message = choices[0].get("message") or {}
-        tool_calls = message.get("tool_calls")
-
-        # 정상 응답이지만 tool call이 없으면 빈 목록
-        if tool_calls is None:
-            tool_calls = []
-
-
-    # 전체 처리 시간
-    latency_ms = turn_data.get("total_ms")
-
+def upsert_llm_call(cursor, session_id, turn_data, mapping):
+    """LLM 원문은 제외하고 토큰/지연/상태 같은 메타데이터만 저장한다."""
+    prompt_tokens, completion_tokens, reasoning_tokens = token_usage(turn_data)
+    agent_id = mapping.get("agent_id") if mapping else None
+    step = mapping.get("step") if mapping else None
 
     cursor.execute(
         """
         INSERT INTO llm_calls (
-            session_id,
-            call_index,
-            step,
-            role,
-            prompt_tokens,
-            completion_tokens,
-            reasoning_tokens,
-            tool_calls,
-            latency_ms
+            session_id, call_index, step, agent_id,
+            prompt_tokens, completion_tokens, reasoning_tokens,
+            latency_ms, status_code, retry_count, tool_call_count
         )
-        VALUES (
-            %s, %s, %s, %s, %s,
-            %s, %s, %s::JSONB, %s
-        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (session_id, call_index)
         DO UPDATE SET
             step = EXCLUDED.step,
-            role = EXCLUDED.role,
+            agent_id = EXCLUDED.agent_id,
             prompt_tokens = EXCLUDED.prompt_tokens,
             completion_tokens = EXCLUDED.completion_tokens,
             reasoning_tokens = EXCLUDED.reasoning_tokens,
-            tool_calls = EXCLUDED.tool_calls,
-            latency_ms = EXCLUDED.latency_ms;
+            latency_ms = EXCLUDED.latency_ms,
+            status_code = EXCLUDED.status_code,
+            retry_count = EXCLUDED.retry_count,
+            tool_call_count = EXCLUDED.tool_call_count;
         """,
         (
             session_id,
-            call_index,
+            turn_data["turn"],
             step,
-            role,
+            agent_id,
             prompt_tokens,
             completion_tokens,
             reasoning_tokens,
-            json.dumps(tool_calls) if tool_calls is not None else None,
-            latency_ms,
+            turn_data.get("total_ms"),
+            turn_data.get("status_code"),
+            turn_data.get("retry_count"),
+            count_tool_calls(turn_data),
         ),
     )
 
-print(
-    f"observations + judgements 자동 저장 준비 완료: "
-    f"{len(ack_files)}개"
-)
 
-print(f"llm_calls 자동 저장 준비 완료: {len(turns)}개")
+def import_run(run_value, project_id):
+    """raw run 하나를 PostgreSQL에 저장한다. scenario는 자동 등록된다."""
+    run_dir = resolve_run_dir(run_value, demo=False)
+    require_files(
+        run_dir,
+        ("summary.json", "session.json", "conditions.json", "scenario.yaml"),
+    )
+
+    summary = load_json(run_dir / "summary.json")
+    session_data = load_json(run_dir / "session.json")
+    conditions_data = load_json(run_dir / "conditions.json")
+
+    session_id = summary.get("session_id")
+    if not session_id:
+        raise ValueError("summary.json에 session_id가 없습니다.")
+
+    # 서로 다른 실행 파일을 실수로 섞어 넣는 일을 막는다.
+    for label, value in (
+        ("session.json", session_data.get("session_id")),
+        ("conditions.json", conditions_data.get("session_id")),
+    ):
+        if value is not None and value != session_id:
+            raise ValueError(
+                f"session_id가 서로 다릅니다: summary={session_id}, {label}={value}"
+            )
+
+    observations = load_persisted_observations(run_dir, session_data)
+    scenario_info = scenario_payload(run_dir, conditions_data)
+    scenario = scenario_info["config"]
+    values = session_values(summary, session_data, conditions_data, scenario, observations)
+
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            verify_project(cursor, project_id)
+            scenario_id = upsert_scenario(cursor, project_id, scenario_info)
+            upsert_session(cursor, session_id, scenario_id, values)
+
+            judgement_count = 0
+            turn_map = {}
+
+            for observation in observations:
+                upsert_observation(cursor, session_id, observation)
+                if upsert_judgement(cursor, session_id, observation):
+                    judgement_count += 1
+
+                # LLM turn 번호를 실제 step/agent에 연결한다.
+                for turn_number in observation.get("llm_turns") or []:
+                    if turn_number in turn_map:
+                        raise ValueError(
+                            f"LLM turn {turn_number}이 여러 step에 연결되어 있습니다."
+                        )
+                    turn_map[turn_number] = {
+                        "step": observation.get("step_id"),
+                        "agent_id": observation.get("agent_id"),
+                    }
+
+            turns = session_data.get("turns") or []
+            seen_turns = set()
+            for turn_data in turns:
+                call_index = turn_data.get("turn")
+                if call_index in seen_turns:
+                    raise ValueError(f"LLM turn {call_index}이 중복되어 있습니다.")
+                seen_turns.add(call_index)
+                upsert_llm_call(cursor, session_id, turn_data, turn_map.get(call_index))
+
+    result = {
+        "session_id": session_id,
+        "scenario_key": scenario_info["scenario_key"],
+        "observations": len(observations),
+        "judgements": judgement_count,
+        "llm_calls": len(session_data.get("turns") or []),
+    }
+
+    print("raw run PostgreSQL 저장 성공")
+    print("session_id:", result["session_id"])
+    print("scenario_key:", result["scenario_key"])
+    print("observations:", result["observations"])
+    print("judgements:", result["judgements"])
+    print("llm_calls:", result["llm_calls"])
+    return result
 
 
-# -------------------------------------------------
-# 실제 DB에 저장 확정
-# -------------------------------------------------
+def main():
+    parser = argparse.ArgumentParser(
+        description="raw run(session.json + ack.json + LLM call)을 PostgreSQL에 저장합니다."
+    )
+    parser.add_argument("run", help="runs/ 아래 폴더명/짧은 prefix 또는 run 폴더 경로")
+    parser.add_argument("--project-id", type=int)
+    args = parser.parse_args()
 
-conn.commit()
-
-cursor.close()
-conn.close()
+    import_run(args.run, get_project_id(args.project_id))
 
 
-print("sessions + observations + judgements + llm_calls 자동 저장 성공!")
-print("session_id:", session_id)
-print("scenario_key:", scenario_key)
+if __name__ == "__main__":
+    main()
