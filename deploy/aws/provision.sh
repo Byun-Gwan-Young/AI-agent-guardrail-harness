@@ -90,8 +90,16 @@ fi
 DOMAIN=$(printf '%s' "$DOMAIN" | tr '[:upper:]' '[:lower:]')
 valid_domain "$DOMAIN" || die "도메인 모양이 아니다 : $DOMAIN"
 
-AMI=$(awsq ssm get-parameters --names "$GUARDRAIL_AMI_PARAM" --query 'Parameters[0].Value')
-[[ "$AMI" == ami-* ]] || die "Ubuntu 24.04 AMI 를 SSM 공개 파라미터에서 찾지 못했다"
+# The SSM public parameter first. AmazonEC2FullAccess alone (DM-93 ③) has no ssm:GetParameters, so on a refusal the
+# newest Canonical (owner 099720109477) Ubuntu 24.04 amd64 gp3 image from DescribeImages (an EC2 permission) is used.
+AMI=$(awsq ssm get-parameters --names "$GUARDRAIL_AMI_PARAM" --query 'Parameters[0].Value' 2>/dev/null || true)
+if [[ "$AMI" != ami-* ]]; then
+    AMI=$(awsq ec2 describe-images --owners 099720109477 \
+        --filters 'Name=name,Values=ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*' Name=state,Values=available \
+        --query 'sort_by(Images,&CreationDate)[-1].ImageId')
+    say "AMI : SSM 공개 파라미터를 읽지 못해 Canonical 이미지 목록에서 찾았다 ($AMI)"
+fi
+[[ "$AMI" == ami-* ]] || die "Ubuntu 24.04 AMI 를 찾지 못했다"
 KEY_ID=$(awsq ec2 describe-key-pairs --filters "Name=key-name,Values=$GUARDRAIL_KEY_NAME" --query 'KeyPairs[0].KeyPairId')
 [[ "$KEY_ID" == key-* ]] || KEY_ID=
 INSTANCES=$(awsq ec2 describe-instances \

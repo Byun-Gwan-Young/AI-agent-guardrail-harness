@@ -57,6 +57,11 @@ FAKE_AWS = textwrap.dedent('''\
         'ec2 allocate-address': 'eipalloc-0fake\\t203.0.113.10',
         'ec2 associate-address': 'eipassoc-0fake',
     }}.get(op, '')
+    if os.environ.get('FAKE_AWS_NO_SSM') and op == 'ssm get-parameters':
+        sys.stderr.write('An error occurred (AccessDeniedException) when calling the GetParameters operation\\n')
+        sys.exit(254)
+    if op == 'ec2 describe-images':
+        out = 'ami-0fallback000000000'
     if os.environ.get('FAKE_AWS_TAGGED'):
         out = {{'ec2 describe-instances': 'i-0fake', 'ec2 describe-security-groups': 'sg-0fake',
                 'ec2 describe-key-pairs': 'key-0fake',
@@ -76,10 +81,11 @@ def fake_bin(tmp):
     return bin_dir
 
 
-def run_script(name, tmp, *args, stdin='', tagged=False):
+def run_script(name, tmp, *args, stdin='', tagged=False, no_ssm=False):
     """Run a deploy/aws script under /bin/bash with the fake AWS CLI and curl first on PATH and HOME in `tmp`."""
     env = {'PATH': f"{fake_bin(tmp)}:/usr/bin:/bin", 'HOME': str(Path(tmp) / 'home'), 'LANG': 'C.UTF-8',
-           'FAKE_AWS_LOG': str(Path(tmp) / 'aws.log'), **({'FAKE_AWS_TAGGED': '1'} if tagged else {})}
+           'FAKE_AWS_LOG': str(Path(tmp) / 'aws.log'), **({'FAKE_AWS_TAGGED': '1'} if tagged else {}),
+           **({'FAKE_AWS_NO_SSM': '1'} if no_ssm else {})}
     (Path(tmp) / 'home').mkdir()
     result = subprocess.run(['/bin/bash', str(AWS / name), *args], input=stdin, capture_output=True, text=True,
                             env=env, timeout=60)
@@ -197,6 +203,16 @@ class Provision(unittest.TestCase):
                                 for v in verbs(calls)), verbs(calls))
             self.assertFalse(target.exists())
             self.assertEqual(list((Path(tmp) / 'home').iterdir()), [])
+
+    def test_ami_falls_back_to_canonical_images_without_ssm_permission(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result, calls = run_script('provision.sh', tmp, '--domain', 'demo.example.org', '--target-env',
+                                       str(Path(tmp) / 'target.env'), no_ssm=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            images = next(c for c in calls if 'describe-images' in c)
+            self.assertIn('099720109477', images)
+            self.assertIn('ami-0fallback000000000', result.stdout)
+            self.assertEqual([v for v in verbs(calls) if v.startswith(CREATE_VERBS)], [])
 
     def test_apply_needs_yes(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -5,6 +5,8 @@
 #   deploy/aws/remote.sh setup      send server-setup.sh and run it with sudo (once ; safe to repeat)
 #   deploy/aws/remote.sh password   send set-password.sh and run it with sudo in a terminal (the site password)
 #   deploy/aws/remote.sh status     API · Caddy · PostgreSQL state and the deployed commit
+#   deploy/aws/remote.sh dns        does the domain's A record point at the server IP yet (dig, from this Mac)
+#   deploy/aws/remote.sh open       open https://DOMAIN/ in the browser
 set -euo pipefail
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib.sh"
@@ -22,6 +24,15 @@ case "${1:-}" in
     status)
         ssh "${SSH_OPTS[@]}" "$SSH_DEST" 'systemctl is-active guardrail-api caddy postgresql; \
             cat /opt/guardrail/app/DEPLOY_INFO.json 2>/dev/null | head -n 4 || echo "아직 배포 안 됨"' ;;
+    dns)
+        resolved=$(dig +short "$GUARDRAIL_DOMAIN" A | tail -n 1)
+        if [[ "$resolved" == "$GUARDRAIL_SERVER_IP" ]]; then
+            say "DNS 반영됨 : $GUARDRAIL_DOMAIN → $resolved"
+        else
+            die "아직 아니다 : $GUARDRAIL_DOMAIN → ${resolved:-없음} (서버 $GUARDRAIL_SERVER_IP). 몇 분 뒤 다시"
+        fi ;;
+    open)
+        open "https://$GUARDRAIL_DOMAIN/" ;;
     *)
-        sed -n '2,8p' "$0"; exit 2 ;;
+        sed -n '2,10p' "$0"; exit 2 ;;
 esac

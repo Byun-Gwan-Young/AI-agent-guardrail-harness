@@ -26,7 +26,7 @@ Caddy  (서버, 80 · 443 만 열림, 인증서 자동)
 | [`provision.sh`](provision.sh) | 맥 (AWS CLI) | 키 페어 · 보안 그룹 (SSH 는 지금 공인 IP/32 만, 80 · 443 전체) · EC2 (서울, Ubuntu 24.04, t3.small, 20 GiB gp3) · 탄력적 IP · (Route 53 이면) A 레코드. `--dry-run` 이 기본, `--apply` 일 때만 만든다. `--update-ssh-ip` 는 SSH 허용 IP 만 바꾼다. 결과로 `target.env` 를 쓴다 |
 | [`teardown.sh`](teardown.sh) | 맥 (AWS CLI) | 태그 `project=guardrail-demo` 로 찾은 인스턴스 · 탄력적 IP · 보안 그룹 · 키 페어를 보여 주고, `delete` 를 입력해야 지운다 |
 | [`configure.sh`](configure.sh) | 맥 | `provision.sh` 를 쓰지 않았을 때 도메인 · 서버 IP · SSH 키 경로를 물어 `target.env` 에 쓴다 |
-| [`remote.sh`](remote.sh) | 맥 | `target.env` 값으로 서버에 접속 (`ssh`), 서버 준비 (`setup`), 비밀번호 설정 (`password`), 상태 (`status`) |
+| [`remote.sh`](remote.sh) | 맥 | `target.env` 값으로 서버에 접속 (`ssh`), 서버 준비 (`setup`), 비밀번호 설정 (`password`), 상태 (`status`), DNS 반영 확인 (`dns`), 브라우저로 열기 (`open`) |
 | [`server-setup.sh`](server-setup.sh) | 서버 (sudo, 한 번) | PostgreSQL · Caddy (공식 apt 저장소) · uv · Python 3.14, 사용자 `guardrail`, 폴더, DB 역할 · DB, 서비스 가상환경. 다시 돌려도 안전 |
 | [`set-password.sh`](set-password.sh) | 서버 (sudo) | 사이트 비밀번호를 두 번 입력받아 bcrypt 해시만 `/etc/guardrail/caddy.env` 에 넣는다 |
 | [`deploy.sh`](deploy.sh) | 맥 | 묶음 만들기 → 보내기 → 서버 설치 (`remote-install.sh`) → 확인 결과 가져오기 → `https://도메인/api/summary` 확인 |
