@@ -45,7 +45,7 @@ say "== 묶음 만들기 ($REF 의 커밋된 파일만)"
 "$PYTHON" -B "$SCRIPT_DIR/bundle.py" build --ref "$REF" --out "$WORK" > "$WORK/bundle-summary.json" \
     || { cat "$WORK/bundle-summary.json"; die "묶음 검사에 걸렸다 (problems)"; }
 "$PYTHON" -I -c 'import json, sys; s = json.load(open(sys.argv[1]))
-print(f"commit {s[\"commit\"][:12]} · 파일 {s[\"files\"]} 개 · 압축 전 {s[\"bytes\"]:,} B · 묶음 {s[\"bundle_bytes\"]:,} B · 화면 세션 {s[\"screen\"][\"sessions\"]}")' \
+print(f"commit {s["commit"][:12]} · 파일 {s["files"]} 개 · 압축 전 {s["bytes"]:,} B · 묶음 {s["bundle_bytes"]:,} B · 화면 세션 {s["screen"]["sessions"]}")' \
     "$WORK/bundle-summary.json"
 if [[ -n "$BUNDLE_ONLY" ]]; then
     say "묶음만 만들었다 : $WORK/bundle.tar.gz (목록 $WORK/bundle-files.txt)"
@@ -68,7 +68,7 @@ if scp "${SSH_OPTS[@]}" "$SSH_DEST:/opt/guardrail/checks/check-postgres-latest.j
         "$REPO/reports/c19-7/server-check-postgres.json"; then
     "$PYTHON" -I -c 'import json, sys; r = json.load(open(sys.argv[1]))
 bad = [c["check"] for c in r.get("comparisons", []) if not c.get("same")]
-print(f"서버 PostgreSQL check : ok={r.get(\"ok\")} · 비교 {len(r.get(\"comparisons\", []))} 개 · 다름 {bad or 0}")' \
+print(f"서버 PostgreSQL check : ok={r.get("ok")} · 비교 {len(r.get("comparisons", []))} 개 · 다름 {bad or 0}")' \
         "$REPO/reports/c19-7/server-check-postgres.json"
 fi
 ssh "${SSH_OPTS[@]}" "$SSH_DEST" 'rm -rf /tmp/guardrail-deploy' || true
