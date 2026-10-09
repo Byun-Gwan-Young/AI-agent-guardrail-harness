@@ -334,6 +334,13 @@ DSN/비밀번호는 로그나 예외 메시지에 출력하지 않습니다.
 받습니다. Provider API Key 원문은 Storage에 저장하지 않습니다. 이 분리는 사용자에게
 URL 입력을 강요하지 않으면서 기존 프록시의 `upstream_url` 계약을 유지하기 위한 것입니다.
 
+`custom` provider는 SSRF 위험 때문에 **기본 비활성화**입니다. 서버 운영자가
+`GUARDRAIL_ALLOW_CUSTOM_PROVIDER=1`을 명시한 경우에만 사용할 수 있습니다. 활성화된
+경우에도 URL의 literal IP와 DNS 해석 결과가 모두 public/global 주소여야 하며 loopback,
+private, link-local, unspecified, multicast, reserved 주소는 거절합니다. 이 검사는 프로젝트
+설정 시점의 admission check이므로, redirect 또는 DNS rebinding까지 막으려면 프록시/네트워크
+계층에서도 요청 시점의 egress 제한을 유지해야 합니다.
+
 `set_project_provider(...)`로 같은 프로젝트의 provider를 바꿀 수 있습니다. 이미 시작한
 live session은 `session_data.provider`에 시작 당시 provider를 snapshot하므로, 나중에 프로젝트가
 Groq -> KMU -> OpenAI로 바뀌어도 과거 session의 실행 맥락은 바뀌지 않습니다.

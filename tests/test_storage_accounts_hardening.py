@@ -2,6 +2,15 @@ import sys
 import unittest
 from unittest.mock import patch
 
+
+def _public_dns_result(host, port, *args, **kwargs):
+    return [(2, 1, 6, "", ("8.8.8.8", port))]
+
+
+def _private_dns_result(host, port, *args, **kwargs):
+    return [(2, 1, 6, "", ("10.20.30.40", port))]
+
+
 import storage.accounts as accounts
 import storage.safety as safety
 import storage.__main__ as storage_main
@@ -51,9 +60,12 @@ class AccountsHardeningTests(unittest.TestCase):
         import os
         with patch.dict(
             os.environ,
-            {accounts.DEFAULT_UPSTREAM_URL_ENV: "  https://provider.example.invalid/v1  "},
+            {
+                accounts.DEFAULT_UPSTREAM_URL_ENV: "  https://provider.example.invalid/v1  ",
+                accounts.CUSTOM_PROVIDER_ENABLED_ENV: "1",
+            },
             clear=False,
-        ):
+        ), patch("storage.accounts.socket.getaddrinfo", side_effect=_public_dns_result):
             self.assertEqual(
                 accounts._get_default_upstream_url(),
                 "https://provider.example.invalid/v1",
@@ -85,13 +97,91 @@ class AccountsHardeningTests(unittest.TestCase):
             provider, url = accounts._get_default_provider_config()
         self.assertEqual((provider, url), ("kmu", "https://kmu.example.invalid/v1"))
 
-    def test_custom_provider_requires_explicit_url(self):
-        with self.assertRaises(RuntimeError):
-            accounts._resolve_provider_upstream("custom")
-        self.assertEqual(
-            accounts._resolve_provider_upstream("custom", "https://custom.example.invalid/v1"),
-            ("custom", "https://custom.example.invalid/v1"),
-        )
+    def test_custom_provider_is_disabled_without_server_flag(self):
+        import os
+        with patch.dict(os.environ, {}, clear=False):
+            old = os.environ.pop(accounts.CUSTOM_PROVIDER_ENABLED_ENV, None)
+            try:
+                with self.assertRaisesRegex(RuntimeError, "custom provider is disabled"):
+                    accounts._resolve_provider_upstream(
+                        "custom", "https://custom.example.invalid/v1"
+                    )
+            finally:
+                if old is not None:
+                    os.environ[accounts.CUSTOM_PROVIDER_ENABLED_ENV] = old
+
+    def test_custom_provider_requires_explicit_url_when_enabled(self):
+        import os
+        with patch.dict(
+            os.environ,
+            {accounts.CUSTOM_PROVIDER_ENABLED_ENV: "1"},
+            clear=False,
+        ):
+            with self.assertRaises(RuntimeError):
+                accounts._resolve_provider_upstream("custom")
+
+    def test_custom_provider_allows_public_target_when_enabled(self):
+        import os
+        with patch.dict(
+            os.environ,
+            {accounts.CUSTOM_PROVIDER_ENABLED_ENV: "1"},
+            clear=False,
+        ), patch("storage.accounts.socket.getaddrinfo", side_effect=_public_dns_result):
+            self.assertEqual(
+                accounts._resolve_provider_upstream(
+                    "custom", "https://custom.example.invalid/v1"
+                ),
+                ("custom", "https://custom.example.invalid/v1"),
+            )
+
+    def test_custom_provider_rejects_loopback_private_and_link_local_literals(self):
+        import os
+        urls = [
+            "http://127.0.0.1:8000/v1",
+            "http://10.0.0.1/v1",
+            "http://172.16.0.1/v1",
+            "http://192.168.1.10/v1",
+            "http://169.254.169.254/latest/meta-data",
+            "http://[::1]/v1",
+            "http://[fe80::1]/v1",
+        ]
+        with patch.dict(
+            os.environ,
+            {accounts.CUSTOM_PROVIDER_ENABLED_ENV: "1"},
+            clear=False,
+        ):
+            for url in urls:
+                with self.subTest(url=url):
+                    with self.assertRaisesRegex(ValueError, "public addresses"):
+                        accounts._resolve_provider_upstream("custom", url)
+
+    def test_custom_provider_rejects_hostname_that_resolves_private(self):
+        import os
+        with patch.dict(
+            os.environ,
+            {accounts.CUSTOM_PROVIDER_ENABLED_ENV: "1"},
+            clear=False,
+        ), patch("storage.accounts.socket.getaddrinfo", side_effect=_private_dns_result):
+            with self.assertRaisesRegex(ValueError, "public addresses"):
+                accounts._resolve_provider_upstream(
+                    "custom", "https://internal-alias.example.invalid/v1"
+                )
+
+    def test_custom_provider_rejects_unresolvable_hostname(self):
+        import os
+        import socket
+        with patch.dict(
+            os.environ,
+            {accounts.CUSTOM_PROVIDER_ENABLED_ENV: "1"},
+            clear=False,
+        ), patch(
+            "storage.accounts.socket.getaddrinfo",
+            side_effect=socket.gaierror("not found"),
+        ):
+            with self.assertRaisesRegex(ValueError, "hostname must resolve"):
+                accounts._resolve_provider_upstream(
+                    "custom", "https://missing.example.invalid/v1"
+                )
 
     def test_named_provider_rejects_user_supplied_url_override(self):
         with self.assertRaises(ValueError):

@@ -26,9 +26,11 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import ipaddress
 import os
 import secrets
 import re
+import socket
 from typing import Any
 from urllib.parse import parse_qsl, urlsplit
 
@@ -51,6 +53,7 @@ DEFAULT_RULE_ID = os.getenv("GUARDRAIL_DEFAULT_RULE_ID", "deadlock-v0.3")
 DEFAULT_PROVIDER_ENV = "GUARDRAIL_DEFAULT_PROVIDER"
 DEFAULT_UPSTREAM_URL_ENV = "GUARDRAIL_DEFAULT_UPSTREAM_URL"  # legacy/custom fallback
 PROVIDER_URL_ENV_PREFIX = "GUARDRAIL_PROVIDER_"
+CUSTOM_PROVIDER_ENABLED_ENV = "GUARDRAIL_ALLOW_CUSTOM_PROVIDER"
 _PROVIDER_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,31}$")
 
 # Public providers have stable OpenAI-compatible base URLs.  KMU intentionally
@@ -116,6 +119,69 @@ def _provider_url_env_name(provider: str) -> str:
     return f"{PROVIDER_URL_ENV_PREFIX}{provider.upper().replace('-', '_')}_URL"
 
 
+def _custom_provider_enabled() -> bool:
+    """Return whether server configuration explicitly enables custom endpoints."""
+    return os.getenv(CUSTOM_PROVIDER_ENABLED_ENV, "").strip().lower() in {
+        "1", "true", "yes", "on"
+    }
+
+
+def _require_custom_provider_enabled() -> None:
+    if not _custom_provider_enabled():
+        raise RuntimeError(
+            f"custom provider is disabled; set {CUSTOM_PROVIDER_ENABLED_ENV}=1 on the server to enable it"
+        )
+
+
+def _validate_public_custom_target(value: str, label: str = "custom upstream URL") -> str:
+    """Validate a custom provider endpoint against SSRF-prone network targets.
+
+    This is a configuration-time admission check.  It requires the custom
+    provider feature flag and rejects any literal or DNS-resolved address that
+    is not globally routable (including loopback, private, link-local,
+    unspecified, multicast, and reserved ranges).
+
+    The proxy/network layer should still enforce outbound protections at
+    request time to cover redirects and DNS rebinding after configuration.
+    """
+    _require_custom_provider_enabled()
+    clean = _validate_upstream_url(value, label)
+    parsed = urlsplit(clean)
+    host = parsed.hostname
+    if not host:
+        raise ValueError(f"{label} must include a hostname")
+
+    try:
+        port = parsed.port
+    except ValueError as exc:
+        raise ValueError(f"{label} contains an invalid port") from exc
+    if port is None:
+        port = 443 if parsed.scheme == "https" else 80
+
+    addresses: set[ipaddress.IPv4Address | ipaddress.IPv6Address] = set()
+    try:
+        addresses.add(ipaddress.ip_address(host.split("%", 1)[0]))
+    except ValueError:
+        try:
+            infos = socket.getaddrinfo(host, port, type=socket.SOCK_STREAM)
+        except socket.gaierror as exc:
+            raise ValueError(f"{label} hostname must resolve") from exc
+        for info in infos:
+            raw = info[4][0].split("%", 1)[0]
+            try:
+                addresses.add(ipaddress.ip_address(raw))
+            except ValueError:
+                raise ValueError(f"{label} hostname resolved to an invalid address") from None
+
+    if not addresses:
+        raise ValueError(f"{label} hostname must resolve")
+    if any(not address.is_global for address in addresses):
+        raise ValueError(
+            f"{label} must resolve only to public addresses; loopback/private/link-local targets are forbidden"
+        )
+    return clean
+
+
 def _resolve_provider_upstream(provider: str, upstream_url: str | None = None) -> tuple[str, str]:
     """Resolve a provider choice to the concrete proxy routing URL.
 
@@ -128,10 +194,14 @@ def _resolve_provider_upstream(provider: str, upstream_url: str | None = None) -
     if upstream_url is not None:
         if provider != "custom":
             raise ValueError("upstream_url may be supplied only for provider='custom'")
-        return provider, _validate_upstream_url(upstream_url, "custom upstream URL")
+        return provider, _validate_public_custom_target(upstream_url, "custom upstream URL")
 
     configured = os.getenv(_provider_url_env_name(provider), "").strip()
     if configured:
+        if provider == "custom":
+            return provider, _validate_public_custom_target(
+                configured, "custom upstream URL"
+            )
         return provider, _validate_upstream_url(configured, f"{provider} upstream URL")
 
     builtin = _BUILTIN_PROVIDER_URLS.get(provider)
@@ -158,7 +228,9 @@ def _get_default_provider_config() -> tuple[str, str]:
 
     legacy_url = os.getenv(DEFAULT_UPSTREAM_URL_ENV, "").strip()
     if legacy_url:
-        return "custom", _validate_upstream_url(legacy_url, "default upstream URL")
+        return "custom", _validate_public_custom_target(
+            legacy_url, "default upstream URL"
+        )
 
     raise RuntimeError(
         "GUARDRAIL_DEFAULT_PROVIDER (preferred) or GUARDRAIL_DEFAULT_UPSTREAM_URL "
