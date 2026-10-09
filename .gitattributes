@@ -62,3 +62,6 @@
 /scenarios/DEMO-LR-stall-v1.yaml text eol=lf
 /scenarios/DEMO-MR-normal-v1.yaml text eol=lf
 /scenarios/DEMO-MR-stall-v1.yaml text eol=lf
+
+# Canonical demo manifest hashes scenario.yaml byte-for-byte.
+/runs/demo/*/scenario.yaml text eol=lf

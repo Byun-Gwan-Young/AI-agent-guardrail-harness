@@ -66,6 +66,30 @@ class InitDbConnectionContractTests(unittest.TestCase):
 
 
 
+
+    def test_target_connection_operational_error_does_not_imply_missing_database(self):
+        target_error = psycopg.OperationalError("connection failed")
+        maintenance = MagicMock()
+        cursor = MagicMock()
+        cursor.fetchone.return_value = (1,)  # target DB exists
+        maintenance.cursor.return_value.__enter__.return_value = cursor
+        maintenance.cursor.return_value.__exit__.return_value = False
+
+        calls = [
+            _ConnectionContext(exc=target_error),
+            _ConnectionContext(connection=maintenance),
+        ]
+
+        with patch("storage.init_db.get_target_database_name", return_value="appdb"), patch(
+            "storage.init_db.get_connection",
+            side_effect=calls,
+        ):
+            with self.assertRaisesRegex(RuntimeError, "존재하지만 연결에 실패"):
+                init_db.ensure_database_exists()
+
+        statements = [call.args[0] for call in cursor.execute.call_args_list]
+        self.assertFalse(any("CREATE DATABASE" in str(stmt) for stmt in statements))
+
     def test_init_does_not_bootstrap_ownerless_writable_project(self):
         with patch("storage.init_db.initialize_schema") as initialize_schema, patch(
             "storage.init_db.list_projects", return_value=[]

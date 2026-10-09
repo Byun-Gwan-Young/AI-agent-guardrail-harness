@@ -61,6 +61,15 @@ Backend/auth 계층이 Google 인증 결과를 검증한 뒤 `google_sub`, `emai
 로그인 허용 여부도 Backend가 `is_email_allowed(email)`로 확인한 뒤 사용자 upsert 흐름을 진행해야 합니다.
 즉 Storage는 OAuth UI/토큰 검증을 구현하지 않고, 검증된 identity와 감사 이벤트를 저장합니다.
 
+### 감사 후 보강된 저장 경계
+
+- canonical demo는 **115 sessions / 926 judgements / 15 scenario versions**가 모두 준비된 경우에만 bulk sync를 진행합니다. 일부 폴더가 빠진 입력은 DB를 열기 전에 거부합니다.
+- demo `scenario.yaml`의 manifest hash는 현재 파일 바이트와 **정확히 일치**해야 하며, `runs/demo/*/scenario.yaml`은 `.gitattributes`에서 LF로 고정합니다.
+- raw 재import는 기존 session의 `source`/scenario identity를 바꾸지 못합니다. 같은 session ID를 다른 프로젝트·scenario로 옮기는 입력은 거부합니다.
+- live observation에는 judgement 결과(`progress`, `criteria` 등)를 넣을 수 없고, judgement의 agent/rule 중복 필드는 같은 step의 observation/result와 일치해야 합니다.
+- API key 검증은 `revoked_at IS NULL` 조건부 갱신을 마지막 성공 기준으로 사용해 revoke와의 경쟁에서 폐기된 키를 성공으로 반환하지 않습니다.
+- 기존 DB의 제약 보강처럼 데이터 정책이 필요한 변경은 일반 `init`에 파괴적으로 숨기지 않고 별도 migration/PM 합의 대상으로 둡니다.
+
 ### 현재 의도적인 한계
 
 - `get_session_progress(session_id, after_step)`의 cursor는 step 단위라 **late judgement까지 무손실로 보장하는 event cursor가 아닙니다.**
@@ -173,10 +182,10 @@ project_id + scenario_key + scenario_hash
 ### raw run
 
 ```powershell
-python -m storage run A-1-v4
+python -m storage run A-1-v2
 ```
 
-`A-1-v4`로 시작하는 raw run이 딱 하나라면 긴 UUID를 생략할 수 있습니다.
+`A-1-v2`로 시작하는 raw run이 딱 하나라면 긴 UUID를 생략할 수 있습니다.
 여러 개가 매칭되면 더 길게 입력하라는 메시지가 나옵니다.
 
 ### demo 한 개
@@ -204,7 +213,7 @@ python -m storage projects
 필요하면 예전 방식도 그대로 쓸 수 있습니다.
 
 ```powershell
-python -m storage.import_run A-1-v4-e174aafe805b4f59bb62d7c95716b8b7
+python -m storage.import_run A-1-v2-b51f67df2fb9402ba15fccb35c3db53e
 python -m storage.import_demo DEMO-CL-normal-v1-108968e505cf4890ab930759f0cf67e5
 python -m storage.import_demo --all
 ```

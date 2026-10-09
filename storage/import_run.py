@@ -39,6 +39,8 @@ def load_persisted_observations(run_dir, session_data):
     expected_steps = {
         item.get("step_id") for item in expected if item.get("step_id") is not None
     }
+    if len(expected_steps) != len(expected):
+        raise ValueError("session.json observation step_id가 없거나 중복되어 있습니다.")
 
     observations_dir = run_dir / "observations"
     ack_files = []
@@ -85,7 +87,33 @@ def load_persisted_observations(run_dir, session_data):
             f"session.json={sorted(expected_steps)}, ack={sorted(actual_steps)}"
         )
 
+    expected_by_step = {item["step_id"]: item for item in expected}
+    loaded_by_step = {item["step_id"]: item for item in loaded}
+    mismatched_steps = [
+        step for step in sorted(expected_steps)
+        if expected_by_step[step] != loaded_by_step[step]
+    ]
+    if mismatched_steps:
+        raise ValueError(
+            "session.json과 ack.json observation 내용이 다릅니다: "
+            f"steps={mismatched_steps}"
+        )
+
     return loaded
+
+
+def _model_name(value):
+    """Return a stable TEXT model identifier from string/object source forms."""
+    if value is None:
+        return None
+    if isinstance(value, str):
+        return value
+    if isinstance(value, dict):
+        for key in ("name", "model", "id"):
+            candidate = value.get(key)
+            if isinstance(candidate, str) and candidate.strip():
+                return candidate.strip()
+    raise ValueError("model must be a string or an object containing name/model/id")
 
 
 def session_values(summary, session_data, conditions_data, scenario, observations):
@@ -100,7 +128,9 @@ def session_values(summary, session_data, conditions_data, scenario, observation
         "termination_reason": summary.get("termination_reason") or meta.get("termination_reason"),
         "phase": conditions_data.get("phase"),
         "guardrail_mode": conditions_data.get("guardrail_mode") or meta.get("guardrail_mode"),
-        "model": conditions_data.get("model") or scenario.get("model") or meta.get("model"),
+        "model": _model_name(
+            conditions_data.get("model") or scenario.get("model") or meta.get("model")
+        ),
         "steps_reached": summary.get("steps") or len(observations),
         # 알려진 부분합을 전체 토큰으로 둔갑시키지 않는다.
         "total_tokens": summary.get("total_tokens"),
@@ -113,6 +143,22 @@ def session_values(summary, session_data, conditions_data, scenario, observation
 
 
 def upsert_session(cursor, session_id, scenario_id, values):
+    """Insert/update a raw-run session without changing its historical identity."""
+    cursor.execute(
+        """
+        SELECT source, scenario_id
+        FROM sessions
+        WHERE id = %s
+        FOR UPDATE;
+        """,
+        (session_id,),
+    )
+    existing = cursor.fetchone()
+    if existing is not None and (existing[0] != "raw-run" or existing[1] != scenario_id):
+        raise ValueError(
+            f"session_id={session_id!r}는 기존 source/project/scenario identity와 다릅니다."
+        )
+
     cursor.execute(
         """
         INSERT INTO sessions (
@@ -127,7 +173,6 @@ def upsert_session(cursor, session_id, scenario_id, values):
         )
         ON CONFLICT (id)
         DO UPDATE SET
-            scenario_id = EXCLUDED.scenario_id,
             status = EXCLUDED.status,
             termination_reason = EXCLUDED.termination_reason,
             phase = EXCLUDED.phase,
@@ -140,9 +185,9 @@ def upsert_session(cursor, session_id, scenario_id, values):
             ended_at = EXCLUDED.ended_at,
             execution_config = EXCLUDED.execution_config,
             session_data = EXCLUDED.session_data,
-            validity = EXCLUDED.validity,
-            source = EXCLUDED.source
+            validity = EXCLUDED.validity
         WHERE sessions.source = EXCLUDED.source
+          AND sessions.scenario_id = EXCLUDED.scenario_id
         RETURNING id;
         """,
         (
@@ -165,7 +210,7 @@ def upsert_session(cursor, session_id, scenario_id, values):
 
     if cursor.fetchone() is None:
         raise ValueError(
-            f"session_id={session_id!r}는 다른 source의 세션에서 이미 사용 중입니다."
+            f"session_id={session_id!r}는 기존 source/project/scenario identity와 다릅니다."
         )
 
 
@@ -334,9 +379,11 @@ def import_run(run_value, project_id):
     # so it receives the secret-only check; persisted session/observation facts
     # receive the stricter storage-shape check.
     assert_no_secrets(scenario_info["config"], "scenario config")
+    assert_no_secrets(values["model"], "model")
     assert_safe_storage_json(values["execution_config"], "execution_config")
     assert_safe_storage_json(values["session_data"], "session_data")
     for observation in observations:
+        assert_no_secrets(observation.get("agent_id"), "observation agent_id")
         assert_safe_storage_json(observation_input(observation), "observation_data")
         criteria = observation.get("criteria") or {}
         progress = observation.get("progress") or {}

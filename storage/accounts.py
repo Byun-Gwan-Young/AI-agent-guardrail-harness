@@ -99,6 +99,11 @@ def _validate_upstream_url(value: str, label: str = "upstream URL") -> str:
         raise ValueError(f"{label} must be an absolute http(s) URL")
     if parsed.username is not None or parsed.password is not None:
         raise ValueError(f"{label} must not contain credentials")
+    if parsed.fragment:
+        # Fragments are not sent to the upstream HTTP server and have no routing
+        # value here. Reject them so credentials cannot be hidden in persistent
+        # URL metadata such as #api_key=... .
+        raise ValueError(f"{label} must not contain a URL fragment")
 
     # Unknown/custom provider keys may not match one of our literal secret
     # patterns. Block credential-shaped query parameter names as well so a URL
@@ -735,9 +740,16 @@ def verify_api_key(raw_key):
                     UPDATE api_keys
                     SET last_used_at = CURRENT_TIMESTAMP
                     WHERE id = %s
+                      AND revoked_at IS NULL
+                    RETURNING last_used_at
                     """,
                     (key_id,),
                 )
+                # A concurrent revoke may have committed after the candidate
+                # SELECT. The conditional UPDATE is the final authority: if it
+                # updated nothing, the key is no longer valid.
+                if cursor.fetchone() is None:
+                    return None
 
                 return {
                     "id": row[3],

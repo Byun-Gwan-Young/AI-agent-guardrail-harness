@@ -120,10 +120,10 @@ class FakeCursor:
             self._set(cols, [] if not row else [tuple(row[c] for c in cols)])
             return
 
-        # judgement requires an observation for the same step
-        if q.startswith("SELECT 1 FROM observations WHERE session_id = %s AND step = %s"):
+        # judgement requires the same observation/agent for the step
+        if q.startswith("SELECT agent_id FROM observations WHERE session_id = %s AND step = %s"):
             row = self.state["observations"].get(tuple(params))
-            self._set(["?column?"], [] if row is None else [(1,)])
+            self._set(["agent_id"], [] if row is None else [(row["agent_id"],)])
             return
 
         # insert judgement

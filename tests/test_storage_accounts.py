@@ -109,8 +109,12 @@ class FakeCursor:
 
         if q.startswith("UPDATE api_keys SET last_used_at = CURRENT_TIMESTAMP"):
             key_id = params[0]
-            self.state["api_keys"][key_id]["last_used_at"] = "used"
-            self._set_rows([], [])
+            key = self.state["api_keys"][key_id]
+            if key["revoked_at"] is None:
+                key["last_used_at"] = "used"
+                self._set_rows(["last_used_at"], [("used",)])
+            else:
+                self._set_rows(["last_used_at"], [])
             return
 
         if "SELECT k.id, k.project_id FROM api_keys k JOIN projects p ON p.id = k.project_id" in q:

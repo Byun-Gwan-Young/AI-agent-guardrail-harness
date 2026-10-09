@@ -198,6 +198,25 @@ class AccountsHardeningTests(unittest.TestCase):
                 "https://provider.example.invalid/v1?api_key=unknown-format-secret"
             )
 
+
+    def test_upstream_url_rejects_fragment(self):
+        with self.assertRaisesRegex(ValueError, "URL fragment"):
+            accounts._validate_upstream_url(
+                "https://provider.example.invalid/v1#api_key=hidden"
+            )
+
+    def test_unknown_secret_field_names_are_rejected(self):
+        with self.assertRaisesRegex(ValueError, "비밀 필드"):
+            safety.assert_no_secrets(
+                {"provider_api_key": "opaque-new-format"},
+                "scenario config",
+            )
+        with self.assertRaisesRegex(ValueError, "저장 금지"):
+            safety.assert_safe_storage_json(
+                {"POSTGRES_PASSWORD": "opaque-password"},
+                "auth event detail",
+            )
+
     def test_upstream_url_allows_noncredential_query_parameter(self):
         self.assertEqual(
             accounts._validate_upstream_url(
