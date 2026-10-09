@@ -1,8 +1,21 @@
-"""실제 raw run을 최종 PostgreSQL 스키마에 저장한다."""
+"""Import one real/raw run into the canonical PostgreSQL Storage schema.
+
+This is a writable-project ingestion path, not a demo loader.  The importer
+reads the persisted run artifacts, derives ``scenario_hash`` from the exact
+``scenario.yaml`` bytes, separates observation input from judgement results,
+and rejects forbidden secrets/model text before opening the write path.
+
+Do not use this importer to write into the read-only canonical demo project and
+do not invent missing source data.  Re-import of the same identity is designed
+to be idempotent through upsert behavior.
+
+See ``storage/README.md`` for the Storage invariants and ownership boundaries.
+"""
 
 import argparse
 
 from storage.db import get_connection, get_project_id
+from storage.safety import assert_no_secrets, assert_safe_storage_json
 from storage.import_utils import (
     build_execution_config,
     build_session_data,
@@ -105,11 +118,12 @@ def upsert_session(cursor, session_id, scenario_id, values):
         INSERT INTO sessions (
             id, scenario_id, status, termination_reason, phase, guardrail_mode,
             model, steps_reached, total_tokens, first_stop_step,
-            started_at, ended_at, execution_config, session_data
+            started_at, ended_at, execution_config, session_data, validity, source
         )
         VALUES (
             %s, %s, %s, %s, %s, %s, %s,
-            %s, %s, %s, %s, %s, %s::jsonb, %s::jsonb
+            %s, %s, %s, %s, %s, %s::jsonb, %s::jsonb,
+            'not_counted', 'raw-run'
         )
         ON CONFLICT (id)
         DO UPDATE SET
@@ -125,7 +139,11 @@ def upsert_session(cursor, session_id, scenario_id, values):
             started_at = EXCLUDED.started_at,
             ended_at = EXCLUDED.ended_at,
             execution_config = EXCLUDED.execution_config,
-            session_data = EXCLUDED.session_data;
+            session_data = EXCLUDED.session_data,
+            validity = EXCLUDED.validity,
+            source = EXCLUDED.source
+        WHERE sessions.source = EXCLUDED.source
+        RETURNING id;
         """,
         (
             session_id,
@@ -144,6 +162,11 @@ def upsert_session(cursor, session_id, scenario_id, values):
             dumps_json(values["session_data"]),
         ),
     )
+
+    if cursor.fetchone() is None:
+        raise ValueError(
+            f"session_id={session_id!r}는 다른 source의 세션에서 이미 사용 중입니다."
+        )
 
 
 def upsert_observation(cursor, session_id, observation):
@@ -304,6 +327,23 @@ def import_run(run_value, project_id):
     scenario_info = scenario_payload(run_dir, conditions_data)
     scenario = scenario_info["config"]
     values = session_values(summary, session_data, conditions_data, scenario, observations)
+
+    # Raw-run files are trusted experiment artifacts, but the DB is still a
+    # persistence boundary. Reject accidental credentials/model traffic before
+    # opening a transaction. scenario config may legitimately contain task text,
+    # so it receives the secret-only check; persisted session/observation facts
+    # receive the stricter storage-shape check.
+    assert_no_secrets(scenario_info["config"], "scenario config")
+    assert_safe_storage_json(values["execution_config"], "execution_config")
+    assert_safe_storage_json(values["session_data"], "session_data")
+    for observation in observations:
+        assert_safe_storage_json(observation_input(observation), "observation_data")
+        criteria = observation.get("criteria") or {}
+        progress = observation.get("progress") or {}
+        assert_safe_storage_json(
+            {"collection": observation.get("collection"), "progress": progress, "criteria": criteria},
+            "judgement result_data",
+        )
 
     with get_connection() as conn:
         with conn.cursor() as cursor:

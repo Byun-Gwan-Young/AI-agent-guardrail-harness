@@ -1,8 +1,8 @@
 """C-19-6 (DM-89) : load the committed demo records into PostgreSQL and check them with SQL.
 
   rows   [--output rows.json]          build the table rows from the files only (no database) and print counts
-  schema                               apply service/schema.sql to GUARDRAIL_DB_URL
-  load                                 replace the demo rows in GUARDRAIL_DB_URL in one transaction
+  schema                               retired after DB unification (use ``python -m storage init``)
+  load                                 retired after DB unification (use ``python -m storage demo-all``)
   check  [--offline] [--output x.json] run the check queries (service/queries.py) on GUARDRAIL_DB_URL, or with
                                        --offline on an in-memory SQLite copy of the same rows; exit 1 on a mismatch
 
@@ -270,17 +270,9 @@ def main(argv=None):
                 args.output.parent.mkdir(parents=True, exist_ok=True)
                 args.output.write_text(json.dumps(report, ensure_ascii=False, indent=1) + '\n', encoding='utf-8')
         elif args.command == 'schema':
-            store = postgres_store(read_only=False)
-            store.apply_schema()
-            report = {'schema': 'applied', 'database': database_name(store)}
+            raise RecordError('service schema writer retired; use `python -m storage init`')
         elif args.command == 'load':
-            store = postgres_store(read_only=False)
-            name = database_name(store)
-            if name != args.expect_db:
-                raise RecordError(f'connected to database {name!r}, expected {args.expect_db!r}; nothing written')
-            rows = build_rows(loaded_at=now())
-            store.replace_all(rows)
-            report = {'loaded': row_counts(rows), 'database': name}
+            raise RecordError('service demo writer retired; use `python -m storage demo-all`')
         else:
             if args.offline:
                 store, where = sqlite_store(build_rows()), 'sqlite-in-memory (offline stand-in, same SQL)'

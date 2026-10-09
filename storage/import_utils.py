@@ -1,4 +1,16 @@
-"""raw/demo importer가 공통으로 사용하는 작은 유틸리티 모음."""
+"""Shared parsing/validation helpers for raw and demo importers.
+
+Key semantic contracts:
+- ``scenario_hash`` is SHA-256 of the original YAML file bytes, not a hash of
+  parsed/re-serialized YAML.
+- observation JSON keeps judge *inputs*; computed progress/criteria belong in
+  ``judgements.result_data``.
+- importer helpers must preserve source identity rather than silently guessing
+  missing versions or records.
+
+This module is deliberately small so both ingestion paths use the same meaning
+for scenario/session data.  See ``storage/README.md`` for the full handoff.
+"""
 
 import hashlib
 import json
@@ -9,6 +21,7 @@ import yaml
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 STOP_DECISIONS = {"deadlock", "termination_failure"}
+CURRENT_SCENARIO_SCHEMA_VERSION = "scenario-v2"
 
 # progress_schema.Observation의 '입력' 성격 필드만 보존한다.
 # progress / criteria는 계산 결과이므로 judgements로 분리한다.
@@ -91,9 +104,20 @@ def require_files(run_dir, relative_paths):
 
 
 def verify_project(cursor, project_id):
-    cursor.execute("SELECT 1 FROM projects WHERE id = %s;", (project_id,))
-    if cursor.fetchone() is None:
+    """raw import 대상이 존재하는 writable project인지 확인한다.
+
+    read_only demo project는 발표 데이터의 canonical boundary이므로 raw run을
+    실수로 섞어 넣지 않는다. CLI 자동 선택과 여기서 이중으로 방어한다.
+    """
+    cursor.execute(
+        "SELECT read_only FROM projects WHERE id = %s;",
+        (project_id,),
+    )
+    row = cursor.fetchone()
+    if row is None:
         raise ValueError(f"projects.id={project_id} 프로젝트가 없습니다.")
+    if bool(row[0]):
+        raise ValueError(f"projects.id={project_id}는 읽기 전용 프로젝트입니다.")
 
 
 def scenario_payload(run_dir, conditions_data):
@@ -106,11 +130,24 @@ def scenario_payload(run_dir, conditions_data):
     if not scenario_key:
         raise ValueError("scenario_id를 찾을 수 없습니다.")
 
-    schema_version = (
-        scenario.get("schema_version")
-        or condition_scenario.get("schema_version")
-        or "scenario-v1"
-    )
+    yaml_schema_version = scenario.get("schema_version")
+    condition_schema_version = condition_scenario.get("schema_version")
+    if (
+        yaml_schema_version
+        and condition_schema_version
+        and yaml_schema_version != condition_schema_version
+    ):
+        raise ValueError(
+            "scenario.yaml과 conditions.json의 schema_version이 다릅니다: "
+            f"{yaml_schema_version!r} != {condition_schema_version!r}"
+        )
+
+    schema_version = yaml_schema_version or condition_schema_version
+    if schema_version != CURRENT_SCENARIO_SCHEMA_VERSION:
+        raise ValueError(
+            "현재 Storage는 scenario-v2만 지원합니다: "
+            f"받은 schema_version={schema_version!r}"
+        )
     name = scenario.get("title") or condition_scenario.get("title") or scenario_key
     task_kind = scenario.get("task_kind") or condition_scenario.get("task_kind")
 
@@ -120,7 +157,7 @@ def scenario_payload(run_dir, conditions_data):
         "schema_version": schema_version,
         "name": name,
         "task_kind": task_kind,
-        # 구버전 scenario_revision이 있더라도 config 안에 그대로 보존된다.
+        # 현재 scenario-v2 원본 구조를 JSONB로 보존한다.
         "config": scenario,
     }
 

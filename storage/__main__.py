@@ -1,8 +1,17 @@
-"""Storage를 초보자도 짧은 명령/메뉴로 실행할 수 있게 하는 진입점."""
+"""Human-friendly CLI entry point for the Storage layer.
+
+This file is only orchestration/UI sugar around the canonical Storage modules.
+It must not duplicate business rules from ``accounts.py``, ``import_run.py``,
+``import_demo.py``, ``live.py``, or ``db.py``.  Keep validation and persistence
+rules in those modules so CLI and Backend callers observe the same contract.
+
+See ``storage/README.md`` before adding commands or changing defaults.
+"""
 
 import argparse
 from pathlib import Path
 
+from storage.accounts import allow_email, list_allowed_emails, remove_email
 from storage.db import get_project_id
 from storage.import_demo import demo_folders, import_all_demos, import_demo
 from storage.import_run import import_run
@@ -67,6 +76,17 @@ def show_projects():
         print(f"id={row[0]} | {row[1]} | mode={row[2]} | rule={row[3]} | {row[4]}")
 
 
+def show_allowed_emails():
+    rows = list_allowed_emails()
+    if not rows:
+        print("허용 이메일이 없습니다.")
+        return
+
+    print("\n[allowed emails]")
+    for row in rows:
+        print(row["email"])
+
+
 def interactive_menu():
     """`python -m storage`만 입력하면 사용할 수 있는 간단 메뉴."""
     while True:
@@ -77,6 +97,9 @@ def interactive_menu():
             "3. demo 1개 저장\n"
             "4. demo 전체 저장\n"
             "5. 프로젝트 목록\n"
+            "6. 허용 이메일 목록\n"
+            "7. 허용 이메일 추가\n"
+            "8. 허용 이메일 삭제\n"
             "0. 종료"
         )
         choice = input("선택: ").strip()
@@ -89,7 +112,7 @@ def interactive_menu():
                 import_run(str(folder), get_project_id())
             elif choice == "3":
                 folder = choose_folder(demo_folders(), "demo", search=True)
-                session_id, count = import_demo(str(folder), get_project_id())
+                session_id, count = import_demo(str(folder))
                 print("demo PostgreSQL 저장 성공")
                 print("session_id:", session_id)
                 print("judgements:", count)
@@ -98,13 +121,23 @@ def interactive_menu():
             elif choice == "4":
                 confirm = input("runs/demo 전체를 저장할까요? (y/N): ").strip().lower()
                 if confirm == "y":
-                    import_all_demos(get_project_id())
+                    import_all_demos()
             elif choice == "5":
                 show_projects()
+            elif choice == "6":
+                show_allowed_emails()
+            elif choice == "7":
+                email = input("추가할 이메일: ").strip()
+                allow_email(email)
+                print("허용 이메일 추가 완료")
+            elif choice == "8":
+                email = input("삭제할 이메일: ").strip()
+                remove_email(email)
+                print("허용 이메일 삭제 완료")
             elif choice == "0":
                 return
             else:
-                print("0~5 중에서 선택하세요.")
+                print("0~8 중에서 선택하세요.")
         except Exception as exc:
             print(f"오류: {exc}")
 
@@ -126,6 +159,14 @@ def command_line():
     sub.add_parser("demo-all", help="demo 전체 저장")
     sub.add_parser("projects", help="프로젝트 목록")
 
+    allow_parser = sub.add_parser("allow-email", help="로그인 허용 이메일 추가")
+    allow_parser.add_argument("email")
+
+    remove_parser = sub.add_parser("remove-email", help="로그인 허용 이메일 삭제")
+    remove_parser.add_argument("email")
+
+    sub.add_parser("allowed-emails", help="로그인 허용 이메일 목록")
+
     args = parser.parse_args()
     if args.command is None:
         interactive_menu()
@@ -139,9 +180,22 @@ def command_line():
         show_projects()
         return
 
-    project_id = get_project_id()
+    if args.command == "allow-email":
+        allow_email(args.email)
+        print("허용 이메일 추가 완료")
+        return
+
+    if args.command == "remove-email":
+        remove_email(args.email)
+        print("허용 이메일 삭제 완료")
+        return
+
+    if args.command == "allowed-emails":
+        show_allowed_emails()
+        return
 
     if args.command == "run":
+        project_id = get_project_id()
         value = args.run
         if not value:
             value = str(choose_folder(raw_folders(), "raw run"))
@@ -150,14 +204,14 @@ def command_line():
         value = args.run
         if not value:
             value = str(choose_folder(demo_folders(), "demo", search=True))
-        session_id, count = import_demo(value, project_id)
+        session_id, count = import_demo(value)
         print("demo PostgreSQL 저장 성공")
         print("session_id:", session_id)
         print("judgements:", count)
         print("observations: 0 (demo record 원본 없음)")
         print("llm_calls: 0 (demo record 원본 없음)")
     elif args.command == "demo-all":
-        import_all_demos(project_id)
+        import_all_demos()
 
 
 if __name__ == "__main__":

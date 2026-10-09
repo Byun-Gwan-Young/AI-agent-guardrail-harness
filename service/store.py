@@ -1,10 +1,12 @@
-"""C-19-6 : one SQL layer for the demo database, used by the loader (service/load_demo.py) and the API (service/api.py).
+"""Read-only SQL layer for the demo API plus a legacy SQLite stand-in for offline tests.
 
-The statements are written once with '?' parameters and plain SQL so that the same text runs on PostgreSQL (psycopg,
-'%s' parameters) and, in the offline tests, on an in-memory SQLite database built from service/schema.sql with the
-type names substituted. The API only reads; PostgreSQL connections for the API are opened read only.
+After DB unification, PostgreSQL is owned by ``storage/``.  The old four-table
+``service/schema.sql`` remains only so the established offline SQLite tests can
+exercise the legacy response contract; service code must never create/replace
+PostgreSQL tables.
 """
 import json
+from datetime import datetime, timezone
 import os
 from pathlib import Path
 import re
@@ -25,6 +27,7 @@ BOOL_COLUMNS = {'frozen', 'git_dirty', 'counted', 'blocked'}
 SQLITE_TYPES = (('DOUBLE PRECISION', 'REAL'), ('TIMESTAMPTZ', 'TEXT'), ('JSONB', 'TEXT'), ('BOOLEAN', 'INTEGER'))
 # Keys that would carry model text. 'reasoning' is allowed only as a token count (an integer or null).
 FORBIDDEN_KEYS = {'narrative', 'reasoning_content', 'thought', 'thoughts', 'content', 'messages'}
+LEGACY_POSTGRES_WRITE_ERROR = ('service PostgreSQL writer is retired after DB unification; ' 'use `python -m storage init` and `python -m storage demo-all`')
 
 
 class RecordError(ValueError):
@@ -89,6 +92,14 @@ class Store:
             return json.loads(value)
         if column in BOOL_COLUMNS:
             return bool(value)
+        # PostgreSQL TIMESTAMPTZ is the same instant regardless of the
+        # connection/session timezone, but psycopg returns it in that timezone.
+        # The committed demo API contract uses UTC (+00:00), so normalize
+        # timezone-aware datetimes before serializing them.
+        if isinstance(value, datetime):
+            if value.tzinfo is not None:
+                value = value.astimezone(timezone.utc)
+            return value.isoformat()
         if hasattr(value, 'isoformat'):
             return value.isoformat()
         if type(value).__name__ == 'Decimal':
@@ -121,6 +132,8 @@ class Store:
 
     # -- writing (loader only) ------------------------------------------------------------------------------------
     def apply_schema(self):
+        if self.dialect == 'postgres':
+            raise RecordError(LEGACY_POSTGRES_WRITE_ERROR)
         conn = self.connect()
         try:
             if self.dialect == 'postgres':
@@ -132,8 +145,9 @@ class Store:
             self.release(conn)
 
     def replace_all(self, rows):
-        """Delete every demo row and insert `rows` ({table: [row dict]}) in one transaction: the same input gives the
-        same tables however often it runs."""
+        """Replace legacy SQLite rows for offline tests. PostgreSQL writes are retired."""
+        if self.dialect == 'postgres':
+            raise RecordError(LEGACY_POSTGRES_WRITE_ERROR)
         conn = self.connect()
         try:
             cur = conn.cursor()

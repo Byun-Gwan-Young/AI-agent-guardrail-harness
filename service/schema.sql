@@ -1,3 +1,7 @@
+-- LEGACY/OFFLINE FIXTURE ONLY.
+-- PostgreSQL is owned by storage/schema.sql after DB unification.
+-- This file remains for tests/test_service_demo_db.py SQLite compatibility.
+
 -- C-19-6 (DM-89) : demo records in PostgreSQL (database guardrail_demo). Read by service/api.py (read only).
 --
 -- Every value is copied from committed record files; nothing is recomputed here (STOP sentences and judgement values

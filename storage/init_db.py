@@ -1,15 +1,21 @@
-"""pgAdmin 없이 VS Code 터미널에서 DB/스키마/첫 프로젝트를 준비한다."""
+"""pgAdmin 없이 터미널에서 DB/schema를 준비하는 helper.
 
-import os
+사용자 소유 프로젝트 생성은 인증 경계인 ``storage.accounts.create_project``가
+담당한다. 이 모듈은 owner 없는 writable 프로젝트를 자동 생성하지 않는다.
+"""
+
 from pathlib import Path
 
 import psycopg
 from psycopg import sql
 
-from storage.db import PROJECT_ROOT, get_connection
+from storage.db import get_connection, get_target_database_name
 
 
 TABLES = {
+    "users",
+    "allowed_emails",
+    "auth_events",
     "projects",
     "api_keys",
     "scenarios",
@@ -21,14 +27,37 @@ TABLES = {
 
 
 def ensure_database_exists():
-    """POSTGRES_DB가 없으면 로컬 PostgreSQL에서 생성한다."""
-    target_db = os.environ["POSTGRES_DB"]
+    """Create the configured application DB only when it does not already exist.
+
+    The target name comes from ``GUARDRAIL_DB_URL`` first and ``POSTGRES_DB``
+    second, exactly like ``storage.db.get_connection``.
+
+    Important deployment detail: we first try the target DB directly.  A normal
+    server account may be allowed to use an existing DB but not have CREATE
+    DATABASE permission.  Therefore we touch the maintenance ``postgres`` DB
+    only after PostgreSQL explicitly reports that the target database does not
+    exist.
+    """
+
+    target_db = get_target_database_name()
+
+    try:
+        # Existing deployment DB: no CREATE DATABASE privilege is needed.
+        with get_connection(autocommit=True):
+            return False
+    except psycopg.errors.InvalidCatalogName:
+        pass
+
     if target_db == "postgres":
-        return False
+        # Reaching here would mean the cluster's maintenance database itself is
+        # unavailable; attempting to create it from itself is not meaningful.
+        raise RuntimeError("PostgreSQL maintenance database 'postgres' does not exist")
 
     try:
         with get_connection(dbname="postgres", autocommit=True) as conn:
             with conn.cursor() as cursor:
+                # Another process may have created it between the failed target
+                # connection and this maintenance connection, so check again.
                 cursor.execute(
                     "SELECT 1 FROM pg_database WHERE datname = %s;",
                     (target_db,),
@@ -43,19 +72,24 @@ def ensure_database_exists():
                 return True
     except psycopg.Error as exc:
         raise RuntimeError(
-            f"DB '{target_db}'를 자동 생성하지 못했습니다. "
-            "계정에 CREATE DATABASE 권한이 없는 환경일 수 있습니다."
+            f"DB '{target_db}'가 존재하지 않고 자동 생성에도 실패했습니다. "
+            "배포 환경이라면 운영자가 DB를 미리 만들었는지와 CREATE DATABASE 권한을 확인하세요."
         ) from exc
 
 
 def initialize_schema():
-    """빈 DB에 schema.sql의 최종 7개 테이블을 생성한다."""
+    """Apply the canonical schema without deleting user/session data."""
     ensure_database_exists()
+
     schema_path = Path(__file__).resolve().parent / "schema.sql"
     schema_sql = schema_path.read_text(encoding="utf-8")
 
     with get_connection() as conn:
         with conn.cursor() as cursor:
+            # schema.sql is additive/idempotent. Destructive historical cleanup
+            # belongs in an explicit one-time migration, never in normal init.
+            cursor.execute(schema_sql, prepare=False)
+
             cursor.execute(
                 """
                 SELECT table_name
@@ -65,22 +99,17 @@ def initialize_schema():
                 """,
                 (list(TABLES),),
             )
+
             existing = {row[0] for row in cursor.fetchall()}
+            missing = TABLES - existing
 
-            if existing == TABLES:
-                print("DB 스키마가 이미 준비되어 있습니다. (7개 테이블 확인)")
-                return False
-
-            if existing:
+            if missing:
                 raise RuntimeError(
-                    "일부 Storage 테이블만 존재합니다. 자동 초기화를 중단합니다: "
-                    + ", ".join(sorted(existing))
+                    "스키마 적용 후에도 일부 테이블이 없습니다: "
+                    + ", ".join(sorted(missing))
                 )
 
-            # schema.sql을 그대로 실행하므로 pgAdmin에서 SQL을 복붙할 필요가 없다.
-            cursor.execute(schema_sql, prepare=False)
-
-    print("DB 스키마 생성 완료: 7개 테이블")
+    print(f"DB 스키마 적용 완료: {len(TABLES)}개 테이블 확인")
     return True
 
 
@@ -95,30 +124,20 @@ def list_projects():
 
 
 def create_project(name, mode, rule_id, upstream_url):
-    """SQL 직접 입력 없이 프로젝트 하나를 만든다."""
-    if mode not in {"observe", "warn", "block"}:
-        raise ValueError("mode는 observe / warn / block 중 하나여야 합니다.")
-    if not name.strip() or not rule_id.strip() or not upstream_url.strip():
-        raise ValueError("name, rule_id, upstream_url은 비울 수 없습니다.")
+    """Retired legacy bootstrap helper.
 
-    with get_connection() as conn:
-        with conn.cursor() as cursor:
-            cursor.execute(
-                """
-                INSERT INTO projects (name, mode, rule_id, upstream_url)
-                VALUES (%s, %s, %s, %s)
-                RETURNING id;
-                """,
-                (name.strip(), mode, rule_id.strip(), upstream_url.strip()),
-            )
-            project_id = cursor.fetchone()[0]
-
-    print(f"프로젝트 생성 완료: id={project_id}, name={name.strip()}")
-    return project_id
+    Ownerless writable projects bypass the account/ownership contract and can
+    also persist an unchecked upstream URL. Keep the symbol only to fail loudly
+    for any old caller; service projects must go through storage.accounts.
+    """
+    raise RuntimeError(
+        "legacy ownerless project bootstrap is retired; "
+        "use storage.accounts.create_project(owner_user_id, name, mode)"
+    )
 
 
 def ensure_first_project_interactive():
-    """프로젝트가 하나도 없을 때만 터미널 질문으로 첫 프로젝트를 만든다."""
+    """Report project state without creating an ownerless writable project."""
     projects = list_projects()
     if projects:
         print("프로젝트가 이미 존재합니다:")
@@ -126,22 +145,20 @@ def ensure_first_project_interactive():
             print(f"  id={project[0]} | {project[1]} | {project[2]} | {project[3]}")
         return projects[0][0] if len(projects) == 1 else None
 
-    print("\n첫 프로젝트가 필요합니다. (SQL 직접 입력 필요 없음)")
-    name = input("프로젝트 이름 [AI Agent Guardrail]: ").strip() or "AI Agent Guardrail"
-    mode = input("모드 [observe]: ").strip() or "observe"
-    rule_id = input("기본 rule_id [deadlock-v0.3]: ").strip() or "deadlock-v0.3"
-
-    upstream_url = ""
-    while not upstream_url:
-        upstream_url = input("LLM upstream URL: ").strip()
-        if not upstream_url:
-            print("upstream URL은 비울 수 없습니다.")
-
-    return create_project(name, mode, rule_id, upstream_url)
+    print(
+        "프로젝트가 없습니다. 스키마 초기화만 완료했습니다. "
+        "사용자 프로젝트는 로그인/백엔드에서 "
+        "storage.accounts.create_project(...)로 생성하세요."
+    )
+    return None
 
 
 def initialize_everything(interactive_project=True):
-    """DB 생성 → schema 생성 → 첫 project 생성까지 한 번에 처리한다."""
+    """DB 확인/생성 -> canonical schema 적용 -> 프로젝트 상태 안내.
+
+    ``interactive_project``는 기존 CLI 호출 호환을 위해 남겼다. True여도
+    프로젝트를 생성하지 않고 현재 상태만 보여 준다.
+    """
     initialize_schema()
     if interactive_project:
         ensure_first_project_interactive()

@@ -1,13 +1,12 @@
-"""C-19-6 : checks against the real PostgreSQL database (after `python -m service.load_demo load`).
+"""Read-only integration checks for the unified PostgreSQL database.
 
-Separate command, not part of tools/run_offline_tests.py (that runner discovers tests/ only and blocks sockets):
+Run separately when GUARDRAIL_DB_URL is set::
 
-  GUARDRAIL_DB_URL=... venv/bin/python -B -m unittest service.test_live_db
+    python -X utf8 -m unittest service.test_live_db -v
 
-Every test is skipped when GUARDRAIL_DB_URL is not set. Nothing is written: the API store opens read-only connections
-and one test confirms a write is refused.
+No test writes to PostgreSQL.  The service Store opens every connection read-only.
 """
-import json
+
 import os
 from pathlib import Path
 import sys
@@ -18,33 +17,36 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from service import load_demo, queries  # noqa: E402
-from service.store import DB_NAME, DB_URL_ENV, database_name, postgres_store  # noqa: E402
+from service.store import DB_URL_ENV, database_name, postgres_store  # noqa: E402
 
 
 @unittest.skipUnless(os.environ.get(DB_URL_ENV), f'{DB_URL_ENV} is not set')
-class LiveDatabase(unittest.TestCase):
+class UnifiedLiveDatabase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.store = postgres_store()
 
-    def test_database_name(self):
-        self.assertEqual(database_name(self.store), DB_NAME)
+    def test_database_is_reachable_and_unified(self):
+        self.assertTrue(database_name(self.store))
+        self.assertTrue(queries._unified_schema(self.store))
 
-    def test_loaded_rows_match_the_files(self):
-        rows = load_demo.build_rows()
-        for table in ('scenarios', 'sessions', 'steps', 'aggregates'):
-            self.assertEqual(self.store.scalar(f'SELECT COUNT(*) FROM {table}'), len(rows[table]), table)
-        stored = self.store.query('SELECT input_sha256, inputs FROM aggregates')[0]
-        self.assertEqual(stored['inputs'], rows['aggregates'][0]['inputs'])
+    def test_demo_session_ids_match_committed_records(self):
+        expected = {row['session_id'] for row in load_demo.build_rows()['sessions']}
+        actual = {row['id'] for row in self.store.query(
+            "SELECT id FROM sessions WHERE source = 'demo-record' ORDER BY id"
+        )}
+        self.assertEqual(actual, expected)
 
-    def test_check_queries(self):
-        aggregate = json.loads((ROOT / load_demo.AGGREGATE).read_text(encoding='utf-8'))
+    def test_unified_check_queries(self):
+        aggregate = load_demo.load_json(ROOT / load_demo.AGGREGATE)
         result = queries.check(self.store, aggregate)
+        self.assertTrue(result['ok'])
         self.assertEqual([c['check'] for c in result['comparisons'] if not c['same']], [])
+        self.assertEqual(result['sessions_by_validity'], {'excluded': 30, 'not_counted': 18, 'valid': 67})
 
     def test_api_store_is_read_only(self):
         with self.assertRaises(Exception):
-            self.store.query("UPDATE scenarios SET title = title WHERE scenario_id = 'none' RETURNING scenario_id")
+            self.store.query("UPDATE projects SET name = name WHERE id = -1 RETURNING id")
 
     def test_api_responses(self):
         from fastapi.testclient import TestClient
@@ -52,6 +54,7 @@ class LiveDatabase(unittest.TestCase):
         client = TestClient(create_app(self.store))
         self.assertEqual(client.get('/api/sessions?validity=valid').json()['count'], 67)
         self.assertEqual([p['value'] for p in client.get('/api/summary').json()['presentation']][:4], [4, 2, 8, 60.8])
+        self.assertEqual(client.get('/api/scenarios').status_code, 200)
 
 
 if __name__ == '__main__':
