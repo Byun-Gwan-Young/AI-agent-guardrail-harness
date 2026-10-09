@@ -40,7 +40,7 @@ Caddy  (서버, 80 · 443 만 열림, 인증서 자동)
 
 ## 서버로 가는 것 · 가지 않는 것
 
-- **간다** (main 의 커밋된 파일만, `bundle.py` 의 `INCLUDE`) : `service/`, `storage/`, `deploy/aws/`, 그 둘이 가져다 쓰는 모듈 (`tools/analyze_session.py` · `tools/gateway_prices.py` · `experiments/` 의 계약 · 프로토콜 상수 3 파일 · `scenario_schema.py` · `json_subset.py` · `progress_schema.py`), 적재 · API 가 읽는 작은 기록 (`reports/c19/aggregate-main.json`, `reports/c18-8/` 제외 목록 · 계정 보정, 세션별 `summary.json` · `scenario.yaml` · `conditions.json` · `record/*.json`, `scenarios/`, `batch_plans/`, 동결 기록), 맥에서 빌드한 화면 `site/index.html`
+- **간다** (main 의 커밋된 파일만, `bundle.py` 의 `INCLUDE`) : `service/`, `storage/`, `deploy/aws/`, 그 둘이 가져다 쓰는 모듈 (`tools/analyze_session.py` · `tools/gateway_prices.py` · `experiments/` 의 계약 · 프로토콜 상수 3 파일 · `scenario_schema.py` · `json_subset.py` · `progress_schema.py`), 적재 · API 가 읽는 작은 기록 (`reports/c19/aggregate-main.json`, `reports/c18-8/` 제외 목록 · 계정 보정, 세션별 `summary.json` · `scenario.yaml` · `conditions.json` · `record/*.json`, `scenarios/README.md`, `batch_plans/`, 동결 기록), 맥에서 빌드한 화면 `site/index.html`
 - **가지 않는다** (`bundle.py` 의 `EXCLUDE`, 묶음 목록에서 한 번 더 검사) : 프록시 · 실행기 · 배치 실행기, KMU · Tavily 키 (`.env*`, `*.pem` 등), 세션 원본 (`logs/`, `session.json`, `steps.json` 등), `docs/handoff`, venv
 - 묶음의 모든 파일을 키 패턴 · 모델 발언 필드 (narrative · reasoning 본문 · 메시지 내용) · 1 MiB 넘는 파일로 검사하고, 하나라도 걸리면 묶음을 만들지 않습니다
 

@@ -51,7 +51,7 @@ INCLUDE = (
     'reports/c18-8/exclusions.json',
     'reports/c18-8/account-corrections.json',
     'docs/criteria/demo-final-freeze.json',
-    'scenarios/',
+    'scenarios/README.md',        # Korean scenario names (service/load_demo.scenario_rows) ; the YAMLs stay
     'batch_plans/',
     'runs/demo/*/summary.json',
     'runs/demo/*/scenario.yaml',
