@@ -11,6 +11,15 @@
 | [`demo-main-v1-lr2.yaml`](demo-main-v1-lr2.yaml) | LR 보충 — arXiv 장애로 뺀 본 실행 LR 13 항목을 다시 (관측 10 + 차단 3) | 13 | `09cc3ef0` | DM-78 ④, DM-80 |
 | [`demo-main-v1-mr2.yaml`](demo-main-v1-mr2.yaml) | MR 보충 — 검색 키 오타(401)로 뺀 MR 3 항목을 다시 | 3 | `e45d2ca0` | DM-81, DM-82 |
 
+## 발표용 실시간 실행 (C-19-4 · C-19-7)
+
+| 파일 | 무엇인지 | 항목 | sha256 (앞 8 자리) | 결정 |
+|---|---|---|---|---|
+| [`demo-live-v1.yaml`](demo-live-v1.yaml) | 발표 당일 실시간 실행 — CT 교착판 차단 1 (주) + CL 교착판 차단 1 (대비), 레인 2 개 | 2 | `83a25d44` | DM-88 ③, DM-94 |
+| [`demo-live-rehearsal-v1.yaml`](demo-live-rehearsal-v1.yaml) | 리허설 — `demo-live-v1` 과 항목 · 레인 · 조건이 같고 계획 ID 만 다름 (리허설이 발표 항목을 써 버리지 않게) | 2 | `790cbeac` | DM-94 ① |
+
+명령은 `reports/c19-4/pm-commands.md` 4 절 (발표), `reports/c19-7/pm-commands.md` (리허설) 에 있습니다.
+
 ## 시험 실행 (C-18, 과제가 의도대로 동작하는지 확인)
 
 | 파일 | 무엇인지 | 결정 |

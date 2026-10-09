@@ -1,0 +1,10 @@
+# C-19-7 리허설용 실시간 실행 계획 (DM-94 ①) : 발표용 demo-live-v1 과 항목 · 레인 · 조건이 같고 계획 ID 만 다르다.
+# 배치 실행기는 끝난 항목을 건너뛰므로, 리허설을 demo-live-v1 로 돌리면 발표 때 돌릴 항목이 남지 않는다. 그래서 따로 둔다.
+# 실행 명령은 reports/c19-7/pm-commands.md 의 리허설 절 (C-19-4 명령서 4 절과 같은 모양, 계획 경로만 다름).
+plan_version: demo-batch-plan-v1
+plan_id: demo-live-rehearsal-v1
+requires_final_freeze: true
+description: 리허설용 실시간 실행 — CT 교착판 차단 1 + CL 교착판 차단 1 (demo-live-v1 과 같은 항목)
+items:
+- {scenario: scenarios/DEMO-CT-stall-v1.yaml, mode: block, repeats: [1]}
+- {scenario: scenarios/DEMO-CL-stall-v1.yaml, mode: block, repeats: [1]}

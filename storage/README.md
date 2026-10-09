@@ -397,3 +397,47 @@ backend가 observation step N을 먼저 보고 cursor를 N으로 영구 이동�
 - `api_keys.key_prefix`는 새 Guardrail key에서 항상 생성되므로 `NOT NULL`입니다. 원문 key와 hash는 목록/API 응답에 노출하지 않습니다.
 - `sessions.guardrail_mode`는 값이 있을 때 `observe` / `block`만 허용합니다.
 - Provider 선택(`provider`)과 실제 routing endpoint(`upstream_url`)는 역할을 분리해서 유지합니다. Provider credential 원문은 PostgreSQL에 저장하지 않습니다.
+
+## 루트 README 에서 옮긴 절
+
+아래 두 절은 루트 `README.md` 에 있던 내용을 그대로 옮긴 것입니다 (C-19-7, DM-97 ④).
+
+### DB 통합 변경 범위 (2026-10-08 원본 대비)
+
+이번 `db-unify` 작업은 Storage/PostgreSQL 통합에 필요한 범위만 수정했습니다. 2026-10-08 원본과 비교했을 때 **기존 파일의 의미 있는 변경은 아래 7개**이며, 프록시·실행기·판정기·시나리오 핵심 로직은 기능적으로 수정하지 않았습니다.
+
+| 파일 | 변경 이유 |
+|---|---|
+| `README.md` | `storage/` 통합 계층, 기여자, 현재 서비스 진행 상태와 Windows/POSIX 개발 환경 주의사항을 문서화 |
+| `service/README.md` | `service/`가 PostgreSQL 스키마/적재를 소유하지 않고 unified Storage를 읽는 read-only API라는 책임 경계를 명확화 |
+| `service/load_demo.py` | 통합 후 이중 writer를 막기 위해 PostgreSQL `schema`/`load` 쓰기 명령을 퇴역시키고 `storage init` / `storage demo-all`로 안내 |
+| `service/queries.py` | 기존 데모 API 응답 모양과 발표 지표를 유지하면서 unified 10-table Storage schema에서 같은 값을 읽도록 조회 계층을 변환 |
+| `service/schema.sql` | 실제 PostgreSQL canonical schema가 아니라 기존 service API 오프라인/SQLite 계약 테스트용 legacy fixture임을 명시 |
+| `service/store.py` | service의 PostgreSQL 쓰기를 방어적으로 차단하고 unified DB read-only 조회 및 TIMESTAMPTZ UTC 직렬화를 지원 |
+| `service/test_live_db.py` | 옛 service 전용 4-table DB 검사가 아니라 unified PostgreSQL의 demo-record/read-only API 계약을 검사하도록 갱신 |
+
+새로운 Storage 구현은 `storage/`와 관련 테스트 파일로 추가되었습니다. 다른 팀 소유 영역의 수정이 필요해 보이는 문제는 기능 코드를 임의로 바꾸지 않고 README의 한계/인수인계 항목으로 남깁니다.
+
+
+### Windows 개발 환경 주의
+
+#### 바이트 해시와 줄바꿈 재현성
+
+`scenario_hash`처럼 **파일 원본 바이트의 SHA-256**을 사용하는 값은 YAML 의미가 같아도 줄바꿈이 `LF`에서 `CRLF`로 바뀌면 달라집니다. 따라서 Windows에서 `git clone`할 때 Git의 `core.autocrlf` 설정 등에 의해 줄바꿈이 변환되면 YAML 파싱과 일반 실행은 정상이어도 byte-hash/reproducibility 검사는 실패할 수 있습니다.
+
+이 문제를 해결하기 위해 저장소 전체 파일을 일괄 변환하지 않습니다. 전체 LF 강제는 다른 팀 파일과 동결 자료를 불필요하게 건드릴 수 있기 때문입니다. 최종적으로 hash-sensitive canonical input 범위가 확정되면 해당 파일만 `.gitattributes`에서 `text eol=lf`로 고정하는 방식이 우선입니다.
+
+현재 단계에서는 다음 원칙을 따릅니다.
+
+- 줄바꿈 차이만 있는 대규모 파일 변경은 커밋하지 않습니다.
+- 동결 파일은 `tools/final_freeze.py check` 결과를 우선합니다.
+- byte-hash-sensitive 파일의 정확한 범위가 확정되기 전에는 다른 팀 파일을 일괄 수정하지 않습니다.
+- Windows 개발 환경에서는 이 재현성 차이를 인지하고, 필요 시 WSL/Linux/CI에서 공식 재현성 검사를 수행합니다.
+현재 공식 오프라인 테스트 실행기(`tools/run_offline_tests.py`)와 일부 기존 테스트/도구는 POSIX(macOS/Linux) 동작을 전제로 합니다. Windows 로컬 환경에서는 다음 차이로 전체 저장소 테스트가 실패할 수 있습니다.
+
+- `signal.getitimer` / `ITIMER_REAL` 기반 모듈 timeout은 Windows Python에서 제공되지 않습니다.
+- 일부 기존 도구의 `strftime('%-m/%-d')` 형식은 Windows에서 지원되지 않습니다.
+- 심볼릭 링크 테스트는 Windows의 개발자 모드/권한 설정에 따라 `WinError 1314`가 날 수 있습니다.
+- 바이트 해시와 재현성 검사는 Git checkout의 CRLF/LF 변환 영향을 받을 수 있습니다.
+
+이 차이를 통과시키기 위해 Storage 작업 범위를 넘어 기존 판정기·실험·데모 UI·시나리오 코드를 수정하지 않습니다. Windows에서는 Storage/service 핵심 테스트와 `tools/final_freeze.py check`를 별도로 확인하고, 전체 공식 오프라인 runner는 POSIX 호환 환경(예: Linux/WSL/CI)에서 최종 검증합니다. Windows 전용 호환 수정이 필요하면 별도 작업으로 다룹니다.
