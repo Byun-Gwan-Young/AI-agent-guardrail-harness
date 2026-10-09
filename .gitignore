@@ -11,3 +11,6 @@ logs/
 docs/handoff/
 data/raw/
 *.bak
+
+# C-19-7 : AWS deploy target values (domain, server IP, SSH key path) — written by deploy/aws/provision.sh or configure.sh
+deploy/aws/target.env

@@ -1,0 +1,27 @@
+# agent-guardrail demo records API (C-19-6, read-only, 127.0.0.1:8020) — systemd unit (C-19-7, DM-91).
+# Installed as /etc/systemd/system/guardrail-api.service by deploy (remote-install.sh).
+# /etc/guardrail/api.env holds only GUARDRAIL_DB_URL (Unix socket, peer authentication as user guardrail : no password).
+[Unit]
+Description=agent-guardrail demo records API (read-only, 127.0.0.1:8020)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=guardrail
+Group=guardrail
+WorkingDirectory=/opt/guardrail/app
+EnvironmentFile=/etc/guardrail/api.env
+ExecStart=/opt/guardrail/venv/bin/python -B -m service.api --host 127.0.0.1 --port 8020
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target
