@@ -35,6 +35,7 @@ PYTHON="$REPO/venv/bin/python"
 
 if [[ -n "$BUNDLE_ONLY" ]]; then
     WORK=$BUNDLE_ONLY
+    mkdir -p "$WORK"
 else
     WORK=$(mktemp -d "${TMPDIR:-/tmp}/guardrail-deploy.XXXXXX")
     trap 'rm -rf "$WORK"' EXIT
