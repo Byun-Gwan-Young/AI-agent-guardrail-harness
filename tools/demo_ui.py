@@ -1,6 +1,6 @@
 """Demo screen (C-19-3, DM-76): one static HTML file built from the committed demo records.
 
-  build --aggregate <aggregate.json> --output <demo.html> [--runs-root runs/demo]
+  build --aggregate <aggregate.json> --output <demo.html> [--runs-root runs/demo] [--api]
 
 Inputs are only what C-19-1 already wrote and the repository already holds: the aggregate JSON (tools/aggregate_demo.py),
 each counted session's record/replay.json, record/manifest.json (start time) and record/judgements.json (judgement_ns),
@@ -16,6 +16,12 @@ positive report, policy and integration settings) are shown disabled with "구�
 
 The "실시간 모니터" menu (C-19-4) works only when tools/demo_live.py serves this page (page(..., live=True) adds the
 polling script); the file opened with a double click has no request code and says the live server is off.
+
+Query API mode (C-19-7, build --api, the page the server's Caddy serves): when the page is served over http(s) and
+/api/summary of the same server answers, the dashboard cards, the session table and each session's steps come from
+the query API (service/api.py, the database); otherwise (file, no answer, wrong shape) the page keeps the records in
+the file. The source line says which ("데이터 : DB (조회 API)" / "데이터 : 파일에 담긴 기록"). Without --api the
+page has no request code, as before.
 Offline; no model call.
 """
 import argparse
@@ -449,6 +455,8 @@ const $=s=>document.querySelector(s),esc=t=>String(t??'').replace(/[&<>"]/g,c=>(
 const compact=o=>JSON.stringify(o,null,1).replace(/\[\s+([^\[\]{}]*?)\s+\]/g,(m,a)=>'['+a.replace(/\s*\n\s*/g,' ')+']');
 const pct=v=>v===null||v===undefined?'—':(100*v).toFixed(1)+'%';
 const byId={};D.sessions.forEach(s=>byId[s.id]=s);
+/* data source of the dashboard and session pages : the records in this file, or the query API (C-19-7, page built with --api) */
+const FILE_SRC={api:false,headline:D.headline,judgement_ms:D.judgement_ms,sessions:D.sessions,byId:byId};let SRC=FILE_SRC,beforeOpen=null;
 const VAR={normal:'정상판',stall:'교착판',natural:'비교군'};
 function scName(s){return esc(s.task_name)+' · '+VAR[s.variant];}
 function pill(s){if(s.mode==='block'&&s.blocked_step)return '<span class="pill p-block">차단 · step '+s.blocked_step+'</span>';
@@ -476,9 +484,9 @@ function timeline(s,host,cur,onpick){const cells=cellsOf(s);host.style.gridTempl
 function legend(s){const after=s&&s.if_stopped&&s.mode!=='block'?' (토큰 '+pct(s.if_stopped.ratio)+')':'';
  return '<div class="legend"><span><i class="c-progress"></i>진전</span><span><i class="c-baseline"></i>기준 (비교 전)</span><span><i class="c-stagnant"></i>제자리 (정체·되돌림)</span><span><i class="c-unmeasured"></i>측정 안 됨</span><span><i class="c-stop"></i>STOP</span><span><i class="c-after"></i>멈췄다면 안 썼을 구간'+after+'</span><span><i class="c-blocked"></i>403 차단</span></div>';}
 /* ---------- dashboard ---------- */
-function dashboard(){const H=D.headline,c=H.observe_classes;
+function dashboard(){const H=SRC.headline,c=H.observe_classes;
  const fpTasks=Object.entries(H.false_positive_by_task).map(([t,v])=>esc(D.task_names[t]||t)+' '+v).join(' · ');
- const j=D.judgement_ms;
+ const j=SRC.judgement_ms;
  $('#kpis').innerHTML=
  '<div class="card kpi"><div class="l">관측한 세션</div><div class="v">'+H.observe_sessions+'</div><div class="d">성공 '+(c.success||0)+' · 교착 '+(c.stalled||0)+' · 에스컬레이션 '+(c.escalated||0)+' · 기타 '+(c.other||0)+'</div><div class="d muted">차단 세션 '+H.block_sessions+' 따로</div></div>'+
  '<div class="card kpi"><div class="l">교착 판정 STOP (교착판)</div><div class="v orange">'+H.stall_detected+' <span style="font-size:15px">/ '+H.stall_reached+'</span></div><div class="d">교착에 닿은 교착판 관측 중 STOP</div><div class="d">정상판 오탐 <b>'+H.false_positive+'</b> / '+H.normal_success+' ('+fpTasks+'), 그중 차단이었다면 성공을 막았을 <b>'+H.blocked_before_success+'</b></div></div>'+
@@ -486,12 +494,12 @@ function dashboard(){const H=D.headline,c=H.observe_classes;
  (j?'<div class="card kpi"><div class="l">판정 지연 p99 (규칙 판정)</div><div class="v">'+j.p99+' ms</div><div class="d">'+j.n+' step · p50 '+j.p50+' ms · 네트워크·LLM 제외 (S-5)</div></div>'
    :'<div class="card kpi pending"><div class="l">판정 지연 p99</div><div class="v muted">[측정 예정]</div><div class="d">기록에 측정값 없음</div></div>');
  const f={type:$('#f-type').value,variant:$('#f-var').value,mode:$('#f-mode').value};
- const rows=D.sessions.filter(s=>(!f.type||s.type===f.type)&&(!f.variant||s.variant===f.variant)&&(!f.mode||s.mode===f.mode));
+ const rows=SRC.sessions.filter(s=>(!f.type||s.type===f.type)&&(!f.variant||s.variant===f.variant)&&(!f.mode||s.mode===f.mode));
  $('#recent').innerHTML=rows.map(s=>'<tr data-id="'+s.id+'"><td><code>'+s.short+'</code></td><td>'+scName(s)+' <span class="muted">'+s.type+'</span></td><td>'+s.steps+'</td><td>'+(s.tokens||0).toLocaleString()+'</td><td>'+pill(s)+'</td><td>'+result(s)+'</td></tr>').join('');
  $('#recent-n').textContent=rows.length+' 세션';
  document.querySelectorAll('#recent tr').forEach(r=>r.onclick=()=>go('session',r.dataset.id));
  /* stall-version STOPs first, then the normal-version false positives; by first STOP step inside each group */
- const stops=D.sessions.filter(s=>s.first_stop&&s.stop_text).map((s,k)=>[s,k])
+ const stops=SRC.sessions.filter(s=>s.first_stop&&s.stop_text).map((s,k)=>[s,k])
   .sort((a,b)=>((a[0].variant==='normal')-(b[0].variant==='normal'))||(a[0].first_stop-b[0].first_stop)||(a[1]-b[1])).map(x=>x[0]);
  $('#alerts').innerHTML=stops.map(s=>'<div class="alert"><b>교착 의심 — '+esc(s.task_name)+' '+VAR[s.variant]+(s.class==='success'?' <span class="muted">(성공 세션 · 오탐)</span>':'')+'</b>step '+s.first_stop+' · '+esc(s.template)+' · '+(s.mode==='block'?'차단':'관측')+'<div>'+esc(s.stop_text)+'</div><button data-id="'+s.id+'">세션 보기</button></div>').join('');
  document.querySelectorAll('#alerts button').forEach(b=>b.onclick=()=>go('session',b.dataset.id));}
@@ -510,9 +518,9 @@ function chart(s){const W=1000,H=120,P=34,rs=s.step_rows,n=rs.length;if(!n)retur
  if(s.first_stop){const k=rs.findIndex(r=>r.n===s.first_stop);if(k>=0)g+='<line x1="'+x(k)+'" y1="8" x2="'+x(k)+'" y2="'+(H-22)+'" stroke="#5b2a12" stroke-dasharray="4 3"/><text class="s" x="'+(x(k)+4)+'" y="18">STOP</text>';}
  const k=rs.findIndex(r=>r.n===cur);if(k>=0)g+='<line x1="'+x(k)+'" y1="8" x2="'+x(k)+'" y2="'+(H-22)+'" stroke="#26231e"/>';
  g+='<text class="s" x="'+P+'" y="'+(H-6)+'">step 1</text><text class="s" x="'+(W-P-70)+'" y="'+(H-6)+'">step '+rs[n-1].n+'</text><text class="s" x="'+P+'" y="12">누적 토큰 '+max.toLocaleString()+'</text></svg>';return g;}
-function sessionOptions(){$('#s-pick').innerHTML=D.sessions.map(s=>'<option value="'+s.id+'">'+s.short+' · '+esc(s.task_name)+' '+VAR[s.variant]+' · '+(s.mode==='block'?'차단':'관측')+'</option>').join('');
+function sessionOptions(){$('#s-pick').innerHTML=SRC.sessions.map(s=>'<option value="'+s.id+'">'+s.short+' · '+esc(s.task_name)+' '+VAR[s.variant]+' · '+(s.mode==='block'?'차단':'관측')+'</option>').join('');
  $('#s-pick').onchange=e=>openSession(e.target.value);}
-function openSession(id){S=byId[id]||D.sessions[0];cur=1;stop();$('#s-pick').value=S.id;renderSession();}
+function openSession(id){S=SRC.byId[id]||SRC.sessions[0];cur=1;stop();$('#s-pick').value=S.id;if(beforeOpen&&beforeOpen(S))return;renderSession();}
 function renderSession(){const s=S;if(!s)return;
  $('#s-alert').innerHTML=s.first_stop?'<div class="alert"><b>교착 의심 — '+esc(s.task_name)+' '+VAR[s.variant]+' · step '+s.first_stop+' ('+esc(s.template)+')</b>'+esc(s.stop_text)+'</div>':'<div class="card muted">이 세션에는 STOP 이 없다.</div>';
  $('#s-head').innerHTML='<b>'+esc(s.name||s.scenario)+'</b><div class="muted">'+esc(s.title)+' · 세션 '+esc(s.id)+' · '+(s.mode==='block'?'차단 (block)':'관측 (observe)')+' · 결과 '+result(s)+' · '+s.steps+' / '+(s.max_steps||'-')+' step · 토큰 '+(s.tokens||0).toLocaleString()+' · 크레딧 '+(s.credits??'—')+'</div>';
@@ -652,7 +660,71 @@ setInterval(lvTick,LIVE_POLL_MS);lvTick();
 """
 
 
-def page(data, root=ROOT, live=False):
+# C-19-7 : the query API's rows -> the values the screen draws. Pure functions (no DOM) so a test can run them in node
+# against fake API responses and compare with the records in the file (slim_step and session_entry above, same values).
+API_MAP = r"""
+const API_TIMEOUT_MS=8000;
+const hasOwn=(o,k)=>k!==null&&k!==undefined&&Object.prototype.hasOwnProperty.call(o||{},k);
+const filled=v=>v!==null&&v!==undefined&&!(typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).length===0)&&v!==''&&v!==false&&v!==0&&!(Array.isArray(v)&&v.length===0);
+async function apiJson(fetchFn,u){const c=typeof AbortController!=='undefined'?new AbortController():null;const t=c?setTimeout(()=>c.abort(),API_TIMEOUT_MS):null;
+ try{const r=await fetchFn(u,{cache:'no-store',credentials:'same-origin',signal:c?c.signal:undefined});if(!r.ok)throw new Error(u+' HTTP '+r.status);return await r.json();}
+ finally{if(t)clearTimeout(t);}}
+function apiStep(f,roles){const rp=filled(f.report)?f.report:null,claim=f.completion_claim,tools=f.tools||[],tk=f.tokens||{};
+ return {n:f.step_id,agent:f.agent??null,role:f.role??null,state:f.state??null,label:f.state_label??null,
+  stop:filled(f.stop)?{t:f.stop.template_id??null,text:f.stop.text??null}:null,blocked:!!f.blocked,status:f.step_status??null,
+  fail:f.failure_reasons||[],tests:filled(f.tests)?[f.tests.passed,f.tests.total]:null,
+  report:!rp?null:{status:(rp.status_label||rp.status)??null,handoff:hasOwn(roles,rp.handoff_to)?roles[rp.handoff_to]:(rp.handoff_to??null),
+   adopted:rp.adopted_items??null,issues:(rp.open_issue_ids||[]).length,issue_ids:[...(rp.open_issue_ids||[])],
+   spec:rp.spec_approved??null,declared:!!rp.completion_declared,deliverable:!!rp.deliverable_reported},
+  claim:claim===null||claim===undefined?null:!!claim.accepted,tools:tools.length,tool_errors:tools.filter(x=>x.is_error).length,
+  changed:(f.changed_paths||[]).length,paths:[...(f.changed_paths||[])],tok:(tk.prompt||0)+(tk.completion||0),
+  cum:f.cumulative_tokens??null,cumc:f.cumulative_credits??null};}
+function apiSession(r,taskNames){const roles=r.role_labels||{},eb=r.escalated_by??null;
+ const ifs=r.if_stopped_token_ratio==null&&r.if_stopped_tokens_after==null?null:{ratio:r.if_stopped_token_ratio??null,tokens_after:r.if_stopped_tokens_after??null};
+ return {id:r.session_id,short:String(r.session_id).slice(-32).slice(0,8),scenario:r.scenario_id,name:null,title:null,
+  task:r.task,task_name:taskNames[r.task]||r.task,variant:r.variant,type:r.task_type,mode:r.mode,class:r.class,
+  termination:r.termination_reason??null,escalated_by:eb,escalated_by_label:hasOwn(roles,eb)?roles[eb]:eb,
+  steps:r.steps,max_steps:r.max_steps??null,tokens:r.tokens_total??null,
+  credits:r.credits_measured!==null&&r.credits_measured!==undefined?r.credits_measured:(r.credits_estimated??null),
+  first_stop:r.first_stop_step??null,template:r.first_stop_template??null,stop_text:r.first_stop_text??null,stop_steps:r.stop_steps||[],
+  blocked_step:r.blocked_step??null,if_stopped:ifs,started_at:r.started_at??null,account:r.account_label??null,plan:r.plan_id??null,
+  replay:false,step_rows:[],roles:roles,loaded:false};}
+/* the counted sessions (validity valid), newest first, and the headline the dashboard cards read */
+async function apiLoad(fetchFn,taskNames){const S=await apiJson(fetchFn,'/api/summary');
+ if(!S||typeof S.headline!=='object'||S.headline===null)throw new Error('/api/summary : headline 없음');
+ const L=await apiJson(fetchFn,'/api/sessions?validity=valid');
+ if(!L||!Array.isArray(L.sessions)||!L.sessions.length||L.count!==L.sessions.length)throw new Error('/api/sessions : 세션 없음');
+ const t=x=>{const v=Date.parse(x.started_at||'');return isNaN(v)?-Infinity:v;};
+ const sessions=L.sessions.map(r=>apiSession(r,taskNames)).map((s,k)=>[s,k]).sort((a,b)=>(t(b[0])-t(a[0]))||(a[1]-b[1])).map(x=>x[0]);
+ return {headline:S.headline,judgement_ms:S.judgement_ms??null,sessions};}
+/* one session's name, title and steps (replay.json values as the database holds them) */
+async function apiSessionSteps(fetchFn,s){const id=encodeURIComponent(s.id);
+ const [one,st]=await Promise.all([apiJson(fetchFn,'/api/sessions/'+id),apiJson(fetchFn,'/api/sessions/'+id+'/steps')]);
+ if(!one||!one.session||!st||!Array.isArray(st.steps))throw new Error('/api/sessions/'+s.id+' : 응답 모양 다름');
+ const sc=one.session.scenario||{};s.name=sc.korean_name??null;s.title=sc.title??null;
+ s.step_rows=st.steps.map(f=>apiStep(f,s.roles));s.replay=st.steps.length>0;s.loaded=true;return s;}
+"""
+
+# The page glue : only in the page built with --api, and only when that page is served over http(s). A file opened
+# with a double click, a missing API or a wrong answer keeps (or puts back) the records in the file; nothing is faked.
+API_SCRIPT = r"""
+/* ---------- query API mode (C-19-7) ---------- */
+const SRC_FILE_TEXT='데이터 : 파일에 담긴 기록';
+const SRC_API_TEXT='데이터 : DB (조회 API) — 대시보드 카드 · 세션 표 · 세션 step. 비교 · 통계 · 시스템 구조 · 사용 가이드는 파일에 담긴 기록';
+function setSrc(t){const e=$('#data-src');if(e)e.textContent=t;}
+function apiRefresh(keep){sessionOptions();dashboard();openSession(SRC.byId[keep]?keep:(SRC.byId[D.guide_session]?D.guide_session:SRC.sessions[0].id));}
+function apiFallback(e){const keep=S&&S.id;SRC=FILE_SRC;beforeOpen=null;setSrc(SRC_FILE_TEXT+' (조회 API 응답 없음 : '+String(e&&e.message||e)+')');apiRefresh(keep);}
+function apiBeforeOpen(s){if(s.loaded)return false;
+ $('#s-alert').innerHTML='';$('#s-head').innerHTML='<span class="muted">세션 '+esc(s.short)+' 의 step 을 조회 API 에서 읽는 중…</span>';
+ $('#s-tl').innerHTML='';$('#s-step').innerHTML='';$('#s-chart').innerHTML='';
+ apiSessionSteps(fetch.bind(window),s).then(()=>{if(S===s)renderSession();}).catch(apiFallback);return true;}
+function apiUse(X){const keep=S&&S.id,byid={};X.sessions.forEach(s=>byid[s.id]=s);
+ SRC={api:true,headline:X.headline,judgement_ms:X.judgement_ms,sessions:X.sessions,byId:byid};beforeOpen=apiBeforeOpen;setSrc(SRC_API_TEXT);apiRefresh(keep);}
+if(/^https?:$/.test(location.protocol)){setSrc(SRC_FILE_TEXT+' (조회 API 확인 중)');apiLoad(fetch.bind(window),D.task_names).then(apiUse).catch(apiFallback);}
+"""
+
+
+def page(data, root=ROOT, live=False, api=False):
     trial = data['kind'] != 'main'
     planned_nav = ''.join(
         f'<button data-planned="{p["id"]}" disabled title="구현 전">{html.escape(p["name"])} <span class="badge">구현 전</span></button>'
@@ -780,23 +852,24 @@ headers  = {{"{html.escape(sysd['session_header'])}": session_id}}</pre></div></
 </div></div>
 </section>
 
-<div class="foot" id="source">데이터 출처 : {html.escape(data['source'])} · {html.escape(data.get('scope') or '')} · 화면 {UI_VERSION}{' · 실시간 모니터 (127.0.0.1)' if live else ''}</div>
+<div class="foot" id="source">데이터 출처 : {html.escape(data['source'])} · {html.escape(data.get('scope') or '')} · 화면 {UI_VERSION}{' · 실시간 모니터 (127.0.0.1)' if live else ''} · <span id="data-src">데이터 : 파일에 담긴 기록</span></div>
 </main></div>
 <script type="application/json" id="demo-data">{payload}</script>
 <script>{SCRIPT}
 document.getElementById('g-ex').textContent=D.example?compact(D.example.body):'';</script>
 {('<script>' + LIVE_SCRIPT + '</script>') if live else ''}
+{('<script>' + API_MAP + API_SCRIPT + '</script>') if api else ''}
 </body></html>
 """
 
 
-def build(aggregate_path, output, runs_root=ROOT / 'runs' / 'demo', root=ROOT):
+def build(aggregate_path, output, runs_root=ROOT / 'runs' / 'demo', root=ROOT, api=False):
     data = collect(load(aggregate_path), runs_root=runs_root, root=root)
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(page(data, root), encoding='utf-8')
+    output.write_text(page(data, root, api=api), encoding='utf-8')
     missing = [s['id'] for s in data['sessions'] if not s['replay']]
-    return {'output': str(output), 'kind': data['kind'], 'sessions': len(data['sessions']),
+    return {'output': str(output), 'kind': data['kind'], 'api': api, 'sessions': len(data['sessions']),
             'replay_missing': missing, 'bytes': output.stat().st_size}
 
 
@@ -807,8 +880,10 @@ def main():
     one.add_argument('--aggregate', type=Path, required=True)
     one.add_argument('--output', type=Path, required=True)
     one.add_argument('--runs-root', type=Path, default=ROOT / 'runs' / 'demo')
+    one.add_argument('--api', action='store_true',
+                     help='add the query API mode (C-19-7): served over http(s), the page reads /api/* of its own server')
     args = parser.parse_args()
-    result = build(args.aggregate, args.output, args.runs_root)
+    result = build(args.aggregate, args.output, args.runs_root, api=args.api)
     print(json.dumps(result, ensure_ascii=False))
     return 1 if result['replay_missing'] else 0
 
