@@ -1,0 +1,422 @@
+{
+ "database": "postgresql:guardrail_demo",
+ "ok": true,
+ "sessions_by_validity": {
+  "valid": 67,
+  "excluded": 30,
+  "not_counted": 18
+ },
+ "sessions_by_plan_kind": {
+  "main": 97,
+  "none": 3,
+  "trial": 15
+ },
+ "excluded_by_code": {
+  "env_upstream_timeout": 9,
+  "env_upstream_502": 3,
+  "incomplete_after_retry": 2,
+  "env_search_unavailable": 13,
+  "env_search_key_invalid": 3
+ },
+ "valid_by_scenario": {
+  "DEMO-CL-normal-v1": {
+   "observe": 5
+  },
+  "DEMO-CL-stall-v1": {
+   "block": 3,
+   "observe": 4
+  },
+  "DEMO-CS-normal-v1": {
+   "observe": 5
+  },
+  "DEMO-CS-stall-v1": {
+   "block": 3,
+   "observe": 5
+  },
+  "DEMO-CT-N-v1": {
+   "observe": 5
+  },
+  "DEMO-CT-normal-v1": {
+   "observe": 5
+  },
+  "DEMO-CT-stall-v1": {
+   "observe": 5,
+   "block": 2
+  },
+  "DEMO-LR-normal-v1": {
+   "observe": 5
+  },
+  "DEMO-LR-stall-v1": {
+   "observe": 5,
+   "block": 2
+  },
+  "DEMO-MR-normal-v1": {
+   "observe": 5
+  },
+  "DEMO-MR-stall-v1": {
+   "observe": 5,
+   "block": 3
+  }
+ },
+ "headline": {
+  "observe_sessions": 54,
+  "observe_classes": {
+   "success": 34,
+   "stalled": 10,
+   "escalated": 10
+  },
+  "block_sessions": 13,
+  "normal_runs": 25,
+  "normal_success": 24,
+  "false_positive": 4,
+  "false_positive_by_task": {
+   "DEMO-CT": 2,
+   "DEMO-MR": 2
+  },
+  "blocked_before_success": 2,
+  "blocked_before_success_sessions": [
+   [
+    "d7d4e26f",
+    7,
+    24
+   ],
+   [
+    "fcd55b67",
+    6,
+    27
+   ]
+  ],
+  "stall_runs": 24,
+  "stall_reached": 9,
+  "stall_detected": 8,
+  "stall_detected_by_task": {
+   "DEMO-CL": [
+    3,
+    4
+   ],
+   "DEMO-CT": [
+    5,
+    5
+   ]
+  },
+  "missed": [
+   "476c0307"
+  ],
+  "stall_escalated": 10,
+  "t1_stall_stop": 0,
+  "saving_mean": 0.60765,
+  "saving_by_type": {
+   "T2": 0.67204,
+   "T3": 0.50033
+  },
+  "block": {
+   "DEMO-CL-stall-v1": {
+    "runs": 3,
+    "classes": {
+     "guardrail_stop": 3
+    },
+    "with_stop": 3,
+    "judged": true,
+    "token_saving": 0.667
+   },
+   "DEMO-CS-stall-v1": {
+    "runs": 3,
+    "classes": {
+     "success": 3
+    },
+    "with_stop": 0,
+    "judged": false,
+    "token_saving": -0.0502
+   },
+   "DEMO-CT-stall-v1": {
+    "runs": 2,
+    "classes": {
+     "guardrail_stop": 2
+    },
+    "with_stop": 2,
+    "judged": true,
+    "token_saving": 0.5896
+   },
+   "DEMO-LR-stall-v1": {
+    "runs": 2,
+    "classes": {
+     "escalated": 2
+    },
+    "with_stop": 0,
+    "judged": false,
+    "token_saving": 0.1837
+   },
+   "DEMO-MR-stall-v1": {
+    "runs": 3,
+    "classes": {
+     "escalated": 3
+    },
+    "with_stop": 0,
+    "judged": false,
+    "token_saving": -0.5202
+   }
+  },
+  "credits_measured_total": 2209.68713
+ },
+ "presentation": [
+  {
+   "label": "정상판 오탐",
+   "value": 4,
+   "denominator": 24,
+   "definition": "성공한 정상판 관측 세션 중 STOP 이 난 세션"
+  },
+  {
+   "label": "그중 차단 모드였다면 성공을 막았을 세션",
+   "value": 2,
+   "denominator": 4,
+   "definition": "오탐 중 첫 STOP step 이 성공 step 보다 앞선 세션"
+  },
+  {
+   "label": "교착판 탐지",
+   "value": 8,
+   "denominator": 9,
+   "definition": "교착에 닿은(미완료) 교착판 관측 세션 중 STOP 이 난 세션"
+  },
+  {
+   "label": "평균 절감률 (%)",
+   "value": 60.8,
+   "denominator": 8,
+   "definition": "탐지된 교착판 관측 세션의 \"첫 STOP 이후 토큰 / 세션 전체 토큰\" 평균"
+  },
+  {
+   "label": "차단 실측 절감 (%)",
+   "value": {
+    "DEMO-CL-stall-v1": 66.7,
+    "DEMO-CT-stall-v1": 59.0
+   },
+   "denominator": {
+    "DEMO-CL-stall-v1": 3,
+    "DEMO-CT-stall-v1": 2
+   },
+   "definition": "STOP 이 난 차단 세션의 평균 토큰을 같은 시나리오 관측 평균과 비교 (DM-23)"
+  }
+ ],
+ "judgement_ms": {
+  "n": 613,
+  "p50": 0.19,
+  "p99": 0.41
+ },
+ "comparisons": [
+  {
+   "check": "valid sessions = aggregate sessions",
+   "sql": 67,
+   "expected": 67,
+   "same": true
+  },
+  {
+   "check": "excluded by code = aggregate exclusion_list.by_code",
+   "sql": {
+    "env_upstream_timeout": 9,
+    "env_upstream_502": 3,
+    "incomplete_after_retry": 2,
+    "env_search_unavailable": 13,
+    "env_search_key_invalid": 3
+   },
+   "expected": {
+    "env_search_key_invalid": 3,
+    "env_search_unavailable": 13,
+    "env_upstream_502": 3,
+    "env_upstream_timeout": 9,
+    "incomplete_after_retry": 2
+   },
+   "same": true
+  },
+  {
+   "check": "valid by scenario and mode = aggregate scenario tables",
+   "sql": {
+    "DEMO-CL-normal-v1": {
+     "observe": 5
+    },
+    "DEMO-CL-stall-v1": {
+     "block": 3,
+     "observe": 4
+    },
+    "DEMO-CS-normal-v1": {
+     "observe": 5
+    },
+    "DEMO-CS-stall-v1": {
+     "block": 3,
+     "observe": 5
+    },
+    "DEMO-CT-N-v1": {
+     "observe": 5
+    },
+    "DEMO-CT-normal-v1": {
+     "observe": 5
+    },
+    "DEMO-CT-stall-v1": {
+     "observe": 5,
+     "block": 2
+    },
+    "DEMO-LR-normal-v1": {
+     "observe": 5
+    },
+    "DEMO-LR-stall-v1": {
+     "observe": 5,
+     "block": 2
+    },
+    "DEMO-MR-normal-v1": {
+     "observe": 5
+    },
+    "DEMO-MR-stall-v1": {
+     "observe": 5,
+     "block": 3
+    }
+   },
+   "expected": {
+    "DEMO-CL-normal-v1": {
+     "observe": 5
+    },
+    "DEMO-CL-stall-v1": {
+     "observe": 4,
+     "block": 3
+    },
+    "DEMO-CS-normal-v1": {
+     "observe": 5
+    },
+    "DEMO-CS-stall-v1": {
+     "observe": 5,
+     "block": 3
+    },
+    "DEMO-CT-N-v1": {
+     "observe": 5
+    },
+    "DEMO-CT-normal-v1": {
+     "observe": 5
+    },
+    "DEMO-CT-stall-v1": {
+     "observe": 5,
+     "block": 2
+    },
+    "DEMO-LR-normal-v1": {
+     "observe": 5
+    },
+    "DEMO-LR-stall-v1": {
+     "observe": 5,
+     "block": 2
+    },
+    "DEMO-MR-normal-v1": {
+     "observe": 5
+    },
+    "DEMO-MR-stall-v1": {
+     "observe": 5,
+     "block": 3
+    }
+   },
+   "same": true
+  },
+  {
+   "check": "normal runs",
+   "sql": 25,
+   "expected": 25,
+   "same": true
+  },
+  {
+   "check": "false positives (aggregate)",
+   "sql": 4,
+   "expected": 4,
+   "same": true
+  },
+  {
+   "check": "stall runs",
+   "sql": 24,
+   "expected": 24,
+   "same": true
+  },
+  {
+   "check": "stall reached (aggregate)",
+   "sql": 9,
+   "expected": 9,
+   "same": true
+  },
+  {
+   "check": "stall detected (aggregate)",
+   "sql": 8,
+   "expected": 8,
+   "same": true
+  },
+  {
+   "check": "stall escalated",
+   "sql": 10,
+   "expected": 10,
+   "same": true
+  },
+  {
+   "check": "saving mean (aggregate)",
+   "sql": 0.60765,
+   "expected": 0.60765,
+   "same": true
+  },
+  {
+   "check": "block token saving (aggregate, judged scenarios)",
+   "sql": {
+    "DEMO-CL-stall-v1": 0.667,
+    "DEMO-CT-stall-v1": 0.5896
+   },
+   "expected": {
+    "DEMO-CL-stall-v1": 0.667,
+    "DEMO-CT-stall-v1": 0.5896
+   },
+   "same": true
+  },
+  {
+   "check": "credits measured total",
+   "sql": 2209.68713,
+   "expected": 2209.68713,
+   "same": true
+  },
+  {
+   "check": "report 4: false positives",
+   "sql": 4,
+   "expected": 4,
+   "same": true
+  },
+  {
+   "check": "report 4: successful normal sessions",
+   "sql": 24,
+   "expected": 24,
+   "same": true
+  },
+  {
+   "check": "report 4: blocked before success",
+   "sql": 2,
+   "expected": 2,
+   "same": true
+  },
+  {
+   "check": "report 4: stall detected",
+   "sql": 8,
+   "expected": 8,
+   "same": true
+  },
+  {
+   "check": "report 4: stall reached",
+   "sql": 9,
+   "expected": 9,
+   "same": true
+  },
+  {
+   "check": "report 4: saving mean %",
+   "sql": 60.8,
+   "expected": 60.8,
+   "same": true
+  },
+  {
+   "check": "report 4: block token saving %",
+   "sql": {
+    "DEMO-CL-stall-v1": 66.7,
+    "DEMO-CT-stall-v1": 59.0
+   },
+   "expected": {
+    "DEMO-CL-stall-v1": 66.7,
+    "DEMO-CT-stall-v1": 59.0
+   },
+   "same": true
+  }
+ ]
+}
