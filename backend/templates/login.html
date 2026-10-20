@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Agent Guardrail · 로그인</title>
+  <style>
+    body { margin:0; min-height:100vh; display:grid; place-items:center; background:#f3f5f8; color:#172033; font-family:system-ui,sans-serif; }
+    main { width:min(360px,80vw); padding:36px; background:white; border:1px solid #dde3eb; border-radius:18px; box-shadow:0 12px 40px #1720330a; }
+    h1 { font-size:24px; margin-top:0; } p { line-height:1.7; overflow-wrap:anywhere; }
+    .muted { color:#657085; font-size:14px; } button { padding:10px 20px; border:0; border-radius:8px; background:#172033; color:white; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Agent Guardrail</h1>
+    <section style="display:{{LOGIN_DISPLAY}}">
+      <p>구글 계정으로 로그인하세요.</p>
+      <p class="muted">{{CONFIG_MESSAGE}}</p>
+      <div id="g_id_onload" data-client_id="{{CLIENT_ID}}"
+           data-login_uri="{{LOGIN_URI}}" data-ux_mode="redirect"
+           data-auto_prompt="false"></div>
+      <div class="g_id_signin" data-type="standard" data-size="large" data-locale="ko"></div>
+    </section>
+    <section style="display:{{USER_DISPLAY}}">
+      <p><strong>{{NAME}}</strong>님, 로그인되었습니다.</p>
+      <p class="muted">{{EMAIL}}</p>
+      <form method="post" action="/api/auth/logout">
+        <input type="hidden" name="csrf_token" value="{{LOGOUT_TOKEN}}">
+        <button type="submit">로그아웃</button>
+      </form>
+    </section>
+  </main>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</body>
+</html>
