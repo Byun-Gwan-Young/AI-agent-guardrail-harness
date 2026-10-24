@@ -276,6 +276,130 @@ venv/bin/python -B tools/final_freeze.py check
 ```
 
 
+### Storage 계정 탈퇴/복구 기능 추가
+
+`db-unify`의 PostgreSQL Storage에 계정 탈퇴 수명주기 기능을 추가했습니다.
+
+이번 구현에서는 별도의 탈퇴 전용 테이블을 만들지 않고, 기존 `users` 테이블 안에서 계정 상태를 관리합니다. 계정 탈퇴는 별도의 업무 데이터라기보다 사용자 계정 자체의 수명주기 상태이므로 다음 세 컬럼을 `users`에 추가했습니다.
+
+```text
+account_status
+deletion_requested_at
+deletion_due_at
+```
+
+계정 상태는 `active`와 `pending_deletion` 두 가지입니다.
+
+```text
+active
+  ↓ 탈퇴 요청
+pending_deletion
+  ├─ 30일 이내 명시적 복구 → active
+  └─ deletion_due_at 경과 → 영구 삭제 대상
+```
+
+탈퇴 요청 즉시 사용자 데이터를 지우지 않고 **30일의 복구 유예기간**을 둡니다. 같은 사용자가 탈퇴 요청을 반복하더라도 기존 `deletion_due_at`을 다시 30일 연장하지 않습니다.
+
+이번 기능과 직접 관련된 핵심 Storage 수정 파일은 다음과 같습니다.
+
+| 파일 | 역할 |
+|---|---|
+| `storage/schema.sql` | `users` 계정 상태 컬럼과 CHECK 제약 추가 |
+| `storage/accounts.py` | 탈퇴 요청, 복구, pending 계정 제한, API key 폐기, purge preview/실제 purge/batch purge |
+| `storage/live.py` | pending 계정의 새 live session 시작 차단, 기존 live session의 안전한 기록/종료 유지 |
+
+DB CHECK 제약으로 다음 상태를 보장합니다.
+
+- `active` 계정은 `deletion_requested_at`, `deletion_due_at`이 모두 `NULL`
+- `pending_deletion` 계정은 두 시각이 모두 존재
+- `deletion_due_at > deletion_requested_at`
+- 정의되지 않은 계정 상태는 허용하지 않음
+
+탈퇴 요청 시 해당 사용자가 소유한 프로젝트의 **Guardrail API key를 즉시 revoke**합니다. 30일 안에 계정을 복구하더라도 이미 revoke된 기존 key는 다시 활성화하지 않으며, 필요하면 새 key를 발급해야 합니다.
+
+탈퇴와 일반 쓰기가 동시에 실행될 때는 사용자 행을 동시성 경계로 사용합니다. 프로젝트/API key 등 일반 쓰기는 먼저 사용자 행을 `FOR SHARE`로 잠그고, 탈퇴·복구·purge는 같은 사용자 행을 `FOR UPDATE`로 잠급니다. 새 live session도 **사용자 → 프로젝트** 순서로 잠가 purge와 잠금 순서를 맞춥니다. 또한 API key 검증은 key의 revoke 상태뿐 아니라 사용자 소유 프로젝트라면 owner 계정이 `active`인지도 확인합니다.
+
+`pending_deletion` 상태에서는 일반 서비스 사용을 제한합니다.
+
+```text
+차단
+- 새 프로젝트 생성
+- 프로젝트 일반 조회 및 설정 변경
+- 새 API key 발급 및 key 관리
+- 새 live session 시작
+
+허용
+- 계정 상태 확인
+- 30일 이내 명시적 복구
+- 이미 실행 중인 live session의 기록 및 정상 종료
+- 이미 생성된 동일 live session의 정확한 idempotent retry
+```
+
+Google 재로그인은 탈퇴 취소로 취급하지 않습니다. `upsert_user_from_google()`은 기존 `pending_deletion` 상태를 자동으로 `active`로 되돌리지 않으며, 복구는 반드시 `restore_account()`를 통해 명시적으로 수행합니다.
+
+복구는 PostgreSQL의 `CURRENT_TIMESTAMP < deletion_due_at`인 동안에만 허용합니다. 삭제 예정 시각에 도달한 뒤에는 아직 실제 purge batch가 실행되지 않았더라도 복구할 수 없습니다.
+
+영구 삭제 전에는 `preview_account_purge()`로 실제 삭제 없이 대상 범위와 개수를 확인할 수 있습니다. 실제 삭제는 `purge_account()`가 수행하며, 다음 조건을 다시 확인한 뒤 한 사용자 단위의 transaction으로 처리합니다.
+
+```text
+account_status = pending_deletion
+CURRENT_TIMESTAMP >= deletion_due_at
+```
+
+사용자 소유 데이터는 반드시 `projects.owner_user_id = user_id`를 기준으로 찾습니다. 삭제 순서는 FK 제약을 지키기 위해 다음과 같이 명시적으로 처리합니다.
+
+```text
+llm_calls / judgements / observations
+                ↓
+             sessions
+                ↓
+             scenarios
+             api_keys
+                ↓
+             projects
+                ↓
+      auth_events / allowed_emails
+                ↓
+              users
+```
+
+canonical demo project는 사용자 계정과 분리되어 있으며 고정된 숫자 ID가 아니라 다음 소유권/읽기 전용 계약으로 구분합니다.
+
+```text
+name = 데모
+owner_user_id = NULL
+read_only = TRUE
+```
+
+계정 purge는 `owner_user_id = 대상 사용자`인 프로젝트만 선택하므로 system-owned canonical demo project는 삭제 대상에 포함되지 않습니다. demo의 실제 ID는 DB의 생성 순서에 따라 달라질 수 있으므로 purge 안전성 판단에 고정 ID를 사용하지 않습니다.
+
+`auth_events`는 단순히 `users` 삭제 후 `user_id=NULL`로 남기지 않고, 해당 사용자 ID 또는 구조화된 `detail.email`로 식별되는 관련 이벤트까지 최종 purge에서 제거합니다. `allowed_emails` 역시 FK가 없으므로 해당 이메일을 명시적으로 삭제합니다.
+
+30일이 지난 계정의 일괄 정리를 위해 `purge_due_accounts(limit=100)` 진입점을 제공합니다. 이 함수는 삭제 기한이 지난 후보만 조회한 뒤 각 사용자별로 `purge_account()`를 호출합니다. 한 사용자 purge 실패가 다른 사용자에게 영향을 주지 않도록 사용자별 transaction 경계를 유지합니다. 실제 주기 실행은 Backend/AWS 등 배포 계층에서 연결합니다.
+
+현재 PostgreSQL 실제 DB를 사용한 검증에서는 다음 동작을 확인했습니다.
+
+- 계정 상태 컬럼 및 CHECK 제약 적용
+- 탈퇴 요청 후 30일 유예 및 반복 요청 시 기한 미연장
+- 탈퇴 요청 즉시 기존 Guardrail API key revoke
+- 복구 후 기존 revoked key 비활성 유지
+- pending 계정의 새 프로젝트/API key/live session 차단
+- 기존 live session의 정확한 retry 및 안전 종료 유지
+- purge preview가 실제 데이터를 삭제하지 않음
+- 30일 이전 purge 거부
+- 삭제 예정 시각 이후 restore 거부
+- 사용자 소유 project/session/observation/judgement/llm_call/API key 삭제
+- 관련 `auth_events`, `allowed_emails` 식별정보 삭제
+- 다른 사용자 데이터 보존
+- system-owned canonical demo project 보존
+- batch purge가 due 계정만 선택하고 아직 due가 아닌 pending 계정은 보존
+
+이번 변경은 PostgreSQL Storage의 계정 수명주기와 삭제 경계를 추가한 것이며, 프록시·판정기·실험 시나리오의 핵심 로직은 수정하지 않습니다.
+
+> **Windows 줄바꿈 주의:** Storage 파일을 수정할 때 `LF will be replaced by CRLF` 경고가 보이더라도 경고만으로 파일 손상으로 판단하지 않습니다. 이를 없애기 위해 `git add --renormalize .`, 저장소 전체 줄바꿈 변환, 공용 `.gitattributes` 임의 수정 등을 수행하지 않습니다. 자세한 저장소 전체 정책은 아래의 기존 **Windows 개발 환경 주의** 절을 따릅니다.
+
+---
+
 ### DB 통합 변경 범위 (2026-10-08 원본 대비)
 
 이번 `db-unify` 작업은 Storage/PostgreSQL 통합에 필요한 범위만 수정했습니다. 2026-10-08 원본과 비교했을 때 **기존 파일의 의미 있는 변경은 아래 7개**이며, 프록시·실행기·판정기·시나리오 핵심 로직은 기능적으로 수정하지 않았습니다.
