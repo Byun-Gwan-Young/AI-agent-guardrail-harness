@@ -276,6 +276,30 @@ venv/bin/python -B tools/final_freeze.py check
 ```
 
 
+### Windows 팀원용 Storage 로컬 개발 (PostgreSQL + Redis)
+
+이 절은 **각 팀원이 자기 PC에서만** PostgreSQL과 Redis를 실행하는 방법입니다. **공용 DB/Redis 서버를 계속 켜둘 필요는 없습니다.** 전체 시나리오 실행 환경의 Python 요구사항은 위의 빠른 시작을 따르며, Storage 개발은 Windows의 Python 3.13 가상환경에서도 검증했습니다. 자세한 최초 설치와 문제 해결은 [Storage 개발 가이드](storage/README.md#팀원용-로컬-개발-가이드-windows-11--wsl2)를 참고하세요.
+
+1. Windows에 PostgreSQL을 설치하고 프로젝트 루트의 **Git에 올리지 않는** `.env`에 자신의 `POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`를 설정합니다. 개발용 DB 이름 예시는 `guardrail_agent_v2`이며, 팀원 간 DB 데이터가 자동 공유되는 것은 아닙니다.
+2. Python 가상환경을 활성화하고 `python -m pip install -r requirements.txt`로 의존성을 설치합니다. Psycopg는 `psycopg[binary]==3.3.5`로 본체와 바이너리 버전을 함께 맞춥니다.
+3. 최초 한 번 WSL2 Ubuntu에 Redis 서버를 설치합니다. `systemd`와 `redis-server` 자동 시작(`enabled`)을 설정한 개발 환경에서는 Windows PowerShell에서 다음 명령어로 WSL을 백그라운드 실행할 수 있습니다.
+
+   ```powershell
+   Start-Process -FilePath "wsl.exe" -ArgumentList @("-d", "Ubuntu", "--", "sleep", "infinity") -WindowStyle Hidden
+   ```
+
+   이후 `wsl -d Ubuntu -- redis-cli ping`으로 `PONG`을 확인하고, Windows Python에서도 Redis 연결이 가능한지 확인합니다. 별도의 Ubuntu 터미널을 계속 열어둘 필요는 없습니다. Windows 부팅 시 WSL 자동 시작은 설정하지 않았으므로 WSL이 종료된 경우 다시 실행해야 합니다. 자세한 내용은 `storage/README.md`를 참고하세요.
+4. `python -m storage init`은 **자신의 개발용 PostgreSQL DB가 준비되지 않은 경우에만** 실행합니다. 이미 사용 중인 DB라면 연결 확인부터 진행하세요.
+
+```powershell
+# VS Code PowerShell / 프로젝트 루트 / 가상환경 활성화
+python -m pip check
+python -c "from storage.db import get_connection; c=get_connection(); print('DB:', c.execute('SELECT current_database()').fetchone()[0]); c.close()"
+python -m unittest discover -s tests -p 'test_storage_*.py' -v
+```
+
+**현재 연동 상태:** `storage/redis_adapter.py`는 PostgreSQL 저장을 먼저 확정한 뒤 Redis 요약 캐시를 갱신하고, 캐시가 없을 때 Redis `WATCH` 아래에서 최신 DB 상태를 재조회하는 **선택형 어댑터**입니다. 아직 실제 `proxy.py`/Backend 호출부에는 자동 연결되지 않았습니다. `session_store.py`의 JSON 대화 복구를 Redis가 대체하지 않으며, Redis의 `last_decision`을 차단/종료 근거로 사용해서도 안 됩니다. 자세한 계약과 실행 검증은 [Storage 개발 가이드](storage/README.md#redis-연동-상태와-운영-원칙)에 정리했습니다.
+
 ### Storage 계정 탈퇴/복구 기능 추가
 
 `db-unify`의 PostgreSQL Storage에 계정 탈퇴 수명주기 기능을 추가했습니다.

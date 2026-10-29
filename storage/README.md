@@ -1,6 +1,210 @@
-# Storage (PostgreSQL)
+# Storage (PostgreSQL + Redis)
 
-멀티 AI 에이전트 가드레일 프로젝트의 PostgreSQL 저장 모듈입니다.
+멀티 AI 에이전트 가드레일 프로젝트의 PostgreSQL 영구 기록과 Redis 실행 상태 캐시를 담당하는 Storage 모듈입니다.
+
+## 팀원용 로컬 개발 가이드 (Windows 11 + WSL2)
+
+이 가이드는 **각 팀원의 로컬 PC**에서 개발용 PostgreSQL과 Redis를 따로 구동하는 방식입니다. 서버를 한 명이 항상 켜두거나 팀원끼리 서로의 `localhost`에 연결할 필요가 없습니다. 프록시/Backend 호출부는 아직 Redis 어댑터를 자동으로 사용하지 않으므로, 아래의 설치 성공이 전체 제품 연동 완료를 뜻하지는 않습니다.
+
+### 1. 준비물과 Python 가상환경
+
+- Windows 11, VS Code + PowerShell, Git, PostgreSQL(Windows 로컬), WSL2 Ubuntu(로컬 Redis용).
+- Python 버전은 **전체 저장소의 실행 조건**과 맞추세요(루트 `README.md` 빠른 시작은 Python 3.14 사용). Windows Storage 테스트는 Python 3.13에서 확인했지만, 이것만으로 전체 실험 실행기의 Windows 호환성을 보장하지 않습니다.
+- 현재 `requirements.txt`는 `psycopg[binary]==3.3.5`와 `redis==8.1.0`을 고정합니다. 팀원마다 임의로 재설치/업그레이드하지 마세요.
+
+새로 clone한 팀원이 프로젝트 루트에서 처음 설정하는 예시입니다. 기존 가상환경이 있다면 새로 만들 필요는 없습니다.
+
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+python -m pip check
+python -m pip list | Select-String 'psycopg|redis'
+```
+
+`venv/`는 `.gitignore`에 포함되어 있습니다. PowerShell에서 스크립트 실행이 차단되면 정책을 무조건 변경하지 말고 조직의 실행 정책에 맞는 터미널/활성화 방법을 사용하세요. **`pip check` 통과만으로 본체/바이너리 간 버전 일치가 보장되지는 않습니다.** 두 Psycopg 패키지가 모두 `3.3.5`인지 확인하세요. 버전 불일치가 있으면 다음 명령으로 재설치할 수 있습니다.
+
+```powershell
+python -m pip install 'psycopg[binary]==3.3.5'
+```
+
+### 2. 각자 PostgreSQL 설치 및 접속
+
+Windows에 PostgreSQL 서버를 최초 한 번 설치한 뒤, 자신의 로컬 PostgreSQL 서비스를 실행합니다. PostgreSQL 자체는 Python 패키지 설치만으로 실행되지 않습니다. 프로젝트 루트의 `.env`(Git 추적 금지)에 각자 **자신의** 접속 정보를 넣습니다.
+
+```env
+POSTGRES_HOST=127.0.0.1
+POSTGRES_PORT=5432
+POSTGRES_DB=guardrail_agent_v2
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=your_local_password_here
+```
+
+`GUARDRAIL_DB_URL`이 설정되어 있으면 `POSTGRES_*`보다 우선합니다. 뜻하지 않은 원격/운영 DB를 연결하지 않도록 **테스트 전에 항상 DB 이름을 확인**하세요. `.env`나 비밀번호, 연결 URL을 채팅·로그·커밋에 붙여 넣지 마세요.
+
+```powershell
+# 비밀번호를 출력하지 않고 현재 접속 DB만 조회
+python -c "from storage.db import get_connection; c=get_connection(); print('DB:', c.execute('SELECT current_database()').fetchone()[0]); c.close()"
+```
+
+새 개발용 DB/스키마가 필요한 경우에만 다음 명령을 실행합니다. `init`은 DB가 없을 때 생성 시도하고 기존 스키마를 보강할 수 있으므로, **실제 서비스 DB에는 무심코 실행하지 않습니다.** 이미 DB가 준비된 팀원은 생략할 수 있습니다.
+
+```powershell
+python -m storage init
+python -m storage projects
+```
+
+이 명령은 owner 없는 writable 사용자 프로젝트를 자동 생성하지 않습니다. 사용자 프로젝트는 인증된 Backend의 `storage.accounts.create_project` 흐름에서 만들어야 합니다.
+
+### 3. Redis 최초 설치 (각 PC에서 한 번)
+
+Windows PowerShell에서 `wsl --install -d Ubuntu`로 WSL2/Ubuntu를 준비할 수 있습니다(관리자 권한·재부팅이 필요할 수 있음). 이미 Ubuntu가 설치되어 있다면 건너뜁니다.
+
+```powershell
+wsl -d Ubuntu
+```
+
+**Ubuntu 터미널 안에서** 다음을 실행합니다.
+
+```bash
+sudo apt update
+sudo apt install redis-server -y
+sudo service redis-server start
+redis-cli ping
+```
+
+`PONG`이 나오면 Ubuntu 쪽 Redis 서버가 응답한 것입니다. `Redis 7.0.15` 및 Windows Python `redis 8.1.0` 조합은 로컬 테스트에서 사용했으며, 두 버전은 서버/클라이언트라 번호가 달라도 됩니다.
+
+### 4. Redis 실행·조회·종료 (Windows 11 + WSL2)
+
+현재 Windows 개발 환경에서는 WSL2 Ubuntu의 `systemd`가 활성화되어 있고, `redis-server` 서비스가 `enabled` 상태입니다.
+
+Redis 서버는 Ubuntu가 시작될 때 자동으로 실행됩니다. 다만 WSL 자체는 유휴 상태에서 종료될 수 있으므로, Windows Python에서 Redis를 계속 사용하려면 개발하는 동안 WSL을 실행 상태로 유지해야 합니다.
+
+**개발 시작 — Windows PowerShell**
+
+```powershell
+Start-Process -FilePath "wsl.exe" -ArgumentList @("-d", "Ubuntu", "--", "sleep", "infinity") -WindowStyle Hidden
+```
+
+이 명령어는 Ubuntu에서 백그라운드 대기 프로세스를 실행해 WSL을 유지합니다. 별도의 Ubuntu 터미널을 계속 열어둘 필요가 없습니다.
+
+**Redis 상태 확인**
+
+```powershell
+wsl -l -v
+wsl -d Ubuntu -- systemctl is-active redis-server
+wsl -d Ubuntu -- redis-cli ping
+```
+
+정상 상태는 Ubuntu `Running`, Redis `active`, `PONG`입니다.
+
+**Windows Python에서 실제 연결 확인**
+
+가상환경을 활성화한 PowerShell에서 실행합니다.
+
+```powershell
+python -c "import redis; print(redis.Redis(host='127.0.0.1', port=6379).ping())"
+```
+
+정상 출력은 `True`입니다. Ubuntu 내부에서 `PONG`이 나오더라도 Windows Python 연결이 성공했는지 별도로 확인해야 합니다.
+
+**개발 종료**
+
+다른 Ubuntu 작업이 없을 때 다음 명령으로 종료할 수 있습니다.
+
+```powershell
+wsl --terminate Ubuntu
+```
+
+이 설정은 Windows 부팅 시 WSL 자체를 자동 실행하는 기능은 아닙니다. Windows를 다시 켜거나 WSL이 종료된 경우에는 개발 시작 명령어를 다시 실행해야 합니다.
+
+본 개발 환경에서는 백그라운드 WSL 실행 후 Windows Python의 Redis `PING=True`까지 확인했습니다. 다른 팀원의 PC에서는 서비스 설정과 연결 상태를 각각 확인해야 합니다.
+
+
+#### WSL 백그라운드 실행 시 주의사항
+
+`Start-Process ... -WindowStyle Hidden`은 숨김 파일을 생성하거나 Windows 시작 프로그램을 등록하는 명령이 아닙니다. Ubuntu에서 `sleep infinity`라는 대기 프로세스를 실행하여 개발하는 동안 WSL을 유지하는 로컬 개발용 방법입니다.
+
+- 개발 세션을 시작할 때 한 번만 실행합니다. 반복 실행하면 대기 프로세스가 중복될 수 있습니다.
+- WSL이 실행되는 동안 메모리 등 시스템 자원을 사용합니다.
+- Windows 재부팅 시 자동으로 다시 실행되지는 않습니다.
+- Redis를 사용하지 않는 팀원에게 이 실행 방법은 필수가 아닙니다.
+- 다른 Ubuntu 작업이 없을 때만 `wsl --terminate Ubuntu`로 종료합니다. 이 명령은 Redis뿐 아니라 해당 Ubuntu에서 실행 중인 다른 작업도 종료합니다.
+- 대기 프로세스는 Redis 자체의 데이터 저장이나 백업 기능을 제공하지 않습니다.
+- 이 방식은 Windows 11 + WSL2 로컬 개발 환경에서 검증한 편의 기능이며, 실제 서버 배포나 운영 환경에서는 별도의 서비스 관리 방식을 사용해야 합니다.
+
+백그라운드 실행을 원하지 않으면 기존처럼 Ubuntu 터미널을 열어두고 사용할 수도 있습니다.
+
+### 5. 자주 사용하는 Storage/Redis 검증 명령어
+
+프로젝트 루트의 **가상환경이 활성화된 PowerShell** 기준입니다.
+
+```powershell
+# 프로젝트와 DB 상태 확인
+python -m storage projects
+python -m storage
+python -m pip check
+python -m pip list | Select-String 'psycopg|redis'
+
+# PostgreSQL/Redis 저장 계층의 기본 단위·회귀 테스트
+python -m unittest discover -s tests -p 'test_storage_*.py' -v
+python -m unittest discover -s tests -p 'test_storage_redis_adapter.py' -v
+python -m unittest discover -s tests -p 'test_storage_redis_b1_regression.py' -v  # 새 B1/I1 회귀 테스트
+
+# Redis를 실행한 뒤, 실제 Redis 통합 테스트(개발용 localhost에만)
+$env:GUARDRAIL_REDIS_TEST_URL='redis://127.0.0.1:6379/0'
+python -m unittest discover -s tests -p 'test_storage_redis_integration.py' -v
+python -m unittest discover -s tests -p 'test_storage_redis_recovery_integration.py' -v
+python -m unittest discover -s tests -p 'test_storage_redis_b1_regression.py' -v  # 실제 Redis 경쟁 재현 포함
+Remove-Item Env:GUARDRAIL_REDIS_TEST_URL
+```
+
+다음 테스트는 **자신의 개발용 PostgreSQL DB에 임시 테스트 데이터를 쓰는 opt-in 테스트**입니다. 실행 전 위의 DB 확인 명령으로 대상이 올바른지 검증하세요. 테스트는 생성한 임시 행만 정리하도록 설계됐지만, 예외로 정리가 남을 수 있으므로 운영 DB에서 실행하지 마세요.
+
+```powershell
+$env:GUARDRAIL_REDIS_TEST_URL='redis://127.0.0.1:6379/0'
+$env:GUARDRAIL_REDIS_PG_TEST='1'
+python -m unittest discover -s tests -p 'test_storage_redis_pg_integration.py' -v
+Remove-Item Env:GUARDRAIL_REDIS_TEST_URL
+Remove-Item Env:GUARDRAIL_REDIS_PG_TEST
+```
+
+일반 `test_storage_*.py` 회귀 실행 시 실제 PostgreSQL/Redis 테스트는 위의 opt-in 환경변수가 없으면 `skipped`가 나올 수 있습니다(실패가 아님). 기존 `test_storage_postgres_integration.py`는 별도 `GUARDRAIL_DB_URL` opt-in 계약을 따르므로, 해당 테스트를 의도적으로 실행할 때만 추가 설정하세요.
+
+### 6. 문제 해결 체크리스트
+
+| 현상 | 확인할 부분 |
+|---|---|
+| `WinError 10061` / Redis 연결 거부 | `wsl -l -v`로 Ubuntu 실행 상태 확인. WSL이 종료됐다면 4번 항목의 백그라운드 실행 명령 사용 후 Redis 상태와 Windows Python 연결 확인 |
+| Ubuntu에서는 `PONG`, Windows에서는 연결 실패 | WSL이 계속 실행 중인지 확인하고, `Test-NetConnection 127.0.0.1 -Port 6379`로 Windows 연결 상태 점검 |
+| PostgreSQL `TypeError: connect() takes no keyword arguments` | `psycopg`/`psycopg-binary` 버전 불일치 확인; 모두 3.3.5로 맞춰 재검증 |
+| `pip check`는 성공인데 DB 연결 실패 | `pip check`는 모든 런타임/ABI 호환성을 검증하지 않음; 실제 DB 연결 테스트 필요 |
+| `GUARDRAIL_DB_URL`이 예상과 다른 DB를 가리킴 | URL이 `POSTGRES_*`보다 우선. DB 이름만 출력하여 확인하고 환경 설정 수정 |
+| Redis 조회값 `None` / 만료 | 캐시 miss는 세션 생성/종료 증거가 아님. Backend가 권한 확인 후 PostgreSQL authoritative 조회 경로 사용 |
+| Windows에서 전체 실험 테스트 실패 | 다른 팀의 POSIX 의존 기능(`signal.getitimer` 등)일 수 있음. Storage 오류로 오인하지 말고 Linux/WSL/CI에서 재검증 |
+
+## Redis 연동 상태와 운영 원칙
+
+- `storage/redis_client.py`: 로컬 Redis 클라이언트. 환경변수 `GUARDRAIL_REDIS_URL`을 지정하지 않으면 `redis://127.0.0.1:6379/0` 사용.
+- `storage/redis_state.py`: 현재 step/상태/선택 규칙 판정 등 **짧게 유지되는 구조화 캐시**. 원문 대화·요청·응답과 API 키는 저장하지 않음.
+- `storage/redis_adapter.py`: **옵트인** PostgreSQL-first 연동. `storage.live` 함수의 성공 후 Redis를 최선으로 갱신; Redis 장애는 이미 성공한 PostgreSQL 쓰기 결과를 실패로 바꾸지 않음. 조회 시 miss/장애는 PostgreSQL에서 재구성.
+- `RedisLiveStateStore(..., selected_rule_id='deadlock-v0.3', prefix='guardrail:dev-local:live:session')`처럼 **Backend/PM과 합의한 표시 규칙**과 환경별 namespace를 명시할 수 있음. 선택 규칙은 Redis 키의 `:rule:<rule_id>:` 구간으로 분리되어 서로 다른 표시 규칙의 판정이 섞이지 않습니다. 기존 버전의 rule 미분리 캐시는 새 선택 규칙 키에서 조회하지 않으며 TTL에 따라 자연 만료됩니다. 규칙을 지정하지 않은 기존 키 형식은 유지됩니다. 예시는 확정된 서비스 정책이 아닙니다.
+- `get_state(session_id)`는 캐시가 살아 있으면 오래된 값을 반환할 수 있음. **차단·종료·권한 판정에는 사용 금지**. DB 기준의 강한 조회는 `get_authoritative_state(session_id)` 이용.
+- Backend는 호출자의 세션/프로젝트 접근 권한을 검증해야 함. 어댑터는 인증/인가 미들웨어가 아니며, async 핸들러에서 동기 Redis/Psycopg 호출을 직접 하면 이벤트 루프를 막을 수 있으니 worker thread로 오프로딩해야 함.
+- 현재 `proxy.py`는 JSON `session_store.py`로 대화/관찰 복구를 수행하며 `storage.live`/Redis 어댑터로 **자동 연결되지 않음**. Redis는 에이전트 프로세스, 대화 원문, 이전 STOP 이력, 모든 observation을 재현하지 않으므로 JSON 복구를 대체할 수 없음. 단일-worker 제약도 그대로 유지됨.
+- **M1**: PostgreSQL은 `(session_id, step, rule_id)` 판정을 저장함. 어댑터는 선택된 규칙의 **현재 관찰 Step** 판정만 Redis 캐시에 표시하고, 늦은 판정은 과거로 되돌리지 않음.
+- **M2 (보완)**: 캐시 miss 시 Redis `WATCH`를 건 뒤 PostgreSQL snapshot을 다시 읽고, 충돌(동시 갱신/키 소실) 시 snapshot을 폐기하고 DB부터 재조회합니다. 이는 지연된 복구가 최신 캐시를 덮어쓰는 경쟁 조건을 줄이기 위한 조치입니다. Redis는 여전히 표시용 캐시이므로 장애 중 발생한 DB 변경을 살아 있는 캐시에 자동 동기화하지는 않습니다. 종료·차단 근거에는 `get_authoritative_state()`를 사용하세요.
+- 개발 서버 Redis 설정이나 임시 상태를 **팀원 간 공유하지 않음**. 실제 Backend가 어댑터를 호출하도록 전환하는 작업, selected rule/인가/async 경계 검토는 통합 팀과 합의 후 별도로 검증해야 함.
+
+**기존 로컬 테스트 기록 (2026-10-29, B1 수정 전):** Redis 자체 오프라인 12개, 설치 스크립트 3개, 어댑터 오프라인 16개, 실제 Redis 통합 5개, Redis 복구 통합 3개, 실제 PostgreSQL+Redis 결합 통합 1개에서 모두 성공 결과를 확인했습니다. 이 기록은 **모듈 검증**이며 실제 Backend/Proxy 전체 E2E 검증을 뜻하지 않습니다. B1/I1 수정 후 로컬 재검증에서는 B1 전용 5/5, 실제 Redis 기본 5/5, Redis 복구 3/3, PostgreSQL+Redis 결합 1/1이 통과했습니다. Storage 전체 회귀 테스트는 139개 실행, 128개 통과, 11개 opt-in skip, 실패 0개입니다. 실제 Backend/Proxy E2E 연동은 아직 검증하지 않았습니다.
+
+### 기존 캐시 키 전환 주의사항 (I1)
+
+- 새 버전은 `selected_rule_id`를 지정하면 `<prefix>:rule:<rule_id>:<session_id>` 형태로 규칙별 캐시를 분리합니다. 반면 `selected_rule_id=None`은 이전 버전과 같은 `<prefix>:<session_id>` 키를 사용합니다.
+- **이전 버전에서 같은 키에 저장한 선택 규칙의 STOP/CONTINUE 판정이 남아 있다면**, 새 규칙 미지정 모드가 그 값을 표시할 수 있습니다. 새 인스턴스만 새로 실행했다고 기존 키가 사라지는 것은 아닙니다.
+- **Backend 연동 또는 표시 규칙 변경 전에** 실행 환경별로 새로운 `prefix`를 지정하세요. 예: `prefix='guardrail:dev-local:v2:live:session'`. 같은 실행 환경의 모든 인스턴스에서 동일한 신규 prefix와 표시 규칙 계약을 사용해야 합니다. 새 prefix는 기존 캐시를 읽지 않고, PostgreSQL 원본으로부터 다시 복구합니다.
+- 기존 키의 제한적 정리는 소유한 애플리케이션의 명확한 키 범위를 확인한 경우에만 선택할 수 있습니다. **다른 팀원의 캐시를 지우거나 `FLUSHALL`/`FLUSHDB`를 실행하지 마세요.** Redis 조회값은 표시용일 뿐이며 종료·차단 판단에는 `get_authoritative_state()`를 사용해야 합니다.
 
 ## AI / 유지보수 인수인계 요약
 
