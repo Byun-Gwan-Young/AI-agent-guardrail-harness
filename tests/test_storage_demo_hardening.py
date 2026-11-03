@@ -72,13 +72,27 @@ class StorageDemoHardeningTests(unittest.TestCase):
         project_id = import_demo.ensure_demo_project(cursor)
         self.assertEqual(project_id, 3)
 
-        select_sql = " ".join(cursor.execute.call_args_list[0].args[0].split())
+        lock_sql = " ".join(cursor.execute.call_args_list[0].args[0].split())
+        self.assertIn("pg_advisory_xact_lock", lock_sql)
+
+        select_sql = " ".join(cursor.execute.call_args_list[1].args[0].split())
         self.assertIn("owner_user_id IS NULL", select_sql)
 
-        update_sql = " ".join(cursor.execute.call_args_list[1].args[0].split())
-        update_params = cursor.execute.call_args_list[1].args[1]
+        update_sql = " ".join(cursor.execute.call_args_list[2].args[0].split())
+        update_params = cursor.execute.call_args_list[2].args[1]
         self.assertIn("provider = %s", update_sql)
         self.assertIn("custom", update_params)
+
+
+    def test_incomplete_canonical_demo_source_is_rejected_before_db(self):
+        folders = import_demo.demo_folders()
+        self.assertEqual(len(folders), import_demo.CANONICAL_DEMO_SESSION_COUNT)
+        with patch("storage.import_demo.demo_folders", return_value=folders[:-1]), patch(
+            "storage.import_demo.get_connection"
+        ) as connect:
+            with self.assertRaisesRegex(ValueError, "완전하지"):
+                import_demo.import_all_demos()
+            connect.assert_not_called()
 
     def test_empty_bulk_source_never_opens_db_or_prunes(self):
         with patch("storage.import_demo._prepare_all_demo_payloads", return_value=[]), patch(

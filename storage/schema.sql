@@ -43,8 +43,50 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT NOT NULL,
     name TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    last_login_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    last_login_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    -- 계정 탈퇴 유예 상태.
+    -- active: 정상 계정
+    -- pending_deletion: 탈퇴 요청 후 30일 유예 중
+    account_status TEXT NOT NULL DEFAULT 'active',
+    deletion_requested_at TIMESTAMPTZ,
+    deletion_due_at TIMESTAMPTZ
 );
+
+-- 기존 DB에도 계정 탈퇴 상태 컬럼을 안전하게 추가한다.
+ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS account_status TEXT NOT NULL DEFAULT 'active',
+    ADD COLUMN IF NOT EXISTS deletion_requested_at TIMESTAMPTZ,
+    ADD COLUMN IF NOT EXISTS deletion_due_at TIMESTAMPTZ;
+
+-- schema.sql을 여러 번 실행해도 같은 제약을 다시 만들 수 있도록
+-- 기존 제약을 제거한 뒤 현재 계약으로 다시 생성한다.
+ALTER TABLE users
+    DROP CONSTRAINT IF EXISTS users_account_status_check;
+
+ALTER TABLE users
+    ADD CONSTRAINT users_account_status_check
+    CHECK (account_status IN ('active', 'pending_deletion'));
+
+ALTER TABLE users
+    DROP CONSTRAINT IF EXISTS users_deletion_state_check;
+
+ALTER TABLE users
+    ADD CONSTRAINT users_deletion_state_check
+    CHECK (
+        (
+            account_status = 'active'
+            AND deletion_requested_at IS NULL
+            AND deletion_due_at IS NULL
+        )
+        OR
+        (
+            account_status = 'pending_deletion'
+            AND deletion_requested_at IS NOT NULL
+            AND deletion_due_at IS NOT NULL
+            AND deletion_due_at > deletion_requested_at
+        )
+    );
 
 
 -- ---------------------------------------------------------
@@ -252,6 +294,7 @@ CREATE TABLE IF NOT EXISTS sessions (
 );
 
 ALTER TABLE sessions
+    ADD COLUMN IF NOT EXISTS guardrail_mode VARCHAR(20),
     ADD COLUMN IF NOT EXISTS validity VARCHAR(20) NOT NULL DEFAULT 'not_counted',
     ADD COLUMN IF NOT EXISTS exclusion_code TEXT,
     ADD COLUMN IF NOT EXISTS rerun_of VARCHAR(200),

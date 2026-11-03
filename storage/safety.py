@@ -71,7 +71,52 @@ _SECRET_ENVS = (
     "GROQ_API_KEY",
     "OPENAI_API_KEY",
     "GUARDRAIL_KEY",
+    "POSTGRES_PASSWORD",
+    "GUARDRAIL_DB_URL",
 )
+
+_SECRET_KEY_SUFFIXES = (
+    "_api_key",
+    "_apikey",
+    "_password",
+    "_passwd",
+    "_token",
+    "_secret",
+    "_private_key",
+)
+
+
+def _normalized_key_name(key: Any) -> str:
+    return str(key).strip().lower().replace("-", "_")
+
+
+def _is_secret_key_name(key: Any) -> bool:
+    normalized = _normalized_key_name(key)
+    return (
+        normalized in {name.replace("-", "_") for name in _FORBIDDEN_SECRET_KEYS}
+        or normalized.endswith(_SECRET_KEY_SUFFIXES)
+    )
+
+
+def secret_fields(value: Any, path: str = "$") -> list[str]:
+    """Return paths whose field names are credential-shaped.
+
+    This deliberately checks names, not only known secret *values*. Provider or
+    deployment credentials can use a previously unseen format, so fields such as
+    ``provider_api_key`` or ``POSTGRES_PASSWORD`` must still be rejected.
+    """
+
+    found: list[str] = []
+    if isinstance(value, dict):
+        for key, item in value.items():
+            here = f"{path}.{key}"
+            if _is_secret_key_name(key):
+                found.append(here)
+            found.extend(secret_fields(item, here))
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            found.extend(secret_fields(item, f"{path}[{index}]"))
+    return found
 
 
 def forbidden_fields(value: Any, path: str = "$") -> list[str]:
@@ -92,7 +137,7 @@ def forbidden_fields(value: Any, path: str = "$") -> list[str]:
 
             if lowered in _FORBIDDEN_TEXT_KEYS:
                 found.append(here)
-            elif lowered in _FORBIDDEN_SECRET_KEYS:
+            elif _is_secret_key_name(key_text):
                 found.append(here)
             elif lowered == "reasoning" and not (
                 item is None or (isinstance(item, int) and not isinstance(item, bool))
@@ -144,7 +189,19 @@ def assert_safe_storage_json(value: Any, label: str) -> None:
 
 
 def assert_no_secrets(value: Any, label: str) -> None:
-    """Secret-only check for trusted configuration/specification documents."""
+    """Reject credential-shaped fields and known/literal secret values.
+
+    Trusted configuration may contain normal task text, so this helper does not
+    apply the raw-model-text field ban. It still rejects credential field names
+    because unknown provider key formats cannot be detected from value patterns
+    alone.
+    """
+
+    fields = secret_fields(value)
+    if fields:
+        preview = fields[:5]
+        suffix = "" if len(fields) <= 5 else f" ... (+{len(fields) - 5} more)"
+        raise ValueError(f"{label}에 비밀 필드가 있습니다: {preview}{suffix}")
 
     hits = secret_hits(value)
     if hits:

@@ -15,6 +15,7 @@ class StorageSchemaResolvedContractTests(unittest.TestCase):
     def test_session_mode_constraint_is_documented_in_schema(self):
         self.assertIn("chk_sessions_guardrail_mode_observe_block", self.schema)
         self.assertIn("guardrail_mode IS NULL OR guardrail_mode IN ('observe', 'block')", self.schema)
+        self.assertIn("ADD COLUMN IF NOT EXISTS guardrail_mode VARCHAR(20)", self.schema)
 
     def test_key_prefix_is_not_null_contract(self):
         self.assertIn("key_prefix TEXT NOT NULL", self.schema)

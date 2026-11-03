@@ -26,10 +26,14 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import ipaddress
 import os
 import secrets
 import re
+import socket
 from typing import Any
+
+import psycopg
 from urllib.parse import parse_qsl, urlsplit
 
 from psycopg.types.json import Jsonb
@@ -51,6 +55,7 @@ DEFAULT_RULE_ID = os.getenv("GUARDRAIL_DEFAULT_RULE_ID", "deadlock-v0.3")
 DEFAULT_PROVIDER_ENV = "GUARDRAIL_DEFAULT_PROVIDER"
 DEFAULT_UPSTREAM_URL_ENV = "GUARDRAIL_DEFAULT_UPSTREAM_URL"  # legacy/custom fallback
 PROVIDER_URL_ENV_PREFIX = "GUARDRAIL_PROVIDER_"
+CUSTOM_PROVIDER_ENABLED_ENV = "GUARDRAIL_ALLOW_CUSTOM_PROVIDER"
 _PROVIDER_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,31}$")
 
 # Public providers have stable OpenAI-compatible base URLs.  KMU intentionally
@@ -96,6 +101,11 @@ def _validate_upstream_url(value: str, label: str = "upstream URL") -> str:
         raise ValueError(f"{label} must be an absolute http(s) URL")
     if parsed.username is not None or parsed.password is not None:
         raise ValueError(f"{label} must not contain credentials")
+    if parsed.fragment:
+        # Fragments are not sent to the upstream HTTP server and have no routing
+        # value here. Reject them so credentials cannot be hidden in persistent
+        # URL metadata such as #api_key=... .
+        raise ValueError(f"{label} must not contain a URL fragment")
 
     # Unknown/custom provider keys may not match one of our literal secret
     # patterns. Block credential-shaped query parameter names as well so a URL
@@ -116,6 +126,69 @@ def _provider_url_env_name(provider: str) -> str:
     return f"{PROVIDER_URL_ENV_PREFIX}{provider.upper().replace('-', '_')}_URL"
 
 
+def _custom_provider_enabled() -> bool:
+    """Return whether server configuration explicitly enables custom endpoints."""
+    return os.getenv(CUSTOM_PROVIDER_ENABLED_ENV, "").strip().lower() in {
+        "1", "true", "yes", "on"
+    }
+
+
+def _require_custom_provider_enabled() -> None:
+    if not _custom_provider_enabled():
+        raise RuntimeError(
+            f"custom provider is disabled; set {CUSTOM_PROVIDER_ENABLED_ENV}=1 on the server to enable it"
+        )
+
+
+def _validate_public_custom_target(value: str, label: str = "custom upstream URL") -> str:
+    """Validate a custom provider endpoint against SSRF-prone network targets.
+
+    This is a configuration-time admission check.  It requires the custom
+    provider feature flag and rejects any literal or DNS-resolved address that
+    is not globally routable (including loopback, private, link-local,
+    unspecified, multicast, and reserved ranges).
+
+    The proxy/network layer should still enforce outbound protections at
+    request time to cover redirects and DNS rebinding after configuration.
+    """
+    _require_custom_provider_enabled()
+    clean = _validate_upstream_url(value, label)
+    parsed = urlsplit(clean)
+    host = parsed.hostname
+    if not host:
+        raise ValueError(f"{label} must include a hostname")
+
+    try:
+        port = parsed.port
+    except ValueError as exc:
+        raise ValueError(f"{label} contains an invalid port") from exc
+    if port is None:
+        port = 443 if parsed.scheme == "https" else 80
+
+    addresses: set[ipaddress.IPv4Address | ipaddress.IPv6Address] = set()
+    try:
+        addresses.add(ipaddress.ip_address(host.split("%", 1)[0]))
+    except ValueError:
+        try:
+            infos = socket.getaddrinfo(host, port, type=socket.SOCK_STREAM)
+        except socket.gaierror as exc:
+            raise ValueError(f"{label} hostname must resolve") from exc
+        for info in infos:
+            raw = info[4][0].split("%", 1)[0]
+            try:
+                addresses.add(ipaddress.ip_address(raw))
+            except ValueError:
+                raise ValueError(f"{label} hostname resolved to an invalid address") from None
+
+    if not addresses:
+        raise ValueError(f"{label} hostname must resolve")
+    if any(not address.is_global for address in addresses):
+        raise ValueError(
+            f"{label} must resolve only to public addresses; loopback/private/link-local targets are forbidden"
+        )
+    return clean
+
+
 def _resolve_provider_upstream(provider: str, upstream_url: str | None = None) -> tuple[str, str]:
     """Resolve a provider choice to the concrete proxy routing URL.
 
@@ -128,10 +201,14 @@ def _resolve_provider_upstream(provider: str, upstream_url: str | None = None) -
     if upstream_url is not None:
         if provider != "custom":
             raise ValueError("upstream_url may be supplied only for provider='custom'")
-        return provider, _validate_upstream_url(upstream_url, "custom upstream URL")
+        return provider, _validate_public_custom_target(upstream_url, "custom upstream URL")
 
     configured = os.getenv(_provider_url_env_name(provider), "").strip()
     if configured:
+        if provider == "custom":
+            return provider, _validate_public_custom_target(
+                configured, "custom upstream URL"
+            )
         return provider, _validate_upstream_url(configured, f"{provider} upstream URL")
 
     builtin = _BUILTIN_PROVIDER_URLS.get(provider)
@@ -158,7 +235,9 @@ def _get_default_provider_config() -> tuple[str, str]:
 
     legacy_url = os.getenv(DEFAULT_UPSTREAM_URL_ENV, "").strip()
     if legacy_url:
-        return "custom", _validate_upstream_url(legacy_url, "default upstream URL")
+        return "custom", _validate_public_custom_target(
+            legacy_url, "default upstream URL"
+        )
 
     raise RuntimeError(
         "GUARDRAIL_DEFAULT_PROVIDER (preferred) or GUARDRAIL_DEFAULT_UPSTREAM_URL "
@@ -185,6 +264,12 @@ def _validate_mode(mode: str) -> str:
     return value
 
 
+def _validate_user_id(user_id: int) -> int:
+    if isinstance(user_id, bool) or not isinstance(user_id, int) or user_id < 1:
+        raise ValueError("user_id must be a positive integer")
+    return user_id
+
+
 def _row_dict(cursor, row):
     if row is None:
         return None
@@ -195,6 +280,37 @@ def _row_dict(cursor, row):
 def _rows_dict(cursor):
     names = [column.name for column in cursor.description]
     return [dict(zip(names, row)) for row in cursor.fetchall()]
+
+
+
+def _require_active_account_cursor(cursor, user_id: int, *, lock: bool = False) -> None:
+    """Allow normal service operations only for an active account.
+
+    Mutating operations pass ``lock=True`` so the user row is held with
+    ``FOR SHARE`` until the transaction ends. Account deletion/purge uses
+    ``FOR UPDATE`` on the same row, which serializes the state transition
+    before any project/key write can commit after a completed withdrawal.
+    """
+    user_id = _validate_user_id(user_id)
+    lock_clause = " FOR SHARE" if lock else ""
+
+    cursor.execute(
+        f"""
+        SELECT account_status
+        FROM users
+        WHERE id = %s{lock_clause}
+        """,
+        (user_id,),
+    )
+    row = cursor.fetchone()
+
+    if row is None:
+        raise LookupError("user not found")
+
+    if row[0] != "active":
+        raise RuntimeError("account is pending deletion")
+
+
 
 
 def _record_auth_event_cursor(cursor, kind: str, user_id: int | None, detail: Any) -> None:
@@ -247,7 +363,15 @@ def upsert_user_from_google(google_sub, email, name):
                     name = EXCLUDED.name,
                     last_login_at = CURRENT_TIMESTAMP
                 RETURNING
-                    id, google_sub, email, name, created_at, last_login_at
+                    id,
+                    google_sub,
+                    email,
+                    name,
+                    created_at,
+                    last_login_at,
+                    account_status,
+                    deletion_requested_at,
+                    deletion_due_at
                 """,
                 (google_sub, email, clean_name),
             )
@@ -259,6 +383,587 @@ def upsert_user_from_google(google_sub, email, name):
                 {"provider": "google"},
             )
             return user
+
+
+
+def get_account_status(user_id):
+    """Return account deletion state without exposing unrelated account data."""
+    user_id = _validate_user_id(user_id)
+
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT
+                    id,
+                    account_status,
+                    deletion_requested_at,
+                    deletion_due_at
+                FROM users
+                WHERE id = %s
+                """,
+                (user_id,),
+            )
+
+            account = _row_dict(cursor, cursor.fetchone())
+            if account is None:
+                raise LookupError("user not found")
+
+            return account
+
+
+def request_account_deletion(user_id):
+    """Start the 30-day deletion grace period and revoke all owned API keys.
+
+    Repeating the request does not extend deletion_due_at.
+    """
+    user_id = _validate_user_id(user_id)
+
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            # Serialize deletion/restore requests for this account.
+            cursor.execute(
+                """
+                SELECT
+                    id,
+                    account_status,
+                    deletion_requested_at,
+                    deletion_due_at
+                FROM users
+                WHERE id = %s
+                FOR UPDATE
+                """,
+                (user_id,),
+            )
+
+            account = _row_dict(cursor, cursor.fetchone())
+            if account is None:
+                raise LookupError("user not found")
+
+            already_pending = account["account_status"] == "pending_deletion"
+
+            if account["account_status"] == "active":
+                cursor.execute(
+                    """
+                    UPDATE users
+                    SET
+                        account_status = 'pending_deletion',
+                        deletion_requested_at = CURRENT_TIMESTAMP,
+                        deletion_due_at = CURRENT_TIMESTAMP + INTERVAL '30 days'
+                    WHERE id = %s
+                    RETURNING
+                        id,
+                        account_status,
+                        deletion_requested_at,
+                        deletion_due_at
+                    """,
+                    (user_id,),
+                )
+                account = _row_dict(cursor, cursor.fetchone())
+
+            elif account["account_status"] != "pending_deletion":
+                raise RuntimeError("unsupported account status")
+
+            # A withdrawal request immediately disables every Guardrail API key
+            # belonging to the user's projects.
+            cursor.execute(
+                """
+                UPDATE api_keys AS k
+                SET revoked_at = COALESCE(k.revoked_at, CURRENT_TIMESTAMP)
+                FROM projects AS p
+                WHERE p.id = k.project_id
+                  AND p.owner_user_id = %s
+                  AND k.revoked_at IS NULL
+                RETURNING k.id
+                """,
+                (user_id,),
+            )
+
+            revoked_key_count = len(cursor.fetchall())
+
+            if not already_pending:
+                _record_auth_event_cursor(
+                    cursor,
+                    "account_deletion_requested",
+                    user_id,
+                    {"revoked_api_key_count": revoked_key_count},
+                )
+
+            account["already_pending"] = already_pending
+            account["revoked_api_key_count"] = revoked_key_count
+            return account
+
+
+def restore_account(user_id):
+    """Restore an account only while its 30-day grace period is still open.
+
+    Previously revoked API keys remain revoked.
+    """
+    user_id = _validate_user_id(user_id)
+
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT
+                    id,
+                    account_status,
+                    deletion_requested_at,
+                    deletion_due_at
+                FROM users
+                WHERE id = %s
+                FOR UPDATE
+                """,
+                (user_id,),
+            )
+
+            account = _row_dict(cursor, cursor.fetchone())
+            if account is None:
+                raise LookupError("user not found")
+
+            if account["account_status"] == "active":
+                account["already_active"] = True
+                return account
+
+            if account["account_status"] != "pending_deletion":
+                raise RuntimeError("unsupported account status")
+
+            cursor.execute(
+                """
+                UPDATE users
+                SET
+                    account_status = 'active',
+                    deletion_requested_at = NULL,
+                    deletion_due_at = NULL
+                WHERE id = %s
+                  AND account_status = 'pending_deletion'
+                  AND CURRENT_TIMESTAMP < deletion_due_at
+                RETURNING
+                    id,
+                    account_status,
+                    deletion_requested_at,
+                    deletion_due_at
+                """,
+                (user_id,),
+            )
+
+            restored = _row_dict(cursor, cursor.fetchone())
+
+            if restored is None:
+                raise RuntimeError("account deletion grace period has expired")
+
+            _record_auth_event_cursor(
+                cursor,
+                "account_restored",
+                user_id,
+                {},
+            )
+
+            restored["already_active"] = False
+            return restored
+
+
+
+def preview_account_purge(user_id):
+    """Return what a final account purge would delete without deleting anything."""
+    user_id = _validate_user_id(user_id)
+
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT
+                    id,
+                    email,
+                    account_status,
+                    deletion_requested_at,
+                    deletion_due_at,
+                    (
+                        deletion_due_at IS NOT NULL
+                        AND CURRENT_TIMESTAMP >= deletion_due_at
+                    ) AS deletion_due
+                FROM users
+                WHERE id = %s
+                """,
+                (user_id,),
+            )
+
+            user = _row_dict(cursor, cursor.fetchone())
+            if user is None:
+                raise LookupError("user not found")
+
+            cursor.execute(
+                """
+                SELECT id
+                FROM projects
+                WHERE owner_user_id = %s
+                ORDER BY id
+                """,
+                (user_id,),
+            )
+            project_ids = [row[0] for row in cursor.fetchall()]
+
+            cursor.execute(
+                """
+                WITH owned_projects AS (
+                    SELECT id
+                    FROM projects
+                    WHERE owner_user_id = %s
+                ),
+                owned_scenarios AS (
+                    SELECT s.id
+                    FROM scenarios AS s
+                    JOIN owned_projects AS p
+                      ON p.id = s.project_id
+                ),
+                owned_sessions AS (
+                    SELECT s.id
+                    FROM sessions AS s
+                    JOIN owned_scenarios AS sc
+                      ON sc.id = s.scenario_id
+                )
+                SELECT
+                    (SELECT COUNT(*) FROM owned_projects) AS projects,
+                    (
+                        SELECT COUNT(*)
+                        FROM api_keys AS k
+                        JOIN owned_projects AS p
+                          ON p.id = k.project_id
+                    ) AS api_keys,
+                    (SELECT COUNT(*) FROM owned_scenarios) AS scenarios,
+                    (SELECT COUNT(*) FROM owned_sessions) AS sessions,
+                    (
+                        SELECT COUNT(*)
+                        FROM observations AS o
+                        JOIN owned_sessions AS s
+                          ON s.id = o.session_id
+                    ) AS observations,
+                    (
+                        SELECT COUNT(*)
+                        FROM judgements AS j
+                        JOIN owned_sessions AS s
+                          ON s.id = j.session_id
+                    ) AS judgements,
+                    (
+                        SELECT COUNT(*)
+                        FROM llm_calls AS l
+                        JOIN owned_sessions AS s
+                          ON s.id = l.session_id
+                    ) AS llm_calls,
+                    (
+                        SELECT COUNT(*)
+                        FROM auth_events AS a
+                        WHERE a.user_id = %s
+                           OR (
+                               a.user_id IS NULL
+                               AND LOWER(a.detail ->> 'email') = LOWER(%s)
+                           )
+                    ) AS auth_events,
+                    (
+                        SELECT COUNT(*)
+                        FROM allowed_emails AS ae
+                        WHERE LOWER(ae.email) = LOWER(%s)
+                    ) AS allowed_emails
+                """,
+                (
+                    user_id,
+                    user_id,
+                    user["email"],
+                    user["email"],
+                ),
+            )
+
+            counts = _row_dict(cursor, cursor.fetchone())
+
+            return {
+                "user_id": user["id"],
+                "account_status": user["account_status"],
+                "deletion_requested_at": user["deletion_requested_at"],
+                "deletion_due_at": user["deletion_due_at"],
+                "deletion_due": bool(user["deletion_due"]),
+                "project_ids": project_ids,
+                "counts": counts,
+            }
+
+
+
+def purge_account(user_id):
+    """Permanently delete one account whose 30-day grace period has expired.
+
+    All user-owned project/runtime data and identifiable account metadata are
+    removed in one transaction. The canonical demo project must never be owned
+    by a user or included in this purge.
+    """
+    user_id = _validate_user_id(user_id)
+
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            # Serialize purge against restore/deletion-state changes.
+            cursor.execute(
+                """
+                SELECT
+                    id,
+                    email,
+                    account_status,
+                    deletion_requested_at,
+                    deletion_due_at
+                FROM users
+                WHERE id = %s
+                FOR UPDATE
+                """,
+                (user_id,),
+            )
+
+            user = _row_dict(cursor, cursor.fetchone())
+            if user is None:
+                raise LookupError("user not found")
+
+            if user["account_status"] != "pending_deletion":
+                raise RuntimeError("account is not pending deletion")
+
+            # PostgreSQL server time is the authority.
+            cursor.execute(
+                """
+                SELECT CURRENT_TIMESTAMP >= %s
+                """,
+                (user["deletion_due_at"],),
+            )
+            if not bool(cursor.fetchone()[0]):
+                raise RuntimeError("account deletion grace period has not expired")
+
+            # Lock all owned projects so their ownership/runtime tree cannot change
+            # while the purge is selecting and deleting its descendants.
+            cursor.execute(
+                """
+                SELECT id
+                FROM projects
+                WHERE owner_user_id = %s
+                ORDER BY id
+                FOR UPDATE
+                """,
+                (user_id,),
+            )
+            project_ids = [row[0] for row in cursor.fetchall()]
+
+            # Lock owned sessions before deleting child rows. This serializes purge
+            # against live observation/judgement/LLM-call writers.
+            cursor.execute(
+                """
+                SELECT s.id
+                FROM sessions AS s
+                JOIN scenarios AS sc
+                  ON sc.id = s.scenario_id
+                JOIN projects AS p
+                  ON p.id = sc.project_id
+                WHERE p.owner_user_id = %s
+                ORDER BY s.id
+                FOR UPDATE OF s
+                """,
+                (user_id,),
+            )
+            cursor.fetchall()
+
+            deleted = {}
+
+            cursor.execute(
+                """
+                DELETE FROM llm_calls AS l
+                USING sessions AS s,
+                      scenarios AS sc,
+                      projects AS p
+                WHERE l.session_id = s.id
+                  AND s.scenario_id = sc.id
+                  AND sc.project_id = p.id
+                  AND p.owner_user_id = %s
+                """,
+                (user_id,),
+            )
+            deleted["llm_calls"] = cursor.rowcount
+
+            cursor.execute(
+                """
+                DELETE FROM judgements AS j
+                USING sessions AS s,
+                      scenarios AS sc,
+                      projects AS p
+                WHERE j.session_id = s.id
+                  AND s.scenario_id = sc.id
+                  AND sc.project_id = p.id
+                  AND p.owner_user_id = %s
+                """,
+                (user_id,),
+            )
+            deleted["judgements"] = cursor.rowcount
+
+            cursor.execute(
+                """
+                DELETE FROM observations AS o
+                USING sessions AS s,
+                      scenarios AS sc,
+                      projects AS p
+                WHERE o.session_id = s.id
+                  AND s.scenario_id = sc.id
+                  AND sc.project_id = p.id
+                  AND p.owner_user_id = %s
+                """,
+                (user_id,),
+            )
+            deleted["observations"] = cursor.rowcount
+
+            cursor.execute(
+                """
+                DELETE FROM sessions AS s
+                USING scenarios AS sc,
+                      projects AS p
+                WHERE s.scenario_id = sc.id
+                  AND sc.project_id = p.id
+                  AND p.owner_user_id = %s
+                """,
+                (user_id,),
+            )
+            deleted["sessions"] = cursor.rowcount
+
+            cursor.execute(
+                """
+                DELETE FROM scenarios AS sc
+                USING projects AS p
+                WHERE sc.project_id = p.id
+                  AND p.owner_user_id = %s
+                """,
+                (user_id,),
+            )
+            deleted["scenarios"] = cursor.rowcount
+
+            cursor.execute(
+                """
+                DELETE FROM api_keys AS k
+                USING projects AS p
+                WHERE k.project_id = p.id
+                  AND p.owner_user_id = %s
+                """,
+                (user_id,),
+            )
+            deleted["api_keys"] = cursor.rowcount
+
+            cursor.execute(
+                """
+                DELETE FROM projects
+                WHERE owner_user_id = %s
+                """,
+                (user_id,),
+            )
+            deleted["projects"] = cursor.rowcount
+
+            # Remove identifiable audit records. user_id-linked records belong to
+            # this account; user-less allow-list events are matched structurally
+            # through detail.email rather than broad JSON/text searching.
+            cursor.execute(
+                """
+                DELETE FROM auth_events
+                WHERE user_id = %s
+                   OR (
+                       user_id IS NULL
+                       AND LOWER(detail ->> 'email') = LOWER(%s)
+                   )
+                """,
+                (user_id, user["email"]),
+            )
+            deleted["auth_events"] = cursor.rowcount
+
+            cursor.execute(
+                """
+                DELETE FROM allowed_emails
+                WHERE LOWER(email) = LOWER(%s)
+                """,
+                (user["email"],),
+            )
+            deleted["allowed_emails"] = cursor.rowcount
+
+            cursor.execute(
+                """
+                DELETE FROM users
+                WHERE id = %s
+                """,
+                (user_id,),
+            )
+            deleted["users"] = cursor.rowcount
+
+            if deleted["users"] != 1:
+                raise RuntimeError("account purge failed to delete exactly one user")
+
+            return {
+                "user_id": user_id,
+                "project_ids": project_ids,
+                "deleted": deleted,
+            }
+
+
+
+def purge_due_accounts(limit=100):
+    """Purge accounts whose deletion grace period has expired.
+
+    Each account is purged in its own transaction through purge_account().
+    A failure for one account does not roll back successful purges for others.
+    """
+    if isinstance(limit, bool) or not isinstance(limit, int) or limit < 1:
+        raise ValueError("limit must be a positive integer")
+
+    # Candidate discovery is intentionally separate from deletion.
+    # purge_account() locks and re-validates every user before deleting.
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT id
+                FROM users
+                WHERE account_status = 'pending_deletion'
+                  AND deletion_due_at IS NOT NULL
+                  AND CURRENT_TIMESTAMP >= deletion_due_at
+                ORDER BY deletion_due_at, id
+                LIMIT %s
+                """,
+                (limit,),
+            )
+            user_ids = [row[0] for row in cursor.fetchall()]
+
+    purged = []
+    failed = []
+
+    for user_id in user_ids:
+        try:
+            result = purge_account(user_id)
+            purged.append(result)
+        except (LookupError, RuntimeError) as exc:
+            # Another request may have restored/deleted this user after candidate
+            # discovery. Keep each account independent and report the failure.
+            failed.append(
+                {
+                    "user_id": user_id,
+                    "error": str(exc),
+                }
+            )
+        except psycopg.Error as exc:
+            # One user's FK/constraint/lock failure must not abort the whole
+            # maintenance batch. Do not expose the database error text because it
+            # may contain connection or schema details. purge_account() owns its
+            # transaction, so a failed user's partial deletes are rolled back.
+            failed.append(
+                {
+                    "user_id": user_id,
+                    "error": "database error during account purge",
+                    "error_type": type(exc).__name__,
+                }
+            )
+
+    return {
+        "candidate_count": len(user_ids),
+        "purged_count": len(purged),
+        "failed_count": len(failed),
+        "purged": purged,
+        "failed": failed,
+    }
+
+
 
 
 def is_email_allowed(email):
@@ -337,6 +1042,11 @@ def list_allowed_emails():
             return _rows_dict(cursor)
 
 
+
+
+
+
+
 def create_project(owner_user_id, name, mode):
     """Create a user-owned Guardrail project."""
     if isinstance(owner_user_id, bool) or not isinstance(owner_user_id, int) or owner_user_id < 1:
@@ -351,6 +1061,8 @@ def create_project(owner_user_id, name, mode):
 
     with get_connection() as conn:
         with conn.cursor() as cursor:
+            _require_active_account_cursor(cursor, owner_user_id, lock=True)
+
             cursor.execute(
                 """
                 INSERT INTO projects (
@@ -390,6 +1102,7 @@ def list_projects(user_id):
     """Return the user's projects plus system-owned read-only demo projects."""
     with get_connection() as conn:
         with conn.cursor() as cursor:
+            _require_active_account_cursor(cursor, user_id)
             cursor.execute(
                 """
                 SELECT
@@ -427,6 +1140,7 @@ def set_project_mode(project_id, user_id, mode):
 
     with get_connection() as conn:
         with conn.cursor() as cursor:
+            _require_active_account_cursor(cursor, user_id, lock=True)
             project = _owned_project(cursor, project_id, user_id)
             if project is None:
                 # Deliberately do not distinguish "not found" from "not yours".
@@ -459,6 +1173,7 @@ def set_project_provider(project_id, user_id, provider, upstream_url=None):
 
     with get_connection() as conn:
         with conn.cursor() as cursor:
+            _require_active_account_cursor(cursor, user_id, lock=True)
             project = _owned_project(cursor, project_id, user_id)
             if project is None:
                 # Same information-hiding rule as the other project mutators.
@@ -507,6 +1222,8 @@ def issue_api_key(project_id, user_id, name):
 
     with get_connection() as conn:
         with conn.cursor() as cursor:
+            _require_active_account_cursor(cursor, user_id, lock=True)
+
             project = _owned_project(cursor, project_id, user_id)
             if project is None:
                 raise LookupError("project not found")
@@ -555,6 +1272,7 @@ def list_api_keys(project_id, user_id):
     """List safe key metadata for an owned project; never return raw/hash values."""
     with get_connection() as conn:
         with conn.cursor() as cursor:
+            _require_active_account_cursor(cursor, user_id)
             project = _owned_project(cursor, project_id, user_id)
             if project is None:
                 raise LookupError("project not found")
@@ -578,6 +1296,7 @@ def revoke_api_key(key_id, user_id):
     """Revoke a key only when it belongs to one of the caller's projects."""
     with get_connection() as conn:
         with conn.cursor() as cursor:
+            _require_active_account_cursor(cursor, user_id, lock=True)
             cursor.execute(
                 """
                 SELECT k.id, k.project_id
@@ -642,7 +1361,9 @@ def verify_api_key(raw_key):
                     p.created_at
                 FROM api_keys k
                 JOIN projects p ON p.id = k.project_id
+                LEFT JOIN users u ON u.id = p.owner_user_id
                 WHERE k.key_prefix = %s
+                  AND (p.owner_user_id IS NULL OR u.account_status = 'active')
                 ORDER BY k.id
                 """,
                 (prefix,),
@@ -663,9 +1384,16 @@ def verify_api_key(raw_key):
                     UPDATE api_keys
                     SET last_used_at = CURRENT_TIMESTAMP
                     WHERE id = %s
+                      AND revoked_at IS NULL
+                    RETURNING last_used_at
                     """,
                     (key_id,),
                 )
+                # A concurrent revoke may have committed after the candidate
+                # SELECT. The conditional UPDATE is the final authority: if it
+                # updated nothing, the key is no longer valid.
+                if cursor.fetchone() is None:
+                    return None
 
                 return {
                     "id": row[3],

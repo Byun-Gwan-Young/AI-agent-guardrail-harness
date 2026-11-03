@@ -65,7 +65,7 @@ def resolve_run_dir(value, demo=False):
     run 폴더를 찾는다.
 
     정확한 폴더명/경로를 우선 사용하고, 못 찾으면 짧은 prefix도 허용한다.
-    예: `A-1-v4`가 딱 한 폴더와만 매칭되면 긴 UUID를 생략할 수 있다.
+    예: `A-1-v2`가 딱 한 폴더와만 매칭되면 긴 UUID를 생략할 수 있다.
     """
     candidate = Path(value)
     if candidate.is_dir():
@@ -296,9 +296,13 @@ def build_execution_config(session_data, conditions_data, scenario):
         "max_steps": termination.get("max_steps"),
         "max_llm_calls_per_step": termination.get("max_llm_calls_per_step"),
         "context_buffer_messages": (
-            conditions_data.get("context_buffer_messages")
-            or scenario.get("context_buffer_messages")
-            or meta.get("context_buffer_messages")
+            conditions_data["context_buffer_messages"]
+            if "context_buffer_messages" in conditions_data
+            else (
+                scenario["context_buffer_messages"]
+                if "context_buffer_messages" in scenario
+                else meta.get("context_buffer_messages")
+            )
         ),
         "reasoning_effort": reasoning,
         "runner_protocol": conditions_data.get("runner_protocol"),

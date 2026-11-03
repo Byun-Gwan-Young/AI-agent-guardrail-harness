@@ -2,6 +2,7 @@ import hashlib
 import unittest
 from unittest.mock import patch
 
+import psycopg
 import storage.accounts as accounts
 
 
@@ -28,7 +29,21 @@ class FakeCursor:
 
     def execute(self, sql, params=()):
         q = " ".join(sql.split())
+        self.state.setdefault("executed_sql", []).append(q)
         self.rowcount = -1
+
+        if q.startswith("SELECT id FROM users WHERE account_status = 'pending_deletion'"):
+            rows = [(user_id,) for user_id in self.state.get("due_user_ids", [])]
+            self._set_rows(["id"], rows)
+            return
+
+        if q.startswith("SELECT account_status FROM users WHERE id = %s"):
+            user = self.state["users"].get(params[0])
+            self._set_rows(
+                ["account_status"],
+                [] if user is None else [(user["account_status"],)],
+            )
+            return
 
         if "SELECT id, name, mode, rule_id, upstream_url, owner_user_id, read_only, created_at FROM projects" in q:
             project_id, user_id = params
@@ -78,13 +93,21 @@ class FakeCursor:
             self._set_rows([], [])
             return
 
-        if "FROM api_keys k JOIN projects p ON p.id = k.project_id WHERE k.key_prefix = %s" in q:
+        if (
+            "FROM api_keys k JOIN projects p ON p.id = k.project_id" in q
+            and "WHERE k.key_prefix = %s" in q
+        ):
             prefix = params[0]
             rows = []
             for key in self.state["api_keys"].values():
                 if key["key_prefix"] != prefix:
                     continue
                 p = self.state["projects"][key["project_id"]]
+                owner_user_id = p["owner_user_id"]
+                if owner_user_id is not None:
+                    user = self.state["users"].get(owner_user_id)
+                    if user is None or user["account_status"] != "active":
+                        continue
                 rows.append((
                     key["id"],
                     key["key_hash"],
@@ -109,8 +132,12 @@ class FakeCursor:
 
         if q.startswith("UPDATE api_keys SET last_used_at = CURRENT_TIMESTAMP"):
             key_id = params[0]
-            self.state["api_keys"][key_id]["last_used_at"] = "used"
-            self._set_rows([], [])
+            key = self.state["api_keys"][key_id]
+            if key["revoked_at"] is None:
+                key["last_used_at"] = "used"
+                self._set_rows(["last_used_at"], [("used",)])
+            else:
+                self._set_rows(["last_used_at"], [])
             return
 
         if "SELECT k.id, k.project_id FROM api_keys k JOIN projects p ON p.id = k.project_id" in q:
@@ -166,6 +193,10 @@ class AccountsOfflineTests(unittest.TestCase):
     def setUp(self):
         self.state = {
             "next_key_id": 1,
+            "users": {
+                100: {"id": 100, "account_status": "active"},
+                200: {"id": 200, "account_status": "active"},
+            },
             "projects": {
                 10: {
                     "id": 10,
@@ -190,6 +221,8 @@ class AccountsOfflineTests(unittest.TestCase):
             },
             "api_keys": {},
             "auth_events": [],
+            "executed_sql": [],
+            "due_user_ids": [],
         }
         self.connection_patch = patch(
             "storage.accounts.get_connection",
@@ -249,6 +282,40 @@ class AccountsOfflineTests(unittest.TestCase):
 
         self.assertIsNone(accounts.verify_api_key(raw))
         self.assertIsNotNone(self.state["api_keys"][info["id"]]["revoked_at"])
+
+    def test_issue_key_locks_active_account_until_transaction_end(self):
+        accounts.issue_api_key(10, 100, "locked issue")
+        self.assertIn(
+            "SELECT account_status FROM users WHERE id = %s FOR SHARE",
+            self.state["executed_sql"],
+        )
+
+    def test_pending_owner_rejects_key_even_if_key_row_was_not_revoked(self):
+        raw, info = accounts.issue_api_key(10, 100, "legacy race key")
+        self.state["users"][100]["account_status"] = "pending_deletion"
+        # Simulate a legacy/racy row that remains unrevoked. Account status is a
+        # second authentication boundary and must still reject the key.
+        self.assertIsNone(accounts.verify_api_key(raw))
+        self.assertIsNone(self.state["api_keys"][info["id"]]["revoked_at"])
+
+    def test_batch_purge_continues_after_one_database_error(self):
+        self.state["due_user_ids"] = [100, 200]
+
+        def fake_purge(user_id):
+            if user_id == 100:
+                raise psycopg.Error("sensitive database detail")
+            return {"user_id": user_id, "deleted": {"users": 1}}
+
+        with patch("storage.accounts.purge_account", side_effect=fake_purge):
+            result = accounts.purge_due_accounts(limit=10)
+
+        self.assertEqual(result["candidate_count"], 2)
+        self.assertEqual(result["purged_count"], 1)
+        self.assertEqual(result["failed_count"], 1)
+        self.assertEqual(result["purged"][0]["user_id"], 200)
+        self.assertEqual(result["failed"][0]["user_id"], 100)
+        self.assertEqual(result["failed"][0]["error"], "database error during account purge")
+        self.assertNotIn("sensitive database detail", repr(result))
 
     def test_other_users_project_is_treated_as_not_found(self):
         with self.assertRaisesRegex(LookupError, "project not found"):

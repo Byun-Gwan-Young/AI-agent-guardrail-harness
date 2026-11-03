@@ -17,12 +17,16 @@ class LiveHardeningTests(unittest.TestCase):
 
     def setUp(self):
         self.state = {
+            "users": {
+                100: {"id": 100, "account_status": "active"},
+            },
             "projects": {
                 1: {
                     "id": 1,
                     "mode": "observe",
                     "read_only": False,
                     "provider": "groq",
+                    "owner_user_id": 100,
                 }
             },
             "scenarios": {
@@ -148,6 +152,79 @@ class LiveHardeningTests(unittest.TestCase):
                 },
             )
 
+
+    def test_observation_rejects_judgement_result_fields(self):
+        self.start()
+        with self.assertRaisesRegex(ValueError, "judge input only"):
+            live.add_observation(
+                "live-hardening",
+                1,
+                "developer",
+                {
+                    "tests_passed": 1,
+                    "progress": {"state": "stagnant"},
+                    "criteria": {"decision": "STOP"},
+                },
+            )
+
+    def test_judgement_agent_must_match_observation_agent(self):
+        self.start()
+        live.add_observation("live-hardening", 1, "developer", {"tests_passed": 1})
+        with self.assertRaisesRegex(ValueError, "agent_id must match"):
+            live.add_judgement(
+                "live-hardening",
+                1,
+                "reviewer",
+                "CONTINUE",
+                "deadlock-v0.3",
+                "progress",
+                0,
+                "progress observed",
+                100,
+                {
+                    "progress": {"version": "progress-v3", "state": "progress"},
+                    "criteria": {"decision": "CONTINUE"},
+                },
+            )
+
+    def test_nested_criteria_version_must_match_rule_id(self):
+        self.start()
+        live.add_observation("live-hardening", 1, "developer", {"tests_passed": 1})
+        with self.assertRaisesRegex(ValueError, "criteria_version"):
+            live.add_judgement(
+                "live-hardening",
+                1,
+                "developer",
+                "CONTINUE",
+                "deadlock-v0.3",
+                "progress",
+                0,
+                "progress observed",
+                100,
+                {
+                    "progress": {"version": "progress-v3", "state": "progress"},
+                    "criteria": {
+                        "criteria_version": "deadlock-v9",
+                        "decision": "CONTINUE",
+                    },
+                },
+            )
+
+    def test_model_rejects_literal_runtime_secret(self):
+        import os
+        secret = "runtime-model-secret-value"
+        with patch.dict(os.environ, {"GROQ_API_KEY": secret}, clear=False):
+            with self.assertRaisesRegex(ValueError, "비밀값"):
+                live.start_live_session(
+                    1,
+                    "secret-model",
+                    "S-1",
+                    "abc123",
+                    "observe",
+                    secret,
+                    {},
+                )
+
     def test_first_stop_step_cannot_exceed_steps_reached(self):
         self.start()
         with self.assertRaisesRegex(ValueError, "cannot exceed steps_reached"):
@@ -167,8 +244,16 @@ class LiveHardeningTests(unittest.TestCase):
             self.assertIn("lock=True", fn_source, fn.__name__)
 
     def test_project_snapshot_is_locked_during_start(self):
-        source = inspect.getsource(live._require_writable_project)
-        self.assertIn("FOR SHARE", source)
+        project_source = inspect.getsource(live._require_writable_project)
+        owner_source = inspect.getsource(live._require_active_project_owner)
+        start_source = inspect.getsource(live.start_live_session)
+
+        self.assertIn("FOR SHARE", project_source)
+        self.assertIn("FOR SHARE", owner_source)
+        self.assertLess(
+            start_source.index("_require_active_project_owner(cursor, project)"),
+            start_source.index("_require_writable_project(cursor, project_id, lock=True)"),
+        )
 
 
 if __name__ == "__main__":

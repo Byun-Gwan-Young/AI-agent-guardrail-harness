@@ -27,54 +27,54 @@ TABLES = {
 
 
 def ensure_database_exists():
-    """Create the configured application DB only when it does not already exist.
+    """Create the configured application DB only when it is confirmed absent.
 
-    The target name comes from ``GUARDRAIL_DB_URL`` first and ``POSTGRES_DB``
-    second, exactly like ``storage.db.get_connection``.
-
-    Important deployment detail: we first try the target DB directly.  A normal
-    server account may be allowed to use an existing DB but not have CREATE
-    DATABASE permission.  Therefore we touch the maintenance ``postgres`` DB
-    only after PostgreSQL explicitly reports that the target database does not
-    exist.
+    We first try the target DB so existing deployments do not need CREATE
+    DATABASE privilege. psycopg may surface a missing database as a generic
+    OperationalError during connection startup, so a failed target connection
+    is *not* itself treated as proof that the DB is missing. We verify existence
+    through the maintenance database before deciding whether to create it.
     """
 
     target_db = get_target_database_name()
 
     try:
-        # Existing deployment DB: no CREATE DATABASE privilege is needed.
         with get_connection(autocommit=True):
             return False
-    except psycopg.errors.InvalidCatalogName:
-        pass
+    except (psycopg.OperationalError, psycopg.errors.InvalidCatalogName) as target_error:
+        if target_db == "postgres":
+            raise RuntimeError(
+                "PostgreSQL target database 'postgres' is not reachable"
+            ) from target_error
 
-    if target_db == "postgres":
-        # Reaching here would mean the cluster's maintenance database itself is
-        # unavailable; attempting to create it from itself is not meaningful.
-        raise RuntimeError("PostgreSQL maintenance database 'postgres' does not exist")
+        try:
+            with get_connection(dbname="postgres", autocommit=True) as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(
+                        "SELECT 1 FROM pg_database WHERE datname = %s;",
+                        (target_db,),
+                    )
+                    if cursor.fetchone() is not None:
+                        # The database exists, so the original failure was auth,
+                        # network, TLS, socket, or another connection problem.
+                        raise RuntimeError(
+                            f"DB '{target_db}'는 존재하지만 연결에 실패했습니다. "
+                            "접속 주소/인증/권한을 확인하세요."
+                        ) from target_error
 
-    try:
-        with get_connection(dbname="postgres", autocommit=True) as conn:
-            with conn.cursor() as cursor:
-                # Another process may have created it between the failed target
-                # connection and this maintenance connection, so check again.
-                cursor.execute(
-                    "SELECT 1 FROM pg_database WHERE datname = %s;",
-                    (target_db,),
-                )
-                if cursor.fetchone() is not None:
-                    return False
-
-                cursor.execute(
-                    sql.SQL("CREATE DATABASE {};").format(sql.Identifier(target_db))
-                )
-                print(f"DB 생성 완료: {target_db}")
-                return True
-    except psycopg.Error as exc:
-        raise RuntimeError(
-            f"DB '{target_db}'가 존재하지 않고 자동 생성에도 실패했습니다. "
-            "배포 환경이라면 운영자가 DB를 미리 만들었는지와 CREATE DATABASE 권한을 확인하세요."
-        ) from exc
+                    cursor.execute(
+                        sql.SQL("CREATE DATABASE {};").format(sql.Identifier(target_db))
+                    )
+                    print(f"DB 생성 완료: {target_db}")
+                    return True
+        except RuntimeError:
+            raise
+        except psycopg.Error as exc:
+            raise RuntimeError(
+                f"DB '{target_db}' 존재 여부 확인 또는 자동 생성에 실패했습니다. "
+                "배포 환경이라면 운영자가 DB를 미리 만들었는지와 "
+                "maintenance DB/CREATE DATABASE 권한을 확인하세요."
+            ) from exc
 
 
 def initialize_schema():

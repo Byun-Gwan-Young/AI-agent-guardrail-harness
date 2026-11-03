@@ -30,11 +30,21 @@ class FakeCursor:
         now = datetime.now(timezone.utc)
 
         # projects
-        if q.startswith("SELECT id, mode, read_only, provider FROM projects WHERE id = %s"):
+        if q.startswith("SELECT id, mode, read_only, provider, owner_user_id FROM projects WHERE id = %s"):
             p = self.state["projects"].get(params[0])
             self._set(
-                ["id", "mode", "read_only", "provider"],
-                [] if not p else [(p["id"], p["mode"], p["read_only"], p["provider"])],
+                ["id", "mode", "read_only", "provider", "owner_user_id"],
+                [] if not p else [(
+                    p["id"], p["mode"], p["read_only"], p["provider"], p["owner_user_id"]
+                )],
+            )
+            return
+
+        if q.startswith("SELECT account_status FROM users WHERE id = %s"):
+            user = self.state["users"].get(params[0])
+            self._set(
+                ["account_status"],
+                [] if user is None else [(user["account_status"],)],
             )
             return
 
@@ -120,10 +130,10 @@ class FakeCursor:
             self._set(cols, [] if not row else [tuple(row[c] for c in cols)])
             return
 
-        # judgement requires an observation for the same step
-        if q.startswith("SELECT 1 FROM observations WHERE session_id = %s AND step = %s"):
+        # judgement requires the same observation/agent for the step
+        if q.startswith("SELECT agent_id FROM observations WHERE session_id = %s AND step = %s"):
             row = self.state["observations"].get(tuple(params))
-            self._set(["?column?"], [] if row is None else [(1,)])
+            self._set(["agent_id"], [] if row is None else [(row["agent_id"],)])
             return
 
         # insert judgement
@@ -260,9 +270,18 @@ class FakeConnection:
 class LiveOfflineTests(unittest.TestCase):
     def setUp(self):
         self.state = {
+            "users": {
+                100: {"id": 100, "account_status": "active"},
+            },
             "projects": {
-                1: {"id": 1, "mode": "observe", "read_only": False, "provider": "groq"},
-                2: {"id": 2, "mode": "observe", "read_only": True, "provider": "custom"},
+                1: {
+                    "id": 1, "mode": "observe", "read_only": False,
+                    "provider": "groq", "owner_user_id": 100,
+                },
+                2: {
+                    "id": 2, "mode": "observe", "read_only": True,
+                    "provider": "custom", "owner_user_id": None,
+                },
             },
             "scenarios": {
                 10: {
@@ -323,6 +342,18 @@ class LiveOfflineTests(unittest.TestCase):
         with self.assertRaisesRegex(LookupError, "project not found"):
             live.start_live_session(
                 2, "x", "S-1", "abc123", "observe", "m", {}
+            )
+
+    def test_pending_owner_blocks_new_start_but_exact_retry_still_works(self):
+        first = self.start()
+        self.state["users"][100]["account_status"] = "pending_deletion"
+
+        retry = self.start()
+        self.assertEqual(retry["id"], first["id"])
+
+        with self.assertRaisesRegex(RuntimeError, "pending deletion"):
+            live.start_live_session(
+                1, "live-2", "S-1", "abc123", "observe", "m", {}
             )
 
     def test_observation_exact_retry_and_conflict(self):

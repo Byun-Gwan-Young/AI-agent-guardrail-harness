@@ -277,7 +277,7 @@ venv/bin/python -B tools/final_freeze.py check
 ```
 
 
-DB 통합(`db-unify`) 변경 범위와 Windows 개발 환경 주의는 [`storage/README.md`](storage/README.md#루트-readme-에서-옮긴-절) 에 있습니다.
+DB 통합(`db-unify`) 변경 범위, Windows 개발 환경 주의, 팀원용 Storage 로컬 개발 (PostgreSQL + Redis), 계정 탈퇴 · 복구는 [`storage/README.md`](storage/README.md#루트-readme-에서-옮긴-절) 에 있습니다.
 
 **키 없이 데모 결과 다시 만들기** — 커밋된 세션 기록(`runs/demo/*/record/`)에서 집계·재생 페이지를 다시 만듭니다
 

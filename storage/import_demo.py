@@ -14,7 +14,6 @@ See ``storage/README.md`` for the demo/live separation contract.
 """
 
 import argparse
-import hashlib
 
 from storage.db import get_connection
 from storage.safety import assert_no_secrets, assert_safe_storage_json
@@ -38,9 +37,22 @@ DEMO_PROJECT_MODE = "observe"
 DEMO_PROJECT_RULE_ID = "deadlock-v0.3"
 DEMO_PROJECT_PROVIDER = "custom"
 DEMO_PROJECT_UPSTREAM_URL = "https://demo.invalid"
+DEMO_PROJECT_LOCK_KEY = "guardrail:canonical-demo-project"
+CANONICAL_DEMO_SESSION_COUNT = 115
+CANONICAL_DEMO_JUDGEMENT_COUNT = 926
+CANONICAL_DEMO_SCENARIO_VERSION_COUNT = 15
 
 def ensure_demo_project(cursor):
-    """읽기 전용 데모 프로젝트를 만들거나 기존 프로젝트를 재사용한다."""
+    """읽기 전용 데모 프로젝트를 만들거나 기존 프로젝트를 재사용한다.
+
+    A transaction-scoped advisory lock serializes the first creation so two
+    importers starting against an empty DB cannot create duplicate system demo
+    projects.
+    """
+    cursor.execute(
+        "SELECT pg_advisory_xact_lock(hashtext(%s));",
+        (DEMO_PROJECT_LOCK_KEY,),
+    )
     cursor.execute(
         """
         SELECT id, read_only, owner_user_id
@@ -290,12 +302,9 @@ def demo_session_payload(run_dir, metadata=None):
     manifest_scenario = manifest.get("scenario") or {}
     manifest_hash = manifest_scenario.get("hash")
     if manifest_hash and manifest_hash != scenario_info["scenario_hash"]:
-        # Git/Windows 체크아웃에서 LF -> CRLF만 바뀐 경우는 허용한다.
-        # DB의 scenario_hash 자체는 요구사항대로 현재 scenario.yaml 원본 바이트 SHA-256을 유지한다.
-        scenario_bytes = (run_dir / "scenario.yaml").read_bytes()
-        lf_hash = hashlib.sha256(scenario_bytes.replace(b"\r\n", b"\n")).hexdigest()
-        if manifest_hash != lf_hash:
-            raise ValueError(f"{run_dir.name}: scenario hash가 manifest와 다릅니다.")
+        raise ValueError(
+            f"{run_dir.name}: scenario.yaml 원본 바이트 SHA-256이 manifest와 다릅니다."
+        )
 
     if manifest_scenario.get("id") not in (None, scenario_info["scenario_key"]):
         raise ValueError(f"{run_dir.name}: scenario id가 manifest와 다릅니다.")
@@ -583,13 +592,37 @@ def _prepare_all_demo_payloads():
     payloads = []
     seen_session_ids = set()
 
-    for folder in demo_folders():
+    folders = demo_folders()
+    if len(folders) != CANONICAL_DEMO_SESSION_COUNT:
+        raise ValueError(
+            "canonical demo 입력이 완전하지 않습니다: "
+            f"expected folders={CANONICAL_DEMO_SESSION_COUNT}, actual={len(folders)}. "
+            "불완전한 입력으로 기존 demo 행을 prune하지 않습니다."
+        )
+
+    for folder in folders:
         payload = demo_session_payload(folder, metadata=metadata)
         session_id = payload["session"]["id"]
         if session_id in seen_session_ids:
             raise ValueError(f"demo session_id가 중복됩니다: {session_id}")
         seen_session_ids.add(session_id)
         payloads.append(payload)
+
+    judgement_count = sum(len(payload["judgements"]) for payload in payloads)
+    scenario_versions = {
+        (payload["scenario"]["scenario_key"], payload["scenario"]["scenario_hash"])
+        for payload in payloads
+    }
+    if judgement_count != CANONICAL_DEMO_JUDGEMENT_COUNT:
+        raise ValueError(
+            "canonical demo judgement 입력이 완전하지 않습니다: "
+            f"expected={CANONICAL_DEMO_JUDGEMENT_COUNT}, actual={judgement_count}"
+        )
+    if len(scenario_versions) != CANONICAL_DEMO_SCENARIO_VERSION_COUNT:
+        raise ValueError(
+            "canonical demo scenario version 입력이 완전하지 않습니다: "
+            f"expected={CANONICAL_DEMO_SCENARIO_VERSION_COUNT}, actual={len(scenario_versions)}"
+        )
 
     return payloads
 
