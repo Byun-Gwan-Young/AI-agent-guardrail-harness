@@ -1,8 +1,8 @@
 # agent-guardrail demo server — Caddy (C-19-7, DM-91). Installed as /etc/caddy/Caddyfile by deploy (remote-install.sh).
 # No value is filled in here : {$GUARDRAIL_DOMAIN} comes from /etc/guardrail/caddy.env (root, 600 ; a systemd drop-in
 # hands it to caddy.service), written by remote-install.sh from deploy/aws/target.env.
-# DM-109 : no shared site password any more. The demo screen and the read-only query API are public ; an account comes
-# from Google sign-in (backend, /login), and what belongs to a user (/api/projects*) needs that sign-in.
+# DM-109 : no shared site password any more. DM-110 : the whole site is behind Google sign-in (forward_auth below) ;
+# only /login and /api/auth/* open without it.
 
 {$GUARDRAIL_DOMAIN} {
 	# HTTPS : Caddy gets the certificate for the domain by itself.
@@ -15,6 +15,13 @@
 		Referrer-Policy "no-referrer"
 		Permissions-Policy "camera=(), microphone=(), geolocation=()"
 		-Server
+	}
+
+	# --- DM-110 : sign-in first. Every request except the sign-in page and sign-in API asks the backend ; no active
+	# session = the backend's 303 to /login goes back to the browser. forward_auth runs before the handle blocks. ---
+	@gated not path /login /api/auth/*
+	forward_auth @gated 127.0.0.1:8030 {
+		uri /api/auth/check
 	}
 
 	# --- service backend (DM-108, 127.0.0.1:8030) : Google sign-in page, sign-in API, the user's projects ---

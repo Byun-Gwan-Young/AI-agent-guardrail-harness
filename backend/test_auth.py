@@ -49,6 +49,16 @@ class AuthTests(unittest.TestCase):
             return self.client.post("/api/auth/google", data={"credential": "token", "g_csrf_token": "csrf"},
                                     follow_redirects=False)
 
+    def test_check_sends_strangers_to_login_and_lets_members_in(self):
+        # DM-110 : what Caddy forward_auth asks before every page.
+        response = self.client.get("/api/auth/check", follow_redirects=False)
+        self.assertEqual((response.status_code, response.headers["location"]), (303, "/login"))
+        signed_in = self.post_new_identity("member@example.org")
+        self.assertEqual((signed_in.status_code, signed_in.headers["location"]), (303, "/"))
+        self.assertEqual(self.client.get("/api/auth/check", follow_redirects=False).status_code, 204)
+        self.state.return_value = self.pending()
+        self.assertEqual(self.client.get("/api/auth/check", follow_redirects=False).status_code, 303)
+
     def test_allow_list_is_the_default(self):
         self.allowed_mock.return_value = False
         self.assertEqual(self.post_new_identity("new@example.org").status_code, 403)

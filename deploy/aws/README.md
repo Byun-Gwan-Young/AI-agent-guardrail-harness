@@ -6,7 +6,7 @@
 
 ```text
 브라우저 (팀원 · 교수님)
-   │ HTTPS · 공용 비밀번호 없음 (DM-109) — 계정은 구글 로그인 (/login)
+   │ HTTPS · 구글 로그인 먼저 (DM-110, forward_auth) — 로그인 전에는 /login 만
    ▼
 Caddy  (서버, 80 · 443 만 열림, 인증서 자동)
    ├─ /                         → 데모 화면 정적 파일 (/opt/guardrail/app/site/index.html, --api 로 빌드)

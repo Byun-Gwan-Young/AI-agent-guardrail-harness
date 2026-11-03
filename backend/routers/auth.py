@@ -4,7 +4,7 @@ from html import escape
 from pathlib import Path
 
 from fastapi import APIRouter, Form, HTTPException, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.encoders import jsonable_encoder
 from psycopg import Error as DatabaseError
 
@@ -80,11 +80,25 @@ def google_login(request: Request, credential: str = Form(...),
     except (DatabaseError, RuntimeError) as exc:
         raise HTTPException(503, "Authentication database unavailable") from exc
     revoke_session(request.cookies.get(COOKIE))
-    response = RedirectResponse("/login", status_code=303)
+    # DM-110 : straight to the demo screen after sign-in (the site is behind sign-in now).
+    response = RedirectResponse("/", status_code=303)
     response.set_cookie(COOKIE, token, max_age=SESSION_TTL, httponly=True,
                         secure=secure_cookie(request), samesite="lax", path="/")
     response.headers["Cache-Control"] = "no-store"
     return response
+
+
+@router.get("/api/auth/check", include_in_schema=False)
+def check(request: Request):
+    """DM-110 : Caddy forward_auth asks this before every page or API request except sign-in itself.
+
+    204 for an active, full session. Anything else (no cookie, expired, recovery-only session) is a 303 to /login,
+    which Caddy hands back to the browser unchanged.
+    """
+    user = optional_account(request)
+    if user and user.get("account_status") == "active" and user.get("session_scope") == "full":
+        return Response(status_code=204, headers={"Cache-Control": "no-store"})
+    return RedirectResponse("/login", status_code=303, headers={"Cache-Control": "no-store"})
 
 
 @router.get("/api/auth/me")

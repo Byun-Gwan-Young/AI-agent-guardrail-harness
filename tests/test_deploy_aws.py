@@ -120,6 +120,12 @@ class CaddyAndUnit(unittest.TestCase):
             self.assertNotIn(later, self.code)   # C-19-9 blocks are comments only
             self.assertIn(later, self.caddy)
 
+    def test_everything_but_sign_in_asks_the_backend_first(self):
+        # DM-110 : forward_auth on every path except the sign-in page and sign-in API.
+        self.assertEqual(re.findall(r'^@gated (.+)$', self.code, re.M), ['not path /login /api/auth/*'])
+        self.assertIn('forward_auth @gated 127.0.0.1:8030 {\nuri /api/auth/check\n}', self.code)
+        self.assertLess(self.code.index('forward_auth'), self.code.index('handle @backend'))
+
     def test_only_the_sign_in_paths_go_to_the_backend_before_the_api(self):
         # DM-108 : /api/auth/* and /api/projects* must not fall into the query API's /api/*.
         self.assertEqual(re.findall(r'^@backend path (.+)$', self.code, re.M),
