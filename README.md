@@ -211,6 +211,7 @@ AI-agent-guardrail-harness/
 │   └── run_offline_tests.py                 전체 오프라인 테스트
 ├── service/                               통합 Storage를 읽는 데모 조회 API (로컬) — service/README.md
 ├── storage/                               PostgreSQL 통합 저장 계층 · 계정/키/live 기록 — storage/README.md
+├── backend/                               서비스 백엔드 : 구글 로그인 · 계정 탈퇴/복구 · 프로젝트 · 세션 조회 API — backend/README.md
 ├── deploy/                                AWS 데모 서버 배포 (Caddy · systemd · 스크립트, PM 이 실행) — deploy/aws/README.md
 ├── tests/                                 오프라인 테스트 (외부 호출 없음)
 │   ├── fixtures/                            테스트 고정 자료 (정답 구현 · 보호 파일 해시 등)
