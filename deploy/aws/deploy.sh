@@ -11,7 +11,7 @@
 #    storage init → storage demo-all → service.load_demo check (any difference stops before the switch) → API restart →
 #    Caddy reload.
 # 3. Fetch the server's check result to reports/c19-7/server-check-postgres.json.
-# 4. https://DOMAIN/api/summary through Caddy : curl asks the site password (typed here, never stored).
+# 4. https://DOMAIN/api/summary and /login through Caddy (no site password since DM-109).
 # DM-108 : the Google client ID in target.env (set-google-client.sh) goes to the server's backend.env ; without it the
 # sign-in page opens but has no Google button.
 set -euo pipefail
@@ -77,12 +77,11 @@ ssh "${SSH_OPTS[@]}" "$SSH_DEST" 'rm -rf /tmp/guardrail-deploy' || true
 (( status == 0 )) || die "서버 설치가 멈췄다 (위 출력). 서버는 이전 릴리스 그대로다"
 
 say "== https://$GUARDRAIL_DOMAIN/api/summary (Caddy 경유)"
-read -r -p "사이트 사용자 이름 (Enter = guardrail) : " site_user
-site_user=${site_user:-guardrail}
-code=$(curl -sS -u "$site_user" -o "$WORK/summary.json" -w '%{http_code}' "https://$GUARDRAIL_DOMAIN/api/summary") || true
+code=$(curl -sS -o "$WORK/summary.json" -w '%{http_code}' "https://$GUARDRAIL_DOMAIN/api/summary") || true
 if [[ "$code" == 200 ]] && grep -q '"headline"' "$WORK/summary.json"; then
     say "응답 200 · headline 있음. 브라우저로 https://$GUARDRAIL_DOMAIN/ 를 연다"
-    say "로그인 화면 : https://$GUARDRAIL_DOMAIN/login"
+    login=$(curl -sS -o /dev/null -w '%{http_code}' "https://$GUARDRAIL_DOMAIN/login") || true
+    say "로그인 화면 : https://$GUARDRAIL_DOMAIN/login (응답 $login)"
     [[ -n "$GUARDRAIL_GOOGLE_CLIENT_ID" ]] || say "주의 : 구글 클라이언트 ID 가 없다 → deploy/aws/set-google-client.sh 뒤 다시 배포"
 else
     die "https://$GUARDRAIL_DOMAIN/api/summary 응답 $code (DNS 반영 · 인증서 발급 직후면 몇 분 뒤 다시 : deploy/aws/remote.sh status)"

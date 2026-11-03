@@ -3,11 +3,10 @@
 #
 #   deploy/aws/remote.sh ssh        log in (first connection : accepts and remembers the host key)
 #   deploy/aws/remote.sh setup      send server-setup.sh and run it with sudo (once ; safe to repeat)
-#   deploy/aws/remote.sh password   send set-password.sh and run it with sudo in a terminal (the site password)
 #   deploy/aws/remote.sh status     API · Caddy · PostgreSQL state and the deployed commit
 #   deploy/aws/remote.sh dns        does the domain's A record point at the server IP yet (dig, from this Mac)
 #   deploy/aws/remote.sh open       open https://DOMAIN/ in the browser
-#   deploy/aws/remote.sh allow-email EMAIL    let EMAIL sign in with Google (DM-108 ; the list lives only in the server DB)
+#   deploy/aws/remote.sh allow-email EMAIL    add EMAIL to the sign-in list (used only if open sign-up is turned off)
 #   deploy/aws/remote.sh remove-email EMAIL   take EMAIL off the sign-in list
 #   deploy/aws/remote.sh allowed-emails       show the sign-in list
 set -euo pipefail
@@ -26,9 +25,6 @@ case "${1:-}" in
     setup)
         scp "${SSH_OPTS[@]}" "$SCRIPT_DIR/server-setup.sh" "$SSH_DEST:/tmp/guardrail-server-setup.sh"
         ssh "${SSH_OPTS[@]}" "$SSH_DEST" 'sudo bash /tmp/guardrail-server-setup.sh && rm -f /tmp/guardrail-server-setup.sh' ;;
-    password)
-        scp "${SSH_OPTS[@]}" "$SCRIPT_DIR/set-password.sh" "$SSH_DEST:/tmp/guardrail-set-password.sh"
-        ssh -t "${SSH_OPTS[@]}" "$SSH_DEST" 'sudo bash /tmp/guardrail-set-password.sh; rm -f /tmp/guardrail-set-password.sh' ;;
     status)
         ssh "${SSH_OPTS[@]}" "$SSH_DEST" 'systemctl is-active guardrail-api guardrail-backend caddy postgresql; \
             cat /opt/guardrail/app/DEPLOY_INFO.json 2>/dev/null | head -n 4 || echo "아직 배포 안 됨"' ;;
@@ -48,5 +44,5 @@ case "${1:-}" in
     allowed-emails)
         storage_cli allowed-emails ;;
     *)
-        sed -n '2,13p' "$0"; exit 2 ;;
+        sed -n '2,12p' "$0"; exit 2 ;;
 esac

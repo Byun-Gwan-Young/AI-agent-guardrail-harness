@@ -1,16 +1,12 @@
 # agent-guardrail demo server — Caddy (C-19-7, DM-91). Installed as /etc/caddy/Caddyfile by deploy (remote-install.sh).
-# No value is filled in here : {$GUARDRAIL_DOMAIN}, {$GUARDRAIL_BASIC_AUTH_USER} and {$GUARDRAIL_BASIC_AUTH_HASH} come
-# from /etc/guardrail/caddy.env (root, 600 ; a systemd drop-in hands it to caddy.service). The password hash is put
-# there on the server by set-password.sh ; the domain by remote-install.sh from deploy/aws/target.env.
+# No value is filled in here : {$GUARDRAIL_DOMAIN} comes from /etc/guardrail/caddy.env (root, 600 ; a systemd drop-in
+# hands it to caddy.service), written by remote-install.sh from deploy/aws/target.env.
+# DM-109 : no shared site password any more. The demo screen and the read-only query API are public ; an account comes
+# from Google sign-in (backend, /login), and what belongs to a user (/api/projects*) needs that sign-in.
 
 {$GUARDRAIL_DOMAIN} {
 	# HTTPS : Caddy gets the certificate for the domain by itself.
 	encode zstd gzip
-
-	# Temporary (DM-92 ②) : one shared password over the whole site. C-19-8 replaces it with Google sign-in.
-	basic_auth {
-		{$GUARDRAIL_BASIC_AUTH_USER} {$GUARDRAIL_BASIC_AUTH_HASH}
-	}
 
 	header {
 		Strict-Transport-Security "max-age=31536000"
@@ -22,7 +18,7 @@
 	}
 
 	# --- service backend (DM-108, 127.0.0.1:8030) : Google sign-in page, sign-in API, the user's projects ---
-	# Before @api : /api/auth/* and /api/projects* would otherwise fall into /api/*. The basic auth above still applies.
+	# Before @api : /api/auth/* and /api/projects* would otherwise fall into /api/*.
 	@backend path /login /api/auth/* /api/projects /api/projects/*
 	handle @backend {
 		reverse_proxy 127.0.0.1:8030

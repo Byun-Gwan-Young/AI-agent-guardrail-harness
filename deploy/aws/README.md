@@ -6,7 +6,7 @@
 
 ```text
 브라우저 (팀원 · 교수님)
-   │ HTTPS · 사이트 비밀번호 (basic auth, 임시 — C-19-8 에서 구글 로그인으로)
+   │ HTTPS · 공용 비밀번호 없음 (DM-109) — 계정은 구글 로그인 (/login)
    ▼
 Caddy  (서버, 80 · 443 만 열림, 인증서 자동)
    ├─ /                         → 데모 화면 정적 파일 (/opt/guardrail/app/site/index.html, --api 로 빌드)
@@ -26,13 +26,12 @@ Caddy  (서버, 80 · 443 만 열림, 인증서 자동)
 | [`provision.sh`](provision.sh) | 맥 (AWS CLI) | 키 페어 · 보안 그룹 (SSH 는 지금 공인 IP/32 만, 80 · 443 전체) · EC2 (서울, Ubuntu 24.04, t3.small, 20 GiB gp3) · 탄력적 IP · (Route 53 이면) A 레코드. `--dry-run` 이 기본, `--apply` 일 때만 만든다. `--update-ssh-ip` 는 SSH 허용 IP 만 바꾼다. 결과로 `target.env` 를 쓴다 |
 | [`teardown.sh`](teardown.sh) | 맥 (AWS CLI) | 태그 `project=guardrail-demo` 로 찾은 인스턴스 · 탄력적 IP · 보안 그룹 · 키 페어를 보여 주고, `delete` 를 입력해야 지운다 |
 | [`configure.sh`](configure.sh) | 맥 | `provision.sh` 를 쓰지 않았을 때 도메인 · 서버 IP · SSH 키 경로를 물어 `target.env` 에 쓴다 |
-| [`remote.sh`](remote.sh) | 맥 | `target.env` 값으로 서버에 접속 (`ssh`), 서버 준비 (`setup`), 비밀번호 설정 (`password`), 상태 (`status`), DNS 반영 확인 (`dns`), 브라우저로 열기 (`open`) |
+| [`remote.sh`](remote.sh) | 맥 | `target.env` 값으로 서버에 접속 (`ssh`), 서버 준비 (`setup`), 상태 (`status`), DNS 반영 확인 (`dns`), 브라우저로 열기 (`open`) |
 | [`server-setup.sh`](server-setup.sh) | 서버 (sudo, 한 번) | PostgreSQL · Caddy (공식 apt 저장소) · uv · Python 3.14, 사용자 `guardrail`, 폴더, DB 역할 · DB, 서비스 가상환경. 다시 돌려도 안전 |
-| [`set-password.sh`](set-password.sh) | 서버 (sudo) | 사이트 비밀번호를 두 번 입력받아 bcrypt 해시만 `/etc/guardrail/caddy.env` 에 넣는다 |
 | [`deploy.sh`](deploy.sh) | 맥 | 묶음 만들기 → 보내기 → 서버 설치 (`remote-install.sh`) → 확인 결과 가져오기 → `https://도메인/api/summary` 확인 |
 | [`bundle.py`](bundle.py) | 맥 | 서버로 가는 묶음 : `git archive main` 의 포함 목록 − 제외 목록, 화면 빌드, 검사 |
 | [`remote-install.sh`](remote-install.sh) | 서버 (deploy 가 실행) | 릴리스 폴더 → 가상환경 → `storage init` · `storage demo-all` · `service.load_demo check` (하나라도 다르면 멈춤, 이전 릴리스 유지) → API 재시작 → Caddy |
-| [`Caddyfile.template`](Caddyfile.template) | 서버 `/etc/caddy/Caddyfile` | HTTPS, 사이트 전체 basic auth, API 로 가는 경로 목록, 보안 헤더. 도메인 · 해시는 환경 파일에서 |
+| [`Caddyfile.template`](Caddyfile.template) | 서버 `/etc/caddy/Caddyfile` | HTTPS, 백엔드 (구글 로그인) · API 로 가는 경로 목록, 보안 헤더. 도메인 · 해시는 환경 파일에서 |
 | [`guardrail-api.service`](guardrail-api.service) | 서버 systemd | 조회 API (`guardrail` 사용자, `127.0.0.1:8020`, `Restart=always`) |
 | [`lib.sh`](lib.sh) | — | 위 스크립트가 함께 쓰는 값 · 함수 |
 

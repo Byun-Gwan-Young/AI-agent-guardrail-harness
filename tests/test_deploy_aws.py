@@ -29,7 +29,7 @@ sys.path.insert(0, str(AWS))
 import bundle  # noqa: E402
 
 MAC_SCRIPTS = ('provision.sh', 'teardown.sh', 'configure.sh', 'remote.sh', 'deploy.sh', 'lib.sh', 'set-google-client.sh')
-SERVER_SCRIPTS = ('server-setup.sh', 'set-password.sh', 'remote-install.sh')
+SERVER_SCRIPTS = ('server-setup.sh', 'remote-install.sh')
 ACCOUNT = '123456789012'
 CREATE_VERBS = ('create-', 'run-instances', 'allocate-address', 'associate-address', 'authorize-', 'revoke-',
                 'change-resource-record-sets', 'start-instances', 'terminate-', 'delete-', 'release-', 'disassociate-')
@@ -105,13 +105,11 @@ class CaddyAndUnit(unittest.TestCase):
         self.lines = [l.split('#', 1)[0].strip() for l in self.caddy.splitlines()]
         self.code = '\n'.join(l for l in self.lines if l)
 
-    def test_basic_auth_over_the_whole_site(self):
-        # One site block, basic_auth directly in it (not inside a handle/route), with only placeholders for user and hash.
+    def test_no_shared_site_password(self):
+        # DM-109 : one site block and no basic auth ; accounts come from Google sign-in (backend).
         self.assertEqual(self.code.count('{$GUARDRAIL_DOMAIN} {'), 1)
-        site = self.code.split('{$GUARDRAIL_DOMAIN} {', 1)[1]
-        before_handles = site.split('handle', 1)[0]
-        self.assertIn('basic_auth {\n{$GUARDRAIL_BASIC_AUTH_USER} {$GUARDRAIL_BASIC_AUTH_HASH}\n}', before_handles)
-        self.assertEqual(self.code.count('basic_auth'), 1)
+        self.assertNotIn('basic_auth', self.code)
+        self.assertNotIn('BASIC_AUTH', self.code)
 
     def test_only_the_api_paths_go_to_the_api(self):
         self.assertEqual(re.findall(r'^@api path (.+)$', self.code, re.M), ['/api/* /docs /redoc /openapi.json'])
@@ -128,8 +126,6 @@ class CaddyAndUnit(unittest.TestCase):
                          ['/login /api/auth/* /api/projects /api/projects/*'])
         self.assertIn('handle @backend {\nreverse_proxy 127.0.0.1:8030\n}', self.code)
         self.assertLess(self.code.index('handle @backend'), self.code.index('handle @api'))
-        site = self.code.split('{$GUARDRAIL_DOMAIN} {', 1)[1]
-        self.assertLess(site.index('basic_auth'), site.index('handle @backend'))
         for header in ('Strict-Transport-Security', 'X-Content-Type-Options', 'X-Frame-Options', 'Referrer-Policy'):
             self.assertIn(header, self.code)
 
@@ -201,6 +197,9 @@ class Scripts(unittest.TestCase):
 
     def test_backend_env_keeps_the_client_id_and_never_a_secret(self):
         text = (AWS / 'remote-install.sh').read_text(encoding='utf-8')
+        self.assertIn("printf 'GUARDRAIL_OPEN_SIGNUP=true\\n'", text)            # DM-109
+        self.assertNotIn('remote.sh password', text)                           # no site password precondition
+        self.assertIn("-e '^GUARDRAIL_BASIC_AUTH_'", text)                     # old password lines dropped
         self.assertIn("printf 'GOOGLE_LOGIN_URI=https://%s/api/auth/google\\n' \"$DOMAIN\"", text)
         self.assertIn("printf 'AUTH_COOKIE_SECURE=true\\n'", text)
         self.assertIn('[[ -n "$CLIENT_ID" ]] || CLIENT_ID=$(sed -n', text)   # an empty argument keeps the server's
@@ -243,13 +242,6 @@ class Scripts(unittest.TestCase):
         block = text.split('allow-email|remove-email)', 1)[1].split(';;', 1)[0]
         self.assertLess(block.index('valid_email'), block.index('storage_cli'))
         self.assertIn('-m storage $*', text)
-
-    def test_set_password_keeps_the_password_off_command_lines_and_files(self):
-        text = (AWS / 'set-password.sh').read_text(encoding='utf-8')
-        self.assertIn('read -r -s -p', text)
-        self.assertIn('printf \'%s\\n\' "$pw1" | caddy hash-password', text)
-        self.assertNotIn('--plaintext', text)
-        self.assertNotRegex(text, r'printf[^\n]*\$pw1[^\n]*>')   # the password is never redirected into a file
 
 
 class Provision(unittest.TestCase):

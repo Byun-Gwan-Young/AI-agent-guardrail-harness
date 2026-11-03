@@ -42,6 +42,39 @@ class AuthTests(unittest.TestCase):
         with service._lock:
             service._sessions.clear()
 
+    def post_new_identity(self, email):
+        self.client.cookies.set("g_csrf_token", "csrf")
+        with patch("backend.routers.auth.verify_google_token", return_value={
+            "sub": "555", "name": "New", "email": email, "email_verified": True}):
+            return self.client.post("/api/auth/google", data={"credential": "token", "g_csrf_token": "csrf"},
+                                    follow_redirects=False)
+
+    def test_allow_list_is_the_default(self):
+        self.allowed_mock.return_value = False
+        self.assertEqual(self.post_new_identity("new@example.org").status_code, 403)
+        self.upsert_mock.assert_not_called()
+        self.assertIn("허용된 이메일만", self.client.get("/login").text)
+
+    def test_open_signup_creates_the_account_without_the_allow_list(self):
+        self.allowed_mock.return_value = False
+        with patch.dict(os.environ, {"GUARDRAIL_OPEN_SIGNUP": "true"}):
+            self.assertEqual(self.post_new_identity("new@example.org").status_code, 303)
+            self.upsert_mock.assert_called_once_with("555", "new@example.org", "New")
+            self.allowed_mock.assert_not_called()
+            page = self.client.get("/login").text
+        self.assertIn("처음 로그인하면 계정이 만들어집니다", page)
+        self.assertNotIn("{{", page)
+
+    def test_open_signup_still_needs_a_verified_email(self):
+        with patch.dict(os.environ, {"GUARDRAIL_OPEN_SIGNUP": "true"}):
+            self.client.cookies.set("g_csrf_token", "csrf")
+            with patch("backend.routers.auth.verify_google_token", return_value={
+                "sub": "556", "email": "x@example.org", "email_verified": False}):
+                response = self.client.post("/api/auth/google", data={"credential": "t", "g_csrf_token": "csrf"},
+                                            follow_redirects=False)
+        self.assertEqual(response.status_code, 401)
+        self.upsert_mock.assert_not_called()
+
     def test_login_logout_and_escape(self):
         self.assertEqual(self.client.get("/api/auth/me").status_code, 401)
         self.client.cookies.set("g_csrf_token", "csrf")

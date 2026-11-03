@@ -13,7 +13,7 @@ from backend.auth.dependencies import optional_account, get_authenticated_accoun
 from backend.auth.service import AccountUnavailable
 from backend.auth.service import change_account
 from backend.auth.schemas import AccountAction
-from backend.auth.service import SESSION_TTL, login_with_google, revoke_session
+from backend.auth.service import SESSION_TTL, login_with_google, open_signup, revoke_session
 
 router = APIRouter(tags=["auth"])
 COOKIE = "guardrail_session"
@@ -32,6 +32,8 @@ def login_page(request: Request):
     html = html.replace("{{CLIENT_ID}}", escape(client_id, quote=True))
     html = html.replace("{{LOGIN_URI}}", escape(uri, quote=True))
     html = html.replace("{{CONFIG_MESSAGE}}", "" if client_id else "서버에 GOOGLE_CLIENT_ID를 설정해 주세요.")
+    html = html.replace("{{SIGNUP_NOTE}}", "처음 로그인하면 계정이 만들어집니다." if open_signup()
+                        else "허용된 이메일만 로그인할 수 있습니다.")
     token = request.cookies.get(COOKIE, "")
     user = optional_account(request)
     message = ""

@@ -34,7 +34,6 @@ as_guardrail() { runuser -u guardrail -- env -i PATH=/usr/bin:/bin LANG=C.UTF-8 
 [[ "$DOMAIN" =~ ^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$ ]] || die "도메인 모양이 아니다"
 [[ -z "$CLIENT_ID" || "$CLIENT_ID" =~ ^[0-9]+-[a-z0-9]+\.apps\.googleusercontent\.com$ ]] || die "구글 클라이언트 ID 모양이 아니다"
 [[ -x "$PY" ]] || die "서비스 가상환경이 없다 (server-setup.sh 먼저)"
-grep -q '^GUARDRAIL_BASIC_AUTH_HASH=' "$CADDY_ENV" 2>/dev/null || die "사이트 비밀번호가 아직 없다 (remote.sh password 먼저)"
 
 step "풀기"
 stage=$(mktemp -d /opt/guardrail/releases/.incoming.XXXXXX)
@@ -82,6 +81,7 @@ tmp=$(umask 027 && mktemp "$BACKEND_ENV.XXXXXX")
     printf 'GUARDRAIL_DB_URL=%s\n' "$DB_URL"
     printf 'GOOGLE_LOGIN_URI=https://%s/api/auth/google\n' "$DOMAIN"
     printf 'AUTH_COOKIE_SECURE=true\n'
+    printf 'GUARDRAIL_OPEN_SIGNUP=true\n'    # DM-109 : any verified Google account the OAuth app lets through
     [[ -z "$CLIENT_ID" ]] || printf 'GOOGLE_CLIENT_ID=%s\n' "$CLIENT_ID"
 } > "$tmp"
 chown root:guardrail "$tmp" && chmod 640 "$tmp" && mv "$tmp" "$BACKEND_ENV"
@@ -93,7 +93,8 @@ systemctl restart guardrail-backend
 
 step "Caddy : 도메인 → caddy.env, Caddyfile 설치, 확인, 다시 읽기"
 tmp=$(umask 077 && mktemp "$CADDY_ENV.XXXXXX")
-{ grep -v '^GUARDRAIL_DOMAIN=' "$CADDY_ENV" || true; printf 'GUARDRAIL_DOMAIN=%s\n' "$DOMAIN"; } > "$tmp"
+# DM-109 : the old shared-password lines (GUARDRAIL_BASIC_AUTH_*) are dropped with the basic auth block.
+{ grep -v -e '^GUARDRAIL_DOMAIN=' -e '^GUARDRAIL_BASIC_AUTH_' "$CADDY_ENV" || true; printf 'GUARDRAIL_DOMAIN=%s\n' "$DOMAIN"; } > "$tmp"
 chmod 600 "$tmp" && mv "$tmp" "$CADDY_ENV"
 install -m 644 "$release/deploy/aws/Caddyfile.template" /etc/caddy/Caddyfile
 ( set -a; . "$CADDY_ENV"; set +a; caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile >/dev/null )

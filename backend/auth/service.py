@@ -1,6 +1,7 @@
 """Single-process demo sessions. Restarting the server signs everyone out."""
 
 import hashlib
+import os
 import secrets
 import time
 from threading import Lock, RLock
@@ -13,6 +14,14 @@ class AccountUnavailable(PermissionError):
     pass
 
 SESSION_TTL = 3600
+# DM-109 : GUARDRAIL_OPEN_SIGNUP=true lets any verified Google account sign up on first login (the allowed_emails
+# list is then not consulted). Off by default : only listed emails. Google's own OAuth "testing" status still limits
+# who can reach this point to the test users registered in the Google console.
+OPEN_SIGNUP_ENV = "GUARDRAIL_OPEN_SIGNUP"
+
+
+def open_signup():
+    return os.getenv(OPEN_SIGNUP_ENV, "").strip().lower() in {"1", "true", "yes", "on"}
 _sessions = {}
 _lock = Lock()
 # Single-worker serialization prevents a concurrent login from issuing a stale
@@ -56,7 +65,7 @@ def _login_with_google(info):
         raise ValueError("Invalid Google identity")
     if not isinstance(email, str) or not email.strip() or info.get("email_verified") is not True:
         raise ValueError("Verified Google email required")
-    if not accounts.is_email_allowed(email):
+    if not open_signup() and not accounts.is_email_allowed(email):
         accounts.record_auth_event("google_login_denied", None,
                                    {"provider": "google", "reason": "email_not_allowed"})
         raise PermissionError("Email is not allowed")

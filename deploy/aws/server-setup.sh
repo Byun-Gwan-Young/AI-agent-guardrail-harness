@@ -70,7 +70,7 @@ chown root:guardrail /etc/guardrail/api.env && chmod 640 /etc/guardrail/api.env
 [[ -f /etc/guardrail/caddy.env ]] || install -o root -g root -m 600 /dev/null /etc/guardrail/caddy.env
 install -d -m 755 /etc/systemd/system/caddy.service.d
 cat > /etc/systemd/system/caddy.service.d/guardrail.conf <<'EOF'
-# systemd drop-in for caddy.service (C-19-7) : hands the domain and the basic auth user/hash to Caddy (Caddyfile {$...}).
+# systemd drop-in for caddy.service (C-19-7) : hands the domain to Caddy (Caddyfile {$...}).
 [Service]
 EnvironmentFile=-/etc/guardrail/caddy.env
 EOF
@@ -82,4 +82,4 @@ printf 'listen_addresses : %s\n' "$(runuser -u postgres -- psql -tAc 'SHOW liste
 printf 'Caddy : %s\n' "$(caddy version | head -n 1)"
 printf 'uv : %s\n' "$(uv --version)"
 printf '서비스 Python : %s\n' "$(/opt/guardrail/venv/bin/python --version)"
-printf '\n준비 끝. 다음 : 비밀번호 설정 (deploy/aws/remote.sh password) → 배포 (deploy/aws/deploy.sh)\n'
+printf '\n준비 끝. 다음 : 배포 (deploy/aws/deploy.sh)\n'
