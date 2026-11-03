@@ -393,6 +393,7 @@ nav button.on{background:#3a3631}nav button:disabled{color:#837d72;cursor:defaul
 nav .sep{border-top:1px solid #3a3631;margin:10px 0}
 .badge{font-size:11px;border:1px solid currentColor;border-radius:9px;padding:0 6px;white-space:nowrap}
 .proj{margin-top:auto;font-size:12px;color:#a59f93}
+.acct{display:block;margin-top:8px;padding:8px 10px;border:1px solid #484139;border-radius:8px;color:#eee7db;text-decoration:none;font-size:13px}.acct:hover{background:#3a362f}
 main{flex:1;min-width:0;padding:16px 22px 28px;display:flex;flex-direction:column;gap:12px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .top h1{font-size:19px;margin:0}.mode{background:#fff;border:1px solid var(--line);border-radius:14px;padding:3px 12px;font-size:13px}
@@ -721,6 +722,9 @@ function apiBeforeOpen(s){if(s.loaded)return false;
 function apiUse(X){const keep=S&&S.id,byid={};X.sessions.forEach(s=>byid[s.id]=s);
  SRC={api:true,headline:X.headline,judgement_ms:X.judgement_ms,sessions:X.sessions,byId:byid};beforeOpen=apiBeforeOpen;setSrc(SRC_API_TEXT);apiRefresh(keep);}
 if(/^https?:$/.test(location.protocol)){setSrc(SRC_FILE_TEXT+' (조회 API 확인 중)');apiLoad(fetch.bind(window),D.task_names).then(apiUse).catch(apiFallback);}
+/* sign-in state (DM-108) : the service backend answers /api/auth/me ; anything but 200 keeps "로그인 · 내 계정" */
+function acctShow(u){const e=$('#acct');if(e&&u&&(u.name||u.email))e.textContent=(u.name||u.email)+' 님 · 내 계정';}
+if(/^https?:$/.test(location.protocol)){fetch('/api/auth/me',{credentials:'same-origin',headers:{Accept:'application/json'}}).then(r=>r.ok?r.json():null).then(acctShow).catch(()=>{});}
 """
 
 
@@ -763,7 +767,7 @@ def page(data, root=ROOT, live=False, api=False):
 <button id="nav-live" data-page="live">실시간 모니터</button>
 <div class="sep"></div>{planned_nav}
 </nav>
-<div class="proj">프로젝트 : 캡스톤 데모</div></aside>
+<div class="proj">프로젝트 : 캡스톤 데모</div>{'<a id="acct" class="acct" href="/login">로그인 · 내 계정</a>' if api else ''}</aside>
 <main>
 <div class="top"><h1 id="title">agent-guardrail — 데모</h1><span class="mode">모드 : 관측 (observe) · 차단 (block) 세션은 따로 표시</span></div>
 {band}

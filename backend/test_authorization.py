@@ -17,8 +17,9 @@ spec.loader.exec_module(fixture)
 class AuthorizationTests(fixture.BackendTests):
     def setUp(self):
         super().setUp()
+        # The base fixture (tests/test_backend_sessions.py) already has projects.owner_user_id since the
+        # backend-foundation merge (DM-107) ; here projects 1 and 2 move to owner 7.
         self.db.executescript("""
-            ALTER TABLE projects ADD COLUMN owner_user_id INTEGER;
             UPDATE projects SET owner_user_id = 7;
             INSERT INTO projects VALUES
               (3, 'Other owner', 'observe', 'deadlock-v0.3', '2026-10-12', 8),

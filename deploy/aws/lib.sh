@@ -20,6 +20,10 @@ say() { printf '%s\n' "$*"; }
 
 valid_domain() { [[ "$1" =~ ^([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$ ]]; }
 
+# DM-108 : a Google OAuth web client ID (public ; the sign-in page shows it) and a sign-in email.
+valid_google_client_id() { [[ "$1" =~ ^[0-9]+-[a-z0-9]+\.apps\.googleusercontent\.com$ ]]; }
+valid_email() { [[ "$1" =~ ^[A-Za-z0-9._%+-]+@([A-Za-z0-9-]+\.)+[A-Za-z]{2,63}$ ]]; }
+
 valid_ipv4() {
     [[ "$1" =~ ^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$ ]] || return 1
     local part
@@ -40,16 +44,21 @@ load_target() {
     GUARDRAIL_SSH_KEY=$(target_value "$file" GUARDRAIL_SSH_KEY)
     GUARDRAIL_SSH_USER=$(target_value "$file" GUARDRAIL_SSH_USER)
     GUARDRAIL_SSH_USER=${GUARDRAIL_SSH_USER:-ubuntu}
+    GUARDRAIL_GOOGLE_CLIENT_ID=$(target_value "$file" GUARDRAIL_GOOGLE_CLIENT_ID)
     valid_domain "$GUARDRAIL_DOMAIN" || die "target.env 의 GUARDRAIL_DOMAIN 이 도메인 모양이 아니다"
     valid_ipv4 "$GUARDRAIL_SERVER_IP" || die "target.env 의 GUARDRAIL_SERVER_IP 가 IPv4 모양이 아니다"
     [[ -f "$GUARDRAIL_SSH_KEY" ]] || die "SSH 키 파일이 없다 (target.env 의 GUARDRAIL_SSH_KEY)"
+    [[ -z "$GUARDRAIL_GOOGLE_CLIENT_ID" ]] || valid_google_client_id "$GUARDRAIL_GOOGLE_CLIENT_ID" \
+        || die "target.env 의 GUARDRAIL_GOOGLE_CLIENT_ID 가 구글 클라이언트 ID 모양이 아니다"
     SSH_OPTS=(-i "$GUARDRAIL_SSH_KEY" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15)
     SSH_DEST="$GUARDRAIL_SSH_USER@$GUARDRAIL_SERVER_IP"
 }
 
 # Writes target.env with owner-only permissions. Arguments: file domain ip key user.
+# A Google client ID already in the file (DM-108, set-google-client.sh) is kept.
 write_target() {
-    local file=$1 tmp
+    local file=$1 tmp cid=
+    [[ -f "$file" ]] && cid=$(target_value "$file" GUARDRAIL_GOOGLE_CLIENT_ID)
     tmp=$(umask 077 && mktemp "${file}.XXXXXX")
     {
         printf '# deploy/aws/target.env — git 제외 (C-19-7). provision.sh / configure.sh 가 썼다. 비밀값 없음.\n'
@@ -58,6 +67,7 @@ write_target() {
         printf 'GUARDRAIL_SSH_KEY=%s\n' "$4"
         printf 'GUARDRAIL_SSH_USER=%s\n' "$5"
         printf 'GUARDRAIL_AWS_REGION=%s\n' "$GUARDRAIL_REGION"
+        [[ -z "$cid" ]] || printf 'GUARDRAIL_GOOGLE_CLIENT_ID=%s\n' "$cid"
     } > "$tmp"
     mv "$tmp" "$file"
 }

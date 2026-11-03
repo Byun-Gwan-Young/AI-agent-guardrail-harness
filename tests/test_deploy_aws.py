@@ -28,7 +28,7 @@ AWS = ROOT / 'deploy' / 'aws'
 sys.path.insert(0, str(AWS))
 import bundle  # noqa: E402
 
-MAC_SCRIPTS = ('provision.sh', 'teardown.sh', 'configure.sh', 'remote.sh', 'deploy.sh', 'lib.sh')
+MAC_SCRIPTS = ('provision.sh', 'teardown.sh', 'configure.sh', 'remote.sh', 'deploy.sh', 'lib.sh', 'set-google-client.sh')
 SERVER_SCRIPTS = ('server-setup.sh', 'set-password.sh', 'remote-install.sh')
 ACCOUNT = '123456789012'
 CREATE_VERBS = ('create-', 'run-instances', 'allocate-address', 'associate-address', 'authorize-', 'revoke-',
@@ -115,12 +115,21 @@ class CaddyAndUnit(unittest.TestCase):
 
     def test_only_the_api_paths_go_to_the_api(self):
         self.assertEqual(re.findall(r'^@api path (.+)$', self.code, re.M), ['/api/* /docs /redoc /openapi.json'])
-        self.assertEqual(re.findall(r'reverse_proxy (\S+)', self.code), ['127.0.0.1:8020'])
+        self.assertEqual(re.findall(r'reverse_proxy (\S+)', self.code), ['127.0.0.1:8030', '127.0.0.1:8020'])
         self.assertIn('handle @api {\nreverse_proxy 127.0.0.1:8020\n}', self.code)
         self.assertIn('handle {\nroot * /opt/guardrail/app/site\nfile_server\n}', self.code)
-        for later in ('/auth', '/v1', '/sessions'):
-            self.assertNotIn(later, self.code)   # C-19-8 / C-19-9 blocks are comments only
+        for later in ('/v1', '/sessions'):
+            self.assertNotIn(later, self.code)   # C-19-9 blocks are comments only
             self.assertIn(later, self.caddy)
+
+    def test_only_the_sign_in_paths_go_to_the_backend_before_the_api(self):
+        # DM-108 : /api/auth/* and /api/projects* must not fall into the query API's /api/*.
+        self.assertEqual(re.findall(r'^@backend path (.+)$', self.code, re.M),
+                         ['/login /api/auth/* /api/projects /api/projects/*'])
+        self.assertIn('handle @backend {\nreverse_proxy 127.0.0.1:8030\n}', self.code)
+        self.assertLess(self.code.index('handle @backend'), self.code.index('handle @api'))
+        site = self.code.split('{$GUARDRAIL_DOMAIN} {', 1)[1]
+        self.assertLess(site.index('basic_auth'), site.index('handle @backend'))
         for header in ('Strict-Transport-Security', 'X-Content-Type-Options', 'X-Frame-Options', 'Referrer-Policy'):
             self.assertIn(header, self.code)
 
@@ -129,6 +138,14 @@ class CaddyAndUnit(unittest.TestCase):
         for line in ('User=guardrail', 'WorkingDirectory=/opt/guardrail/app', 'EnvironmentFile=/etc/guardrail/api.env',
                      'Restart=always',
                      'ExecStart=/opt/guardrail/venv/bin/python -B -m service.api --host 127.0.0.1 --port 8020'):
+            self.assertIn(line + '\n', unit)
+
+    def test_backend_unit(self):
+        unit = (AWS / 'guardrail-backend.service').read_text(encoding='utf-8')
+        for line in ('User=guardrail', 'WorkingDirectory=/opt/guardrail/app', 'EnvironmentFile=/etc/guardrail/backend.env',
+                     'Restart=always', 'ProtectSystem=strict',
+                     'ExecStart=/opt/guardrail/venv/bin/python -B -m uvicorn backend.main:app --host 127.0.0.1 '
+                     '--port 8030 --workers 1'):
             self.assertIn(line + '\n', unit)
 
     def test_server_db_url_is_a_socket_without_password(self):
@@ -177,9 +194,55 @@ class Scripts(unittest.TestCase):
         text = (AWS / 'remote-install.sh').read_text(encoding='utf-8')
         order = [text.index(s) for s in ('-m storage init', '-m storage demo-all', '-m service.load_demo check',
                                          'die "check 가 같지 않다', 'ln -sfn "$release"', 'systemctl restart guardrail-api',
-                                         'systemctl reload-or-restart caddy')]
+                                         'systemctl restart guardrail-backend', 'systemctl reload-or-restart caddy',
+                                         'http://127.0.0.1:8030/login')]
         self.assertEqual(order, sorted(order))
         self.assertIn('caddy validate', text)
+
+    def test_backend_env_keeps_the_client_id_and_never_a_secret(self):
+        text = (AWS / 'remote-install.sh').read_text(encoding='utf-8')
+        self.assertIn("printf 'GOOGLE_LOGIN_URI=https://%s/api/auth/google\\n' \"$DOMAIN\"", text)
+        self.assertIn("printf 'AUTH_COOKIE_SECURE=true\\n'", text)
+        self.assertIn('[[ -n "$CLIENT_ID" ]] || CLIENT_ID=$(sed -n', text)   # an empty argument keeps the server's
+        self.assertIn('chown root:guardrail "$tmp" && chmod 640 "$tmp"', text)
+        self.assertNotRegex(text, r'(?i)client_secret|GOOGLE_CLIENT_SECRET')
+
+    def test_client_id_and_email_shapes(self):
+        lib = str(AWS / 'lib.sh')
+        def ok(fn, value):
+            return subprocess.run(['/bin/bash', '-c', f'. "{lib}"; {fn} "$1"', '_', value]).returncode == 0
+        good_id = '1234567890-abcdefghij0123456789' + '.apps.' + 'googleusercontent' + '.com'
+        self.assertTrue(ok('valid_google_client_id', good_id))
+        for bad in ('', 'abc', good_id + ' x', good_id.replace('.apps.', '.app.'), "1-a'.apps.x"):
+            self.assertFalse(ok('valid_google_client_id', bad), bad)
+        self.assertTrue(ok('valid_email', 'pm.name+tag@example.org'))
+        for bad in ('', 'no-at.example.org', "a'b@example.org", 'a b@example.org', 'a@b', 'a@example.org;rm'):
+            self.assertFalse(ok('valid_email', bad), bad)
+
+    def test_write_target_keeps_the_client_id(self):
+        lib = str(AWS / 'lib.sh')
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / 'target.env'
+            target.write_text('GUARDRAIL_DOMAIN=old.example.org\nGUARDRAIL_GOOGLE_CLIENT_ID=1-abc\n', encoding='utf-8')
+            result = subprocess.run(['/bin/bash', '-c', f'. "{lib}"; write_target "$1" demo.example.org 10.0.0.1 k ubuntu',
+                                     '_', str(target)], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            text = target.read_text(encoding='utf-8')
+            self.assertIn('GUARDRAIL_DOMAIN=demo.example.org\n', text)
+            self.assertIn('GUARDRAIL_GOOGLE_CLIENT_ID=1-abc\n', text)
+
+    def test_set_google_client_asks_and_replaces_one_line(self):
+        text = (AWS / 'set-google-client.sh').read_text(encoding='utf-8')
+        self.assertIn('read -r -p', text)
+        self.assertIn('valid_google_client_id "$cid" || die', text)
+        self.assertIn("grep -v '^GUARDRAIL_GOOGLE_CLIENT_ID='", text)
+        self.assertNotRegex(text, r'(?i)secret\s*[:=]|read -r -s')    # the client secret is never asked
+
+    def test_remote_email_commands_check_the_email_first(self):
+        text = (AWS / 'remote.sh').read_text(encoding='utf-8')
+        block = text.split('allow-email|remove-email)', 1)[1].split(';;', 1)[0]
+        self.assertLess(block.index('valid_email'), block.index('storage_cli'))
+        self.assertIn('-m storage $*', text)
 
     def test_set_password_keeps_the_password_off_command_lines_and_files(self):
         text = (AWS / 'set-password.sh').read_text(encoding='utf-8')
@@ -310,11 +373,13 @@ class Bundle(unittest.TestCase):
             self.assertFalse(path.startswith(('logs/', 'docs/handoff', 'venv/', '.env')), path)
             self.assertNotRegex(path, r'(session|steps)\.json$|\.pem$|target\.env$')
             self.assertLessEqual(len(self.files[path]), bundle.MAX_FILE_BYTES, path)
-        for absent in ('proxy.py', 'experiments/run_scenario.py', 'tools/run_batch.py', 'requirements.txt'):
+        for absent in ('proxy.py', 'experiments/run_scenario.py', 'tools/run_batch.py', 'requirements.txt',
+                       'backend/test_auth.py'):
             self.assertNotIn(absent, paths)
         for present in ('site/index.html', 'DEPLOY_INFO.json', 'service/api.py', 'storage/__main__.py',
                         'service/requirements-server.txt', 'deploy/aws/remote-install.sh', 'scenarios/README.md',
-                        'reports/c19/aggregate-main.json', 'docs/criteria/demo-final-freeze.json'):
+                        'reports/c19/aggregate-main.json', 'docs/criteria/demo-final-freeze.json',
+                        'backend/main.py', 'backend/templates/login.html', 'deploy/aws/guardrail-backend.service'):
             self.assertIn(present, paths)
         self.assertEqual(len([p for p in paths if p.endswith('/record/replay.json')]), 115)
         self.assertIn(b'apiLoad', self.files['site/index.html'])

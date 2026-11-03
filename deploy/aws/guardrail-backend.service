@@ -1,0 +1,29 @@
+# agent-guardrail service backend (Google sign-in, account, projects ; 127.0.0.1:8030) — systemd unit (DM-108).
+# Installed as /etc/systemd/system/guardrail-backend.service by deploy (remote-install.sh).
+# /etc/guardrail/backend.env holds GUARDRAIL_DB_URL (Unix socket, peer authentication as user guardrail : no password),
+# GOOGLE_CLIENT_ID (public OAuth client ID, from target.env), GOOGLE_LOGIN_URI and AUTH_COOKIE_SECURE.
+# One worker only : sign-in sessions live in this process's memory (backend/auth/service.py). Restart signs everyone out.
+[Unit]
+Description=agent-guardrail service backend (Google sign-in, 127.0.0.1:8030)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=guardrail
+Group=guardrail
+WorkingDirectory=/opt/guardrail/app
+EnvironmentFile=/etc/guardrail/backend.env
+ExecStart=/opt/guardrail/venv/bin/python -B -m uvicorn backend.main:app --host 127.0.0.1 --port 8030 --workers 1
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target

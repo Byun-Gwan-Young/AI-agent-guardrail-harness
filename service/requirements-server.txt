@@ -1,6 +1,8 @@
 # C-19-7 (DM-91) : packages of the demo server only (query API service/api.py, loader storage/ + service/load_demo.py).
 # Installed on the server into /opt/guardrail/venv (Python 3.14 via uv) by deploy/aws/remote-install.sh. Versions are
 # the ones of this repository's venv (requirements.txt) ; psycopg[binary] as in storage/requirements-storage.txt.
+# DM-108 : the service backend (backend/, Google sign-in) adds google-auth with its requests transport and
+# python-multipart (the sign-in form post).
 fastapi==0.141.1
 starlette==1.6.0
 pydantic==2.13.5
@@ -17,3 +19,14 @@ h11==0.16.0
 psycopg[binary]==3.3.5
 python-dotenv==1.2.3
 PyYAML==6.0.3
+google-auth==2.62.0
+pyasn1==0.6.5
+pyasn1-modules==0.4.2
+cryptography==50.0.1
+cffi==2.1.1
+pycparser==3.0
+requests==2.34.2
+urllib3==2.7.0
+certifi==2026.7.22
+charset-normalizer==3.5.1
+python-multipart==0.0.32

@@ -38,6 +38,7 @@ BUNDLE_VERSION = 'guardrail-server-bundle-v1'
 INCLUDE = (
     'service/',
     'storage/',
+    'backend/',                   # DM-108 : service backend (Google sign-in, account, projects) ; its tests stay out
     'deploy/aws/',
     'tools/analyze_session.py',
     'tools/gateway_prices.py',
@@ -61,6 +62,7 @@ INCLUDE = (
 # Never on the server (DM-91 ⑤), even if an INCLUDE path would reach it. Checked again on the bundled file list.
 EXCLUDE = (
     'logs/*',                     # proxy session logs (raw)
+    'backend/test_*.py',          # backend tests (run on the Mac, not on the server)
     'docs/handoff/*',             # PM hand-over documents
     'venv/*', '.venv/*',          # local virtual environments
     '.env', '.env.*', '*/.env', '*/.env.*',   # key files

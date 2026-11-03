@@ -12,6 +12,8 @@
 #    Caddy reload.
 # 3. Fetch the server's check result to reports/c19-7/server-check-postgres.json.
 # 4. https://DOMAIN/api/summary through Caddy : curl asks the site password (typed here, never stored).
+# DM-108 : the Google client ID in target.env (set-google-client.sh) goes to the server's backend.env ; without it the
+# sign-in page opens but has no Google button.
 set -euo pipefail
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$SCRIPT_DIR/../.." && pwd)
@@ -23,7 +25,7 @@ while (( $# )); do
     case "$1" in
         --bundle-only) shift; BUNDLE_ONLY=${1:-}; [[ -n "$BUNDLE_ONLY" ]] || die "--bundle-only 에 폴더를 준다" ;;
         --ref) shift; REF=${1:-main} ;;
-        -h|--help) sed -n '2,16p' "$0"; exit 0 ;;
+        -h|--help) sed -n '2,18p' "$0"; exit 0 ;;
         *) die "모르는 인자 : $1" ;;
     esac
     shift
@@ -58,7 +60,7 @@ scp "${SSH_OPTS[@]}" "$WORK/bundle.tar.gz" "$WORK/remote-install.sh" "$SSH_DEST:
 
 say "== 서버에서 설치 · 적재 · 확인"
 set +e
-ssh "${SSH_OPTS[@]}" "$SSH_DEST" "sudo bash /tmp/guardrail-deploy/remote-install.sh /tmp/guardrail-deploy/bundle.tar.gz '$GUARDRAIL_DOMAIN'"
+ssh "${SSH_OPTS[@]}" "$SSH_DEST" "sudo bash /tmp/guardrail-deploy/remote-install.sh /tmp/guardrail-deploy/bundle.tar.gz '$GUARDRAIL_DOMAIN' '$GUARDRAIL_GOOGLE_CLIENT_ID'"
 status=$?
 set -e
 
@@ -80,6 +82,8 @@ site_user=${site_user:-guardrail}
 code=$(curl -sS -u "$site_user" -o "$WORK/summary.json" -w '%{http_code}' "https://$GUARDRAIL_DOMAIN/api/summary") || true
 if [[ "$code" == 200 ]] && grep -q '"headline"' "$WORK/summary.json"; then
     say "응답 200 · headline 있음. 브라우저로 https://$GUARDRAIL_DOMAIN/ 를 연다"
+    say "로그인 화면 : https://$GUARDRAIL_DOMAIN/login"
+    [[ -n "$GUARDRAIL_GOOGLE_CLIENT_ID" ]] || say "주의 : 구글 클라이언트 ID 가 없다 → deploy/aws/set-google-client.sh 뒤 다시 배포"
 else
     die "https://$GUARDRAIL_DOMAIN/api/summary 응답 $code (DNS 반영 · 인증서 발급 직후면 몇 분 뒤 다시 : deploy/aws/remote.sh status)"
 fi

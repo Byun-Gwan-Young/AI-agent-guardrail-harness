@@ -21,13 +21,18 @@
 		-Server
 	}
 
+	# --- service backend (DM-108, 127.0.0.1:8030) : Google sign-in page, sign-in API, the user's projects ---
+	# Before @api : /api/auth/* and /api/projects* would otherwise fall into /api/*. The basic auth above still applies.
+	@backend path /login /api/auth/* /api/projects /api/projects/*
+	handle @backend {
+		reverse_proxy 127.0.0.1:8030
+	}
+
 	# --- query API (C-19-6, read-only, 127.0.0.1:8020) : only these paths go to the API ---
 	@api path /api/* /docs /redoc /openapi.json
 	handle @api {
 		reverse_proxy 127.0.0.1:8020
 	}
-
-	# --- C-19-8 : /auth/* (Google sign-in) block goes here. Not open now. ---
 
 	# --- C-19-9 : /v1/* and /sessions/* (service gateway, key-protected) blocks go here. Not open now. ---
 
