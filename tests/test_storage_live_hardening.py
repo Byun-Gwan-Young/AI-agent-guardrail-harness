@@ -17,12 +17,16 @@ class LiveHardeningTests(unittest.TestCase):
 
     def setUp(self):
         self.state = {
+            "users": {
+                100: {"id": 100, "account_status": "active"},
+            },
             "projects": {
                 1: {
                     "id": 1,
                     "mode": "observe",
                     "read_only": False,
                     "provider": "groq",
+                    "owner_user_id": 100,
                 }
             },
             "scenarios": {
@@ -240,8 +244,16 @@ class LiveHardeningTests(unittest.TestCase):
             self.assertIn("lock=True", fn_source, fn.__name__)
 
     def test_project_snapshot_is_locked_during_start(self):
-        source = inspect.getsource(live._require_writable_project)
-        self.assertIn("FOR SHARE", source)
+        project_source = inspect.getsource(live._require_writable_project)
+        owner_source = inspect.getsource(live._require_active_project_owner)
+        start_source = inspect.getsource(live.start_live_session)
+
+        self.assertIn("FOR SHARE", project_source)
+        self.assertIn("FOR SHARE", owner_source)
+        self.assertLess(
+            start_source.index("_require_active_project_owner(cursor, project)"),
+            start_source.index("_require_writable_project(cursor, project_id, lock=True)"),
+        )
 
 
 if __name__ == "__main__":

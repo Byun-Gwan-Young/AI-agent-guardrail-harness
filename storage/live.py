@@ -112,17 +112,17 @@ def _rows_dict(cursor):
     return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
 
-def _require_writable_project(cursor, project_id: int):
-    # FOR SHARE freezes the project routing/mode snapshot while a *new* live
-    # session is being created.  Project-setting updates wait until this
-    # transaction finishes, so a session cannot start half on the old config and
-    # half on the new config.
+def _require_writable_project(cursor, project_id: int, *, lock: bool = True):
+    # New live sessions lock the account first and then the project.  The initial
+    # unlocked read is used only to discover ownership and preserve exact retry
+    # behavior; the authoritative routing/mode snapshot is re-read with
+    # ``FOR SHARE`` before a new session is inserted.
+    lock_clause = " FOR SHARE" if lock else ""
     cursor.execute(
-        """
-        SELECT id, mode, read_only, provider
+        f"""
+        SELECT id, mode, read_only, provider, owner_user_id
         FROM projects
-        WHERE id = %s
-        FOR SHARE
+        WHERE id = %s{lock_clause}
         """,
         (project_id,),
     )
@@ -131,11 +131,41 @@ def _require_writable_project(cursor, project_id: int):
         # A read-only demo project must not receive live traffic.
         raise LookupError("project not found")
     return {
-        "id": row[0],
-        "mode": row[1],
-        "read_only": row[2],
-        "provider": row[3],
+    "id": row[0],
+    "mode": row[1],
+    "read_only": row[2],
+    "provider": row[3],
+    "owner_user_id": row[4],
     }
+
+
+def _require_active_project_owner(cursor, project) -> None:
+    """Lock and require an active owner before a new live session is created."""
+    owner_user_id = project.get("owner_user_id")
+
+    # Preserve existing behavior for legacy/system-owned projects.
+    # Read-only demo projects are already rejected by _require_writable_project().
+    if owner_user_id is None:
+        return
+
+    cursor.execute(
+        """
+        SELECT account_status
+        FROM users
+        WHERE id = %s
+        FOR SHARE
+        """,
+        (owner_user_id,),
+    )
+    row = cursor.fetchone()
+
+    if row is None:
+        raise LookupError("project owner not found")
+
+    if row[0] != "active":
+        raise RuntimeError("account is pending deletion")
+
+
 
 
 def _require_live_session(
@@ -266,7 +296,10 @@ def start_live_session(
 
     with get_connection() as conn:
         with conn.cursor() as cursor:
-            project = _require_writable_project(cursor, project_id)
+            # First read is intentionally unlocked: exact retries remain allowed
+            # for an already-started session even after its owner requests
+            # deletion. New sessions acquire locks below in user -> project order.
+            project = _require_writable_project(cursor, project_id, lock=False)
             scenario_id = _scenario_id(cursor, project_id, scenario_key, scenario_hash)
 
             # Check an already-created session *before* comparing against current
@@ -282,6 +315,15 @@ def start_live_session(
                         "session_id already exists with different live-session data"
                     )
                 return _live_start_result(existing)
+
+            # Lock order for a *new* session is user -> project, matching account
+            # purge. This avoids the project -> user / user -> project inversion
+            # that could otherwise create a database deadlock.
+            _require_active_project_owner(cursor, project)
+            locked_project = _require_writable_project(cursor, project_id, lock=True)
+            if locked_project["owner_user_id"] != project["owner_user_id"]:
+                raise RuntimeError("project ownership changed during live session start")
+            project = locked_project
 
             # The public signature contains mode because the proxy already passes
             # it, but projects.mode is the source of truth for *new* sessions.

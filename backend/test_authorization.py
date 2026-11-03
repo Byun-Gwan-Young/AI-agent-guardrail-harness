@@ -58,7 +58,10 @@ class AuthorizationTests(fixture.BackendTests):
         from fastapi.testclient import TestClient
         app.dependency_overrides.clear()
         token = create_session({'id': 7, 'sub': 'google-user'})
-        with TestClient(app) as client:
+        with patch('backend.auth.service.fetch_account_state', return_value={
+            'account_status': 'active', 'can_restore': None,
+            'deletion_requested_at': None, 'deletion_due_at': None,
+        }), TestClient(app) as client:
             client.cookies.set('guardrail_session', token)
             self.assertEqual(client.get('/api/projects').status_code, 200)
             client.cookies.set('guardrail_session', 'forged')

@@ -1,8 +1,22 @@
 """Public session metadata; raw configuration and model text are omitted."""
 
 from datetime import datetime
+from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+
+class ProjectCreateRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: str = Field(min_length=1, max_length=100)
+    mode: Literal["observe", "block"] = "observe"
+    csrf_token: str = Field(min_length=1, max_length=256)
+
+    @field_validator("name", mode="before")
+    @classmethod
+    def strip_name(cls, value):
+        return value.strip() if isinstance(value, str) else value
 
 
 class ProjectResponse(BaseModel):

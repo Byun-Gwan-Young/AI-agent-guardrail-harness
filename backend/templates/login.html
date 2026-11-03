@@ -26,6 +26,18 @@
     <section style="display:{{USER_DISPLAY}}">
       <p><strong>{{NAME}}</strong>님, 로그인되었습니다.</p>
       <p class="muted">{{EMAIL}}</p>
+      <p role="status">{{ACCOUNT_MESSAGE}}</p>
+      <div id="account-actions" data-csrf="{{ACTION_CSRF}}">
+        <div style="display:{{WITHDRAW_DISPLAY}}">
+          <p class="muted">탈퇴하면 즉시 로그아웃되고 API 키가 폐기됩니다. 30일 동안 계정을 복구할 수 있습니다.</p>
+          <button type="button" data-action="withdraw">회원 탈퇴</button>
+        </div>
+        <div style="display:{{RESTORE_DISPLAY}}">
+          <p class="muted">복구 후 다시 로그인해 주세요. 폐기된 API 키는 복원되지 않습니다.</p>
+          <button type="button" data-action="restore">계정 복구</button>
+        </div>
+        <p id="action-result" role="status" aria-live="polite"></p>
+      </div>
       <form method="post" action="/api/auth/logout">
         <input type="hidden" name="csrf_token" value="{{LOGOUT_TOKEN}}">
         <button type="submit">로그아웃</button>
@@ -33,5 +45,44 @@
     </section>
   </main>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script>
+    document.querySelectorAll('[data-action]').forEach(button => {
+      button.addEventListener('click', async () => {
+        const action = button.dataset.action;
+        const prompt = action === 'withdraw'
+          ? '탈퇴를 요청할까요? 즉시 로그아웃되며, 계정 복구 유예기간은 30일입니다.'
+          : '계정 탈퇴를 취소하고 복구할까요?';
+        if (!window.confirm(prompt)) return;
+        const output = document.getElementById('action-result');
+        button.disabled = true;
+        try {
+          const response = await fetch('/api/auth/' + action, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({confirm: true, csrf_token: document.getElementById('account-actions').dataset.csrf})
+          });
+          if (!response.ok) {
+            const messages = {
+              401: '로그인이 만료되었습니다. 새로 로그인해 주세요.',
+              403: '요청을 확인할 수 없습니다. 구글 계정으로 다시 로그인해 주세요.',
+              409: '계정 복구 기한이 지났습니다.',
+              422: '요청 내용을 확인해 주세요.',
+              503: '서버에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.'
+            };
+            throw new Error(messages[response.status] || '요청을 처리하지 못했습니다.');
+          }
+          const result = await response.json();
+          window.alert(action === 'withdraw'
+            ? '탈퇴 요청이 접수되었습니다. 복구 기한: ' + new Date(result.deletion_due_at).toLocaleString('ko-KR')
+            : '계정이 복구되었습니다. 다시 로그인해 주세요.');
+          window.location.replace('/login');
+        } catch (error) {
+          output.textContent = error.message;
+        } finally {
+          button.disabled = false;
+        }
+      });
+    });
+  </script>
 </body>
 </html>

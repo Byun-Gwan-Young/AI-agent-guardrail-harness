@@ -11,3 +11,5 @@ logs/
 docs/handoff/
 data/raw/
 *.bak
+
+.venv/
