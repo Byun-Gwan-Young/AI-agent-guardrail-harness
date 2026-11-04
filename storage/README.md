@@ -206,6 +206,64 @@ Remove-Item Env:GUARDRAIL_REDIS_PG_TEST
 - **Backend 연동 또는 표시 규칙 변경 전에** 실행 환경별로 새로운 `prefix`를 지정하세요. 예: `prefix='guardrail:dev-local:v2:live:session'`. 같은 실행 환경의 모든 인스턴스에서 동일한 신규 prefix와 표시 규칙 계약을 사용해야 합니다. 새 prefix는 기존 캐시를 읽지 않고, PostgreSQL 원본으로부터 다시 복구합니다.
 - 기존 키의 제한적 정리는 소유한 애플리케이션의 명확한 키 범위를 확인한 경우에만 선택할 수 있습니다. **다른 팀원의 캐시를 지우거나 `FLUSHALL`/`FLUSHDB`를 실행하지 마세요.** Redis 조회값은 표시용일 뿐이며 종료·차단 판단에는 `get_authoritative_state()`를 사용해야 합니다.
 
+## Backend 연동 계약 — 기본 Live 시나리오 자동 등록 (방식 B)
+
+> **설계 결정 사항이며 아직 구현 완료가 아닙니다.** 이 문서는 Backend/Storage가 앞으로 맞출 연동 계약입니다. README를 추가하는 것만으로 기본 시나리오 등록 함수나 Backend/Proxy의 Redis 연결이 생기지는 않습니다. 실제 구현 및 통합 테스트를 별도로 진행해야 합니다.
+
+### 목표와 적용 범위
+
+- **일반 Live 요청**은 별도의 실험용 `scenario.yaml`을 받지 않더라도 해당 프로젝트의 **기본 Live 시나리오**를 등록·조회한 후 PostgreSQL에 기록합니다.
+- **명시적인 실험 시나리오**가 있으면 기존 `scenario_key`/`scenario_hash`를 그대로 사용합니다. 이를 `live-default`에 섞거나 기존 시나리오를 덮어쓰지 않습니다.
+- 기존 `sessions.scenario_id NOT NULL` 제약, `storage/schema.sql`, `storage.live.start_live_session(...)` 공개 함수 계약은 유지합니다. 일반 Live 세션은 기존 Storage 규칙대로 `source='live'`, `validity='not_counted'`로 취급합니다. 자동 등록은 평가용 정답 라벨을 만드는 동작이 아닙니다.
+
+### 기본 Live 시나리오 식별 규칙 (구현 목표)
+
+| 항목 | 결정된 규칙 |
+| --- | --- |
+| 단위 | 활성 계정 소유의 쓰기 가능한 프로젝트별 기본 시나리오 **버전** |
+| `scenario_key` | `live-default` |
+| `schema_version` | `scenario-v2` |
+| `scenario_hash` | Git에서 버전 관리하는 기본 YAML **원본 바이트**의 SHA-256 (64자리 16진수) |
+| `name` | `Default Live Session` |
+| `task_kind` | `live` |
+| `config` | 기본 YAML을 검증·파싱한 구조화 JSONB. 요청·대화 원문, 자격증명 및 API Key는 제외 |
+| 유일성 | `(project_id, scenario_key, scenario_hash)`의 기존 UNIQUE 제약 이용 |
+| 버전 변경 | YAML 내용이 바뀌면 새 hash로 **새 scenario 행**을 등록하고 과거 session의 참조는 보존 |
+
+**선행 작업:** 유효한 `scenario-v2` 기본 YAML 정의 파일을 Storage에 추가하고 실제 스키마 검증을 통과시켜야 합니다. 예를 들어 `storage/fixtures/default_live_scenario_v1.yaml`은 **예정 경로**이지 현재 존재하는 파일이 아닙니다. 임의의 해시 문자열이나 빈 JSON으로 이를 대신해서는 안 됩니다.
+
+### Backend/Storage 실행 순서 (구현 예정)
+
+1. **Backend 인증·인가:** 로그인/Guardrail API Key를 확인하고 사용자가 `active` 상태인지, 해당 프로젝트에 쓰기 권한이 있는지 검증합니다. 탈퇴 대기·삭제된 계정과 읽기 전용 데모 프로젝트에서는 신규 Live 실행을 허용하지 않습니다.
+2. **시나리오 선택:** 명시된 유효한 실험 시나리오가 있으면 해당 버전을 사용합니다. 없으면 새로 구현할 `ensure_default_live_scenario(project_id)` 같은 **별도 Storage 공개 함수**로 기본 시나리오를 등록하거나 기존 행을 조회합니다. **이 함수는 아직 구현되어 있지 않습니다.**
+3. **중복·경쟁 조건 방지:** 등록 함수는 계정/프로젝트 상태를 트랜잭션에서 재확인하고, 기존 잠금 순서와 UNIQUE 제약을 준수하며 원자적으로 INSERT/충돌 조회를 처리해야 합니다. 같은 `(project_id, key, hash)`에 다른 내용이 있으면 덮어쓰지 않고 오류 처리합니다. 기존 `start_live_session` 시그니처를 몰래 변경하지 않습니다.
+4. **세션 ID 통일:** Backend가 새 `session_id`를 생성하여 Proxy와 Storage에 **동일한 값**을 전달합니다. Redis/Proxy 호환을 위해 영문·숫자·`_`·`-`로 구성된 1~128자 ID를 사용하고 서로 다른 세션에 재사용하지 않습니다.
+5. **이벤트 기록:** 연동 지점에서 `RedisLiveAdapter.start_live_session(...)` → `add_observation(...)` → 해당 관찰의 `add_judgement(...)` 및 `add_llm_call(...)` → `end_live_session(...)`을 실제 이벤트 시점에 호출합니다. `add_llm_call`은 호출이 발생하는 시점에 기록하는 것이며 매번 판정 다음에만 실행한다는 뜻은 아닙니다. `mode`는 `projects.mode` (`observe`/`block`)와 일치해야 합니다.
+6. **PostgreSQL 우선, Redis 보조:** 각 쓰기는 PostgreSQL 성공 후 Redis 요약 캐시를 갱신합니다. Redis 장애가 이미 성공한 DB 작업을 실패로 바꾸면 안 됩니다. Redis가 만료·소실되었다면 PostgreSQL의 기존 세션을 재조회해 캐시를 복구하고, 이를 새로운 세션 생성으로 취급하지 않습니다.
+7. **권한과 조회:** Backend는 Redis 조회 전에도 사용자·프로젝트·세션 접근 권한을 검증합니다. `get_state(session_id)`는 **표시용 캐시**로 오래된 값일 수 있습니다. 종료·차단·권한 같은 제어 결정은 캐시 값에 의존하지 않고 Proxy의 기존 판단 및 권위 있는 PostgreSQL 상태를 사용합니다. 최신 DB 상태가 필요하면 `get_authoritative_state(session_id)` 경로를 이용합니다.
+
+### Rule ID, TTL, 실행 환경 주의사항
+
+- 표시할 판정 규칙은 세션 시작 시 해당 프로젝트의 `rule_id`를 확인해 `execution_config`의 `selected_rule_id`로 스냅샷하고, 그 세션 동안 일관되게 사용하도록 **Backend 연동 시 구현**합니다. 예시 `deadlock-v0.3`을 모든 프로젝트의 규칙으로 강제하지 않습니다.
+- Redis 기본 TTL은 **24시간**으로 운영하는 설계를 전제로 하되, 캐시 만료가 세션 종료를 의미하지는 않습니다. 실제 TTL 설정과 테스트는 연동 시 확인합니다.
+- `RedisLiveStateStore`의 `selected_rule_id`별 키 분리를 사용하고, 개발자·실행 환경마다 새로운 `prefix`를 선택해 이전 규칙의 캐시와 섞이지 않도록 합니다. 기존 키 전환 주의사항(I1)은 위 절을 따릅니다.
+- `RedisLiveAdapter`는 동기식 경계입니다. async Backend 핸들러에서는 필요 시 **worker thread**로 호출을 분리해 이벤트 루프가 블로킹되지 않도록 합니다.
+- DB/Redis에는 대화 원문, LLM request/response, reasoning, 공급자 비밀키를 저장하지 않습니다. Redis는 대시보드가 직접 접근하는 DB가 아니라 Backend 내부 보조 캐시입니다.
+- `proxy.py`의 JSON 기반 대화·세션 복구는 별도 기능으로 유지합니다. Redis 캐시는 에이전트 실행 상태 전체나 이전 STOP 이력을 복원하는 수단이 아닙니다.
+- 기존 `get_session_progress(session_id, after_step)`는 step 기반 cursor입니다. 같은 step에서 늦게 확정된 판정을 놓칠 수 있으므로, 무손실 증분 조회가 필요하면 Backend/PM과 별도의 event cursor 계약을 구현해야 합니다.
+
+### 담당별 구현·검증 체크리스트
+
+| 담당 | 남은 작업 | 상태 |
+| --- | --- | --- |
+| Storage | 유효한 기본 Live `scenario-v2` YAML 정의 및 해시/검증 | **구현 필요** |
+| Storage | 동시성·권한 안전한 `ensure_default_live_scenario(...)` 등 별도 공개 함수 및 단위 테스트 | **구현 필요** |
+| Backend/Proxy | 인증 후 기본/명시 시나리오 선택, 동일 `session_id` 공유, Storage Live 호출 연결 | **구현 필요** |
+| Backend/Proxy | 선택 규칙 snapshot, Redis namespace, 조회 권한, async 호출 경계 처리 | **구현 필요** |
+| 통합 테스트 | 일반 Live 최초 실행 → PG 세션/이벤트 기록 → Redis 갱신·소실 복구 → 종료 흐름 | **E2E 검증 필요** |
+
+참고: `storage/import_utils.py`의 `upsert_scenario(...)`는 import 경로의 내부 도우미입니다. Backend가 직접 호출해 기본 Live 등록 함수로 대용하거나, 시나리오 등록 실패를 무시하고 세션을 생성해서는 안 됩니다.
+
 ## AI / 유지보수 인수인계 요약
 
 이 절은 **다른 팀원이나 AI가 Storage 코드를 처음 읽을 때 가장 먼저 보는 계약 요약**입니다.
@@ -277,7 +335,7 @@ Backend/auth 계층이 Google 인증 결과를 검증한 뒤 `google_sub`, `emai
 ### 현재 의도적인 한계
 
 - `get_session_progress(session_id, after_step)`의 cursor는 step 단위라 **late judgement까지 무손실로 보장하는 event cursor가 아닙니다.**
-- 일반 live 요청에서 `scenario_key` / `scenario_hash`를 어떻게 확보할지는 Proxy/Backend와의 팀 계약이 필요합니다.
+- 일반 Live 요청의 `scenario_key` / `scenario_hash`는 **방식 B(프로젝트별 기본 시나리오 자동 등록)**로 설계 방향을 정했지만, 기본 YAML·등록 함수·Backend 호출부는 아직 구현되지 않았습니다. 명시적 실험 시나리오는 기존 식별자를 그대로 사용합니다.
 - 기존 `service/` demo API와 live 조회 API를 합칠지 분리할지는 Backend/Dashboard 계약입니다.
 - OpenAI-compatible provider는 현재 구조로 routing할 수 있지만, 전혀 다른 wire protocol/provider는 Proxy adapter가 별도로 필요할 수 있습니다.
 - Windows에서 기존 repository-wide POSIX 테스트가 실패한다고 해서 Storage가 다른 팀 소유 판정/실험 파일을 수정하지 않습니다. 전체 공식 runner는 POSIX/WSL/CI에서 최종 확인합니다.
@@ -593,14 +651,13 @@ backend가 observation step N을 먼저 보고 cursor를 N으로 영구 이동�
 
 ## 최종 통합 시 확인할 팀 계약
 
-아래 항목은 Storage 내부에서 임의로 결정하면 Proxy/Backend/Dashboard와 계약이 어긋날 수 있어
-**최종 통합 전에 PM과 함께 결정해야 합니다.** 현재 Storage 구현은 기존 함수 시그니처를 유지하며
-이 결정을 강제로 추측하지 않습니다.
+아래 항목은 Proxy/Backend/Dashboard와 함께 구현·검증해야 합니다. **1번은 방식 B로 설계 방향을 확정했지만 구현 전**이고, 나머지는 최종 통합 전에 PM과 세부 계약을 확인해야 합니다. 현재 Storage 구현은 기존 공개 함수 시그니처를 유지합니다.
 
-1. **Live scenario identity 전달 경로**
+1. **Live scenario identity 전달 경로 — 방식 B 선택, 구현 필요**
    - `start_live_session(project_id, session_id, scenario_key, scenario_hash, ...)`는 정확한 scenario version을 요구합니다.
-   - 실제 Proxy/Backend가 `scenario_key`와 `scenario_hash`를 어떤 요청/세션 메타데이터에서 얻어 Storage에 넘길지 확정해야 합니다.
-   - 이 값이 없는 일반 live 요청을 지원하려면 `scenario_id` nullable 여부를 포함해 별도 계약 변경이 필요합니다.
+   - 명시적 시나리오가 있는 실험은 기존 key/hash를 유지합니다. 일반 Live 요청에는 프로젝트별 `live-default` 기본 YAML을 별도 Storage 함수로 원자적으로 등록/조회한 뒤 key/hash를 전달합니다.
+   - 기본 YAML 정의와 `ensure_default_live_scenario(project_id)` 등 공개 함수, Backend/Proxy 연결은 아직 구현되지 않았습니다. `sessions.scenario_id NOT NULL` 제약과 기존 `storage.live` 호출 계약은 유지합니다.
+   - 위 **「Backend 연동 계약 — 기본 Live 시나리오 자동 등록 (방식 B)」** 절에 구현 조건과 담당을 정리했습니다.
 
 2. **Lossless live polling cursor**
    - 현재 `get_session_progress(session_id, after_step)`의 `after_step`은 호환성을 위한 **step cursor**입니다.
