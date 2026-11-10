@@ -1,0 +1,7 @@
+# Storage linkage metadata only; never pass this file to an experiment runner.
+schema_version: storage-live-v1
+scenario_id: live-default
+title: Default Live Session
+task_kind: live
+purpose: session-linkage
+definition_version: 1
